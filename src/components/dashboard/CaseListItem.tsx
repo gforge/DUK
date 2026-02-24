@@ -96,7 +96,6 @@ export default function CaseListItem({
       <Box
         role="listitem"
         tabIndex={props.tabIndex ?? 0}
-        onClick={handleOpen}
         sx={{
           px: 2,
           py: 1.5,
@@ -110,6 +109,10 @@ export default function CaseListItem({
         }}
         aria-label={`${patient?.displayName ?? caseData.patientId} – ${t(`status.${caseData.status}`)}`}
         {...props}
+        onClick={(e) => {
+          props.onClick?.(e)
+          handleOpen()
+        }}
         onKeyDown={(e) => {
           handleKeyDown(e)
           props.onKeyDown?.(e)
