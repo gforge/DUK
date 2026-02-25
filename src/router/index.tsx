@@ -1,5 +1,5 @@
 import React, { Suspense, lazy } from 'react'
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { HashRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { CircularProgress, Box } from '@mui/material'
 import AppShell from '../components/layout/AppShell'
 
@@ -20,7 +20,7 @@ function Loader() {
 
 export default function AppRouter() {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <AppShell>
         <Suspense fallback={<Loader />}>
           <Routes>
@@ -34,6 +34,6 @@ export default function AppRouter() {
           </Routes>
         </Suspense>
       </AppShell>
-    </BrowserRouter>
+    </HashRouter>
   )
 }
