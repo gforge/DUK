@@ -4,6 +4,8 @@ A fully interactive clinical triage flow demonstration built with React, TypeScr
 
 > **This is a demo application. It contains no real patient data, no authentication, and no network calls. All data is stored in browser `localStorage`.**
 
+**[→ Live demo](https://gforge.github.io/DUK/)**
+
 ---
 
 ## Quick Start
