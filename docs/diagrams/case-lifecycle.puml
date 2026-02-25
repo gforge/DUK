@@ -1,0 +1,21 @@
+@startuml
+title Case Lifecycle - State Diagram
+
+state NEW
+state NEEDS_REVIEW
+state TRIAGED
+state FOLLOWING_UP
+state CLOSED
+
+[*] --> NEW
+NEW --> NEEDS_REVIEW : "submitForReview"
+NEEDS_REVIEW --> TRIAGED : "triageCase"
+TRIAGED --> FOLLOWING_UP : "setFollowingUp / setDeadline"
+TRIAGED --> CLOSED : "closeDirectly"
+FOLLOWING_UP --> CLOSED : "followUpClosed"
+
+note right
+  Transitions enforced in src/api/service/cases.ts
+end note
+
+@enduml

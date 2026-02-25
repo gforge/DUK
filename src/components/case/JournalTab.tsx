@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import {
   Box,
   Typography,
@@ -9,30 +9,25 @@ import {
   Select,
   MenuItem,
   Paper,
-  Chip,
-  Alert,
   CircularProgress,
-  Divider,
-  Tooltip,
-  IconButton,
 } from '@mui/material'
-import ContentCopyIcon from '@mui/icons-material/ContentCopy'
-import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import { useTranslation } from 'react-i18next'
 import { useRole } from '../../store/roleContext'
 import { useSnack } from '../../store/snackContext'
 import { useApi } from '../../hooks/useApi'
 import * as client from '../../api/client'
 import type { Case, Patient } from '../../api/schemas'
-import { format } from 'date-fns'
+import JournalDraftCard from './journal/JournalDraftCard'
+import BookingsList from './BookingsList'
 
 interface JournalTabProps {
   caseData: Case
   patient?: Patient
+  onCaseChange?: () => void
 }
 
-export default function JournalTab({ caseData, patient: _patient }: JournalTabProps) {
-  const { t } = useTranslation()
+export default function JournalTab({ caseData, patient: _patient, onCaseChange }: JournalTabProps) {
+  const { t, i18n } = useTranslation()
   const { currentUser, isRole } = useRole()
   const { showSnack } = useSnack()
 
@@ -41,7 +36,7 @@ export default function JournalTab({ caseData, patient: _patient }: JournalTabPr
   const [approving, setApproving] = useState<string | null>(null)
   const [copied, setCopied] = useState<string | null>(null)
 
-  const { data: templates } = useApi(() => client.getJournalTemplates(), [])
+  const { data: allTemplates } = useApi(() => client.getJournalTemplates(), [])
   const {
     data: drafts,
     loading,
@@ -49,6 +44,11 @@ export default function JournalTab({ caseData, patient: _patient }: JournalTabPr
   } = useApi(() => client.getJournalDrafts(caseData.id), [caseData.id])
 
   const canApprove = isRole('DOCTOR', 'PAL')
+
+  const currentLangTemplates = useMemo(() => {
+    const all = allTemplates ?? []
+    return all.filter((t) => (t.language ?? 'sv') === i18n.language)
+  }, [allTemplates, i18n.language])
 
   async function handleGenerate() {
     if (!selectedTemplate) return
@@ -59,6 +59,7 @@ export default function JournalTab({ caseData, patient: _patient }: JournalTabPr
         selectedTemplate,
         currentUser.id,
         currentUser.role,
+        i18n.language,
       )
       showSnack(t('journal.generate'), 'success')
       refetchDrafts()
@@ -91,13 +92,20 @@ export default function JournalTab({ caseData, patient: _patient }: JournalTabPr
 
   return (
     <Box>
-      {/* Generate new draft */}
+      <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
+        <BookingsList
+          caseData={caseData}
+          onChange={() => {
+            onCaseChange?.()
+          }}
+        />
+      </Paper>
       <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
         <Typography variant="subtitle2" fontWeight={600} gutterBottom>
           {t('journal.generate')}
         </Typography>
         <Stack direction="row" gap={2} flexWrap="wrap" alignItems="flex-end">
-          <FormControl size="small" sx={{ minWidth: 240 }}>
+          <FormControl size="small" sx={{ minWidth: 260 }}>
             <InputLabel id="journal-template-label">{t('journal.selectTemplate')}</InputLabel>
             <Select
               labelId="journal-template-label"
@@ -105,7 +113,7 @@ export default function JournalTab({ caseData, patient: _patient }: JournalTabPr
               onChange={(e) => setSelectedTemplate(e.target.value)}
               label={t('journal.selectTemplate')}
             >
-              {templates?.map((tmpl) => (
+              {currentLangTemplates.map((tmpl) => (
                 <MenuItem key={tmpl.id} value={tmpl.id}>
                   {tmpl.name}
                 </MenuItem>
@@ -123,7 +131,6 @@ export default function JournalTab({ caseData, patient: _patient }: JournalTabPr
         </Stack>
       </Paper>
 
-      {/* Draft list */}
       {loading && <CircularProgress />}
       {!loading && (!drafts || drafts.length === 0) && (
         <Typography color="text.secondary" variant="body2">
@@ -133,86 +140,15 @@ export default function JournalTab({ caseData, patient: _patient }: JournalTabPr
 
       <Stack gap={2}>
         {drafts?.map((draft) => (
-          <Paper key={draft.id} variant="outlined" sx={{ p: 2, borderRadius: 2 }}>
-            <Stack direction="row" justifyContent="space-between" alignItems="center" mb={1}>
-              <Stack direction="row" gap={1} alignItems="center">
-                <Chip
-                  label={draft.status === 'APPROVED' ? t('journal.approved') : t('journal.draft')}
-                  size="small"
-                  color={draft.status === 'APPROVED' ? 'success' : 'default'}
-                  icon={
-                    draft.status === 'APPROVED' ? <CheckCircleIcon fontSize="inherit" /> : undefined
-                  }
-                />
-                <Typography variant="caption" color="text.secondary">
-                  {format(new Date(draft.createdAt), 'dd MMM yyyy HH:mm')}
-                </Typography>
-              </Stack>
-
-              <Stack direction="row" gap={1}>
-                <Tooltip title={copied === draft.id ? t('journal.copied') : t('journal.copy')}>
-                  <IconButton
-                    size="small"
-                    onClick={() => handleCopy(draft.content, draft.id)}
-                    aria-label={t('journal.copy')}
-                  >
-                    <ContentCopyIcon fontSize="small" />
-                  </IconButton>
-                </Tooltip>
-
-                {draft.status === 'DRAFT' &&
-                  (canApprove ? (
-                    <Button
-                      size="small"
-                      variant="outlined"
-                      color="success"
-                      onClick={() => handleApprove(draft.id)}
-                      disabled={approving === draft.id}
-                      startIcon={
-                        approving === draft.id ? <CircularProgress size={12} /> : undefined
-                      }
-                    >
-                      {t('journal.approve')}
-                    </Button>
-                  ) : (
-                    <Tooltip title={t('journal.onlyDoctorApprove')}>
-                      <span>
-                        <Button size="small" variant="outlined" disabled>
-                          {t('journal.approve')}
-                        </Button>
-                      </span>
-                    </Tooltip>
-                  ))}
-              </Stack>
-            </Stack>
-
-            <Divider sx={{ mb: 1 }} />
-
-            <Box
-              component="pre"
-              sx={{
-                fontFamily: 'inherit',
-                fontSize: '0.85rem',
-                whiteSpace: 'pre-wrap',
-                wordBreak: 'break-word',
-                m: 0,
-                p: 1,
-                bgcolor: 'background.default',
-                borderRadius: 1,
-                maxHeight: 320,
-                overflowY: 'auto',
-              }}
-            >
-              {draft.content}
-            </Box>
-
-            {draft.status === 'APPROVED' && (
-              <Typography variant="caption" color="text.secondary" display="block" mt={1}>
-                {t('journal.approvedBy')}: {draft.approvedByUserId} ·{' '}
-                {draft.approvedAt ? format(new Date(draft.approvedAt), 'dd MMM yyyy HH:mm') : ''}
-              </Typography>
-            )}
-          </Paper>
+          <JournalDraftCard
+            key={draft.id}
+            draft={draft}
+            canApprove={canApprove}
+            approving={approving}
+            copied={copied}
+            onApprove={handleApprove}
+            onCopy={handleCopy}
+          />
         ))}
       </Stack>
     </Box>

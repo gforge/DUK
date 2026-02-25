@@ -1,0 +1,5 @@
+export const now = new Date()
+export const iso = (d: Date) => d.toISOString()
+export const isoDate = (d: Date) => d.toISOString().slice(0, 10)
+export const daysAgo = (n: number) => new Date(now.getTime() - n * 86_400_000)
+export const daysFromNow = (n: number) => new Date(now.getTime() + n * 86_400_000)

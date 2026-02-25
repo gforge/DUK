@@ -1,0 +1,17 @@
+import * as service from '../service'
+import type { FormResponse, Case } from '../schemas'
+import { withDelay } from './delay'
+
+export const getFormResponses = (caseId: string): Promise<FormResponse[]> =>
+  withDelay(() => service.getFormResponses(caseId))
+
+export const submitFormResponse = (
+  patientId: string,
+  caseId: string,
+  templateId: string,
+  answers: Record<string, string | number | boolean>,
+): Promise<FormResponse> =>
+  withDelay(() => service.submitFormResponse(patientId, caseId, templateId, answers))
+
+export const seekContact = (patientId: string, caseId: string): Promise<Case> =>
+  withDelay(() => service.seekContact(patientId, caseId))

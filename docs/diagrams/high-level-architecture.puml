@@ -1,0 +1,38 @@
+@startuml
+title High-level Architecture — Duk Demo
+
+package "Client" {
+  [React UI]
+}
+
+package "API Client" {
+  [src/api/client]
+}
+
+package "Service Layer" {
+  [src/api/service]
+  [Policy Parser]
+  [Journal Renderer]
+}
+
+package "Persistence" {
+  [In-memory store]
+  [localStorage]
+}
+
+[React UI] --> [src/api/client]
+[src/api/client] --> [src/api/service]
+[src/api/service] --> [Policy Parser]
+[src/api/service] --> [Journal Renderer]
+[src/api/service] --> [In-memory store]
+[In-memory store] --> [localStorage]
+
+note left of [Policy Parser]
+  src/api/policyParser/*
+end note
+
+note right of [Journal Renderer]
+  src/api/journalRenderer.ts
+end note
+
+@enduml

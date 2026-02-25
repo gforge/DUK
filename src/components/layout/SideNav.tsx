@@ -14,6 +14,7 @@ import DashboardIcon from '@mui/icons-material/Dashboard'
 import PolicyIcon from '@mui/icons-material/GppMaybe'
 import BuildIcon from '@mui/icons-material/Build'
 import PersonIcon from '@mui/icons-material/Person'
+import RouteIcon from '@mui/icons-material/Route'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useRole } from '../../store/roleContext'
@@ -48,6 +49,12 @@ export default function SideNav({ drawerWidth, mobileOpen, onClose, isMobile }: 
       label: t('nav.policy'),
       icon: <PolicyIcon />,
       path: '/policy',
+      roles: ['NURSE', 'DOCTOR', 'PAL'] as const,
+    },
+    {
+      label: t('nav.journeys'),
+      icon: <RouteIcon />,
+      path: '/journeys',
       roles: ['NURSE', 'DOCTOR', 'PAL'] as const,
     },
     {

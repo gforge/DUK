@@ -1,0 +1,21 @@
+@startuml
+title Journal Draft Generation — Sequence
+
+actor Clinician
+participant "UI" as UI
+participant "Client" as Client
+participant "Service" as Service
+participant "JournalRenderer" as JR
+
+Clinician -> UI : request generate draft
+UI -> Client : generateJournalDraft(caseId)
+Client -> Service : generateJournalDraft
+Service -> Service : fetch case, patient, latest responses
+Service -> JR : renderTemplate(context)
+JR --> Service : renderedContent
+Service -> Service : save JournalDraft + audit event
+Service --> Client : JournalDraft
+
+note right of JR: src/api/journalRenderer.ts
+
+@enduml

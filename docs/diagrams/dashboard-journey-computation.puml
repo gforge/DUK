@@ -1,0 +1,13 @@
+@startuml
+title Dashboard / Journey Computation — Activity
+
+start
+:Load patients & journeys;
+:For each patient: select latest ACTIVE PatientJourney;
+:Apply JourneyTemplate entries (offsets/windows);
+:Compute effective steps (getEffectiveSteps);
+:Map effective steps to queue/category;
+:Build dashboard Case rows with computed category and nextStep;
+stop
+
+@enduml

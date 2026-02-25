@@ -8,6 +8,7 @@ const CaseDetail = lazy(() => import('../pages/CaseDetail'))
 const PatientView = lazy(() => import('../pages/PatientView'))
 const PolicyEditor = lazy(() => import('../pages/PolicyEditor'))
 const DemoTools = lazy(() => import('../pages/DemoTools'))
+const JourneyEditor = lazy(() => import('../pages/JourneyEditor'))
 
 function Loader() {
   return (
@@ -28,6 +29,7 @@ export default function AppRouter() {
             <Route path="/cases/:id" element={<CaseDetail />} />
             <Route path="/patient" element={<PatientView />} />
             <Route path="/policy" element={<PolicyEditor />} />
+            <Route path="/journeys" element={<JourneyEditor />} />
             <Route path="/demo-tools" element={<DemoTools />} />
           </Routes>
         </Suspense>

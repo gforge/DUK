@@ -1,69 +1,43 @@
 import React, { useState } from 'react'
 import {
-  Box,
-  Typography,
-  Button,
-  Table,
-  TableHead,
-  TableBody,
-  TableRow,
-  TableCell,
-  Paper,
-  IconButton,
-  Switch,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  MenuItem,
   Alert,
+  Box,
+  Button,
   Chip,
   CircularProgress,
-  Tooltip,
+  IconButton,
+  Paper,
   Stack,
+  Switch,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  Tooltip,
+  Typography,
 } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline'
-import { useForm, Controller } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
 import { useTranslation } from 'react-i18next'
 import { useApi } from '../hooks/useApi'
 import { useSnack } from '../store/snackContext'
 import * as client from '../api/client'
-import { validateExpression } from '../api/policyParser'
 import type { PolicyRule } from '../api/schemas'
+import PolicyRuleDialog, { ruleSchema, SEVERITIES } from '../components/policy/PolicyRuleDialog'
+import PolicyHelpDialog from '../components/policy/PolicyHelpDialog'
+import type { RuleForm } from '../components/policy/PolicyRuleDialog'
 
-const SEVERITIES = ['LOW', 'MEDIUM', 'HIGH'] as const
+const EMPTY_FORM: RuleForm = { severity: 'MEDIUM', name: '', expression: '', description: '' }
 
-const ruleSchema = z.object({
-  name: z.string().min(1, 'Name is required'),
-  expression: z
-    .string()
-    .min(1, 'Expression is required')
-    .superRefine((val, ctx) => {
-      const err = validateExpression(val)
-      if (err) ctx.addIssue({ code: z.ZodIssueCode.custom, message: err })
-    }),
-  severity: z.enum(SEVERITIES),
-  description: z.string().optional(),
-})
-type RuleForm = z.infer<typeof ruleSchema>
+const severityColor = (s: string) =>
+  s === 'HIGH' ? 'error' : s === 'MEDIUM' ? 'warning' : 'success'
 
-const AVAILABLE_VARS = [
-  'PNRS_1',
-  'PNRS_2',
-  'OSS.total',
-  'EQ5D.index',
-  'EQ_VAS',
-  'OSS.function',
-  'OSS.pain',
-  'numResponsesTotal',
-  'daysSinceTherapy',
-]
+// suppress unused imports
+void ruleSchema
+void SEVERITIES
 
 export default function PolicyEditor() {
   const { t } = useTranslation()
@@ -72,27 +46,20 @@ export default function PolicyEditor() {
 
   const [open, setOpen] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
+  const [formValues, setFormValues] = useState<RuleForm>(EMPTY_FORM)
   const [deleting, setDeleting] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
   const [helpOpen, setHelpOpen] = useState(false)
 
-  const { control, handleSubmit, reset, formState, watch } = useForm<RuleForm>({
-    resolver: zodResolver(ruleSchema),
-    defaultValues: { severity: 'MEDIUM', name: '', expression: '', description: '' },
-  })
-
-  const watchedExpr = watch('expression')
-  const exprError = watchedExpr ? validateExpression(watchedExpr) : null
-
   function openCreate() {
     setEditingId(null)
-    reset({ severity: 'MEDIUM', name: '', expression: '', description: '' })
+    setFormValues(EMPTY_FORM)
     setOpen(true)
   }
 
   function openEdit(rule: PolicyRule) {
     setEditingId(rule.id)
-    reset({
+    setFormValues({
       name: rule.name,
       expression: rule.expression,
       severity: rule.severity,
@@ -113,7 +80,7 @@ export default function PolicyEditor() {
       await refetch()
       showSnack(t('policy.ruleSaved'), 'success')
       setOpen(false)
-    } catch (e) {
+    } catch {
       showSnack(t('common.error'), 'error')
     } finally {
       setSaving(false)
@@ -141,9 +108,6 @@ export default function PolicyEditor() {
       setDeleting(null)
     }
   }
-
-  const severityColor = (s: string) =>
-    s === 'HIGH' ? 'error' : s === 'MEDIUM' ? 'warning' : 'success'
 
   return (
     <Box sx={{ p: 3 }}>
@@ -261,138 +225,15 @@ export default function PolicyEditor() {
         </Paper>
       )}
 
-      {/* Create / Edit Dialog */}
-      <Dialog open={open} onClose={() => setOpen(false)} maxWidth="sm" fullWidth>
-        <form onSubmit={handleSubmit(onSubmit)} noValidate>
-          <DialogTitle>{editingId ? t('policy.editRule') : t('policy.addRule')}</DialogTitle>
-          <DialogContent>
-            <Stack spacing={2.5} sx={{ pt: 1 }}>
-              <Controller
-                name="name"
-                control={control}
-                render={({ field, fieldState }) => (
-                  <TextField
-                    {...field}
-                    label={t('policy.name')}
-                    error={!!fieldState.error}
-                    helperText={fieldState.error?.message}
-                    fullWidth
-                    required
-                    size="small"
-                  />
-                )}
-              />
-              <Controller
-                name="expression"
-                control={control}
-                render={({ field, fieldState }) => (
-                  <TextField
-                    {...field}
-                    label={t('policy.expression')}
-                    error={!!fieldState.error || !!exprError}
-                    helperText={
-                      fieldState.error?.message || exprError || t('policy.expressionHint')
-                    }
-                    fullWidth
-                    required
-                    size="small"
-                    inputProps={{ style: { fontFamily: 'monospace' } }}
-                  />
-                )}
-              />
-              <Box>
-                <Typography variant="caption" color="text.secondary" display="block" gutterBottom>
-                  {t('policy.availableVars')}:
-                </Typography>
-                <Stack direction="row" flexWrap="wrap" gap={0.5}>
-                  {AVAILABLE_VARS.map((v) => (
-                    <Chip
-                      key={v}
-                      label={v}
-                      size="small"
-                      variant="outlined"
-                      sx={{ fontFamily: 'monospace', fontSize: 11 }}
-                    />
-                  ))}
-                </Stack>
-              </Box>
-              <Controller
-                name="severity"
-                control={control}
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    select
-                    label={t('policy.severity')}
-                    fullWidth
-                    required
-                    size="small"
-                  >
-                    {SEVERITIES.map((s) => (
-                      <MenuItem key={s} value={s}>
-                        {t(`severity.${s}`)}
-                      </MenuItem>
-                    ))}
-                  </TextField>
-                )}
-              />
-              <Controller
-                name="description"
-                control={control}
-                render={({ field, fieldState }) => (
-                  <TextField
-                    {...field}
-                    label={t('policy.description')}
-                    error={!!fieldState.error}
-                    helperText={fieldState.error?.message}
-                    fullWidth
-                    size="small"
-                    multiline
-                    rows={2}
-                  />
-                )}
-              />
-            </Stack>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setOpen(false)}>{t('common.cancel')}</Button>
-            <Button type="submit" variant="contained" disabled={saving || !formState.isValid}>
-              {saving ? <CircularProgress size={18} /> : t('common.save')}
-            </Button>
-          </DialogActions>
-        </form>
-      </Dialog>
-
-      {/* Help Dialog */}
-      <Dialog open={helpOpen} onClose={() => setHelpOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>{t('policy.syntaxTitle')}</DialogTitle>
-        <DialogContent>
-          <Typography variant="body2" gutterBottom>
-            {t('policy.syntaxDescription')}
-          </Typography>
-          <Box
-            component="pre"
-            sx={{
-              bgcolor: 'background.default',
-              p: 1.5,
-              borderRadius: 1,
-              fontSize: '0.75rem',
-              fontFamily: 'monospace',
-            }}
-          >
-            {`PNRS_1 >= 7
-OSS.total < 22 && PNRS_2 > 5
-EQ5D.index <= 0.5 || EQ_VAS < 30
-(OSS.total + PNRS_1) > 25`}
-          </Box>
-          <Typography variant="body2" sx={{ mt: 1 }}>
-            {t('policy.operators')}: {`< <= > >= == != && ||`}
-          </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setHelpOpen(false)}>{t('common.close')}</Button>
-        </DialogActions>
-      </Dialog>
+      <PolicyRuleDialog
+        open={open}
+        editingId={editingId}
+        saving={saving}
+        onClose={() => setOpen(false)}
+        onSubmit={onSubmit}
+        formValues={formValues}
+      />
+      <PolicyHelpDialog open={helpOpen} onClose={() => setHelpOpen(false)} />
     </Box>
   )
 }

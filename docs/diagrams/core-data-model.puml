@@ -1,0 +1,59 @@
+@startuml
+title Core Data Model — ERD (simplified)
+
+class Patient {
+  id
+  displayName
+  personalNumber
+  palId
+  lastOpenedAt
+}
+
+class Case {
+  id
+  patientId
+  status
+  category
+  triggers
+  policyWarnings
+  assignedRole
+  deadline
+}
+
+class PatientJourney {
+  id
+  patientId
+  journeyTemplateId
+  startDate
+}
+
+class JourneyTemplateEntry {
+  id
+  offsetDays
+  windowDays
+  scoreAliases
+}
+
+class FormResponse {
+  id
+  patientId
+  caseId
+  templateId
+  answers
+  scores
+}
+
+class JournalDraft {
+  id
+  caseId
+  templateId
+  content
+  status
+}
+
+Patient "1" -- "*" Case : has
+Patient "1" -- "*" PatientJourney : journeys
+Case "1" -- "*" FormResponse : responses
+Case "1" -- "*" JournalDraft : drafts
+
+@enduml

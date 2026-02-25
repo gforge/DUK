@@ -3,7 +3,9 @@ import { Paper, Stack, Box, Typography, Chip, Divider } from '@mui/material'
 import PersonIcon from '@mui/icons-material/Person'
 import { useTranslation } from 'react-i18next'
 import { format } from 'date-fns'
-import type { Case, Patient, TriggerType } from '../../api/schemas'
+import TriggerChips from '../common/TriggerChips'
+import AutoWarningsBadge from '../common/AutoWarningsBadge'
+import type { Case, Patient } from '../../api/schemas'
 
 interface PatientCardProps {
   patient: Patient
@@ -118,46 +120,21 @@ export default function PatientCard({ patient, caseData }: PatientCardProps) {
                   <Typography variant="caption" color="text.secondary" display="block">
                     {t('dashboard.triggers')}
                   </Typography>
-                  <Stack direction="row" flexWrap="wrap" gap={0.5} mt={0.5}>
-                    {caseData.triggers.map((trigger: TriggerType) => (
-                      <Chip
-                        key={trigger}
-                        label={t(`trigger.${trigger}`)}
-                        size="small"
-                        color={
-                          trigger === 'HIGH_PAIN' || trigger === 'INFECTION_SUSPECTED'
-                            ? 'error'
-                            : 'warning'
-                        }
-                        variant="outlined"
-                      />
-                    ))}
-                  </Stack>
+                  <Box mt={0.5}>
+                    <TriggerChips triggers={caseData.triggers} />
+                  </Box>
                 </Box>
               )}
 
               {caseData.policyWarnings.length > 0 && (
                 <Box>
-                  <Typography variant="caption" color="text.secondary" display="block">
+                  <Typography variant="caption" color="text.secondary" display="block" mb={0.5}>
                     {t('case.policyWarnings')}
                   </Typography>
-                  <Stack gap={0.5} mt={0.5}>
-                    {caseData.policyWarnings.map((w) => (
-                      <Chip
-                        key={w.ruleId}
-                        label={`${w.ruleName} (${t(`severity.${w.severity}`)})`}
-                        size="small"
-                        color={
-                          w.severity === 'HIGH'
-                            ? 'error'
-                            : w.severity === 'MEDIUM'
-                              ? 'warning'
-                              : 'default'
-                        }
-                        variant="filled"
-                      />
-                    ))}
-                  </Stack>
+                  <AutoWarningsBadge
+                    warnings={caseData.policyWarnings}
+                    lastActivityAt={caseData.lastActivityAt}
+                  />
                 </Box>
               )}
             </Box>

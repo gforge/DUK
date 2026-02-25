@@ -1,17 +1,5 @@
 import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react'
-import {
-  Box,
-  Typography,
-  TextField,
-  InputAdornment,
-  ToggleButtonGroup,
-  ToggleButton,
-  Stack,
-  Paper,
-  Skeleton,
-  Alert,
-} from '@mui/material'
-import SearchIcon from '@mui/icons-material/Search'
+import { Alert, Box, Skeleton, Stack, Typography } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { useApi } from '../hooks/useApi'
@@ -19,8 +7,11 @@ import { useRole } from '../store/roleContext'
 import { useHotkeys } from '../hooks/useHotkeys'
 import { useFocusRestore } from '../hooks/useFocusRestore'
 import * as client from '../api/client'
-import type { Case, CaseCategory, Patient } from '../api/schemas'
+import type { CaseCategory, Patient } from '../api/schemas'
 import QueueColumn from '../components/dashboard/QueueColumn'
+import DashboardToolbar from '../components/dashboard/DashboardToolbar'
+import { sortCases } from '../components/dashboard/sortCases'
+import type { SortMode } from '../components/dashboard/sortCases'
 
 type PalFilter = 'all' | 'mine' | 'created_by_me'
 
@@ -33,8 +24,19 @@ export default function Dashboard() {
 
   const [search, setSearch] = useState('')
   const [palFilter, setPalFilter] = useState<PalFilter>('all')
+  const [showWaiting, setShowWaiting] = useState(false)
+  const [sortMode, setSortMode] = useState<SortMode>('time')
+  const [expanded, setExpanded] = useState<Set<CaseCategory>>(new Set())
 
-  // Restore focus when coming back from a case
+  const toggleExpanded = useCallback((cat: CaseCategory) => {
+    setExpanded((prev) => {
+      const next = new Set(prev)
+      if (next.has(cat)) next.delete(cat)
+      else next.add(cat)
+      return next
+    })
+  }, [])
+
   useEffect(() => {
     restore()
   }, [restore])
@@ -44,16 +46,12 @@ export default function Dashboard() {
     loading: casesLoading,
     error: casesError,
     refetch,
-  } = useApi(() => client.getCases(), [])
+  } = useApi(() => client.getCasesForDashboard(), [])
   const { data: patients, loading: patientsLoading } = useApi(() => client.getPatients(), [])
 
-  // Hotkeys
   useHotkeys(
     useMemo(
-      () => ({
-        '/': () => searchRef.current?.focus(),
-        'g d': () => navigate('/dashboard'),
-      }),
+      () => ({ '/': () => searchRef.current?.focus(), 'g d': () => navigate('/dashboard') }),
       [navigate],
     ),
   )
@@ -67,35 +65,52 @@ export default function Dashboard() {
   const filteredCases = useMemo(() => {
     if (!cases) return []
     return cases.filter((c) => {
-      // PAL filter
       if (palFilter === 'mine') {
-        const patient = patientMap.get(c.patientId)
-        if (patient?.palId !== currentUser.id) return false
+        if (patientMap.get(c.patientId)?.palId !== currentUser.id) return false
       }
       if (palFilter === 'created_by_me') {
         if (c.createdByUserId !== currentUser.id && c.triagedByUserId !== currentUser.id)
           return false
       }
-
-      // Search
       if (search.trim()) {
         const q = search.toLowerCase()
         const patient = patientMap.get(c.patientId)
-        const nameMatch = patient?.displayName.toLowerCase().includes(q)
-        const idMatch = c.id.toLowerCase().includes(q) || c.patientId.toLowerCase().includes(q)
-        if (!nameMatch && !idMatch) return false
+        if (
+          !patient?.displayName.toLowerCase().includes(q) &&
+          !c.id.toLowerCase().includes(q) &&
+          !c.patientId.toLowerCase().includes(q)
+        )
+          return false
       }
-
       return true
     })
   }, [cases, palFilter, currentUser.id, search, patientMap])
 
-  const byCategory = useCallback(
-    (cat: CaseCategory) => filteredCases.filter((c) => c.category === cat),
-    [filteredCases],
+  const { activeCases, waitingCases } = useMemo(() => {
+    const active = filteredCases.filter((c) => c.activeCategory !== null)
+    const waiting = filteredCases.filter((c) => c.activeCategory === null)
+    return { activeCases: active, waitingCases: waiting }
+  }, [filteredCases])
+
+  const effectiveShowWaiting = showWaiting || search.trim().length > 0
+  const sortedActiveCases = useMemo(
+    () => sortCases(activeCases, sortMode, patientMap),
+    [activeCases, sortMode, patientMap],
+  )
+  const sortedWaitingCases = useMemo(
+    () => sortCases(waitingCases, sortMode, patientMap),
+    [waitingCases, sortMode, patientMap],
   )
 
-  const loading = casesLoading || patientsLoading
+  const byCategory = useCallback(
+    (cat: CaseCategory) => sortedActiveCases.filter((c) => c.activeCategory === cat),
+    [sortedActiveCases],
+  )
+  const waitingByCategory = useCallback(
+    (cat: CaseCategory) =>
+      effectiveShowWaiting ? sortedWaitingCases.filter((c) => c.category === cat) : [],
+    [sortedWaitingCases, effectiveShowWaiting],
+  )
 
   return (
     <Box>
@@ -103,51 +118,20 @@ export default function Dashboard() {
         {t('dashboard.title')}
       </Typography>
 
-      {/* Filters */}
-      <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
-        <Stack direction={{ xs: 'column', sm: 'row' }} gap={2} alignItems="center" flexWrap="wrap">
-          <TextField
-            inputRef={searchRef}
-            size="small"
-            placeholder={t('dashboard.search')}
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            slotProps={{
-              input: {
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon fontSize="small" />
-                  </InputAdornment>
-                ),
-              },
-            }}
-            sx={{ minWidth: 240 }}
-            aria-label={t('dashboard.search')}
-          />
-
-          {isRole('PAL', 'DOCTOR', 'NURSE') && (
-            <ToggleButtonGroup
-              value={palFilter}
-              exclusive
-              onChange={(_, v) => v && setPalFilter(v)}
-              size="small"
-              aria-label="patient filter"
-            >
-              <ToggleButton value="all" aria-label={t('dashboard.filterAll')}>
-                {t('dashboard.filterAll')}
-              </ToggleButton>
-              {isRole('PAL') && (
-                <ToggleButton value="mine" aria-label={t('dashboard.filterMine')}>
-                  {t('dashboard.filterMine')}
-                </ToggleButton>
-              )}
-              <ToggleButton value="created_by_me" aria-label={t('dashboard.filterCreatedByMe')}>
-                {t('dashboard.filterCreatedByMe')}
-              </ToggleButton>
-            </ToggleButtonGroup>
-          )}
-        </Stack>
-      </Paper>
+      <DashboardToolbar
+        searchRef={searchRef}
+        search={search}
+        onSearch={setSearch}
+        palFilter={palFilter}
+        onPalFilter={setPalFilter}
+        sortMode={sortMode}
+        onSortMode={setSortMode}
+        showWaiting={showWaiting}
+        onToggleWaiting={() => setShowWaiting((v) => !v)}
+        waitingCount={waitingCases.length}
+        showPalFilter={isRole('PAL', 'DOCTOR', 'NURSE')}
+        showMineFilter={isRole('PAL')}
+      />
 
       {casesError && (
         <Alert severity="error" sx={{ mb: 2 }}>
@@ -155,34 +139,27 @@ export default function Dashboard() {
         </Alert>
       )}
 
-      {loading ? (
-        <Stack direction={{ xs: 'column', lg: 'row' }} gap={2}>
+      {casesLoading || patientsLoading ? (
+        <Stack gap={1.5}>
           {[0, 1, 2].map((i) => (
-            <Box key={i} flex={1}>
-              <Skeleton variant="rectangular" height={200} sx={{ borderRadius: 2 }} />
-            </Box>
+            <Skeleton key={i} variant="rectangular" height={64} sx={{ borderRadius: 2 }} />
           ))}
         </Stack>
       ) : (
-        <Stack direction={{ xs: 'column', lg: 'row' }} gap={2} alignItems="flex-start">
-          <QueueColumn
-            category="ACUTE"
-            cases={byCategory('ACUTE')}
-            patients={patientMap}
-            onRefresh={refetch}
-          />
-          <QueueColumn
-            category="SUBACUTE"
-            cases={byCategory('SUBACUTE')}
-            patients={patientMap}
-            onRefresh={refetch}
-          />
-          <QueueColumn
-            category="CONTROL"
-            cases={byCategory('CONTROL')}
-            patients={patientMap}
-            onRefresh={refetch}
-          />
+        <Stack gap={1.5}>
+          {(['ACUTE', 'SUBACUTE', 'CONTROL'] as CaseCategory[]).map((cat) => (
+            <QueueColumn
+              key={cat}
+              category={cat}
+              cases={byCategory(cat)}
+              waitingCases={waitingByCategory(cat)}
+              patients={patientMap}
+              onRefresh={refetch}
+              expanded={expanded.has(cat)}
+              onToggle={() => toggleExpanded(cat)}
+              sortMode={sortMode}
+            />
+          ))}
         </Stack>
       )}
     </Box>

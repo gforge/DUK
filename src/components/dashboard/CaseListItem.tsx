@@ -1,17 +1,13 @@
 import React from 'react'
-import { Box, Typography, Stack, Chip, Tooltip, IconButton, Divider } from '@mui/material'
-import CheckCircleIcon from '@mui/icons-material/CheckCircle'
-import HelpIcon from '@mui/icons-material/Help'
-import ErrorIcon from '@mui/icons-material/Error'
-import PhoneIcon from '@mui/icons-material/Phone'
-import SmartphoneIcon from '@mui/icons-material/Smartphone'
-import PolicyIcon from '@mui/icons-material/GppMaybe'
+import { Box, Typography, Stack, Divider } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
+import { format, differenceInDays, parseISO } from 'date-fns'
 import { useFocusRestore } from '../../hooks/useFocusRestore'
 import StatusChip from '../common/StatusChip'
-import type { Case, Patient, TriggerType } from '../../api/schemas'
-import { format } from 'date-fns'
+import TriggerChips from '../common/TriggerChips'
+import AutoWarningsBadge from '../common/AutoWarningsBadge'
+import type { Case, Patient, CaseStatus } from '../../api/schemas'
 
 interface CaseListItemProps extends React.HTMLAttributes<HTMLDivElement> {
   caseData: Case
@@ -20,52 +16,47 @@ interface CaseListItemProps extends React.HTMLAttributes<HTMLDivElement> {
   'data-list-item'?: boolean
 }
 
-function CaseStatusIcon({ caseData }: { caseData: Case }) {
-  const hasPolicyWarning = caseData.policyWarnings.length > 0
-  const hasHighSeverity = caseData.policyWarnings.some((w) => w.severity === 'HIGH')
-  const needsReview = caseData.status === 'NEEDS_REVIEW'
-  const isClosed = caseData.status === 'CLOSED'
-
-  if (isClosed) return <CheckCircleIcon sx={{ color: 'success.main' }} fontSize="small" />
-  if (hasHighSeverity || (hasPolicyWarning && needsReview))
-    return <ErrorIcon sx={{ color: 'error.main' }} fontSize="small" />
-  if (needsReview) return <HelpIcon sx={{ color: 'warning.main' }} fontSize="small" />
-  return <CheckCircleIcon sx={{ color: 'success.main' }} fontSize="small" />
+/** Left-border colour communicates urgency at a glance */
+const STATUS_BORDER: Record<CaseStatus, string> = {
+  NEW: '#9e9e9e',
+  NEEDS_REVIEW: '#f44336',
+  TRIAGED: '#42a5f5',
+  FOLLOWING_UP: '#ab47bc',
+  CLOSED: '#66bb6a',
 }
 
-function TriggerBadge({ trigger }: { trigger: TriggerType }) {
+function ScheduledLabel({ scheduledAt }: { scheduledAt: string }) {
   const { t } = useTranslation()
-  const isNotOpened = trigger === 'NOT_OPENED'
-  const isNoResponse = trigger === 'NO_RESPONSE'
+  const days = differenceInDays(new Date(), parseISO(scheduledAt))
 
-  const icon = isNotOpened ? (
-    <SmartphoneIcon fontSize="inherit" />
-  ) : isNoResponse ? (
-    <PhoneIcon fontSize="inherit" />
-  ) : null
+  let label: string
+  let color: string
+
+  if (days > 14) {
+    label = t('dashboard.scheduledDaysAgo', { count: days })
+    color = 'error.main'
+  } else if (days > 0) {
+    label = t('dashboard.scheduledDaysAgo', { count: days })
+    color = 'warning.main'
+  } else if (days === 0) {
+    label = t('dashboard.scheduledToday')
+    color = 'success.main'
+  } else {
+    label = t('dashboard.scheduledInDays', { count: Math.abs(days) })
+    color = 'text.secondary'
+  }
 
   return (
-    <Chip
-      icon={icon ?? undefined}
-      label={t(`trigger.${trigger}`)}
-      size="small"
-      variant="outlined"
-      color={
-        trigger === 'HIGH_PAIN' || trigger === 'INFECTION_SUSPECTED'
-          ? 'error'
-          : trigger === 'NOT_OPENED' || trigger === 'NO_RESPONSE'
-            ? 'warning'
-            : 'default'
-      }
-      sx={{ fontSize: 10, height: 20 }}
-    />
+    <Typography variant="caption" sx={{ color }}>
+      {label}
+    </Typography>
   )
 }
 
 export default function CaseListItem({
   caseData,
   patient,
-  onRefresh,
+  onRefresh: _onRefresh,
   ...props
 }: CaseListItemProps) {
   const { t } = useTranslation()
@@ -97,10 +88,16 @@ export default function CaseListItem({
         role="listitem"
         tabIndex={props.tabIndex ?? 0}
         sx={{
-          px: 2,
-          py: 1.5,
+          pl: 1.5,
+          pr: 2,
+          py: 1.25,
           cursor: 'pointer',
-          '&:hover': { backgroundColor: 'action.hover' },
+          borderLeft: `4px solid ${STATUS_BORDER[caseData.status]}`,
+          transition: 'box-shadow 0.15s',
+          '&:hover': {
+            bgcolor: 'action.hover',
+            boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
+          },
           '&:focus-visible': {
             outline: '2px solid',
             outlineColor: 'primary.main',
@@ -118,61 +115,38 @@ export default function CaseListItem({
           props.onKeyDown?.(e)
         }}
       >
-        <Stack direction="row" alignItems="flex-start" gap={1}>
-          <Box sx={{ pt: 0.3 }}>
-            <CaseStatusIcon caseData={caseData} />
+        {/* Row 1: Patient name + Status badge */}
+        <Stack direction="row" alignItems="center" justifyContent="space-between" gap={1}>
+          <Typography variant="body2" fontWeight={600} noWrap sx={{ maxWidth: 160 }}>
+            {patient?.displayName ?? caseData.patientId}
+          </Typography>
+          <StatusChip status={caseData.status} />
+        </Stack>
+
+        {/* Row 2: Trigger chips */}
+        {caseData.triggers.length > 0 && (
+          <Box mt={0.5}>
+            <TriggerChips triggers={caseData.triggers} />
           </Box>
+        )}
 
-          <Box sx={{ flex: 1, minWidth: 0 }}>
-            <Stack direction="row" alignItems="center" justifyContent="space-between" gap={1}>
-              <Typography variant="body2" fontWeight={600} noWrap sx={{ maxWidth: 150 }}>
-                {patient?.displayName ?? caseData.patientId}
+        {/* Row 3: Auto-warnings badge + meta */}
+        <Stack direction="row" alignItems="center" justifyContent="space-between" gap={1} mt={0.5}>
+          <AutoWarningsBadge
+            warnings={caseData.policyWarnings}
+            lastActivityAt={caseData.lastActivityAt}
+          />
+          <Stack direction="row" gap={1} flexWrap="wrap" justifyContent="flex-end">
+            {caseData.scheduledAt && <ScheduledLabel scheduledAt={caseData.scheduledAt} />}
+            <Typography variant="caption" color="text.secondary">
+              {t('dashboard.lastActivity')}: {lastActivity}
+            </Typography>
+            {deadline && (
+              <Typography variant="caption" color="warning.dark">
+                ⏱ {deadline}
               </Typography>
-              <StatusChip status={caseData.status} />
-            </Stack>
-
-            {/* Triggers */}
-            {caseData.triggers.length > 0 && (
-              <Stack direction="row" flexWrap="wrap" gap={0.5} mt={0.5}>
-                {caseData.triggers.slice(0, 3).map((trigger) => (
-                  <TriggerBadge key={trigger} trigger={trigger} />
-                ))}
-                {caseData.triggers.length > 3 && (
-                  <Chip
-                    label={`+${caseData.triggers.length - 3}`}
-                    size="small"
-                    sx={{ fontSize: 10, height: 20 }}
-                  />
-                )}
-              </Stack>
             )}
-
-            {/* Policy warnings */}
-            {caseData.policyWarnings.length > 0 && (
-              <Tooltip title={caseData.policyWarnings.map((w) => w.ruleName).join(', ')} arrow>
-                <Chip
-                  icon={<PolicyIcon fontSize="inherit" />}
-                  label={`${caseData.policyWarnings.length} ${t('case.policyWarnings')}`}
-                  size="small"
-                  color="error"
-                  variant="outlined"
-                  sx={{ mt: 0.5, fontSize: 10, height: 20 }}
-                />
-              </Tooltip>
-            )}
-
-            {/* Meta */}
-            <Stack direction="row" gap={1} mt={0.5} flexWrap="wrap">
-              <Typography variant="caption" color="text.secondary">
-                {t('dashboard.lastActivity')}: {lastActivity}
-              </Typography>
-              {deadline && (
-                <Typography variant="caption" color="warning.dark">
-                  ⏱ {deadline}
-                </Typography>
-              )}
-            </Stack>
-          </Box>
+          </Stack>
         </Stack>
       </Box>
       <Divider />

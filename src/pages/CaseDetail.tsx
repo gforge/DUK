@@ -24,7 +24,9 @@ import FormResponsesTab from '../components/case/FormResponsesTab'
 import TriageTab from '../components/case/TriageTab'
 import JournalTab from '../components/case/JournalTab'
 import AuditLogTab from '../components/case/AuditLogTab'
+import JourneyTab from '../components/case/JourneyTab'
 import StatusChip from '../components/common/StatusChip'
+import AutoWarningsBadge from '../components/common/AutoWarningsBadge'
 
 interface TabPanelProps {
   children: React.ReactNode
@@ -122,10 +124,9 @@ export default function CaseDetail() {
         <StatusChip status={caseData.status} size="medium" />
         <Chip label={t(`category.${caseData.category}`)} variant="outlined" size="small" />
         {caseData.policyWarnings.length > 0 && (
-          <Chip
-            label={`${caseData.policyWarnings.length} policy warning(s)`}
-            color="error"
-            size="small"
+          <AutoWarningsBadge
+            warnings={caseData.policyWarnings}
+            lastActivityAt={caseData.lastActivityAt}
           />
         )}
       </Stack>
@@ -144,9 +145,10 @@ export default function CaseDetail() {
           sx={{ borderBottom: 1, borderColor: 'divider' }}
         >
           <Tab label={t('case.tab_forms')} id="case-tab-0" aria-controls="case-tabpanel-0" />
-          <Tab label={t('case.tab_triage')} id="case-tab-1" aria-controls="case-tabpanel-1" />
-          <Tab label={t('case.tab_journal')} id="case-tab-2" aria-controls="case-tabpanel-2" />
-          <Tab label={t('case.tab_audit')} id="case-tab-3" aria-controls="case-tabpanel-3" />
+          <Tab label={t('case.tab_journey')} id="case-tab-1" aria-controls="case-tabpanel-1" />
+          <Tab label={t('case.tab_triage')} id="case-tab-2" aria-controls="case-tabpanel-2" />
+          <Tab label={t('case.tab_journal')} id="case-tab-3" aria-controls="case-tabpanel-3" />
+          <Tab label={t('case.tab_audit')} id="case-tab-4" aria-controls="case-tabpanel-4" />
         </Tabs>
 
         <Box sx={{ p: 2 }}>
@@ -155,14 +157,22 @@ export default function CaseDetail() {
           </TabPanel>
 
           <TabPanel value={activeTab} index={1}>
-            <TriageTab caseData={caseData} onTriaged={refetchCase} />
+            <JourneyTab caseData={caseData} />
           </TabPanel>
 
           <TabPanel value={activeTab} index={2}>
-            <JournalTab caseData={caseData} patient={patient ?? undefined} />
+            <TriageTab caseData={caseData} onTriaged={refetchCase} />
           </TabPanel>
 
           <TabPanel value={activeTab} index={3}>
+            <JournalTab
+              caseData={caseData}
+              patient={patient ?? undefined}
+              onCaseChange={refetchCase}
+            />
+          </TabPanel>
+
+          <TabPanel value={activeTab} index={4}>
             <AuditLogTab caseId={caseData.id} />
           </TabPanel>
         </Box>

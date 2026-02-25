@@ -1,0 +1,18 @@
+@startuml
+title PatientJourney Lifecycle
+
+state ACTIVE
+state SUSPENDED
+state COMPLETED
+
+[*] --> ACTIVE
+ACTIVE --> SUSPENDED : "suspend"
+SUSPENDED --> ACTIVE : "resume"
+ACTIVE --> COMPLETED : "complete"
+SUSPENDED --> COMPLETED : "complete"
+
+note right
+  The codebase currently defines the enum but lacks enforced transitions
+end note
+
+@enduml

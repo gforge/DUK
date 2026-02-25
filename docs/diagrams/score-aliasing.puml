@@ -1,0 +1,16 @@
+@startuml
+title Score Aliasing — Sequence
+
+actor System
+participant "JourneyTemplateEntry" as Entry
+participant "Service" as Service
+participant "PolicyScope" as Scope
+
+System -> Entry : read scoreAliases { alias: "OSS.total" -> path: "scores.OSS.total" }
+Service -> Scope : inject alias values into numeric scope
+Scope --> Service : scope {OSS.total: 22}
+Service -> PolicyParser : evaluateExpression(rule, scope)
+
+note right: aliasing implemented in journeyResolver.buildPolicyScopeWithAliases
+
+@enduml

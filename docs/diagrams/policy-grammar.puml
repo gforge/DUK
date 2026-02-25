@@ -1,0 +1,22 @@
+@startuml
+title Policy Expression Grammar (overview)
+
+class Expression
+class Term
+class Factor
+class Identifier
+class Number
+class Comparison
+class LogicalOp
+
+Expression --> Term
+Term --> Factor
+Factor --> Identifier
+Factor --> Number
+Expression --> Comparison
+Expression --> LogicalOp
+
+note left: Supported operators: + - * /, == != < <= > >=, && ||
+note right: See src/api/policyParser for tokenizer and parser
+
+@enduml

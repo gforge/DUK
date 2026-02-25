@@ -125,6 +125,11 @@ src/
     └── DemoTools.tsx
 ```
 
+### Design docs & diagrams
+
+- The English design document and PlantUML sources are in `docs/design.md` and `docs/diagrams/`.
+- Diagrams include component, state, class (ERD) and sequence diagrams that map to implementation files.
+
 ---
 
 ## Available Scripts

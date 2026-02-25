@@ -1,12 +1,9 @@
-import React, { useRef, useState } from 'react'
+import React, { useState } from 'react'
 import {
   Box,
   Typography,
   Button,
   Alert,
-  Paper,
-  Stack,
-  TextField,
   Divider,
   Dialog,
   DialogTitle,
@@ -15,15 +12,13 @@ import {
   DialogActions,
   LinearProgress,
 } from '@mui/material'
-import DownloadIcon from '@mui/icons-material/Download'
-import UploadIcon from '@mui/icons-material/Upload'
-import RestoreIcon from '@mui/icons-material/Restore'
-import ContentCopyIcon from '@mui/icons-material/ContentCopy'
 import { useTranslation } from 'react-i18next'
 import { useSnack } from '../store/snackContext'
 import * as client from '../api/client'
-
-type ConfirmAction = 'reset' | 'reseed' | 'import' | null
+import SeedPanel from '../components/demo/SeedPanel'
+import ExportPanel from '../components/demo/ExportPanel'
+import ImportPanel from '../components/demo/ImportPanel'
+import type { ConfirmAction } from '../components/demo/SeedPanel'
 
 export default function DemoTools() {
   const { t } = useTranslation()
@@ -33,14 +28,12 @@ export default function DemoTools() {
   const [importText, setImportText] = useState('')
   const [confirmAction, setConfirmAction] = useState<ConfirmAction>(null)
   const [parseError, setParseError] = useState('')
-  const textAreaRef = useRef<HTMLTextAreaElement>(null)
 
   async function handleExport() {
     setLoading(true)
     try {
       const state = await client.exportState()
-      const json = JSON.stringify(state, null, 2)
-      setExported(json)
+      setExported(JSON.stringify(state, null, 2))
       showSnack(t('demoTools.exportSuccess'), 'success')
     } catch {
       showSnack(t('common.error'), 'error')
@@ -83,14 +76,23 @@ export default function DemoTools() {
 
   async function confirmAndExecute() {
     setLoading(true)
+    const action = confirmAction
     setConfirmAction(null)
     try {
-      if (confirmAction === 'reset' || confirmAction === 'reseed') {
-        await client.resetAndReseed()
-        showSnack(t('demoTools.resetSuccess'), 'success')
-      } else if (confirmAction === 'import') {
-        const parsed = JSON.parse(importText)
-        await client.importState(parsed)
+      if (action === 'reset' || action === 'reseed-minimal') {
+        await client.resetAndReseed('minimal')
+        showSnack(
+          action === 'reset' ? t('demoTools.resetSuccess') : t('demoTools.reseedMinimalSuccess'),
+          'success',
+        )
+      } else if (action === 'reseed-realistic') {
+        await client.resetAndReseed('realistic')
+        showSnack(t('demoTools.reseedRealisticSuccess'), 'success')
+      } else if (action === 'reseed-faker') {
+        await client.resetAndReseed('faker')
+        showSnack(t('demoTools.reseedFakerSuccess'), 'success')
+      } else if (action === 'import') {
+        await client.importState(JSON.parse(importText))
         showSnack(t('demoTools.importSuccess'), 'success')
         setImportText('')
       }
@@ -109,127 +111,28 @@ export default function DemoTools() {
       <Alert severity="warning" sx={{ mb: 3 }}>
         {t('demoTools.warning')}
       </Alert>
-
       {loading && <LinearProgress sx={{ mb: 2 }} />}
 
-      {/* Export */}
-      <Paper variant="outlined" sx={{ borderRadius: 2, p: 2.5, mb: 3 }}>
-        <Typography variant="subtitle1" fontWeight={600} gutterBottom>
-          {t('demoTools.exportTitle')}
-        </Typography>
-        <Typography variant="body2" color="text.secondary" gutterBottom>
-          {t('demoTools.exportDescription')}
-        </Typography>
-        <Stack direction="row" spacing={1} sx={{ mt: 1.5 }}>
-          <Button
-            variant="contained"
-            startIcon={<DownloadIcon />}
-            onClick={handleExport}
-            disabled={loading}
-          >
-            {t('demoTools.export')}
-          </Button>
-          {exported && (
-            <>
-              <Button variant="outlined" startIcon={<ContentCopyIcon />} onClick={handleCopyExport}>
-                {t('demoTools.copyJson')}
-              </Button>
-              <Button variant="outlined" onClick={handleDownload}>
-                {t('demoTools.downloadJson')}
-              </Button>
-            </>
-          )}
-        </Stack>
-        {exported && (
-          <Box
-            component="textarea"
-            ref={textAreaRef}
-            value={exported}
-            readOnly
-            rows={8}
-            sx={{
-              mt: 2,
-              width: '100%',
-              fontFamily: 'monospace',
-              fontSize: '0.72rem',
-              p: 1,
-              borderRadius: 1,
-              border: '1px solid',
-              borderColor: 'divider',
-              bgcolor: 'background.default',
-              resize: 'vertical',
-            }}
-          />
-        )}
-      </Paper>
-
-      {/* Import */}
-      <Paper variant="outlined" sx={{ borderRadius: 2, p: 2.5, mb: 3 }}>
-        <Typography variant="subtitle1" fontWeight={600} gutterBottom>
-          {t('demoTools.importTitle')}
-        </Typography>
-        <Typography variant="body2" color="text.secondary" gutterBottom>
-          {t('demoTools.importDescription')}
-        </Typography>
-        <TextField
-          multiline
-          rows={6}
-          fullWidth
-          value={importText}
-          onChange={(e) => {
-            setImportText(e.target.value)
-            setParseError('')
-          }}
-          placeholder={t('demoTools.importPlaceholder')}
-          error={!!parseError}
-          helperText={parseError}
-          sx={{ mt: 1.5, fontFamily: 'monospace' }}
-          inputProps={{ style: { fontFamily: 'monospace', fontSize: '0.75rem' } }}
-        />
-        <Button
-          variant="contained"
-          color="warning"
-          startIcon={<UploadIcon />}
-          onClick={handleImportPrepare}
-          disabled={loading || !importText.trim()}
-          sx={{ mt: 1.5 }}
-        >
-          {t('demoTools.import')}
-        </Button>
-      </Paper>
-
+      <SeedPanel loading={loading} onSeedAction={setConfirmAction} />
       <Divider sx={{ my: 2 }} />
+      <ExportPanel
+        loading={loading}
+        exported={exported}
+        onExport={handleExport}
+        onCopy={handleCopyExport}
+        onDownload={handleDownload}
+      />
+      <ImportPanel
+        loading={loading}
+        importText={importText}
+        parseError={parseError}
+        onImportTextChange={(v) => {
+          setImportText(v)
+          setParseError('')
+        }}
+        onImportPrepare={handleImportPrepare}
+      />
 
-      {/* Reset / Re-seed */}
-      <Paper variant="outlined" sx={{ borderRadius: 2, p: 2.5 }}>
-        <Typography variant="subtitle1" fontWeight={600} gutterBottom>
-          {t('demoTools.resetTitle')}
-        </Typography>
-        <Typography variant="body2" color="text.secondary" gutterBottom>
-          {t('demoTools.resetDescription')}
-        </Typography>
-        <Stack direction="row" spacing={1} sx={{ mt: 1.5 }}>
-          <Button
-            variant="outlined"
-            color="error"
-            startIcon={<RestoreIcon />}
-            onClick={() => setConfirmAction('reseed')}
-            disabled={loading}
-          >
-            {t('demoTools.reseed')}
-          </Button>
-          <Button
-            variant="contained"
-            color="error"
-            onClick={() => setConfirmAction('reset')}
-            disabled={loading}
-          >
-            {t('demoTools.reset')}
-          </Button>
-        </Stack>
-      </Paper>
-
-      {/* Confirm dialog */}
       <Dialog
         open={confirmAction !== null}
         onClose={() => setConfirmAction(null)}
@@ -239,13 +142,21 @@ export default function DemoTools() {
         <DialogTitle>
           {confirmAction === 'import'
             ? t('demoTools.confirmImportTitle')
-            : t('demoTools.confirmResetTitle')}
+            : confirmAction === 'reseed-realistic'
+              ? t('demoTools.confirmRealisticTitle')
+              : confirmAction === 'reseed-faker'
+                ? t('demoTools.confirmFakerTitle')
+                : t('demoTools.confirmResetTitle')}
         </DialogTitle>
         <DialogContent>
           <DialogContentText>
             {confirmAction === 'import'
               ? t('demoTools.confirmImportText')
-              : t('demoTools.confirmResetText')}
+              : confirmAction === 'reseed-realistic'
+                ? t('demoTools.confirmRealisticText')
+                : confirmAction === 'reseed-faker'
+                  ? t('demoTools.confirmFakerText')
+                  : t('demoTools.confirmResetText')}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
