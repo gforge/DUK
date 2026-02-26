@@ -5,14 +5,27 @@ state ACTIVE
 state SUSPENDED
 state COMPLETED
 
-[*] --> ACTIVE
-ACTIVE --> SUSPENDED : "suspend"
-SUSPENDED --> ACTIVE : "resume"
-ACTIVE --> COMPLETED : "complete"
-SUSPENDED --> COMPLETED : "complete"
+[*] --> ACTIVE : assignPatientJourney
 
-note right
-  The codebase currently defines the enum but lacks enforced transitions
+ACTIVE --> SUSPENDED : suspend
+SUSPENDED --> ACTIVE : resume
+ACTIVE --> COMPLETED : complete
+SUSPENDED --> COMPLETED : complete
+
+ACTIVE --> ACTIVE : SWITCH_TEMPLATE\n(change template\n& optional date reset)
+
+note right of ACTIVE
+  Transitions enforced by
+  updatePatientJourneyStatus
+  in src/api/service/
+  patientJourneys.ts
+end note
+
+note bottom of ACTIVE
+  SWITCH_TEMPLATE modifies
+  journeyTemplateId and
+  optionally resets startDate.
+  Recorded in modifications[].
 end note
 
 @enduml

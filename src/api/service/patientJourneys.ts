@@ -29,6 +29,21 @@ export function assignPatientJourney(
   return journey
 }
 
+export function updatePatientJourneyStatus(
+  journeyId: string,
+  status: 'ACTIVE' | 'COMPLETED' | 'SUSPENDED',
+): PatientJourney {
+  const state = getStore()
+  const journey = state.patientJourneys.find((j) => j.id === journeyId)
+  if (!journey) throw new Error(`Journey ${journeyId} not found`)
+  const updated: PatientJourney = { ...journey, status, updatedAt: now() }
+  setStore({
+    ...state,
+    patientJourneys: state.patientJourneys.map((j) => (j.id === journeyId ? updated : j)),
+  })
+  return updated
+}
+
 export function modifyPatientJourney(
   journeyId: string,
   modification: Omit<JourneyModification, 'id' | 'addedAt'>,
@@ -45,6 +60,10 @@ export function modifyPatientJourney(
   }
   if (modification.type === 'SWITCH_TEMPLATE' && modification.newTemplateId)
     updated = { ...updated, journeyTemplateId: modification.newTemplateId }
+
+  // Allow re-anchoring the start date when switching templates (e.g. surgery happened)
+  if (modification.type === 'SWITCH_TEMPLATE' && modification.newStartDate)
+    updated = { ...updated, startDate: modification.newStartDate }
 
   setStore({
     ...state,

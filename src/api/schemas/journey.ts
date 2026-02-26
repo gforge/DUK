@@ -8,6 +8,21 @@ export const JourneyModificationTypeSchema = z.enum(['ADD_STEP', 'REMOVE_STEP', 
 export type JourneyModificationType = z.infer<typeof JourneyModificationTypeSchema>
 
 /**
+ * A reusable instruction template (physio protocol, wound care instructions, etc.)
+ * that can be attached to journey steps.
+ */
+export const InstructionTemplateSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  /** Markdown content shown to clinicians and patients. */
+  content: z.string(),
+  tags: z.array(z.string()).default([]),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
+})
+export type InstructionTemplate = z.infer<typeof InstructionTemplateSchema>
+
+/**
  * One step inside a reusable journey template.
  * scoreAliases maps raw score keys to semantic journey-relative names,
  * e.g. { "PNRS_2": "PNRS_week4", "OSS.total": "OSS_week4" }.
@@ -19,12 +34,17 @@ export const JourneyTemplateEntrySchema = z.object({
   offsetDays: z.number(),
   windowDays: z.number().default(2),
   order: z.number(),
-  templateId: z.string(),
+  /** Questionnaire template ID — optional; a step may be instruction-only. */
+  templateId: z.string().optional(),
   scoreAliases: z.record(z.string(), z.string()).default({}),
   /** Human-readable labels for each alias, used in journal templates via {{label.X}}. */
   scoreAliasLabels: z.record(z.string(), z.string()).default({}),
   /** Which dashboard column is active while this step's window is open. */
   dashboardCategory: CaseCategorySchema.default('CONTROL'),
+  /** Quick freeform instruction text (markdown). Shown to clinician and patient. */
+  instructionText: z.string().optional(),
+  /** Reference to a reusable InstructionTemplate. Overrides instructionText if both present. */
+  instructionTemplateId: z.string().optional(),
 })
 export type JourneyTemplateEntry = z.infer<typeof JourneyTemplateEntrySchema>
 
@@ -34,6 +54,13 @@ export const JourneyTemplateSchema = z.object({
   description: z.string().optional(),
   entries: z.array(JourneyTemplateEntrySchema),
   createdAt: z.string().datetime(),
+  /** If derived from another template, the parent's ID is recorded here. */
+  parentTemplateId: z.string().optional(),
+  /**
+   * ISO timestamp of the last time this template was synced with its parent
+   * (or the timestamp of derivation if never explicitly synced).
+   */
+  derivedAt: z.string().optional(),
 })
 export type JourneyTemplate = z.infer<typeof JourneyTemplateSchema>
 
@@ -65,6 +92,10 @@ export const JourneyModificationSchema = z.object({
   stepId: z.string().optional(),
   previousTemplateId: z.string().optional(),
   newTemplateId: z.string().optional(),
+  /** Present on SWITCH_TEMPLATE when the reference date is also reset. */
+  previousStartDate: z.string().optional(),
+  /** New YYYY-MM-DD anchor date — all step offsets recalculate from this date. */
+  newStartDate: z.string().optional(),
 })
 export type JourneyModification = z.infer<typeof JourneyModificationSchema>
 

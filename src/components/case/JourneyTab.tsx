@@ -53,6 +53,8 @@ export default function JourneyTab({ caseData }: JourneyTabProps) {
         stepId?: string
         newTemplateId?: string
         previousTemplateId?: string
+        previousStartDate?: string
+        newStartDate?: string
       },
     ) => {
       if (!activeJourney || !currentUser) return
@@ -63,6 +65,8 @@ export default function JourneyTab({ caseData }: JourneyTabProps) {
         ...(payload.stepId ? { stepId: payload.stepId } : {}),
         ...(payload.newTemplateId ? { newTemplateId: payload.newTemplateId } : {}),
         ...(payload.previousTemplateId ? { previousTemplateId: payload.previousTemplateId } : {}),
+        ...(payload.previousStartDate ? { previousStartDate: payload.previousStartDate } : {}),
+        ...(payload.newStartDate ? { newStartDate: payload.newStartDate } : {}),
         ...(payload.entry
           ? {
               entry: {
@@ -175,6 +179,7 @@ export default function JourneyTab({ caseData }: JourneyTabProps) {
           journeyId={activeJourney.id}
           currentTemplateId={activeJourney.journeyTemplateId}
           currentTemplateName={currentTemplate?.name ?? ''}
+          currentStartDate={activeJourney.startDate}
           steps={effectiveSteps}
           journeyTemplates={journeyTemplates}
           questionnaireTemplates={questionnaireTemplates}

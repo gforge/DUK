@@ -3,11 +3,27 @@ title Dashboard / Journey Computation — Activity
 
 start
 :Load patients & journeys;
-:For each patient: select latest ACTIVE PatientJourney;
-:Apply JourneyTemplate entries (offsets/windows);
-:Compute effective steps (getEffectiveSteps);
-:Map effective steps to queue/category;
-:Build dashboard Case rows with computed category and nextStep;
+:For each patient: select
+latest ACTIVE PatientJourney;
+:Apply JourneyTemplate entries
+(offsets/windows from startDate);
+:Apply modifications
+(ADD_STEP, REMOVE_STEP,
+SWITCH_TEMPLATE);
+:Overlay research module
+entries if researchModuleIds
+are present;
+:Hydrate instructions
+(resolve instructionTemplateId
+→ content, or use
+instructionText fallback);
+:Compute effective steps
+(getEffectiveSteps);
+:Map effective steps to
+queue/category;
+:Build dashboard Case rows
+with computed category
+and nextStep;
 stop
 
 @enduml

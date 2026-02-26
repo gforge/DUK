@@ -3,6 +3,7 @@ import { Alert, Box, Paper, Stack, Tab, Tabs, Typography } from '@mui/material'
 import RouteIcon from '@mui/icons-material/Route'
 import ScienceIcon from '@mui/icons-material/Science'
 import PeopleIcon from '@mui/icons-material/People'
+import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined'
 import { useTranslation } from 'react-i18next'
 import { useApi } from '../hooks/useApi'
 import * as client from '../api/client'
@@ -10,6 +11,7 @@ import { useSnack } from '../store/snackContext'
 import JourneyTemplatesTab from '../components/journey/editor/JourneyTemplatesTab'
 import ResearchModulesTab from '../components/journey/editor/ResearchModulesTab'
 import PatientJourneysTable from '../components/journey/editor/PatientJourneysTable'
+import InstructionTemplatesTab from '../components/journey/editor/InstructionTemplatesTab'
 
 function TabPanel({
   children,
@@ -47,6 +49,11 @@ export default function JourneyEditor() {
     [],
   )
   const { data: patients } = useApi(() => client.getPatients(), [])
+  const {
+    data: instructionTemplates,
+    loading: itLoading,
+    refetch: refetchIT,
+  } = useApi(() => client.getInstructionTemplates(), [])
 
   const handleDeleteTemplate = async (templateId: string, name: string) => {
     if (!confirm(t('journey.editor.confirmDeleteTemplate', { name }))) return
@@ -60,6 +67,24 @@ export default function JourneyEditor() {
     await client.deleteResearchModule(moduleId)
     showSnack(t('journey.editor.moduleDeleted'), 'success')
     refetchRM()
+  }
+
+  const handleDeleteInstruction = async (id: string, name: string) => {
+    if (!confirm(t('journey.editor.confirmDeleteInstruction', { name }))) return
+    await client.deleteInstructionTemplate(id)
+    showSnack(t('journey.editor.instructionDeleted'), 'success')
+    refetchIT()
+  }
+
+  const handleSaveInstruction = async (data: {
+    id?: string
+    name: string
+    content: string
+    tags: string[]
+  }) => {
+    await client.saveInstructionTemplate(data)
+    showSnack(t('policy.ruleSaved'), 'success')
+    refetchIT()
   }
 
   return (
@@ -99,6 +124,12 @@ export default function JourneyEditor() {
             label={t('journey.editor.tabPatientJourneys')}
             id="journey-tab-2"
           />
+          <Tab
+            icon={<DescriptionOutlinedIcon fontSize="small" />}
+            iconPosition="start"
+            label={t('journey.editor.tabInstructions')}
+            id="journey-tab-3"
+          />
         </Tabs>
 
         <Box sx={{ p: 2 }}>
@@ -107,6 +138,7 @@ export default function JourneyEditor() {
               journeyTemplates={journeyTemplates}
               loading={jLoading}
               onDelete={handleDeleteTemplate}
+              onRefresh={refetchJT}
             />
           </TabPanel>
           <TabPanel value={tab} index={1}>
@@ -123,6 +155,14 @@ export default function JourneyEditor() {
               patients={patients}
               journeyTemplates={journeyTemplates}
               researchModules={researchModules}
+            />
+          </TabPanel>
+          <TabPanel value={tab} index={3}>
+            <InstructionTemplatesTab
+              instructionTemplates={instructionTemplates}
+              loading={itLoading}
+              onDelete={handleDeleteInstruction}
+              onSave={handleSaveInstruction}
             />
           </TabPanel>
         </Box>

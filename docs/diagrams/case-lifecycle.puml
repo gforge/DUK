@@ -15,7 +15,8 @@ TRIAGED --> CLOSED : "closeDirectly"
 FOLLOWING_UP --> CLOSED : "followUpClosed"
 
 note right
-  Transitions enforced in src/api/service/cases.ts
+  Transitions enforced in
+  src/api/service/cases.ts
 end note
 
 @enduml

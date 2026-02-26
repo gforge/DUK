@@ -1,5 +1,7 @@
 **Journal Templating — Whitelist & Rules**
 
+![Journal Generation](../diagrams/journal-generation.svg)
+
 Overview
 
 - Journal templates are rendered by a safe, Mustache-like renderer at `src/api/journalRenderer.ts`.

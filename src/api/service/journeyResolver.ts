@@ -4,6 +4,7 @@ import type { JourneyTemplateEntry, CaseCategory, FormResponse } from '../schema
 
 /**
  * A resolved, ordered step for a specific patient — after modifications and research overlays.
+ * resolvedInstruction is hydrated from instructionTemplateId (preferred) or instructionText.
  */
 export type EffectiveStep = JourneyTemplateEntry & {
   isAdded: boolean
@@ -11,13 +12,15 @@ export type EffectiveStep = JourneyTemplateEntry & {
   researchModuleId?: string
   replacesStepId?: string
   scheduledDate: string // YYYY-MM-DD relative to journey.startDate
+  resolvedInstruction?: string // hydrated instruction content (markdown)
 }
 
 /**
  * Resolves the effective, ordered steps for a patient journey.
  * Applies ADD_STEP / REMOVE_STEP modifications in chronological order.
- * SWITCH_TEMPLATE is already reflected in journey.journeyTemplateId.
+ * SWITCH_TEMPLATE is already reflected in journey.journeyTemplateId and startDate.
  * Research module entries are then merged/inserted.
+ * Instruction content is hydrated from instructionTemplateId or instructionText.
  */
 export function getEffectiveSteps(journeyId: string): EffectiveStep[] {
   const state = getStore()
@@ -31,11 +34,22 @@ export function getEffectiveSteps(journeyId: string): EffectiveStep[] {
   const toDate = (offsetDays: number) =>
     new Date(startMs + offsetDays * 86_400_000).toISOString().slice(0, 10)
 
+  const resolveInstruction = (entry: JourneyTemplateEntry): string | undefined => {
+    if (entry.instructionTemplateId) {
+      const it = (state.instructionTemplates ?? []).find(
+        (t) => t.id === entry.instructionTemplateId,
+      )
+      return it?.content ?? entry.instructionText
+    }
+    return entry.instructionText
+  }
+
   let steps: EffectiveStep[] = template.entries.map((e) => ({
     ...e,
     isAdded: false,
     isResearch: false,
     scheduledDate: toDate(e.offsetDays),
+    resolvedInstruction: resolveInstruction(e),
   }))
 
   const removedIds = new Set<string>()
@@ -48,6 +62,7 @@ export function getEffectiveSteps(journeyId: string): EffectiveStep[] {
         isAdded: true,
         isResearch: false,
         scheduledDate: toDate(mod.entry.offsetDays),
+        resolvedInstruction: resolveInstruction(mod.entry),
       })
     }
   }
@@ -74,6 +89,7 @@ export function getEffectiveSteps(journeyId: string): EffectiveStep[] {
           researchModuleId: moduleId,
           replacesStepId: entry.replaceStepId,
           scheduledDate: original?.scheduledDate ?? toDate(0),
+          resolvedInstruction: original?.resolvedInstruction,
         }
         steps = steps.filter((s) => s.id !== entry.replaceStepId)
         steps.push(researchStep)

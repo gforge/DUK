@@ -16,7 +16,16 @@ Factor --> Number
 Expression --> Comparison
 Expression --> LogicalOp
 
-note left: Supported operators: + - * /, == != < <= > >=, && ||
-note right: See src/api/policyParser for tokenizer and parser
+note left
+  Supported operators:
+  + - * /
+  == != < <= > >=
+  && ||
+end note
+
+note bottom
+  See src/api/policyParser
+  for tokenizer and parser
+end note
 
 @enduml

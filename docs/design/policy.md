@@ -1,5 +1,9 @@
 **Policy — Expression Language and Evaluation**
 
+![Policy Grammar](../diagrams/policy-grammar.svg)
+
+![Triage Policy Sequence](../diagrams/triage-policy-sequence.svg)
+
 Overview
 
 - Policies are user-editable rules that evaluate to boolean. They are safe: implemented by a tokenizer + recursive-descent parser. No eval.

@@ -1,10 +1,20 @@
-import React from 'react'
-import { Box, Chip, Stack, Tooltip, Typography, useTheme } from '@mui/material'
+import React, { useState } from 'react'
+import {
+  Box,
+  Chip,
+  Collapse,
+  IconButton,
+  Stack,
+  Tooltip,
+  Typography,
+  useTheme,
+} from '@mui/material'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked'
 import ErrorIcon from '@mui/icons-material/Error'
 import ScienceIcon from '@mui/icons-material/Science'
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 import { useTranslation } from 'react-i18next'
 import type { EffectiveStep } from '../../api/service'
 import type { FormResponse } from '../../api/schemas'
@@ -33,6 +43,16 @@ export default function JourneyTimeline({
 }: JourneyTimelineProps) {
   const { t } = useTranslation()
   const theme = useTheme()
+  const [expandedInstructions, setExpandedInstructions] = useState<Set<string>>(new Set())
+
+  const toggleInstruction = (id: string) => {
+    setExpandedInstructions((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
 
   if (steps.length === 0) {
     return (
@@ -139,6 +159,48 @@ export default function JourneyTimeline({
                   {t('journey.scheduledDate')}: {step.scheduledDate}
                   {step.windowDays > 0 && ` ±${step.windowDays}d`}
                 </Typography>
+
+                {step.resolvedInstruction && (
+                  <Box>
+                    <Tooltip title={t('journey.toggleInstruction')}>
+                      <IconButton
+                        size="small"
+                        onClick={() => toggleInstruction(step.id)}
+                        sx={{ ml: -0.5, mt: 0.25 }}
+                        aria-label={t('journey.toggleInstruction')}
+                      >
+                        <InfoOutlinedIcon
+                          fontSize="small"
+                          color={expandedInstructions.has(step.id) ? 'primary' : 'action'}
+                        />
+                      </IconButton>
+                    </Tooltip>
+                    <Collapse in={expandedInstructions.has(step.id)}>
+                      <Box
+                        sx={{
+                          mt: 0.5,
+                          p: 1.5,
+                          bgcolor: 'action.hover',
+                          borderRadius: 1,
+                          borderLeft: 3,
+                          borderColor: 'primary.light',
+                        }}
+                      >
+                        <Typography
+                          variant="caption"
+                          component="pre"
+                          sx={{
+                            whiteSpace: 'pre-wrap',
+                            fontFamily: 'inherit',
+                            color: 'text.secondary',
+                          }}
+                        >
+                          {step.resolvedInstruction}
+                        </Typography>
+                      </Box>
+                    </Collapse>
+                  </Box>
+                )}
               </Box>
             </Box>
           )

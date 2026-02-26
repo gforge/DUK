@@ -1,5 +1,5 @@
-import { getStore, patchStore } from '../storage'
-import { now } from './utils'
+import { getStore, patchStore, setStore } from '../storage'
+import { uuid, now } from './utils'
 import type { Patient } from '../schemas'
 
 export function getPatients(): Patient[] {
@@ -8,6 +8,21 @@ export function getPatients(): Patient[] {
 
 export function getPatient(id: string): Patient | undefined {
   return getStore().patients.find((p) => p.id === id)
+}
+
+export function createPatient(
+  data: Pick<Patient, 'displayName' | 'personalNumber' | 'dateOfBirth'>,
+): Patient {
+  const state = getStore()
+  const patient: Patient = {
+    id: uuid(),
+    displayName: data.displayName,
+    personalNumber: data.personalNumber,
+    dateOfBirth: data.dateOfBirth,
+    createdAt: now(),
+  }
+  setStore({ ...state, patients: [...state.patients, patient] })
+  return patient
 }
 
 export function patientOpenedApp(patientId: string): Patient {

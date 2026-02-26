@@ -7,7 +7,12 @@ import { AuditEventSchema } from './audit'
 import { JournalDraftSchema, JournalTemplateSchema } from './journal'
 import { PolicyRuleSchema } from './policy'
 import { QuestionnaireTemplateSchema, FormSeriesSchema } from './questionnaire'
-import { JourneyTemplateSchema, ResearchModuleSchema, PatientJourneySchema } from './journey'
+import {
+  JourneyTemplateSchema,
+  ResearchModuleSchema,
+  PatientJourneySchema,
+  InstructionTemplateSchema,
+} from './journey'
 
 export const AppStateSchema = z.object({
   users: z.array(UserSchema),
@@ -23,5 +28,6 @@ export const AppStateSchema = z.object({
   journeyTemplates: z.array(JourneyTemplateSchema),
   researchModules: z.array(ResearchModuleSchema),
   patientJourneys: z.array(PatientJourneySchema),
+  instructionTemplates: z.array(InstructionTemplateSchema),
 })
 export type AppState = z.infer<typeof AppStateSchema>

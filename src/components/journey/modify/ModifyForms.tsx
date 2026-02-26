@@ -180,6 +180,9 @@ interface SwitchTemplateProps {
   onSelectTemplate: (id: string) => void
   reason: string
   setReason: (v: string) => void
+  /** Optional new anchor date (e.g. surgery date). Resets all step offsets. */
+  newStartDate: string
+  setNewStartDate: (v: string) => void
 }
 
 export function SwitchTemplateForm({
@@ -189,6 +192,8 @@ export function SwitchTemplateForm({
   onSelectTemplate,
   reason,
   setReason,
+  newStartDate,
+  setNewStartDate,
 }: SwitchTemplateProps) {
   const { t } = useTranslation()
   return (
@@ -215,6 +220,16 @@ export function SwitchTemplateForm({
           {otherTemplates.find((t) => t.id === selectedTemplateId)?.description}
         </Typography>
       )}
+      <TextField
+        label={t('journey.modify.newStartDate')}
+        helperText={t('journey.modify.newStartDateHint')}
+        value={newStartDate}
+        onChange={(e) => setNewStartDate(e.target.value)}
+        size="small"
+        type="date"
+        fullWidth
+        InputLabelProps={{ shrink: true }}
+      />
       <TextField
         label={t('journey.modify.reason')}
         value={reason}

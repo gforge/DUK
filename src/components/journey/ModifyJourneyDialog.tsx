@@ -24,6 +24,7 @@ interface ModifyJourneyDialogProps {
   steps: EffectiveStep[]
   journeyTemplates: JourneyTemplate[]
   questionnaireTemplates: QuestionnaireTemplate[]
+  currentStartDate: string
   onModify: (
     type: 'ADD_STEP' | 'REMOVE_STEP' | 'SWITCH_TEMPLATE',
     payload: {
@@ -32,6 +33,8 @@ interface ModifyJourneyDialogProps {
       stepId?: string
       newTemplateId?: string
       previousTemplateId?: string
+      previousStartDate?: string
+      newStartDate?: string
     },
   ) => Promise<void>
 }
@@ -41,6 +44,7 @@ export default function ModifyJourneyDialog({
   onClose,
   currentTemplateId,
   currentTemplateName,
+  currentStartDate,
   steps,
   journeyTemplates,
   questionnaireTemplates,
@@ -62,6 +66,7 @@ export default function ModifyJourneyDialog({
 
   const [newTemplateId, setNewTemplateId] = useState('')
   const [switchReason, setSwitchReason] = useState('')
+  const [newStartDate, setNewStartDate] = useState('')
 
   const handleClose = () => {
     setError(null)
@@ -101,6 +106,7 @@ export default function ModifyJourneyDialog({
           reason: switchReason,
           newTemplateId,
           previousTemplateId: currentTemplateId,
+          ...(newStartDate ? { previousStartDate: currentStartDate, newStartDate } : {}),
         })
       }
       handleClose()
@@ -167,6 +173,8 @@ export default function ModifyJourneyDialog({
               onSelectTemplate={setNewTemplateId}
               reason={switchReason}
               setReason={setSwitchReason}
+              newStartDate={newStartDate}
+              setNewStartDate={setNewStartDate}
             />
           )}
         </Box>

@@ -19,10 +19,12 @@ import {
   AccordionSummary,
   AccordionDetails,
   Chip,
+  Paper,
 } from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import SmartphoneIcon from '@mui/icons-material/Smartphone'
 import ContactPhoneIcon from '@mui/icons-material/ContactPhone'
+import RouteIcon from '@mui/icons-material/Route'
 import { useTranslation } from 'react-i18next'
 import { format } from 'date-fns'
 import { useRole } from '../store/roleContext'
@@ -31,6 +33,7 @@ import { useNavigate } from 'react-router-dom'
 import { useApi } from '../hooks/useApi'
 import * as client from '../api/client'
 import StatusChip from '../components/common/StatusChip'
+import JourneyTimeline from '../components/journey/JourneyTimeline'
 
 export default function PatientView() {
   const { t } = useTranslation()
@@ -55,6 +58,23 @@ export default function PatientView() {
     () => client.getPatient(currentUser.id),
     [currentUser.id],
   )
+
+  const { data: journeys } = useApi(
+    () => client.getPatientJourneys(currentUser.id),
+    [currentUser.id],
+  )
+  const { data: journeyTemplates } = useApi(() => client.getJourneyTemplates(), [])
+
+  const activeJourney = journeys?.find((j) => j.status === 'ACTIVE')
+
+  const { data: effectiveSteps } = useApi(
+    () => (activeJourney ? client.getEffectiveSteps(activeJourney.id) : Promise.resolve([])),
+    [activeJourney?.id],
+  )
+
+  const journeyName = activeJourney
+    ? journeyTemplates?.find((jt) => jt.id === activeJourney.journeyTemplateId)?.name
+    : undefined
 
   if (!isRole('PATIENT')) return null
 
@@ -134,6 +154,23 @@ export default function PatientView() {
           {t('patient.seekContact')}
         </Button>
       </Stack>
+
+      {/* Care Plan (journey timeline) */}
+      <Paper variant="outlined" sx={{ mb: 3, borderRadius: 2, p: 2 }}>
+        <Stack direction="row" alignItems="center" gap={1} mb={1.5}>
+          <RouteIcon color="primary" fontSize="small" />
+          <Typography variant="subtitle1" fontWeight={600}>
+            {t('patient.carePlan')}
+          </Typography>
+        </Stack>
+        {activeJourney && effectiveSteps ? (
+          <JourneyTimeline steps={effectiveSteps} formResponses={[]} journeyName={journeyName} />
+        ) : (
+          <Typography variant="body2" color="text.secondary">
+            {t('patient.noCarePlan')}
+          </Typography>
+        )}
+      </Paper>
 
       {/* Cases */}
       <Typography variant="subtitle1" fontWeight={600} gutterBottom>

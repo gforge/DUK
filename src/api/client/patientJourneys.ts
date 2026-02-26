@@ -1,5 +1,5 @@
 import * as service from '../service'
-import type { PatientJourney, JourneyModification } from '../schemas'
+import type { PatientJourney, JourneyModification, PatientJourneyStatus } from '../schemas'
 import type { EffectiveStep } from '../service'
 import { withDelay } from './delay'
 
@@ -18,6 +18,11 @@ export const assignPatientJourney = (
   withDelay(() =>
     service.assignPatientJourney(patientId, journeyTemplateId, startDate, researchModuleIds),
   )
+
+export const updatePatientJourneyStatus = (
+  journeyId: string,
+  status: PatientJourneyStatus,
+): Promise<PatientJourney> => withDelay(() => service.updatePatientJourneyStatus(journeyId, status))
 
 export const modifyPatientJourney = (
   journeyId: string,

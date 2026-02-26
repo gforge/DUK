@@ -5,6 +5,7 @@ class Patient {
   id
   displayName
   personalNumber
+  dateOfBirth
   palId
   lastOpenedAt
 }
@@ -25,13 +26,53 @@ class PatientJourney {
   patientId
   journeyTemplateId
   startDate
+  status
+  researchModuleIds
+  modifications[]
+}
+
+class JourneyTemplate {
+  id
+  name
+  description
+  parentTemplateId
+  derivedAt
+  entries[]
 }
 
 class JourneyTemplateEntry {
   id
+  label
   offsetDays
   windowDays
+  order
+  templateId?
   scoreAliases
+  scoreAliasLabels
+  dashboardCategory
+  instructionText?
+  instructionTemplateId?
+}
+
+class InstructionTemplate {
+  id
+  name
+  content
+  tags[]
+  createdAt
+  updatedAt
+}
+
+class JourneyModification {
+  id
+  type
+  addedByUserId
+  reason
+  addedAt
+  previousTemplateId?
+  newTemplateId?
+  previousStartDate?
+  newStartDate?
 }
 
 class FormResponse {
@@ -55,5 +96,10 @@ Patient "1" -- "*" Case : has
 Patient "1" -- "*" PatientJourney : journeys
 Case "1" -- "*" FormResponse : responses
 Case "1" -- "*" JournalDraft : drafts
+JourneyTemplate "1" -- "*" JourneyTemplateEntry : entries
+JourneyTemplate "0..1" -- "*" JourneyTemplate : parentTemplateId (derives)
+PatientJourney "*" -- "1" JourneyTemplate : journeyTemplateId
+PatientJourney "1" -- "*" JourneyModification : modifications
+JourneyTemplateEntry "*" -- "0..1" InstructionTemplate : instructionTemplateId
 
 @enduml

@@ -1,6 +1,8 @@
 @startuml
 title High-level Architecture — Duk Demo
 
+left to right direction
+
 package "Client" {
   [React UI]
 }
@@ -11,8 +13,13 @@ package "API Client" {
 
 package "Service Layer" {
   [src/api/service]
-  [Policy Parser]
-  [Journal Renderer]
+
+  package "Modules" {
+    [Policy Parser] <<src/api/policyParser/*>>
+    [Journal Renderer] <<src/api/journalRenderer.ts>>
+    [Journey Resolver]
+    [Instruction Templates]
+  }
 }
 
 package "Persistence" {
@@ -24,15 +31,16 @@ package "Persistence" {
 [src/api/client] --> [src/api/service]
 [src/api/service] --> [Policy Parser]
 [src/api/service] --> [Journal Renderer]
+[src/api/service] --> [Journey Resolver]
+[src/api/service] --> [Instruction Templates]
 [src/api/service] --> [In-memory store]
 [In-memory store] --> [localStorage]
 
-note left of [Policy Parser]
-  src/api/policyParser/*
-end note
-
-note right of [Journal Renderer]
-  src/api/journalRenderer.ts
+note bottom of [Journey Resolver]
+  Computes effective steps,
+  hydrates instructions,
+  handles template derivation
+  & SWITCH_TEMPLATE
 end note
 
 @enduml

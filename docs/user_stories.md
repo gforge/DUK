@@ -140,4 +140,104 @@ This document captures the key user stories for the Duk demo application. The li
 
 ---
 
-These stories map directly to the workflows and components described in the design document. They should evolve alongside the implementation, and new stories can be added for additional features (e.g. journey management, audit filtering, etc.).
+These stories map directly to the workflows and components described in the design document. They should evolve alongside the implementation, and new stories can be added for additional features (e.g. audit filtering, etc.).
+
+---
+
+## US9 – Journey switching with date reset
+
+**As a** clinician **I want** to switch a patient's journey template (e.g., from non‑op to post‑surgery protocol) and optionally reset the start date to a clinically relevant anchor (e.g. surgery date):
+
+- the modification dialog shows a "New start date" field when switching templates
+- all subsequent steps recalculate relative to the new anchor date
+- the modification history clearly shows both the template switch and the date change
+
+**Acceptance criteria**
+
+1. `SWITCH_TEMPLATE` modification accepts optional `newStartDate` and `previousStartDate`.
+2. After switching, `PatientJourney.startDate` reflects the new date and `getEffectiveSteps` returns dates relative to it.
+3. The modification history panel shows a date reset banner when applicable.
+4. Unit tests cover SWITCH_TEMPLATE with date reset.
+
+> _Related code_: `src/api/service/patientJourneys.ts`, `src/components/journey/modify/ModifyForms.tsx`, `src/tests/journey.test.ts`.
+
+---
+
+## US10 – Patient registration & journey assignment
+
+**As a** clinician (nurse/doctor/PAL) **I want** to register new patients and assign them to a clinical journey with a configurable reference date:
+
+- a dedicated `/patients` page lists all patients with search/filter
+- clicking "Register Patient" opens a 3-step wizard: patient details → journey assignment → review & confirm
+- existing patients can have journeys assigned via an "Assign Journey" button on their table row
+- the reference date (e.g. surgery date, injury date) becomes the journey's `startDate`
+
+**Acceptance criteria**
+
+1. `/patients` route exists and is accessible to NURSE, DOCTOR, PAL roles via the sidebar.
+2. `createPatient` service function creates a new patient record.
+3. `assignPatientJourney` assigns a journey template with the selected start date.
+4. The patients table shows active journey status per patient.
+
+> _Related code_: `src/pages/Patients.tsx`, `src/api/service/patients.ts`, `src/router/index.tsx`.
+
+---
+
+## US11 – Physio & patient instructions on the timeline
+
+**As a** clinician **I want** to attach physio protocols or care instructions to specific journey steps so patients and staff see relevant guidance at each checkpoint:
+
+- journey template entries can have inline `instructionText` or reference a reusable `InstructionTemplate`
+- the timeline renders instructions as collapsible panels with an info icon toggle
+- instruction templates are managed in the Journey Editor under an "Instructions" tab with full CRUD
+
+**Acceptance criteria**
+
+1. `JourneyTemplateEntry` supports `instructionText` and `instructionTemplateId` fields.
+2. `InstructionTemplate` entity exists with CRUD operations.
+3. `getEffectiveSteps` returns `resolvedInstruction` hydrated from the template or inline text.
+4. The `JourneyTimeline` component renders collapsible instruction panels.
+5. The Journey Editor has an "Instructions" tab for managing reusable templates.
+6. Unit tests verify instruction hydration from both template references and inline text.
+
+> _Related code_: `src/api/schemas/journey.ts`, `src/api/service/instructionTemplates.ts`, `src/components/journey/JourneyTimeline.tsx`, `src/components/journey/editor/InstructionTemplatesTab.tsx`.
+
+---
+
+## US12 – Template inheritance & derivation
+
+**As a** clinician **I want** to derive a new journey template from an existing parent, make local changes, and later selectively sync updates from the parent:
+
+- "Derive" button on a template creates a full copy with `parentTemplateId` linkage
+- derived templates show a badge indicating their parent
+- "Sync from Parent" button computes diffs (added/removed/changed entries) and presents a checklist
+- the clinician selects which changes to apply; unselected changes remain as local customisations
+
+**Acceptance criteria**
+
+1. `deriveJourneyTemplate(parentId, newName)` creates a deep copy with `parentTemplateId` and `derivedAt`.
+2. Derived entries get new UUIDs (no shared references with parent).
+3. `computeParentDiff(childId)` returns `EntryDiff[]` (ADDED, REMOVED, CHANGED).
+4. `applyParentDiff(childId, entryIds[])` selectively merges and updates `derivedAt`.
+5. The Journey Editor UI shows derive/sync buttons with appropriate dialogs.
+6. Unit tests cover derive, diff computation, and selective sync.
+
+> _Related code_: `src/api/service/journeyTemplates.ts`, `src/components/journey/editor/JourneyTemplatesTab.tsx`, `src/tests/journey.test.ts`.
+
+---
+
+## US13 – Patient care plan view
+
+**As a** patient **I want** to see my clinical journey timeline with instructions so I know what to expect at each checkpoint:
+
+- the patient view shows a "My Care Plan" section with the journey timeline
+- each step shows its scheduled date, status, and any resolved instructions
+- instructions are displayed as collapsible panels identical to the clinician view
+
+**Acceptance criteria**
+
+1. Patient view (`/patient`) fetches the active journey and effective steps.
+2. A "My Care Plan" `Paper` section renders a read-only `JourneyTimeline`.
+3. Resolved instructions are visible and expandable.
+
+> _Related code_: `src/pages/PatientView.tsx`, `src/components/journey/JourneyTimeline.tsx`.

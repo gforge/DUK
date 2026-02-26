@@ -59,9 +59,11 @@
     "edit": "Edit",
     "error": "An error occurred",
     "language": "Language",
+    "next": "Next",
     "no": "No",
     "notSet": "Not set",
     "save": "Save",
+    "saving": "Saving…",
     "yes": "Yes"
   },
   "dashboard": {
@@ -183,6 +185,9 @@
       "confirm": "Apply",
       "currentTemplate": "Current template",
       "newTemplate": "New template",
+      "newStartDate": "New start date",
+      "newStartDateHint": "e.g. surgery date — all steps will be recalculated relative to this date.",
+      "dateReset": "Start date changed: {{from}} → {{to}}",
       "offsetDays": "Day offset (from surgery date)",
       "questionnaire": "Questionnaire template",
       "reason": "Clinical reason (required)",
@@ -211,9 +216,28 @@
       "tabPatientJourneys": "Patient Journeys",
       "tabResearch": "Research Modules",
       "tabTemplates": "Journey Templates",
+      "tabInstructions": "Instructions",
       "templateDeleted": "Template deleted",
-      "title": "Journey Editor"
-    }
+      "title": "Journey Editor",
+      "noInstructions": "No instruction templates configured.",
+      "instructionDeleted": "Instruction template deleted",
+      "confirmDeleteInstruction": "Delete instruction template \"{{name}}\"?",
+      "derive": "Derive Template",
+      "deriveDialogTitle": "Derive template from \"{{name}}\"",
+      "deriveName": "New template name",
+      "derived": "Derived",
+      "parentTemplate": "Parent Template",
+      "syncFromParent": "Sync from Parent",
+      "syncDialogTitle": "Sync changes from parent template",
+      "syncNoChanges": "No changes to sync.",
+      "syncApplied": "Changes applied",
+      "diffAdded": "Added",
+      "diffRemoved": "Removed",
+      "diffChanged": "Changed",
+      "instruction": "Instruction",
+      "instructionTemplate": "Instruction Template"
+    },
+    "toggleInstruction": "Show/hide instructions"
   },
   "journal": {
     "approve": "Approve Draft",
@@ -233,6 +257,7 @@
     "dashboard": "Dashboard",
     "demoTools": "Demo Tools",
     "journeys": "Journeys",
+    "patients": "Patients",
     "policy": "Triage Policies"
   },
   "nextStep": {
@@ -259,7 +284,43 @@
     "seekContactConfirm": "Do you want to send a contact request to your care provider?",
     "seekContactTitle": "Seek Contact",
     "title": "Patient View",
-    "triggers": "Triggers"
+    "triggers": "Triggers",
+    "carePlan": "My Care Plan",
+    "noCarePlan": "No care plan assigned."
+  },
+  "patients": {
+    "title": "Patients",
+    "displayName": "Name",
+    "personalNumber": "Personal Number",
+    "dateOfBirth": "Date of Birth",
+    "activeJourney": "Active Journey",
+    "noResults": "No patients found",
+    "noJourney": "No journey",
+    "assignJourney": "Assign Journey",
+    "journeyAssigned": "Journey assigned",
+    "searchPlaceholder": "Search by name or personal number…",
+    "register": {
+      "action": "Register Patient",
+      "title": "Register New Patient",
+      "stepPatient": "Patient Details",
+      "stepJourney": "Assign Journey",
+      "stepConfirm": "Confirm",
+      "requiredFields": "Please fill in all required fields.",
+      "fetchFromRegister": "Fetch from register",
+      "fetchFirst": "Please fetch patient data from the population register first.",
+      "reservnummerDetected": "Coordination number detected — date of birth must be entered manually.",
+      "foundInRegister": "Found in population register",
+      "notFoundInRegister": "Not found in population register — please enter name manually.",
+      "nameOverride": "Name override (optional)",
+      "nameOverrideHint": "Leave blank to use the name from the register.",
+      "journeyRequired": "Select a journey template and start date.",
+      "selectTemplate": "Journey Template",
+      "referenceDate": "Reference date (e.g. surgery date)",
+      "referenceDateHint": "All steps are calculated relative to this date.",
+      "reviewTitle": "Review and confirm",
+      "confirm": "Register",
+      "success": "Patient registered"
+    }
   },
   "policy": {
     "addRule": "Add Rule",
@@ -389,12 +450,11 @@
     "bookings": "Bookings",
     "bookingCancelSuccess": "Booking cancelled",
     "bookingUpdated": "Booking updated",
-    "editBooking": "Edit booking"
-  ,
-  "bookingExport": {
-    "exportIcal": "Download iCal",
-    "addToGoogle": "Open in Google Calendar"
-  }
+    "editBooking": "Edit booking",
+    "bookingExport": {
+      "exportIcal": "Download iCal",
+      "addToGoogle": "Open in Google Calendar"
+    }
   },
   "trigger": {
     "ABNORMAL_ANSWER": "Abnormal Answer",

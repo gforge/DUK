@@ -59,9 +59,11 @@
     "edit": "Redigera",
     "error": "Fel uppstod",
     "language": "Språk",
+    "next": "Nästa",
     "no": "Nej",
     "notSet": "Ej satt",
     "save": "Spara",
+    "saving": "Sparar…",
     "yes": "Ja"
   },
   "dashboard": {
@@ -183,6 +185,9 @@
       "confirm": "Tillämpa",
       "currentTemplate": "Aktuell mall",
       "newTemplate": "Ny mall",
+      "newStartDate": "Nytt startdatum",
+      "newStartDateHint": "T.ex. operationsdatum — alla steg beräknas om relativt detta datum.",
+      "dateReset": "Startdatum ändrat: {{from}} → {{to}}",
       "offsetDays": "Dagoffset (från operationsdatum)",
       "questionnaire": "Frågeformulärsmall",
       "reason": "Klinisk motivering (obligatorisk)",
@@ -211,9 +216,28 @@
       "tabPatientJourneys": "Patientresor",
       "tabResearch": "Forskningsmoduler",
       "tabTemplates": "Resmallar",
+      "tabInstructions": "Instruktioner",
       "templateDeleted": "Mall borttagen",
-      "title": "Reseditorn"
-    }
+      "title": "Reseditorn",
+      "noInstructions": "Inga instruktionsmallar konfigurerade.",
+      "instructionDeleted": "Instruktionsmall borttagen",
+      "confirmDeleteInstruction": "Ta bort instruktionsmall \"{{name}}\"?",
+      "derive": "Härledd mall",
+      "deriveDialogTitle": "Härledd mall från \"{{name}}\"",
+      "deriveName": "Nytt mallnamn",
+      "derived": "Härledd",
+      "parentTemplate": "Föräldramall",
+      "syncFromParent": "Synka från föräldramall",
+      "syncDialogTitle": "Synka ändringar från föräldramall",
+      "syncNoChanges": "Inga ändringar att synka.",
+      "syncApplied": "Ändringar tillämpade",
+      "diffAdded": "Tillagt",
+      "diffRemoved": "Borttaget",
+      "diffChanged": "Ändrat",
+      "instruction": "Instruktion",
+      "instructionTemplate": "Instruktionsmall"
+    },
+    "toggleInstruction": "Visa/dölj instruktioner"
   },
   "journal": {
     "approve": "Godkänn utkast",
@@ -232,6 +256,7 @@
     "dashboard": "Dashboard",
     "demoTools": "Demo-verktyg",
     "journeys": "Patientresor",
+    "patients": "Patienter",
     "policy": "Triagepolicyer"
   },
   "nextStep": {
@@ -258,7 +283,43 @@
     "seekContactConfirm": "Vill du skicka en kontaktförfrågan till din vårdgivare?",
     "seekContactTitle": "Söka kontakt",
     "title": "Patientvy",
-    "triggers": "Triggers"
+    "triggers": "Triggers",
+    "carePlan": "Min vårdplan",
+    "noCarePlan": "Ingen vårdplan tilldelad."
+  },
+  "patients": {
+    "title": "Patienter",
+    "displayName": "Namn",
+    "personalNumber": "Personnummer",
+    "dateOfBirth": "Födelsedatum",
+    "activeJourney": "Aktiv patientresa",
+    "noResults": "Inga patienter hittades",
+    "noJourney": "Ingen resa",
+    "assignJourney": "Tilldela resa",
+    "journeyAssigned": "Patientresa tilldelad",
+    "searchPlaceholder": "Sök namn eller personnummer…",
+    "register": {
+      "action": "Registrera patient",
+      "title": "Registrera ny patient",
+      "stepPatient": "Patientuppgifter",
+      "stepJourney": "Tilldela resa",
+      "stepConfirm": "Bekräfta",
+      "requiredFields": "Fyll i alla obligatoriska fält.",
+      "fetchFromRegister": "Hämta från folkbokföringen",
+      "fetchFirst": "Hämta patientuppgifter från folkbokföringen först.",
+      "reservnummerDetected": "Reservnummer identifierat – födelsedatum måste anges manuellt.",
+      "foundInRegister": "Hittades i folkbokföringen",
+      "notFoundInRegister": "Hittades inte i folkbokföringen – ange namn manuellt.",
+      "nameOverride": "Namnkorrigering (valfritt)",
+      "nameOverrideHint": "Lämna tomt för att använda namnet från folkbokföringen.",
+      "journeyRequired": "Välj en resemall och startdatum.",
+      "selectTemplate": "Resemall",
+      "referenceDate": "Referensdatum (t.ex. operationsdatum)",
+      "referenceDateHint": "Alla steg beräknas relativt detta datum.",
+      "reviewTitle": "Granska och bekräfta",
+      "confirm": "Registrera",
+      "success": "Patient registrerad"
+    }
   },
   "policy": {
     "addRule": "Lägg till regel",

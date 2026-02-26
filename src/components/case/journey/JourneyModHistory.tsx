@@ -55,6 +55,11 @@ export default function JourneyModHistory({ modifications, journeyTemplates }: P
                   mod.newTemplateId}
               </Typography>
             )}
+            {mod.newStartDate && (
+              <Typography variant="caption" display="block" color="warning.main" fontWeight={600}>
+                {t('journey.modify.dateReset')}: {mod.previousStartDate} → {mod.newStartDate}
+              </Typography>
+            )}
           </Paper>
         ))}
       </Stack>

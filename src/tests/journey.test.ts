@@ -221,4 +221,148 @@ describe('modifyPatientJourney', () => {
     // old template preserved in modification record
     expect(journeys[0].modifications[0].previousTemplateId).toBe('jt-standard')
   })
+
+  it('SWITCH_TEMPLATE with newStartDate resets the journey start date', () => {
+    service.modifyPatientJourney('pj-1', {
+      type: 'SWITCH_TEMPLATE',
+      addedByUserId: 'user-pal-1',
+      reason: 'Surgery occurred — resetting timeline',
+      previousTemplateId: 'jt-standard',
+      newTemplateId: 'jt-complex',
+      previousStartDate: '2026-01-15',
+      newStartDate: '2026-02-10',
+    })
+    const journeys = service.getPatientJourneys('p-1')
+    expect(journeys[0].journeyTemplateId).toBe('jt-complex')
+    expect(journeys[0].startDate).toBe('2026-02-10')
+    const mod = journeys[0].modifications[0]
+    expect(mod.previousStartDate).toBe('2026-01-15')
+    expect(mod.newStartDate).toBe('2026-02-10')
+  })
+})
+
+// ─── deriveJourneyTemplate ───────────────────────────────────────────────────
+
+describe('deriveJourneyTemplate', () => {
+  it('creates a child template with parentTemplateId set', () => {
+    const child = service.deriveJourneyTemplate('jt-standard', 'Standard copy')
+    expect(child.parentTemplateId).toBe('jt-standard')
+    expect(child.name).toBe('Standard copy')
+    expect(child.derivedAt).toBeDefined()
+    // Should have same number of entries as parent
+    const parent = service.getJourneyTemplates().find((t) => t.id === 'jt-standard')!
+    expect(child.entries.length).toBe(parent.entries.length)
+  })
+
+  it('child gets new ids for entries (deep copy)', () => {
+    const child = service.deriveJourneyTemplate('jt-standard', 'Test copy')
+    const parent = service.getJourneyTemplates().find((t) => t.id === 'jt-standard')!
+    const parentIds = parent.entries.map((e) => e.id)
+    const childIds = child.entries.map((e) => e.id)
+    // No id overlap
+    expect(childIds.every((id) => !parentIds.includes(id))).toBe(true)
+  })
+
+  it('throws when parent does not exist', () => {
+    expect(() => service.deriveJourneyTemplate('nonexistent', 'X')).toThrow()
+  })
+})
+
+// ─── computeParentDiff / applyParentDiff ────────────────────────────────────
+
+describe('computeParentDiff', () => {
+  it('returns empty for template without parent', () => {
+    expect(service.computeParentDiff('jt-standard')).toEqual([])
+  })
+
+  it('detects CHANGED entries after parent modification', () => {
+    // jt-proximal-humerus is derived from jt-standard
+    // Modify parent entry label
+    const templates = service.getJourneyTemplates()
+    const parent = templates.find((t) => t.id === 'jt-standard')!
+    const entry0 = parent.entries[0]
+    service.saveJourneyTemplate({
+      ...parent,
+      entries: parent.entries.map((e, i) => (i === 0 ? { ...e, label: 'Updated first step' } : e)),
+    })
+    const diffs = service.computeParentDiff('jt-proximal-humerus')
+    const changed = diffs.filter((d) => d.type === 'CHANGED')
+    expect(changed.length).toBeGreaterThanOrEqual(1)
+  })
+})
+
+describe('applyParentDiff', () => {
+  it('applies selected diffs and updates derivedAt', () => {
+    // Modify parent
+    const templates = service.getJourneyTemplates()
+    const parent = templates.find((t) => t.id === 'jt-standard')!
+    service.saveJourneyTemplate({
+      ...parent,
+      entries: parent.entries.map((e, i) => (i === 0 ? { ...e, label: 'Synced label' } : e)),
+    })
+
+    const diffs = service.computeParentDiff('jt-proximal-humerus')
+    const changedIds = diffs.filter((d) => d.type === 'CHANGED').map((d) => d.entryId)
+    expect(changedIds.length).toBeGreaterThanOrEqual(1)
+
+    const before = service.getJourneyTemplates().find((t) => t.id === 'jt-proximal-humerus')!
+    const updated = service.applyParentDiff('jt-proximal-humerus', changedIds)
+    expect(updated.derivedAt).not.toBe(before.derivedAt)
+    // After sync, diff should be empty for those entries
+    const postDiffs = service.computeParentDiff('jt-proximal-humerus')
+    const stillChanged = postDiffs.filter(
+      (d) => d.type === 'CHANGED' && changedIds.includes(d.entryId),
+    )
+    expect(stillChanged.length).toBe(0)
+  })
+})
+
+// ─── resolvedInstruction hydration ──────────────────────────────────────────
+
+describe('resolvedInstruction', () => {
+  it('hydrates resolvedInstruction from instructionTemplateId', () => {
+    // Find a journey that uses a template with instructionTemplateId on entries
+    const templates = service.getJourneyTemplates()
+    const templateWithInstruction = templates.find((t) =>
+      t.entries.some((e) => e.instructionTemplateId),
+    )
+    if (!templateWithInstruction) return // skip if no seed has it
+
+    // Find or create a patient journey using this template
+    const journeys = service.getPatientJourneys()
+    let journey = journeys.find((j) => j.journeyTemplateId === templateWithInstruction.id)
+    if (!journey) {
+      journey = service.assignPatientJourney('p-1', templateWithInstruction.id, '2026-01-01')
+    }
+
+    const steps = service.getEffectiveSteps(journey.id)
+    const withInstruction = steps.find((s) => s.resolvedInstruction)
+    expect(withInstruction).toBeDefined()
+    expect(withInstruction!.resolvedInstruction!.length).toBeGreaterThan(0)
+  })
+
+  it('falls back to instructionText when no instructionTemplateId', () => {
+    // Create a template with instructionText only
+    const template = service.saveJourneyTemplate({
+      name: 'Instruction Text Test',
+      description: 'Test',
+      entries: [
+        {
+          id: 'ite-1',
+          label: 'Day 1',
+          offsetDays: 1,
+          windowDays: 1,
+          order: 1,
+          templateId: 'qt-wound-pain',
+          scoreAliases: {},
+          scoreAliasLabels: {},
+          dashboardCategory: 'ACUTE' as const,
+          instructionText: 'Custom inline instruction text',
+        },
+      ],
+    })
+    const journey = service.assignPatientJourney('p-1', template.id, '2026-01-01')
+    const steps = service.getEffectiveSteps(journey.id)
+    expect(steps[0].resolvedInstruction).toBe('Custom inline instruction text')
+  })
 })

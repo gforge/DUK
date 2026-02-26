@@ -6,6 +6,7 @@ import AppShell from '../components/layout/AppShell'
 const Dashboard = lazy(() => import('../pages/Dashboard'))
 const CaseDetail = lazy(() => import('../pages/CaseDetail'))
 const PatientView = lazy(() => import('../pages/PatientView'))
+const Patients = lazy(() => import('../pages/Patients'))
 const PolicyEditor = lazy(() => import('../pages/PolicyEditor'))
 const DemoTools = lazy(() => import('../pages/DemoTools'))
 const JourneyEditor = lazy(() => import('../pages/JourneyEditor'))
@@ -28,6 +29,8 @@ export default function AppRouter() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/cases/:id" element={<CaseDetail />} />
             <Route path="/patient" element={<PatientView />} />
+            <Route path="/patients" element={<Patients />} />
+            <Route path="/patients/:id" element={<Patients />} />
             <Route path="/policy" element={<PolicyEditor />} />
             <Route path="/journeys" element={<JourneyEditor />} />
             <Route path="/demo-tools" element={<DemoTools />} />

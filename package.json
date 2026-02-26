@@ -16,7 +16,7 @@
     "format": "prettier --write src",
     "generate:i18n": "i18next-cli extract --quiet",
     "ncu": "ncu",
-    "diagrams:render": "docker run --rm -v \"$PWD\":/workspace plantuml/plantuml -tsvg /workspace/docs/diagrams",
+    "diagrams:render": "docker run --rm --user \"$(id -u):$(id -g)\" -v \"$PWD\":/workspace plantuml/plantuml -tsvg /workspace/docs/diagrams",
     "diagrams:clean": "bash -lc \"rm -f docs/diagrams/*.svg || true\""
   },
   "dependencies": {

@@ -11,6 +11,7 @@ import { journalTemplates } from './journalTemplates'
 import { journeyTemplates } from './journeyTemplates'
 import { researchModules } from './researchModules'
 import { patientJourneys } from './patientJourneys'
+import { instructionTemplates } from './instructionTemplates'
 
 export const SEED_STATE: AppState = {
   users,
@@ -26,4 +27,5 @@ export const SEED_STATE: AppState = {
   journeyTemplates,
   researchModules,
   patientJourneys,
+  instructionTemplates,
 }

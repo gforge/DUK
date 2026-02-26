@@ -6,11 +6,15 @@ participant "JourneyTemplateEntry" as Entry
 participant "Service" as Service
 participant "PolicyScope" as Scope
 
-System -> Entry : read scoreAliases { alias: "OSS.total" -> path: "scores.OSS.total" }
-Service -> Scope : inject alias values into numeric scope
+System -> Entry : read scoreAliases\n{ alias: "OSS.total"\n-> path: "scores.OSS.total" }
+Service -> Scope : inject alias values\ninto numeric scope
 Scope --> Service : scope {OSS.total: 22}
 Service -> PolicyParser : evaluateExpression(rule, scope)
 
-note right: aliasing implemented in journeyResolver.buildPolicyScopeWithAliases
+note right
+  Aliasing implemented in
+  journeyResolver
+  .buildPolicyScopeWithAliases
+end note
 
 @enduml
