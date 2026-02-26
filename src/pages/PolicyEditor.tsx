@@ -46,8 +46,7 @@ export default function PolicyEditor() {
     error,
     refetch,
   } = useApi(
-    () =>
-      selectedTemplateId ? client.getPolicyRules(selectedTemplateId) : Promise.resolve(null),
+    () => (selectedTemplateId ? client.getPolicyRules(selectedTemplateId) : Promise.resolve(null)),
     [selectedTemplateId],
   )
 
@@ -157,12 +156,7 @@ export default function PolicyEditor() {
           ))}
         </TextField>
         {selectedTemplateId && (
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={openCreate}
-            disableElevation
-          >
+          <Button variant="contained" startIcon={<AddIcon />} onClick={openCreate} disableElevation>
             {t('policy.addRule')}
           </Button>
         )}
@@ -204,4 +198,3 @@ export default function PolicyEditor() {
     </Box>
   )
 }
-

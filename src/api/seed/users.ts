@@ -98,4 +98,42 @@ export const patients: Patient[] = [
     lastOpenedAt: iso(daysAgo(6)),
     createdAt: iso(daysAgo(100)),
   },
+  // ── Proximal Humerus patients ────────────────────────────────────────────
+  {
+    id: 'p-11',
+    displayName: 'Ingrid Ingvarsson',
+    personalNumber: '195206144321',
+    dateOfBirth: '1952-06-14',
+    palId: 'user-pal-1',
+    lastOpenedAt: iso(daysAgo(1)),
+    createdAt: iso(daysAgo(2)),
+  },
+  {
+    id: 'p-12',
+    displayName: 'Johan Johansson',
+    personalNumber: '195308085678',
+    dateOfBirth: '1953-08-08',
+    palId: 'user-doc-1',
+    lastOpenedAt: iso(daysAgo(2)),
+    createdAt: iso(daysAgo(35)),
+  },
+  // ── Distal Radius patients ───────────────────────────────────────────────
+  {
+    id: 'p-13',
+    displayName: 'Ragnhild Rasmussen',
+    personalNumber: '196811259012',
+    dateOfBirth: '1968-11-25',
+    palId: 'user-pal-1',
+    lastOpenedAt: iso(daysAgo(1)),
+    createdAt: iso(daysAgo(14)),
+  },
+  {
+    id: 'p-14',
+    displayName: 'Bert Borg',
+    personalNumber: '195704043456',
+    dateOfBirth: '1957-04-04',
+    palId: 'user-doc-1',
+    lastOpenedAt: iso(daysAgo(3)),
+    createdAt: iso(daysAgo(52)),
+  },
 ]

@@ -129,4 +129,104 @@ export const formResponses: FormResponse[] = [
     scores: { 'OSS.total': 32, 'EQ5D.index': 0.72 },
     submittedAt: iso(daysAgo(2)),
   },
+  // ── Proximal humerus patients ─────────────────────────────────────────────
+  // Ingrid — case-11 — acute, high pain + numbness (baseline only)
+  {
+    id: 'fr-p11-1',
+    patientId: 'p-11',
+    templateId: 'qt-numbness-infection',
+    caseId: 'case-11',
+    answers: { NUMB_1: true, NUMB_2: false, INF_WOUND: false, INF_FEVER: false, PNRS_1: 9 },
+    scores: {},
+    submittedAt: iso(daysAgo(2)),
+  },
+  // Johan — case-12 — subacute, week 4: high pain + low shoulder function
+  {
+    id: 'fr-p12-1',
+    patientId: 'p-12',
+    templateId: 'qt-numbness-infection',
+    caseId: 'case-12',
+    answers: { NUMB_1: false, NUMB_2: false, INF_WOUND: false, INF_FEVER: false, PNRS_1: 6 },
+    scores: {},
+    submittedAt: iso(daysAgo(34)),
+  },
+  {
+    id: 'fr-p12-2',
+    patientId: 'p-12',
+    templateId: 'qt-wound-pain',
+    caseId: 'case-12',
+    answers: { WOUND_HEALED: true, WOUND_DISCHARGE: false, PNRS_2: 5, PNRS_NIGHT: 4 },
+    scores: {},
+    submittedAt: iso(daysAgo(25)),
+  },
+  {
+    id: 'fr-p12-3',
+    patientId: 'p-12',
+    templateId: 'qt-function-oss',
+    caseId: 'case-12',
+    // PNRS_week4=7 (≥ 7 → rule-ph-2), OSS_week4=20 (< 25 → rule-ph-3)
+    answers: { OSS_1: 2, OSS_2: 2, OSS_3: 2, OSS_4: 2, OSS_5: 2, PNRS_2: 7 },
+    scores: { 'OSS.total': 20 },
+    submittedAt: iso(daysAgo(7)),
+  },
+  // ── Distal radius patients ───────────────────────────────────────────────
+  // Ragnhild — case-13 — acute, pain increasing (PNRS_1=6 → PNRS_2=8 → rule-dr-1)
+  {
+    id: 'fr-p13-1',
+    patientId: 'p-13',
+    templateId: 'qt-numbness-infection',
+    caseId: 'case-13',
+    answers: { NUMB_1: false, NUMB_2: false, INF_WOUND: false, INF_FEVER: false, PNRS_1: 6 },
+    scores: {},
+    submittedAt: iso(daysAgo(13)),
+  },
+  {
+    id: 'fr-p13-2',
+    patientId: 'p-13',
+    templateId: 'qt-wound-pain',
+    caseId: 'case-13',
+    answers: { WOUND_HEALED: false, WOUND_DISCHARGE: true, PNRS_2: 8, PNRS_NIGHT: 7 },
+    scores: {},
+    submittedAt: iso(daysAgo(1)),
+  },
+  // Bert — case-14 — subacute week 8: pain resurges + function worsens
+  {
+    id: 'fr-p14-1',
+    patientId: 'p-14',
+    templateId: 'qt-numbness-infection',
+    caseId: 'case-14',
+    answers: { NUMB_1: false, NUMB_2: false, INF_WOUND: false, INF_FEVER: false, PNRS_1: 5 },
+    scores: {},
+    submittedAt: iso(daysAgo(51)),
+  },
+  {
+    id: 'fr-p14-2',
+    patientId: 'p-14',
+    templateId: 'qt-wound-pain',
+    caseId: 'case-14',
+    answers: { WOUND_HEALED: true, WOUND_DISCHARGE: false, PNRS_2: 4, PNRS_NIGHT: 3 },
+    scores: {},
+    submittedAt: iso(daysAgo(38)),
+  },
+  {
+    id: 'fr-p14-3',
+    patientId: 'p-14',
+    templateId: 'qt-function-oss',
+    caseId: 'case-14',
+    // week 4 response — decent but not alarming
+    answers: { OSS_1: 3, OSS_2: 4, OSS_3: 4, OSS_4: 3, OSS_5: 4, PNRS_2: 4 },
+    scores: { 'OSS.total': 36 },
+    submittedAt: iso(daysAgo(24)),
+  },
+  {
+    id: 'fr-p14-4',
+    patientId: 'p-14',
+    templateId: 'qt-function-oss',
+    caseId: 'case-14',
+    // week 8 response — pain resurges and function deteriorates
+    // PNRS_week4=6 (≥ 6 → rule-dr-2), OSS_week8=20 (< 26 → rule-dr-4)
+    answers: { OSS_1: 2, OSS_2: 2, OSS_3: 2, OSS_4: 2, OSS_5: 2, PNRS_2: 6 },
+    scores: { 'OSS.total': 20 },
+    submittedAt: iso(daysAgo(3)),
+  },
 ]
