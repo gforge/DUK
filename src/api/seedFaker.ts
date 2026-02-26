@@ -120,6 +120,7 @@ export async function buildFakerSeed(): Promise<AppState> {
         status: 'ACTIVE',
         researchModuleIds: [],
         modifications: [],
+        recurringCompletions: [],
         createdAt,
         updatedAt: createdAt,
       })

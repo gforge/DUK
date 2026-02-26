@@ -38,3 +38,18 @@ export const unenrollResearchModule = (
   journeyId: string,
   moduleId: string,
 ): Promise<PatientJourney> => withDelay(() => service.unenrollResearchModule(journeyId, moduleId))
+
+/**
+ * Records one completed occurrence of a recurring step.
+ * Normally called automatically by submitFormResponse when journeyContext is provided.
+ * Can also be called directly for manual overrides.
+ */
+export const recordRecurringCompletion = (
+  journeyId: string,
+  stepId: string,
+  occurrenceIndex: number,
+  completedAt: string,
+): Promise<PatientJourney> =>
+  withDelay(() =>
+    service.recordRecurringCompletion(journeyId, stepId, occurrenceIndex, completedAt),
+  )

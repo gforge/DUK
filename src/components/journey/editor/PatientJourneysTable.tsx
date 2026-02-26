@@ -66,7 +66,7 @@ export default function PatientJourneysTable({
       <TableHead>
         <TableRow>
           <TableCell>{t('journey.patient')}</TableCell>
-          <TableCell>{t('journey.template')}</TableCell>
+          <TableCell>{t('journey.template.label')}</TableCell>
           <TableCell>{t('journey.startDate')}</TableCell>
           <TableCell>{t('journey.journeyStatus.label')}</TableCell>
           <TableCell>{t('journey.researchLabel')}</TableCell>

@@ -80,6 +80,7 @@ export function buildRealisticSeed(): AppState {
         status: 'ACTIVE',
         researchModuleIds: [],
         modifications: [],
+        recurringCompletions: [],
         createdAt,
         updatedAt: createdAt,
       })

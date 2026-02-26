@@ -15,6 +15,7 @@ import ErrorIcon from '@mui/icons-material/Error'
 import ScienceIcon from '@mui/icons-material/Science'
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
+import RepeatIcon from '@mui/icons-material/Repeat'
 import { useTranslation } from 'react-i18next'
 import type { EffectiveStep } from '../../api/service'
 import type { FormResponse } from '../../api/schemas'
@@ -136,6 +137,19 @@ export default function JourneyTimeline({
                         label={t('journey.added')}
                         size="small"
                         color="warning"
+                        variant="outlined"
+                        sx={{ height: 20, fontSize: 11 }}
+                      />
+                    </Tooltip>
+                  )}
+
+                  {step.isRecurring && step.occurrenceIndex !== undefined && (
+                    <Tooltip title={t('journey.recurringStep')}>
+                      <Chip
+                        icon={<RepeatIcon />}
+                        label={t('journey.recurringOccurrence', { n: step.occurrenceIndex + 1 })}
+                        size="small"
+                        color="secondary"
                         variant="outlined"
                         sx={{ height: 20, fontSize: 11 }}
                       />

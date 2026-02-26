@@ -31,6 +31,8 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 import ForkRightIcon from '@mui/icons-material/ForkRight'
 import SyncIcon from '@mui/icons-material/Sync'
+import EditIcon from '@mui/icons-material/Edit'
+import RepeatIcon from '@mui/icons-material/Repeat'
 import { useTranslation } from 'react-i18next'
 import * as client from '../../../api/client'
 import { useSnack } from '../../../store/snackContext'
@@ -54,6 +56,7 @@ export default function JourneyTemplatesTab({
   const { showSnack } = useSnack()
   const [deriveTarget, setDeriveTarget] = useState<JourneyTemplate | null>(null)
   const [syncTarget, setSyncTarget] = useState<JourneyTemplate | null>(null)
+  const [editTarget, setEditTarget] = useState<JourneyTemplate | null>(null)
 
   if (loading) return <Skeleton variant="rectangular" height={200} sx={{ borderRadius: 1 }} />
   if (!journeyTemplates?.length)
@@ -152,6 +155,7 @@ export default function JourneyTemplatesTab({
                         </Tooltip>
                       </Stack>
                     </TableCell>
+                    <TableCell>{t('journey.template.recurrenceIntervalDays')}</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -215,6 +219,24 @@ export default function JourneyTemplatesTab({
                           })}
                         </Stack>
                       </TableCell>
+                      <TableCell>
+                        {entry.recurrenceIntervalDays !== undefined ? (
+                          <Chip
+                            icon={<RepeatIcon />}
+                            label={t('journey.template.recurrenceUnit', {
+                              count: entry.recurrenceIntervalDays,
+                            })}
+                            size="small"
+                            color="secondary"
+                            variant="outlined"
+                            sx={{ fontSize: 10, height: 20 }}
+                          />
+                        ) : (
+                          <Typography variant="caption" color="text.secondary">
+                            —
+                          </Typography>
+                        )}
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -223,6 +245,18 @@ export default function JourneyTemplatesTab({
           </Accordion>
         ))}
       </Stack>
+
+      {/* Edit Template Dialog */}
+      {editTarget && (
+        <EditTemplateDialog
+          template={editTarget}
+          onClose={() => setEditTarget(null)}
+          onSaved={() => {
+            setEditTarget(null)
+            onRefresh?.()
+          }}
+        />
+      )}
 
       {/* Derive Dialog */}
       {deriveTarget && (
@@ -425,6 +459,94 @@ function SyncFromParentDialog({
           disableElevation
         >
           {t('common.confirm')}
+        </Button>
+      </DialogActions>
+    </Dialog>
+  )
+}
+
+// ─── Edit Template Dialog ────────────────────────────────────────────────────
+
+function EditTemplateDialog({
+  template,
+  onClose,
+  onSaved,
+}: {
+  template: JourneyTemplate
+  onClose: () => void
+  onSaved: () => void
+}) {
+  const { t } = useTranslation()
+  const { showSnack } = useSnack()
+  const [name, setName] = useState(template.name)
+  const [description, setDescription] = useState(template.description ?? '')
+  const [referenceDateLabel, setReferenceDateLabel] = useState(
+    template.referenceDateLabel ?? 'Startdatum',
+  )
+  const [saving, setSaving] = useState(false)
+
+  const handleSave = async () => {
+    if (!name.trim()) return
+    setSaving(true)
+    try {
+      await client.saveJourneyTemplate({
+        ...template,
+        name: name.trim(),
+        description: description.trim() || undefined,
+        referenceDateLabel: referenceDateLabel.trim() || 'Startdatum',
+      })
+      showSnack(t('journey.template.saved'), 'success')
+      onSaved()
+    } catch {
+      showSnack(t('common.error'), 'error')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  return (
+    <Dialog open onClose={onClose} maxWidth="xs" fullWidth>
+      <DialogTitle>{t('journey.editor.editTemplate')}</DialogTitle>
+      <DialogContent>
+        <Stack gap={2} sx={{ mt: 1 }}>
+          <TextField
+            label={t('journey.template.name')}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            size="small"
+            fullWidth
+            autoFocus
+            required
+          />
+          <TextField
+            label={t('journey.template.description')}
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            size="small"
+            fullWidth
+            multiline
+            minRows={2}
+          />
+          <TextField
+            label={t('journey.template.referenceDateLabel')}
+            value={referenceDateLabel}
+            onChange={(e) => setReferenceDateLabel(e.target.value)}
+            size="small"
+            fullWidth
+            required
+            helperText={t('journey.template.referenceDateLabelHint')}
+          />
+        </Stack>
+      </DialogContent>
+      <DialogActions sx={{ px: 2, pb: 2 }}>
+        <Button onClick={onClose}>{t('common.cancel')}</Button>
+        <Button
+          variant="contained"
+          onClick={handleSave}
+          disabled={saving || !name.trim()}
+          disableElevation
+        >
+          {saving ? t('common.saving') : t('common.save')}
         </Button>
       </DialogActions>
     </Dialog>

@@ -48,6 +48,39 @@ const MIGRATIONS: Migration[] = [
       instructionTemplates: s['instructionTemplates'] ?? [],
     }),
   },
+  {
+    from: 1,
+    to: 2,
+    up: (s) => ({
+      ...s,
+      schemaVersion: 2,
+      // Backfill recurringCompletions on all existing patientJourneys.
+      // referenceDateLabel on journeyTemplates and recurrenceIntervalDays on entries
+      // have Zod defaults so they are populated automatically by AppStateSchema.safeParse.
+      patientJourneys: Array.isArray(s['patientJourneys'])
+        ? (s['patientJourneys'] as Record<string, unknown>[]).map((j) => ({
+            ...j,
+            recurringCompletions: j['recurringCompletions'] ?? [],
+          }))
+        : [],
+    }),
+  },
+  {
+    from: 2,
+    to: 3,
+    up: (s) => ({
+      ...s,
+      schemaVersion: 3,
+      // Backfill journeyTemplateId on all existing policyRules.
+      // We assign them to the standard fracture template as a safe default.
+      policyRules: Array.isArray(s['policyRules'])
+        ? (s['policyRules'] as Record<string, unknown>[]).map((r) => ({
+            ...r,
+            journeyTemplateId: r['journeyTemplateId'] ?? 'jt-standard',
+          }))
+        : [],
+    }),
+  },
 ]
 
 // ---------------------------------------------------------------------------

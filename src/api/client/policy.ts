@@ -2,7 +2,8 @@ import * as service from '../service'
 import type { PolicyRule, Case } from '../schemas'
 import { withDelay } from './delay'
 
-export const getPolicyRules = (): Promise<PolicyRule[]> => withDelay(() => service.getPolicyRules())
+export const getPolicyRules = (journeyTemplateId: string): Promise<PolicyRule[]> =>
+  withDelay(() => service.getPolicyRules(journeyTemplateId))
 
 export const savePolicyRule = (
   rule: Omit<PolicyRule, 'id' | 'createdAt'> & { id?: string },

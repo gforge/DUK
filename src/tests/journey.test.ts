@@ -346,6 +346,7 @@ describe('resolvedInstruction', () => {
     const template = service.saveJourneyTemplate({
       name: 'Instruction Text Test',
       description: 'Test',
+      referenceDateLabel: 'Startdatum',
       entries: [
         {
           id: 'ite-1',
@@ -364,5 +365,106 @@ describe('resolvedInstruction', () => {
     const journey = service.assignPatientJourney('p-1', template.id, '2026-01-01')
     const steps = service.getEffectiveSteps(journey.id)
     expect(steps[0].resolvedInstruction).toBe('Custom inline instruction text')
+  })
+
+  it('expands a recurring entry into multiple occurrences up to the horizon', () => {
+    const template = service.saveJourneyTemplate({
+      name: 'Recurrence Test',
+      referenceDateLabel: 'Startdatum',
+      entries: [
+        {
+          id: 'rec-1',
+          label: 'Halvårsuppföljning',
+          offsetDays: 180,
+          windowDays: 14,
+          order: 1,
+          scoreAliases: {},
+          scoreAliasLabels: {},
+          dashboardCategory: 'CONTROL' as const,
+          recurrenceIntervalDays: 182,
+        },
+      ],
+    })
+    // 5 years horizon => 365*5 = 1825 days. First at 180, then 362, 544, 726, 908, 1090, 1272, 1454, 1636, 1818 = 10 occurrences
+    const journey = service.assignPatientJourney('p-1', template.id, '2024-01-01')
+    const steps = service.getEffectiveSteps(journey.id)
+
+    expect(steps.length).toBeGreaterThan(1)
+    expect(steps.every((s) => s.isRecurring)).toBe(true)
+    // IDs should follow the __r0, __r1, etc. convention
+    expect(steps[0].id).toBe('rec-1__r0')
+    expect(steps[1].id).toBe('rec-1__r1')
+    // First occurrence scheduled at startDate + 180 days
+    const startMs = new Date('2024-01-01').getTime()
+    const expected0 = new Date(startMs + 180 * 86_400_000).toISOString().slice(0, 10)
+    expect(steps[0].scheduledDate).toBe(expected0)
+    // Second occurrence at first + 182 days (no completion recorded)
+    const expected1 = new Date(startMs + (180 + 182) * 86_400_000).toISOString().slice(0, 10)
+    expect(steps[1].scheduledDate).toBe(expected1)
+    // All must be within the horizon
+    const horizonDate = new Date(startMs + 1825 * 86_400_000).toISOString().slice(0, 10)
+    expect(steps.every((s) => s.scheduledDate <= horizonDate)).toBe(true)
+  })
+
+  it('re-anchors next recurring occurrence from actual completion date', () => {
+    const template = service.saveJourneyTemplate({
+      name: 'Late Completion Test',
+      referenceDateLabel: 'Startdatum',
+      entries: [
+        {
+          id: 'late-1',
+          label: 'Uppföljning',
+          offsetDays: 90,
+          windowDays: 14,
+          order: 1,
+          scoreAliases: {},
+          scoreAliasLabels: {},
+          dashboardCategory: 'CONTROL' as const,
+          recurrenceIntervalDays: 180,
+        },
+      ],
+    })
+    const journey = service.assignPatientJourney('p-1', template.id, '2024-01-01')
+
+    // Simulate occurrence 0 being completed 60 days late (at day 150)
+    const lateCompletionDate = '2024-06-29' // 2024-01-01 + 150 days
+    service.recordRecurringCompletion(journey.id, 'late-1', 0, lateCompletionDate)
+
+    const steps = service.getEffectiveSteps(journey.id)
+    // Occurrence 0 is still at day 90
+    expect(steps[0].scheduledDate).toBe('2024-03-31') // 2024-01-01 + 90 days
+    // Occurrence 1 should be re-anchored: max(day 90 + 180, day 150 + 180) = day 330
+    const startMs = new Date('2024-01-01').getTime()
+    const expectedNext = new Date(
+      Math.max(
+        startMs + 90 * 86_400_000 + 180 * 86_400_000,
+        new Date(lateCompletionDate).getTime() + 180 * 86_400_000,
+      ),
+    )
+      .toISOString()
+      .slice(0, 10)
+    expect(steps[1].scheduledDate).toBe(expectedNext)
+  })
+})
+
+// ─── recordRecurringCompletion ─────────────────────────────────────────────────
+
+describe('recordRecurringCompletion', () => {
+  it('adds a completion record to the journey', () => {
+    const journey = service.getPatientJourneys('p-1')[0]
+    const updated = service.recordRecurringCompletion(journey.id, 'some-step', 0, '2024-06-01')
+    expect(updated.recurringCompletions).toHaveLength(1)
+    expect(updated.recurringCompletions[0]).toMatchObject({
+      stepId: 'some-step',
+      occurrenceIndex: 0,
+      completedAt: '2024-06-01',
+    })
+  })
+
+  it('is idempotent — calling twice does not duplicate the record', () => {
+    const journey = service.getPatientJourneys('p-1')[0]
+    service.recordRecurringCompletion(journey.id, 'some-step', 0, '2024-06-01')
+    const updated = service.recordRecurringCompletion(journey.id, 'some-step', 0, '2024-06-01')
+    expect(updated.recurringCompletions).toHaveLength(1)
   })
 })

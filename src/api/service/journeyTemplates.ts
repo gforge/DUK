@@ -53,6 +53,7 @@ export function deriveJourneyTemplate(parentId: string, newName: string): Journe
     createdAt: now(),
     parentTemplateId: parentId,
     derivedAt: now(),
+    referenceDateLabel: parent.referenceDateLabel,
   }
   setStore({ ...state, journeyTemplates: [...state.journeyTemplates, child] })
   return child
@@ -120,6 +121,47 @@ export function computeParentDiff(childId: string): EntryDiff[] {
  * entryIds refers to entryId values from the EntryDiff array.
  * Updates derivedAt so next diff is relative to this sync point.
  */
+// ---------------------------------------------------------------------------
+// Policy variable discovery
+// ---------------------------------------------------------------------------
+
+/**
+ * A variable that can be referenced in a policy expression.
+ * Journey-specific variables come from template scoreAliases + scoreAliasLabels.
+ */
+export interface PolicyVariable {
+  /** The identifier used in policy expressions, e.g. "PNRS_baseline". */
+  name: string
+  /** Human-readable label shown in the UI, e.g. "Smärta dag 1–2 (PNRS)". */
+  label: string
+  /** Name of the journey template the variable comes from (used for grouping). */
+  templateName: string
+}
+
+/**
+ * Scans all journey templates in the store and collects every score alias that
+ * has a human-readable label. These are the variables clinicians can reference
+ * in policy expressions to compare measurements across time-points.
+ */
+export function getAvailablePolicyVariables(): PolicyVariable[] {
+  const state = getStore()
+  const seen = new Set<string>()
+  const vars: PolicyVariable[] = []
+
+  for (const jt of state.journeyTemplates) {
+    for (const entry of jt.entries) {
+      for (const [, alias] of Object.entries(entry.scoreAliases)) {
+        if (seen.has(alias)) continue
+        seen.add(alias)
+        const label = entry.scoreAliasLabels?.[alias] ?? alias
+        vars.push({ name: alias, label, templateName: jt.name })
+      }
+    }
+  }
+
+  return vars
+}
+
 export function applyParentDiff(childId: string, entryIds: string[]): JourneyTemplate {
   const state = getStore()
   const child = state.journeyTemplates.find((t) => t.id === childId)

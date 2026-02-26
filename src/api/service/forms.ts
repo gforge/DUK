@@ -14,11 +14,19 @@ export function getFormResponses(caseId: string): FormResponse[] {
   return getStore().formResponses.filter((r) => r.caseId === caseId)
 }
 
+export interface JourneyStepContext {
+  patientJourneyId: string
+  /** Base entry id (not the __r0 expanded variant). */
+  journeyStepId: string
+  occurrenceIndex: number
+}
+
 export function submitFormResponse(
   patientId: string,
   caseId: string,
   templateId: string,
   answers: Record<string, string | number | boolean>,
+  journeyContext?: JourneyStepContext,
 ): FormResponse {
   let state = getStore()
   const template = state.questionnaireTemplates.find((t) => t.id === templateId)!
@@ -45,7 +53,13 @@ export function submitFormResponse(
     answers,
     scores,
     submittedAt: now(),
+    ...(journeyContext && {
+      patientJourneyId: journeyContext.patientJourneyId,
+      journeyStepId: journeyContext.journeyStepId,
+      occurrenceIndex: journeyContext.occurrenceIndex,
+    }),
   }
+
   const existingCase = state.cases.find((c) => c.id === caseId)!
   const updatedCase: Case = {
     ...existingCase,
@@ -55,10 +69,44 @@ export function submitFormResponse(
     status: existingCase.status === 'NEW' ? 'NEEDS_REVIEW' : existingCase.status,
   }
 
+  // If linked to a recurring step, record the completion so the next occurrence
+  // is re-anchored relative to today.
+  let patientJourneys = state.patientJourneys
+  if (journeyContext) {
+    const journey = patientJourneys.find((j) => j.id === journeyContext.patientJourneyId)
+    const tmpl = journey
+      ? state.journeyTemplates.find((t) => t.id === journey.journeyTemplateId)
+      : undefined
+    const entry = tmpl?.entries.find((e) => e.id === journeyContext.journeyStepId)
+    if (journey && entry?.recurrenceIntervalDays !== undefined) {
+      const alreadyRecorded = (journey.recurringCompletions ?? []).some(
+        (c) =>
+          c.stepId === journeyContext.journeyStepId &&
+          c.occurrenceIndex === journeyContext.occurrenceIndex,
+      )
+      if (!alreadyRecorded) {
+        const updatedJourney = {
+          ...journey,
+          recurringCompletions: [
+            ...(journey.recurringCompletions ?? []),
+            {
+              stepId: journeyContext.journeyStepId,
+              occurrenceIndex: journeyContext.occurrenceIndex,
+              completedAt: now().slice(0, 10),
+            },
+          ],
+          updatedAt: now(),
+        }
+        patientJourneys = patientJourneys.map((j) => (j.id === journey.id ? updatedJourney : j))
+      }
+    }
+  }
+
   state = {
     ...state,
     formResponses: [...state.formResponses, response],
     cases: state.cases.map((c) => (c.id === caseId ? updatedCase : c)),
+    patientJourneys,
   }
   state = addAuditEvent(state, caseId, patientId, 'PATIENT', 'FORM_SUBMITTED', {
     templateId,

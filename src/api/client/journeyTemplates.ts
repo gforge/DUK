@@ -1,6 +1,6 @@
 import * as service from '../service'
 import type { JourneyTemplate } from '../schemas'
-import type { EntryDiff } from '../service'
+import type { EntryDiff, PolicyVariable } from '../service'
 import { withDelay } from './delay'
 
 export const getJourneyTemplates = (): Promise<JourneyTemplate[]> =>
@@ -23,3 +23,6 @@ export const computeParentDiff = (childId: string): Promise<EntryDiff[]> =>
 
 export const applyParentDiff = (childId: string, entryIds: string[]): Promise<JourneyTemplate> =>
   withDelay(() => service.applyParentDiff(childId, entryIds))
+
+export const getAvailablePolicyVariables = (): Promise<PolicyVariable[]> =>
+  withDelay(() => service.getAvailablePolicyVariables())

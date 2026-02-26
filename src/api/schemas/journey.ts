@@ -45,6 +45,12 @@ export const JourneyTemplateEntrySchema = z.object({
   instructionText: z.string().optional(),
   /** Reference to a reusable InstructionTemplate. Overrides instructionText if both present. */
   instructionTemplateId: z.string().optional(),
+  /**
+   * If set, this step recurs every N days after the previous occurrence is completed.
+   * Completion is triggered when the patient submits the linked form.
+   * getEffectiveSteps expands this into multiple occurrences up to a 5-year horizon.
+   */
+  recurrenceIntervalDays: z.number().int().positive().optional(),
 })
 export type JourneyTemplateEntry = z.infer<typeof JourneyTemplateEntrySchema>
 
@@ -61,6 +67,12 @@ export const JourneyTemplateSchema = z.object({
    * (or the timestamp of derivation if never explicitly synced).
    */
   derivedAt: z.string().optional(),
+  /**
+   * Human-readable name for the anchor/reference date used when assigning this template.
+   * Displayed in the registration dialog instead of the generic "Referensdatum".
+   * Examples: "Operationsdatum", "Skadedatum", "Uppföljningsstart".
+   */
+  referenceDateLabel: z.string().default('Startdatum'),
 })
 export type JourneyTemplate = z.infer<typeof JourneyTemplateSchema>
 
@@ -99,6 +111,18 @@ export const JourneyModificationSchema = z.object({
 })
 export type JourneyModification = z.infer<typeof JourneyModificationSchema>
 
+/**
+ * Records one completed occurrence of a recurring step.
+ * stepId refers to the base entry id (not the __r0 variant from getEffectiveSteps).
+ */
+export const RecurringCompletionSchema = z.object({
+  stepId: z.string(),
+  occurrenceIndex: z.number().int().min(0),
+  /** YYYY-MM-DD when the patient submitted the form for this occurrence. */
+  completedAt: z.string(),
+})
+export type RecurringCompletion = z.infer<typeof RecurringCompletionSchema>
+
 export const PatientJourneySchema = z.object({
   id: z.string(),
   patientId: z.string(),
@@ -107,6 +131,8 @@ export const PatientJourneySchema = z.object({
   status: PatientJourneyStatusSchema,
   researchModuleIds: z.array(z.string()),
   modifications: z.array(JourneyModificationSchema),
+  /** Completion records for recurring steps — drives the next-occurrence date calculation. */
+  recurringCompletions: z.array(RecurringCompletionSchema).default([]),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
 })

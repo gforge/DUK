@@ -3,8 +3,9 @@ import { uuid, now, evaluatePolicyRules } from './utils'
 import { buildPolicyScopeWithAliases } from './journeyResolver'
 import type { Case, PolicyRule, PolicyWarning } from '../schemas'
 
-export function getPolicyRules(): PolicyRule[] {
-  return getStore().policyRules
+/** Returns all rules for a specific journey template. */
+export function getPolicyRules(journeyTemplateId: string): PolicyRule[] {
+  return getStore().policyRules.filter((r) => r.journeyTemplateId === journeyTemplateId)
 }
 
 export function savePolicyRule(
@@ -35,7 +36,17 @@ export function reEvaluatePolicyForCase(caseId: string): Case {
   const caseData = state.cases.find((c) => c.id === caseId)!
   const responses = state.formResponses.filter((r) => r.caseId === caseId)
   const scope = buildPolicyScopeWithAliases(responses, caseData.patientId)
-  const warnings: PolicyWarning[] = evaluatePolicyRules(state.policyRules, scope)
+
+  // Only evaluate rules belonging to the patient's active journey template
+  const activeJourney = state.patientJourneys
+    .filter((j) => j.patientId === caseData.patientId && j.status === 'ACTIVE')
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0]
+
+  const applicableRules = activeJourney
+    ? state.policyRules.filter((r) => r.journeyTemplateId === activeJourney.journeyTemplateId)
+    : []
+
+  const warnings: PolicyWarning[] = evaluatePolicyRules(applicableRules, scope)
   const updated: Case = { ...caseData, policyWarnings: warnings, lastActivityAt: now() }
   setStore({ ...state, cases: state.cases.map((c) => (c.id === caseId ? updated : c)) })
   return updated

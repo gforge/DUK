@@ -22,6 +22,7 @@ export function assignPatientJourney(
     status: 'ACTIVE',
     researchModuleIds,
     modifications: [],
+    recurringCompletions: [],
     createdAt: now(),
     updatedAt: now(),
   }
@@ -96,6 +97,43 @@ export function unenrollResearchModule(journeyId: string, moduleId: string): Pat
   const updated: PatientJourney = {
     ...journey,
     researchModuleIds: journey.researchModuleIds.filter((id) => id !== moduleId),
+    updatedAt: now(),
+  }
+  setStore({
+    ...state,
+    patientJourneys: state.patientJourneys.map((j) => (j.id === journeyId ? updated : j)),
+  })
+  return updated
+}
+
+/**
+ * Records that a specific occurrence of a recurring step has been completed.
+ * Called automatically from submitFormResponse when the form is linked to a
+ * recurring journey step (recurrenceIntervalDays is set on the template entry).
+ *
+ * Idempotent: calling it twice for the same stepId + occurrenceIndex is a no-op.
+ */
+export function recordRecurringCompletion(
+  journeyId: string,
+  stepId: string,
+  occurrenceIndex: number,
+  completedAt: string, // YYYY-MM-DD
+): PatientJourney {
+  const state = getStore()
+  const journey = state.patientJourneys.find((j) => j.id === journeyId)
+  if (!journey) throw new Error(`Journey ${journeyId} not found`)
+
+  const alreadyRecorded = (journey.recurringCompletions ?? []).some(
+    (c) => c.stepId === stepId && c.occurrenceIndex === occurrenceIndex,
+  )
+  if (alreadyRecorded) return journey
+
+  const updated: PatientJourney = {
+    ...journey,
+    recurringCompletions: [
+      ...(journey.recurringCompletions ?? []),
+      { stepId, occurrenceIndex, completedAt },
+    ],
     updatedAt: now(),
   }
   setStore({

@@ -1,6 +1,7 @@
 import * as service from '../service'
 import type { Patient } from '../schemas'
 import { withDelay } from './delay'
+import { formatPersonnummer } from '../utils/personnummer'
 
 export const getPatients = (): Promise<Patient[]> => withDelay(() => service.getPatients())
 
@@ -57,3 +58,22 @@ export const lookupPersonnummer = (
   }
   return withDelay(() => result)
 }
+
+export interface DemoRegisterHint {
+  pnr: string // formatted YYYYMMDD-XXXX
+  pnr12: string // raw 12-digit (for lookup)
+  displayName: string
+}
+
+/**
+ * Returns all entries from the simulated population register, formatted for
+ * display in the registration help box. This exists purely for the demo UI.
+ */
+export const getDemoRegisterHints = (): Promise<DemoRegisterHint[]> =>
+  withDelay(() =>
+    Object.entries(FAKE_REGISTER).map(([pnr12, { displayName }]) => ({
+      pnr12,
+      pnr: formatPersonnummer(pnr12),
+      displayName,
+    })),
+  )
