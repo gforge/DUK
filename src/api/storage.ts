@@ -2,11 +2,15 @@ import type { AppState } from './schemas'
 
 const STORAGE_KEY = 'duk_app_state'
 
-export function loadState(): AppState | null {
+/**
+ * Returns the raw JSON-parsed value from localStorage without any validation
+ * or casting. Callers are responsible for validating/migrating before use.
+ */
+export function loadState(): unknown | null {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
     if (!raw) return null
-    return JSON.parse(raw) as AppState
+    return JSON.parse(raw)
   } catch {
     return null
   }
@@ -25,11 +29,6 @@ let memoryStore: AppState | null = null
 
 export function getStore(): AppState {
   if (memoryStore) return memoryStore
-  const persisted = loadState()
-  if (persisted) {
-    memoryStore = persisted
-    return memoryStore
-  }
   throw new Error('Store not initialised — call initStore() first')
 }
 

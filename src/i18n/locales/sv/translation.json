@@ -460,5 +460,17 @@
     "NO_RESPONSE": "Ej svarat",
     "NOT_OPENED": "Ej öppnat appen",
     "SEEK_CONTACT": "Söker kontakt"
+  },
+  "migration": {
+    "title": "Datakompabilitetsproblem",
+    "storedVersion": "Lagrad version",
+    "currentVersion": "App-version",
+    "reasonDowngrade": "Den sparade datan skapades av en nyare version av appen. Nedgradering stöds inte.",
+    "reasonNoPath": "Inget uppgraderingsstig finns från den lagrade schemaversionen till den aktuella versionen.",
+    "reasonParseError": "Den lagrade datan kunde inte valideras efter migrering.",
+    "downloadCta": "Ladda ner data som JSON",
+    "downloadHint": "Spara en kopia av din data — den kan konverteras manuellt senare.",
+    "clearCta": "Rensa och börja om",
+    "clearHint": "Detta raderar all lagrad data permanent."
   }
 }

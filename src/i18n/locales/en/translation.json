@@ -456,6 +456,18 @@
       "addToGoogle": "Open in Google Calendar"
     }
   },
+  "migration": {
+    "title": "Data Compatibility Issue",
+    "storedVersion": "Stored version",
+    "currentVersion": "App version",
+    "reasonDowngrade": "The stored data was created by a newer version of this app. Downgrade migrations are not supported.",
+    "reasonNoPath": "No upgrade path exists from the stored schema version to the current version.",
+    "reasonParseError": "The stored data could not be validated after migration.",
+    "downloadCta": "Download data as JSON",
+    "downloadHint": "Save a copy of your data — it can be converted manually later.",
+    "clearCta": "Clear and start fresh",
+    "clearHint": "This permanently deletes all stored data."
+  },
   "trigger": {
     "ABNORMAL_ANSWER": "Abnormal Answer",
     "HIGH_PAIN": "High Pain",

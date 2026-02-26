@@ -3,6 +3,8 @@ import { ThemeProvider, createTheme, CssBaseline } from '@mui/material'
 import { RoleProvider } from './store/roleContext'
 import { SnackProvider } from './store/snackContext'
 import AppRouter from './router'
+import MigrationErrorOverlay from './components/common/MigrationErrorOverlay'
+import type { MigrationResultErr } from './api/migrations'
 
 const theme = createTheme({
   palette: {
@@ -43,15 +45,23 @@ const theme = createTheme({
   },
 })
 
-export default function App() {
+interface AppProps {
+  migrationError?: MigrationResultErr
+}
+
+export default function App({ migrationError }: AppProps = {}) {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <RoleProvider>
-        <SnackProvider>
-          <AppRouter />
-        </SnackProvider>
-      </RoleProvider>
+      {migrationError ? (
+        <MigrationErrorOverlay error={migrationError} />
+      ) : (
+        <RoleProvider>
+          <SnackProvider>
+            <AppRouter />
+          </SnackProvider>
+        </RoleProvider>
+      )}
     </ThemeProvider>
   )
 }

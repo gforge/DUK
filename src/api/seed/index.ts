@@ -1,4 +1,5 @@
 import type { AppState } from '../schemas'
+import { CURRENT_SCHEMA_VERSION } from '../schemaVersion'
 import { users, patients } from './users'
 import { cases } from './cases'
 import { policyRules } from './policyRules'
@@ -14,6 +15,7 @@ import { patientJourneys } from './patientJourneys'
 import { instructionTemplates } from './instructionTemplates'
 
 export const SEED_STATE: AppState = {
+  schemaVersion: CURRENT_SCHEMA_VERSION,
   users,
   patients,
   cases,

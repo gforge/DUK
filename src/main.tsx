@@ -2,28 +2,31 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import './i18n/index'
 import App from './App'
-import { initStore } from './api/storage'
-import { loadState } from './api/storage'
+import { initStore, loadState } from './api/storage'
 import { SEED_STATE } from './api/seed'
-import type { AppState } from './api/schemas'
+import { runMigrations } from './api/migrations'
+import type { MigrationResultErr } from './api/migrations'
 
-/**
- * Migrate persisted state to add any new top-level fields introduced in later versions.
- * This avoids wiping user data when the schema grows.
- */
-function migrateState(state: AppState): AppState {
-  return {
-    ...state,
-    instructionTemplates: state.instructionTemplates ?? SEED_STATE.instructionTemplates,
+// Boot: load raw persisted state, migrate to current schema version, or fall
+// back to seed data. If migration is impossible show a blocking overlay.
+const raw = loadState()
+let migrationError: MigrationResultErr | undefined
+
+if (raw === null) {
+  // First launch or cleared storage — start with seed data
+  initStore(SEED_STATE)
+} else {
+  const result = runMigrations(raw)
+  if (result.ok) {
+    initStore(result.state)
+  } else {
+    // Cannot migrate — render the overlay without touching the store
+    migrationError = result
   }
 }
 
-// Boot: load persisted state from localStorage, or fall back to seed data
-const persisted = loadState()
-initStore(persisted ? migrateState(persisted) : SEED_STATE)
-
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <App />
+    <App migrationError={migrationError} />
   </React.StrictMode>,
 )

@@ -15,6 +15,7 @@ import {
 } from './journey'
 
 export const AppStateSchema = z.object({
+  schemaVersion: z.number().int().default(0),
   users: z.array(UserSchema),
   patients: z.array(PatientSchema),
   cases: z.array(CaseSchema),
