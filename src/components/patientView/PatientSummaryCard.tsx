@@ -3,6 +3,7 @@ import { Card, CardContent, CircularProgress, Stack, Typography } from '@mui/mat
 import { useTranslation } from 'react-i18next'
 import { format } from 'date-fns'
 import type { Patient } from '../../api/schemas'
+import { formatPersonnummer } from '../../api/utils/personnummer'
 
 interface Props {
   patient: Patient | null | undefined
@@ -21,7 +22,7 @@ export default function PatientSummaryCard({ patient, loading }: Props) {
           <Stack spacing={1}>
             <Typography variant="h6">{patient.displayName}</Typography>
             <Typography variant="body2" color="text.secondary">
-              {t('patient.personalNumber')}: {patient.personalNumber}
+              {t('patient.personalNumber')}: {formatPersonnummer(patient.personalNumber)}
             </Typography>
             {patient.lastOpenedAt && (
               <Typography variant="body2" color="text.secondary">

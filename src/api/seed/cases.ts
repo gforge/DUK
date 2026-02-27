@@ -79,6 +79,8 @@ export const cases: Case[] = [
     assignedRole: 'NURSE',
     nextStep: 'DIGITAL_CONTROL',
     deadline: iso(daysFromNow(7)),
+    internalNote:
+      'Digital kontroll planerad. Säkerställ att patienten fått instruktioner för formuläret.',
     createdByUserId: 'user-pal-1',
     triagedByUserId: 'user-pal-1',
     scheduledAt: iso(daysAgo(21)),
@@ -195,6 +197,7 @@ export const cases: Case[] = [
     policyWarnings: [],
     nextStep: 'PHYSIO_VISIT',
     deadline: iso(daysFromNow(14)),
+    internalNote: 'Boka fysiobesök inom 2 veckor — rörlighetsproblem kvarstår sedan operationen.',
     assignedRole: 'NURSE',
     createdByUserId: 'user-pal-1',
     triagedByUserId: 'user-pal-1',

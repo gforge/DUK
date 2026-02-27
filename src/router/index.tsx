@@ -10,6 +10,7 @@ const Patients = lazy(() => import('../pages/Patients'))
 const PolicyEditor = lazy(() => import('../pages/PolicyEditor'))
 const DemoTools = lazy(() => import('../pages/DemoTools'))
 const JourneyEditor = lazy(() => import('../pages/JourneyEditor'))
+const Worklist = lazy(() => import('../pages/Worklist'))
 
 function Loader() {
   return (
@@ -33,6 +34,7 @@ export default function AppRouter() {
             <Route path="/patients/:id" element={<Patients />} />
             <Route path="/policy" element={<PolicyEditor />} />
             <Route path="/journeys" element={<JourneyEditor />} />
+            <Route path="/worklist" element={<Worklist />} />
             <Route path="/demo-tools" element={<DemoTools />} />
           </Routes>
         </Suspense>

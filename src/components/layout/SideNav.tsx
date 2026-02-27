@@ -16,6 +16,7 @@ import BuildIcon from '@mui/icons-material/Build'
 import PersonIcon from '@mui/icons-material/Person'
 import PeopleIcon from '@mui/icons-material/People'
 import RouteIcon from '@mui/icons-material/Route'
+import AssignmentIcon from '@mui/icons-material/Assignment'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useRole } from '../../store/roleContext'
@@ -45,6 +46,12 @@ export default function SideNav({ drawerWidth, mobileOpen, onClose, isMobile }: 
       icon: <PersonIcon />,
       path: '/patient',
       roles: ['PATIENT'] as const,
+    },
+    {
+      label: t('nav.worklist'),
+      icon: <AssignmentIcon />,
+      path: '/worklist',
+      roles: ['NURSE', 'DOCTOR', 'PAL'] as const,
     },
     {
       label: t('nav.policy'),

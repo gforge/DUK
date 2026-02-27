@@ -54,5 +54,5 @@ export function parsePersonnummer(pnr: string): PnrInfo {
  */
 export function formatPersonnummer(pnr12: string): string {
   if (pnr12.length !== 12) return pnr12
-  return `${pnr12.slice(0, 8)}-${pnr12.slice(8)}`
+  return `${pnr12.slice(0, 2)}\u00a0${pnr12.slice(2, 8)}-${pnr12.slice(8)}`
 }

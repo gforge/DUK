@@ -25,8 +25,6 @@ import TriageActionDetails from './TriageActionDetails'
 export const TriageFormSchema = TriageInputSchema.extend({
   deadline: z.string().optional(),
   closeImmediately: z.boolean(),
-  bookingTime: z.string().optional(),
-  bookingRole: z.string().optional(),
   bookingNote: z.string().optional(),
 })
 export type TriageForm = z.infer<typeof TriageFormSchema>

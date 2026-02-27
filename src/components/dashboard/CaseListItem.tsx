@@ -7,6 +7,7 @@ import { useFocusRestore } from '../../hooks/useFocusRestore'
 import StatusChip from '../common/StatusChip'
 import TriggerChips from '../common/TriggerChips'
 import AutoWarningsBadge from '../common/AutoWarningsBadge'
+import DeadlineLabel from '../common/DeadlineLabel'
 import type { Case, Patient, CaseStatus } from '../../api/schemas'
 
 interface CaseListItemProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -80,7 +81,7 @@ export default function CaseListItem({
     ? format(new Date(caseData.lastActivityAt), 'dd MMM HH:mm')
     : '—'
 
-  const deadline = caseData.deadline ? format(new Date(caseData.deadline), 'dd MMM yyyy') : null
+  const deadline = caseData.deadline ?? null
 
   return (
     <>
@@ -141,11 +142,7 @@ export default function CaseListItem({
             <Typography variant="caption" color="text.secondary">
               {t('dashboard.lastActivity')}: {lastActivity}
             </Typography>
-            {deadline && (
-              <Typography variant="caption" color="warning.dark">
-                ⏱ {deadline}
-              </Typography>
-            )}
+            {deadline && <DeadlineLabel deadline={deadline} />}
           </Stack>
         </Stack>
       </Box>

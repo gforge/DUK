@@ -3,7 +3,10 @@ import { Paper, Stack, Box, Typography, Chip, Divider } from '@mui/material'
 import PersonIcon from '@mui/icons-material/Person'
 import { useTranslation } from 'react-i18next'
 import { format } from 'date-fns'
+import { formatPersonnummer } from '../../api/utils/personnummer'
 import TriggerChips from '../common/TriggerChips'
+import StatusChip from '../common/StatusChip'
+import DeadlineLabel from '../common/DeadlineLabel'
 import AutoWarningsBadge from '../common/AutoWarningsBadge'
 import type { Case, Patient } from '../../api/schemas'
 
@@ -44,7 +47,7 @@ export default function PatientCard({ patient, caseData }: PatientCardProps) {
               {patient.displayName}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              {patient.personalNumber} · {patient.dateOfBirth}
+              {formatPersonnummer(patient.personalNumber)} · {patient.dateOfBirth}
             </Typography>
             {lastOpened ? (
               <Typography variant="caption" color="text.secondary">
@@ -98,9 +101,9 @@ export default function PatientCard({ patient, caseData }: PatientCardProps) {
                 <Typography variant="caption" color="text.secondary">
                   {t('case.deadline')}
                 </Typography>
-                <Typography variant="body2" fontWeight={600}>
-                  {format(new Date(caseData.deadline), 'dd MMM yyyy')}
-                </Typography>
+                <Box mt={0.25}>
+                  <DeadlineLabel deadline={caseData.deadline} />
+                </Box>
               </Box>
             )}
           </Box>

@@ -10,7 +10,7 @@ export type CaseWithActiveCategory = Case & {
 
 const VALID_TRANSITIONS: Record<CaseStatus, CaseStatus[]> = {
   NEW: ['NEEDS_REVIEW'],
-  NEEDS_REVIEW: ['TRIAGED'],
+  NEEDS_REVIEW: ['TRIAGED', 'CLOSED'],
   TRIAGED: ['FOLLOWING_UP', 'CLOSED'],
   FOLLOWING_UP: ['CLOSED'],
   CLOSED: [],

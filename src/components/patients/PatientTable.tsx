@@ -13,6 +13,7 @@ import RouteIcon from '@mui/icons-material/Route'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import type { Patient, PatientJourney, JourneyTemplate } from '../../api/schemas'
+import { formatPersonnummer } from '../../api/utils/personnummer'
 
 interface Props {
   patients: Patient[]
@@ -79,7 +80,7 @@ export default function PatientTable({
                   {patient.displayName}
                 </Typography>
               </TableCell>
-              <TableCell>{patient.personalNumber}</TableCell>
+              <TableCell>{formatPersonnummer(patient.personalNumber)}</TableCell>
               <TableCell>{patient.dateOfBirth}</TableCell>
               <TableCell>
                 {name ? (

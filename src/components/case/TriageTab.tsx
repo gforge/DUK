@@ -5,7 +5,6 @@ import type { Case } from '../../api/schemas'
 import { useRole } from '../../store/roleContext'
 import { useSnack } from '../../store/snackContext'
 import * as client from '../../api/client'
-import type { Role } from '../../api/schemas'
 import TriageForm from './triage/TriageForm'
 import type { TriageForm as TriageFormData } from './triage/TriageForm'
 
@@ -24,21 +23,15 @@ export default function TriageTab({ caseData, onTriaged }: TriageTabProps) {
   async function onSubmit(data: TriageFormData) {
     try {
       const deadline = data.deadline ? new Date(data.deadline).toISOString() : undefined
-      // If a booking was scheduled from the triage, create it first
-      if (data.bookingTime) {
-        const booking = {
-          id: `${caseData.id}-${Date.now()}`,
-          type: data.nextStep,
-          role: data.bookingRole as unknown as Role | undefined,
-          scheduledAt: new Date(data.bookingTime).toISOString(),
-          note: data.bookingNote ?? undefined,
-          createdByUserId: currentUser.id,
-          createdAt: new Date().toISOString(),
-        }
-        await client.createBooking(caseData.id, booking, currentUser.id, currentUser.role)
-      }
+      const internalNote =
+        [data.bookingNote, data.internalNote].filter(Boolean).join('\n') || undefined
 
-      await client.triageCase(caseData.id, { ...data, deadline }, currentUser.id, currentUser.role)
+      await client.triageCase(
+        caseData.id,
+        { ...data, deadline, internalNote },
+        currentUser.id,
+        currentUser.role,
+      )
       showSnack(t('triage.success'), 'success')
       onTriaged()
     } catch (err) {

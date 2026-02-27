@@ -2,19 +2,16 @@ import React, { useRef } from 'react'
 import {
   Box,
   TextField,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
   Stack,
   Typography,
-  Paper,
   Alert,
   Accordion,
   AccordionSummary,
   AccordionDetails,
   InputAdornment,
   IconButton,
+  ToggleButtonGroup,
+  ToggleButton,
 } from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth'
@@ -90,6 +87,7 @@ export default function TriageActionDetails({
             }}
           />
           <DeadlineQuickChips
+            label={t('triage.quickDeadline')}
             onSelect={(iso) => setValue('deadline', iso, { shouldValidate: true })}
           />
           <TextField
@@ -99,7 +97,7 @@ export default function TriageActionDetails({
                 (!!val?.trim() && parseDeadlineInput(val) !== null) ||
                 t('triage.deadlineRequired'),
             })}
-            label={t('triage.deadline')}
+            label={t(cfg.allowBooking ? 'triage.deadlineBookBy' : 'triage.deadline')}
             type="text"
             size="small"
             fullWidth
@@ -130,71 +128,44 @@ export default function TriageActionDetails({
 
       {/* Assigned role */}
       {cfg.showAssignedRole && (
-        <FormControl fullWidth size="small">
-          <InputLabel id="assign-role-label">{t('triage.assignRole')}</InputLabel>
-          <Controller
-            name="assignedRole"
-            control={control}
-            render={({ field }) => (
-              <Select
-                {...field}
-                labelId="assign-role-label"
-                label={t('triage.assignRole')}
-                value={field.value ?? ''}
+        <Controller
+          name="assignedRole"
+          control={control}
+          render={({ field }) => (
+            <Box>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ mb: 0.5, display: 'block' }}
               >
-                <MenuItem value="">
-                  <em>{t('common.notSet')}</em>
-                </MenuItem>
+                {t('triage.assignRole')}
+              </Typography>
+              <ToggleButtonGroup
+                value={field.value ?? ''}
+                exclusive
+                onChange={(_, val) => field.onChange(val ?? '')}
+                size="small"
+              >
                 {ROLES.map((role) => (
-                  <MenuItem key={role} value={role}>
+                  <ToggleButton key={role} value={role}>
                     {t(`role.${role}`)}
-                  </MenuItem>
+                  </ToggleButton>
                 ))}
-              </Select>
-            )}
-          />
-        </FormControl>
+              </ToggleButtonGroup>
+            </Box>
+          )}
+        />
       )}
 
-      {/* Booking / Appointment */}
+      {/* Booking indication */}
       {cfg.allowBooking && (
-        <Paper variant="outlined" sx={{ p: 2 }}>
-          <Stack gap={1}>
-            <Typography variant="body2">{t('triage.bookingTitle')}</Typography>
-            <TextField
-              {...register('bookingTime')}
-              type="datetime-local"
-              label={t('triage.bookingTime')}
-              InputLabelProps={{ shrink: true }}
-              size="small"
-            />
-            <Controller
-              name="bookingRole"
-              control={control}
-              render={({ field }) => (
-                <FormControl size="small">
-                  <Select {...field} displayEmpty>
-                    <MenuItem value="">
-                      <em>{t('common.notSet')}</em>
-                    </MenuItem>
-                    {(cfg.bookingRoles ?? ROLES).map((r) => (
-                      <MenuItem key={r} value={r}>
-                        {t(`role.${r}`)}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              )}
-            />
-            <TextField
-              {...register('bookingNote')}
-              label={t('triage.bookingNote')}
-              size="small"
-              multiline
-              minRows={2}
-            />
-          </Stack>
-        </Paper>
+        <TextField
+          {...register('bookingNote')}
+          label={t('triage.bookingNote')}
+          size="small"
+          multiline
+          minRows={2}
+        />
       )}
 
       {/* Internal note — always primary for PHONE_CALL, otherwise in accordion */}

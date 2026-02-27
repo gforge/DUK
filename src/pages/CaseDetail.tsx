@@ -1,5 +1,6 @@
-import React, { useState, useMemo, useCallback } from 'react'
+import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react'
 import {
+  Badge,
   Box,
   Typography,
   Tabs,
@@ -52,6 +53,7 @@ export default function CaseDetail() {
   const navigate = useNavigate()
   const { t } = useTranslation()
   const [activeTab, setActiveTab] = useState(0)
+  const didAutoSelectTab = useRef(false)
 
   const {
     data: caseData,
@@ -64,6 +66,15 @@ export default function CaseDetail() {
     () => (caseData ? client.getPatient(caseData.patientId) : Promise.resolve(undefined)),
     [caseData?.patientId],
   )
+
+  useEffect(() => {
+    if (!didAutoSelectTab.current && caseData) {
+      didAutoSelectTab.current = true
+      if (['NEW', 'NEEDS_REVIEW'].includes(caseData.status)) {
+        setActiveTab(2)
+      }
+    }
+  }, [caseData])
 
   useHotkeys(
     useMemo(
@@ -146,7 +157,20 @@ export default function CaseDetail() {
         >
           <Tab label={t('case.tab_forms')} id="case-tab-0" aria-controls="case-tabpanel-0" />
           <Tab label={t('case.tab_journey')} id="case-tab-1" aria-controls="case-tabpanel-1" />
-          <Tab label={t('case.tab_triage')} id="case-tab-2" aria-controls="case-tabpanel-2" />
+          <Tab
+            label={
+              <Badge
+                color="error"
+                variant="dot"
+                invisible={!['NEW', 'NEEDS_REVIEW'].includes(caseData.status)}
+                sx={{ pr: 1 }}
+              >
+                {t('case.tab_triage')}
+              </Badge>
+            }
+            id="case-tab-2"
+            aria-controls="case-tabpanel-2"
+          />
           <Tab label={t('case.tab_journal')} id="case-tab-3" aria-controls="case-tabpanel-3" />
           <Tab label={t('case.tab_audit')} id="case-tab-4" aria-controls="case-tabpanel-4" />
         </Tabs>
