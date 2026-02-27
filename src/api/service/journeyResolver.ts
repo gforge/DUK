@@ -186,7 +186,12 @@ export function buildPolicyScopeWithAliases(
   for (const step of getEffectiveSteps(journey.id)) {
     if (Object.keys(step.scoreAliases).length === 0) continue
     const stepResponses = responses
-      .filter((r) => r.templateId === step.templateId)
+      .filter((r) =>
+        // Prefer exact step match via journeyStepId (set for responses submitted
+        // after step keys were introduced). Fall back to templateId for legacy
+        // responses that predate the journeyStepId field.
+        r.journeyStepId ? r.journeyStepId === step.id : r.templateId === step.templateId,
+      )
       .sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime())
     const latest = stepResponses[0]
     if (!latest) continue

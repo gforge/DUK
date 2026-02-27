@@ -93,7 +93,7 @@ export default function FormResponsesTab({ caseId }: FormResponsesTabProps) {
                         <TableCell
                           sx={{ fontWeight: 500, width: '50%', borderBottom: 'none', py: 0.5 }}
                         >
-                          {question ? t(question.labelKey) : key}
+                          {question ? question.label['sv'] || key : key}
                         </TableCell>
                         <TableCell sx={{ borderBottom: 'none', py: 0.5 }}>
                           <AnswerValue value={value} />

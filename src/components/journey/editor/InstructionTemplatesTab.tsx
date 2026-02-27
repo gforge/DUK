@@ -138,7 +138,7 @@ export default function InstructionTemplatesTab({
     <Box>
       <Stack direction="row" justifyContent="flex-end" sx={{ mb: 1.5 }}>
         <Button size="small" variant="outlined" startIcon={<AddIcon />} onClick={handleCreate}>
-          {t('policy.addRule')}
+          {t('journey.editor.addInstruction')}
         </Button>
       </Stack>
 

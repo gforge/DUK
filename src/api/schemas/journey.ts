@@ -39,6 +39,13 @@ export const JourneyTemplateEntrySchema = z.object({
   scoreAliases: z.record(z.string(), z.string()).default({}),
   /** Human-readable labels for each alias, used in journal templates via {{label.X}}. */
   scoreAliasLabels: z.record(z.string(), z.string()).default({}),
+  /**
+   * Short identifier used in policy expressions to disambiguate scores from
+   * this step vs. other steps using the same questionnaire template.
+   * Auto-derived from `label` (slugified) if not explicitly set.
+   * Examples: "week_4", "6m_followup", "baseline".
+   */
+  stepKey: z.string().optional(),
   /** Which dashboard column is active while this step's window is open. */
   dashboardCategory: CaseCategorySchema.default('CONTROL'),
   /** Quick freeform instruction text (markdown). Shown to clinician and patient. */

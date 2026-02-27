@@ -5,11 +5,13 @@ export const QuestionSchema = z.object({
   id: z.string(),
   key: z.string(), // used in policy expressions, e.g. "PNRS_1"
   type: QuestionTypeSchema,
-  labelKey: z.string(), // i18n key
+  label: z.record(z.string(), z.string()).default({}), // locale map, e.g. { sv: "Smärta nu (0–10)" }
   required: z.boolean().default(true),
   min: z.number().optional(),
   max: z.number().optional(),
-  options: z.array(z.object({ value: z.string(), labelKey: z.string() })).optional(),
+  options: z
+    .array(z.object({ value: z.string(), label: z.record(z.string(), z.string()) }))
+    .optional(),
 })
 export type Question = z.infer<typeof QuestionSchema>
 

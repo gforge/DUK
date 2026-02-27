@@ -81,6 +81,66 @@ const MIGRATIONS: Migration[] = [
         : [],
     }),
   },
+  {
+    from: 3,
+    to: 4,
+    up: (s) => {
+      // Mapping from the old i18n keys to resolved Swedish text.
+      const KEY_TO_SV: Record<string, string> = {
+        'questionnaire.numbness_fingers': 'Domningar i fingrar?',
+        'questionnaire.numbness_toes': 'Domningar i tår?',
+        'questionnaire.infection_wound': 'Tecken på infektion vid såret?',
+        'questionnaire.infection_fever': 'Feber (>38°)?',
+        'questionnaire.pain_now': 'Smärta just nu (0–10)',
+        'questionnaire.wound_healed': 'Är såret läkt?',
+        'questionnaire.wound_discharge': 'Sekret från såret?',
+        'questionnaire.pain_night': 'Värsta smärtan natten (0–10)',
+        'questionnaire.oss_pain': 'Smärta vid aktivitet (1=ingen, 5=svår)',
+        'questionnaire.oss_washing': 'Kan du tvätta dig?',
+        'questionnaire.oss_transport': 'Klara transporter?',
+        'questionnaire.oss_dressing': 'Klä på dig?',
+        'questionnaire.oss_shopping': 'Handla?',
+        'questionnaire.eq_mobility': 'Rörlighet',
+        'questionnaire.eq_selfcare': 'Egenvård',
+        'questionnaire.eq_usual_activity': 'Vanliga aktiviteter',
+        'questionnaire.eq_pain_discomfort': 'Smärta/obehag',
+        'questionnaire.eq_anxiety': 'Oro/nedstämdhet',
+        'questionnaire.eq_vas': 'Din hälsa idag (0=sämsta, 100=bästa möjliga)',
+        'questionnaire.free_text': 'Övriga kommentarer (valfri)',
+        'eq.level_1': 'Inga problem',
+        'eq.level_2': 'Vissa problem',
+        'eq.level_3': 'Stora problem',
+      }
+      const resolveLabel = (key: unknown): Record<string, string> => {
+        const raw = typeof key === 'string' ? key : ''
+        return { sv: KEY_TO_SV[raw] ?? raw }
+      }
+      return {
+        ...s,
+        schemaVersion: 4,
+        questionnaireTemplates: Array.isArray(s['questionnaireTemplates'])
+          ? (s['questionnaireTemplates'] as Record<string, unknown>[]).map((qt) => ({
+              ...qt,
+              questions: Array.isArray(qt['questions'])
+                ? (qt['questions'] as Record<string, unknown>[]).map((q) => {
+                    const { labelKey: _lk, ...rest } = q as Record<string, unknown>
+                    return {
+                      ...rest,
+                      label: resolveLabel(_lk),
+                      options: Array.isArray(q['options'])
+                        ? (q['options'] as Record<string, unknown>[]).map((o) => {
+                            const { labelKey: _ok, ...oRest } = o as Record<string, unknown>
+                            return { ...oRest, label: resolveLabel(_ok) }
+                          })
+                        : undefined,
+                    }
+                  })
+                : [],
+            }))
+          : [],
+      }
+    },
+  },
 ]
 
 // ---------------------------------------------------------------------------
