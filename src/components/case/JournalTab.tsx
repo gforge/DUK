@@ -10,7 +10,10 @@ import {
   MenuItem,
   Paper,
   CircularProgress,
+  Tooltip,
+  IconButton,
 } from '@mui/material'
+import PrintIcon from '@mui/icons-material/Print'
 import { useTranslation } from 'react-i18next'
 import { useRole } from '../../store/roleContext'
 import { useSnack } from '../../store/snackContext'
@@ -92,6 +95,13 @@ export default function JournalTab({ caseData, patient: _patient, onCaseChange }
 
   return (
     <Box>
+      <Stack direction="row" justifyContent="flex-end" sx={{ mb: 1, displayPrint: 'none' }}>
+        <Tooltip title={t('common.print')}>
+          <IconButton size="small" onClick={() => window.print()} aria-label={t('common.print')}>
+            <PrintIcon fontSize="small" />
+          </IconButton>
+        </Tooltip>
+      </Stack>
       <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
         <BookingsList
           caseData={caseData}

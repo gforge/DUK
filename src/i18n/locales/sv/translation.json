@@ -2,6 +2,21 @@
   "app": {
     "disclaimer": "DEMO – All data är fiktiv/pseudonymiserad. Ingen riktig patientdata."
   },
+  "notFound": {
+    "title": "Sidan hittades inte",
+    "message": "Adressen du f\u00f6rs\u00f6kte n\u00e5 finns inte. Kontrollera att URL:en \u00e4r korrekt.",
+    "goHome": "Till startsidan"
+  },
+  "nurseContact": {
+    "contacted": "Kontaktad",
+    "reminded": "Påminnelse skickad",
+    "contactedDone": "Kontakt loggad i händelselogg",
+    "remindedDone": "Påminnelse loggad i händelselogg",
+    "suggestion": {
+      "SEEK_CONTACT": "Patienten har begärt kontakt. Kontakta per telefon eller i systemet.",
+      "NOT_OPENED": "Patienten har inte öppnat formuläret. Skicka en påminnelse eller ring upp."
+    }
+  },
   "audit": {
     "action": "Händelse",
     "actions": {
@@ -12,7 +27,9 @@
       "JOURNAL_DRAFT_CREATED": "Journalutkast skapat",
       "SEEK_CONTACT": "Söker kontakt",
       "STATUS_CHANGED": "Status ändrad",
-      "TRIAGED": "Triagerad"
+      "TRIAGED": "Triagerad",
+      "CONTACTED": "Patient kontaktad",
+      "REMINDER_SENT": "Påminnelse skickad"
     },
     "details": "Detaljer",
     "noEvents": "Inga händelser",
@@ -64,7 +81,10 @@
     "notSet": "Ej satt",
     "save": "Spara",
     "saving": "Sparar…",
-    "yes": "Ja"
+    "yes": "Ja",
+    "patientFilter": "Patientfilter",
+    "mainNavigation": "Huvudnavigering",
+    "openNavigationMenu": "\u00d6ppna navigeringsmeny"
   },
   "dashboard": {
     "filterAll": "Alla",
@@ -187,6 +207,18 @@
     "recurringStep": "Återkommande uppföljningstillfälle",
     "type": "Typ",
     "window": "Fönster",
+    "pause": "Pausa resa",
+    "resume": "Återuppta resa",
+    "pauseConfirmTitle": "Pausa patientresa?",
+    "pauseConfirmBody": "Tidslinjen fryses medan resan är pausad. Alla kommande steg skjuts fram tills du återupptar resan.",
+    "pauseSuccess": "Resa pausad",
+    "resumeSuccess": "Resa återupptagen",
+    "pausedBanner": "Resa pausad sedan {{days}} dag",
+    "pausedBanner_other": "Resa pausad sedan {{days}} dagar",
+    "pausedBannerToday": "Resa pausad i dag",
+    "pausedDaysShort": "+{{days}}d pausad",
+    "deriveCopy": "(kopia)",
+    "referenceDateDefault": "Startdatum",
     "journeyStatus": {
       "label": "Status",
       "ACTIVE": "Aktiv",
@@ -205,12 +237,28 @@
       "editModule": "Redigera modul",
       "moduleSaved": "Forskningsmodul sparad",
       "studyName": "Studienamn",
+      "studyInfo": "Studieinformation (visas för patienten)",
+      "studyInfoHint": "Markdown-text som visas för patienten i samtyckesdialogen.",
       "entries": "poster",
       "addEntry": "Lägg till post",
       "noEntries": "Inga poster definierade.",
       "entryMode": "Läge",
       "entryModeValue": "REPLACE",
-      "replaceStepHint": "Välj originalstegets id att ersätta"
+      "replaceStepHint": "Välj originalstegets id att ersätta",
+      "consent": {
+        "dialogTitle": "Samtycke – {{studyName}}",
+        "infoLabel": "Studieinformation",
+        "checkbox": "Patienten har informerats och lämnar sitt samtycke till studien",
+        "grant": "Registrera samtycke",
+        "granted": "Samtycke registrerat {{date}}",
+        "grantedBy": "av {{user}}",
+        "revoke": "Återkalla samtycke",
+        "revokeConfirmTitle": "Återkalla samtycke?",
+        "revokeConfirmBody": "Patientens samtycke till \"{{studyName}}\" återkallas. Åtgärden loggas.",
+        "revoked": "Samtycke återkallat {{date}}",
+        "revokeSuccess": "Samtycke återkallat",
+        "grantSuccess": "Samtycke registrerat"
+      }
     },
     "modify": {
       "action": "Justera resa",
@@ -221,7 +269,7 @@
       "newStartDate": "Nytt startdatum",
       "newStartDateHint": "T.ex. operationsdatum — alla steg beräknas om relativt detta datum.",
       "dateReset": "Startdatum ändrat: {{from}} → {{to}}",
-      "offsetDays": "Dagoffset (från operationsdatum)",
+      "offsetDays": "Antal dagar sedan start",
       "questionnaire": "Frågeformulärsmall",
       "reason": "Klinisk motivering (obligatorisk)",
       "reasonPlaceholder": "T.ex. Patienten rapporterar ökad svullnad — lägger till extra kontroll",
@@ -298,6 +346,7 @@
       "offsetDaysHint": "Antal dagar efter startdatum (t.ex. operationsdatum) då steget planeras",
       "windowDays": "Tidsfönster (±dagar)",
       "windowDaysHint": "Patienten kan svara upp till ±N dagar från planerat datum och ändå räknas som \"i tid\"",
+      "windowDaysSuggest": "Förslag: {{n}} dagar",
       "dashboardCategory": "Instrumentpanelskategori",
       "noForm": "— Inget formulär (instruktionssteg) —",
       "noFormHint": "Lämna tomt för ett rent instruktionssteg.",
@@ -429,7 +478,23 @@
     "title": "Patientvy",
     "triggers": "Triggers",
     "carePlan": "Min vårdplan",
-    "noCarePlan": "Ingen vårdplan tilldelad."
+    "noCarePlan": "Ingen vårdplan tilldelad.",
+    "researchStudies": "Forskningsstudier",
+    "consentPending": "Samtycke saknas",
+    "consentGranted": "Samtycke givet {{date}}",
+    "consentWithdraw": "Återkalla samtycke",
+    "readAndConsent": "Läs och ge samtycke",
+    "form": {
+      "dueForms": "Formulär att fylla i",
+      "noFormsDue": "Inga formulär att fylla i just nu.",
+      "fillIn": "Fyll i",
+      "fillIn_name": "Fyll i {{name}}",
+      "submit": "Skicka in",
+      "submitted": "Formuläret har skickats in",
+      "required": "Obligatoriskt fält",
+      "overdue": "Försenad",
+      "unknownType": "Okänd frågetyp: {{type}}"
+    }
   },
   "patients": {
     "title": "Patienter",
@@ -447,6 +512,7 @@
       "title": "Registrera ny patient",
       "stepPatient": "Patientuppgifter",
       "stepJourney": "Tilldela resa",
+      "stepStudies": "Forskning",
       "stepConfirm": "Bekräfta",
       "requiredFields": "Fyll i alla obligatoriska fält.",
       "fetchFromRegister": "Hämta från folkbokföringen",
@@ -463,10 +529,44 @@
       "reviewTitle": "Granska och bekräfta",
       "confirm": "Registrera",
       "success": "Patient registrerad",
+      "noStudies": "Inga forskningsmoduler konfigurerade.",
+      "studiesHint": "Patienten kan bekräfta sitt samtycke via sin sida vid inloggning.",
+      "reviewStudies": "Forskning:",
+      "noStudiesSelected": "Inga valda",
       "demoHintTitle": "Demo: tillgängliga personer i folkbokföringen",
       "demoHintDescription": "Klicka på en rad för att fylla i personnumret automatiskt.",
       "demoHintAlreadyRegistered": "redan registrerad"
+    },
+    "conflicts": {
+      "step": "Konflikter",
+      "title": "Överlappande formulär",
+      "hint": "Följande formulär är redan inplanerade i ett befintligt program. Markerade formulär hoppas över i det nya programmet — patienten fyller i dem via det tidigare programmet istället.",
+      "none": "Inga överlappande formulär hittades. Det nya programmet körs självständigt.",
+      "overlapDays": "{{count}} dagars överlapp",
+      "overlapDays_one": "1 dags överlapp",
+      "checkConflicts": "Kontrollera överlapp",
+      "scheduledOn": "Schemalagd",
+      "existingOn": "befintlig"
     }
+  },
+  "patientDetail": {
+    "notFound": "Patienten hittades inte.",
+    "registered": "Registrerad",
+    "cases": "\u00c4renden",
+    "noCases": "Inga \u00e4renden f\u00f6r denna patient.",
+    "triggers": "Triggers",
+    "created": "Skapad",
+    "lastActivity": "Senaste aktivitet",
+    "journeys": "Patientresor",
+    "noJourneys": "Inga patientresor tilldelade.",
+    "journeyTemplate": "Resemall",
+    "startDate": "Startdatum",
+    "consents": "Forskningssamtycken",
+    "consentStudy": "Studie",
+    "grantedAt": "Beviljat",
+    "revokedAt": "\u00c5terkallat",
+    "revoked": "\u00c5terkallat",
+    "active": "Aktivt"
   },
   "policy": {
     "selectTemplate": "Välj uppföljningsmall",
@@ -566,6 +666,7 @@
     "deadlineRequired": "Deadline krävs för denna åtgärd",
     "deadlineResolved": "→ {{date}}",
     "error": "Fel vid triage",
+    "requiresClinician": "Triagering kr\u00e4ver \u00e5tkomst som klinisk personal.",
     "followUp": "Sätt till uppföljning",
     "internalNote": "Intern notering (valfri)",
     "more": "Mer information",
@@ -619,6 +720,8 @@
     "bookingNote": "Bokningsindikation (valfri)",
     "bookings": "Bokningar",
     "bookingCancelSuccess": "Bokning avbokad",
+    "bookingCancelTitle": "Avboka bokning",
+    "bookingCancelConfirm": "Är du säker på att du vill avboka? Åtgärden kan inte ångras.",
     "bookingUpdated": "Bokning uppdaterad",
     "editBooking": "Redigera bokning"
   },

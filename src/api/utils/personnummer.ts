@@ -15,7 +15,7 @@ export interface PnrInfo {
  * Parse a Swedish personnummer string (10- or 12-digit, with or without separator).
  */
 export function parsePersonnummer(pnr: string): PnrInfo {
-  const clean = pnr.replace(/[-+ ]/g, '')
+  const clean = pnr.replace(/[-+\s]/g, '')
   if (!/^\d{10}$|^\d{12}$/.test(clean)) {
     return { isValid: false, isReservnummer: false, dateOfBirth: null }
   }

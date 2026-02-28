@@ -1,0 +1,42 @@
+@startuml
+title Consent — Lifecycle State Diagram
+
+state "GRANTED\n(active)" as GRANTED
+state "REVOKED\n(terminal)" as REVOKED
+
+[*] --> GRANTED : grantConsent(\n  patientId,\n  researchModuleId,\n  patientJourneyId,\n  grantedByUserId\n)\ngrantedAt = now()
+
+GRANTED --> REVOKED : revokeConsent(\n  consentId,\n  revokedByUserId\n)\nrevokedAt = now()
+
+REVOKED --> [*]
+
+note right of GRANTED
+  Idempotency:
+  If an active Consent already exists
+  for the same (patientId, researchModuleId,
+  patientJourneyId), grantConsent returns
+  the existing record without creating
+  a duplicate.
+end note
+
+note right of REVOKED
+  The record is NEVER deleted.
+  revokedAt and revokedByUserId
+  are set for audit purposes.
+  hasActiveConsent() returns false.
+
+  A new call to grantConsent
+  after revocation creates a
+  fresh Consent record.
+  Both the revoked and the new
+  record are preserved in
+  AppState.researchConsents.
+end note
+
+note bottom
+  Service: src/api/service/researchConsents.ts
+  Storage: AppState.researchConsents[]
+  UI: src/components/journey/ConsentDialog.tsx
+end note
+
+@enduml

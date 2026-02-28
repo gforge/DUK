@@ -5,6 +5,7 @@ import WarningAmberIcon from '@mui/icons-material/WarningAmber'
 import { useTranslation } from 'react-i18next'
 import RoleSwitcher from '../common/RoleSwitcher'
 import LanguageSwitcher from '../common/LanguageSwitcher'
+import GlobalSearch from './GlobalSearch'
 import { useRole } from '../../store/roleContext'
 
 interface TopBarProps {
@@ -19,13 +20,13 @@ export default function TopBar({ drawerWidth, onMenuClick }: TopBarProps) {
   return (
     <AppBar
       position="fixed"
-      sx={{ zIndex: (theme) => theme.zIndex.drawer + 1, width: '100%' }}
+      sx={{ zIndex: (theme) => theme.zIndex.drawer + 1, width: '100%', displayPrint: 'none' }}
       elevation={1}
     >
       <Toolbar sx={{ gap: 1, minHeight: 56 }}>
         <IconButton
           color="inherit"
-          aria-label="open navigation menu"
+          aria-label={t('common.openNavigationMenu')}
           edge="start"
           onClick={onMenuClick}
           sx={{ mr: 1, display: { md: 'none' } }}
@@ -55,6 +56,9 @@ export default function TopBar({ drawerWidth, onMenuClick }: TopBarProps) {
         </Tooltip>
 
         <Box sx={{ flexGrow: 1 }} />
+
+        {/* Global patient search (clinicians only) */}
+        <GlobalSearch />
 
         {/* Current user badge */}
         <Typography variant="body2" sx={{ opacity: 0.85, display: { xs: 'none', sm: 'block' } }}>

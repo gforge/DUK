@@ -2,6 +2,12 @@ import { getStore, setStore } from '../storage'
 import { uuid, now } from './utils'
 import type { PatientJourney, JourneyModification } from '../schemas'
 
+/** Returns whole days between two ISO datetimes (or between datetime and now). */
+function wholeElapsedDays(isoStart: string, isoEnd?: string): number {
+  const endMs = isoEnd ? new Date(isoEnd).getTime() : Date.now()
+  return Math.floor((endMs - new Date(isoStart).getTime()) / 86_400_000)
+}
+
 export function getPatientJourneys(patientId?: string): PatientJourney[] {
   const journeys = getStore().patientJourneys
   return patientId ? journeys.filter((j) => j.patientId === patientId) : journeys
@@ -12,8 +18,22 @@ export function assignPatientJourney(
   journeyTemplateId: string,
   startDate: string,
   researchModuleIds: string[] = [],
+  mergedStepIds: { stepId: string; fromJourneyId: string }[] = [],
 ): PatientJourney {
   const state = getStore()
+
+  // Convert merged step IDs into REMOVE_STEP modifications so the new
+  // journey never shows forms that will be filled through a parallel journey.
+  const mergeModifications: JourneyModification[] = mergedStepIds.map(({ stepId, fromJourneyId }) => ({
+    id: uuid(),
+    type: 'REMOVE_STEP' as const,
+    addedByUserId: 'system',
+    addedAt: now(),
+    reason: 'Merged with existing journey — form will be collected through the earlier programme.',
+    stepId,
+    mergedFromJourneyId: fromJourneyId,
+  }))
+
   const journey: PatientJourney = {
     id: uuid(),
     patientId,
@@ -21,8 +41,10 @@ export function assignPatientJourney(
     startDate,
     status: 'ACTIVE',
     researchModuleIds,
-    modifications: [],
+    modifications: mergeModifications,
     recurringCompletions: [],
+    pausedAt: null,
+    totalPausedDays: 0,
     createdAt: now(),
     updatedAt: now(),
   }
@@ -38,6 +60,53 @@ export function updatePatientJourneyStatus(
   const journey = state.patientJourneys.find((j) => j.id === journeyId)
   if (!journey) throw new Error(`Journey ${journeyId} not found`)
   const updated: PatientJourney = { ...journey, status, updatedAt: now() }
+  setStore({
+    ...state,
+    patientJourneys: state.patientJourneys.map((j) => (j.id === journeyId ? updated : j)),
+  })
+  return updated
+}
+
+/**
+ * Freezes the journey timeline. The step scheduler will add `totalPausedDays +
+ * daysSince(pausedAt)` to every step's offset so upcoming steps shift forward.
+ */
+export function pauseJourney(journeyId: string): PatientJourney {
+  const state = getStore()
+  const journey = state.patientJourneys.find((j) => j.id === journeyId)
+  if (!journey) throw new Error(`Journey ${journeyId} not found`)
+  if (journey.status !== 'ACTIVE') throw new Error(`Journey ${journeyId} is not active`)
+  const updated: PatientJourney = {
+    ...journey,
+    status: 'SUSPENDED',
+    pausedAt: now(),
+    updatedAt: now(),
+  }
+  setStore({
+    ...state,
+    patientJourneys: state.patientJourneys.map((j) => (j.id === journeyId ? updated : j)),
+  })
+  return updated
+}
+
+/**
+ * Resumes a suspended journey. Accumulates the elapsed pause duration into
+ * `totalPausedDays` so all step dates remain permanently shifted forward
+ * by the total time paused.
+ */
+export function resumeJourney(journeyId: string): PatientJourney {
+  const state = getStore()
+  const journey = state.patientJourneys.find((j) => j.id === journeyId)
+  if (!journey) throw new Error(`Journey ${journeyId} not found`)
+  if (journey.status !== 'SUSPENDED') throw new Error(`Journey ${journeyId} is not suspended`)
+  const additionalDays = journey.pausedAt ? wholeElapsedDays(journey.pausedAt) : 0
+  const updated: PatientJourney = {
+    ...journey,
+    status: 'ACTIVE',
+    pausedAt: null,
+    totalPausedDays: (journey.totalPausedDays ?? 0) + additionalDays,
+    updatedAt: now(),
+  }
   setStore({
     ...state,
     patientJourneys: state.patientJourneys.map((j) => (j.id === journeyId ? updated : j)),

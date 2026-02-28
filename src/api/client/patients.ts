@@ -47,7 +47,7 @@ const FAKE_REGISTER: Record<string, { displayName: string }> = {
 export const lookupPersonnummer = (
   personalNumber: string,
 ): Promise<{ displayName: string } | null> => {
-  const normalized = personalNumber.replace(/[-+ ]/g, '')
+  const normalized = personalNumber.replace(/[-+\s]/g, '')
   let result: { displayName: string } | null = null
   if (normalized.length === 12) {
     result = FAKE_REGISTER[normalized] ?? null

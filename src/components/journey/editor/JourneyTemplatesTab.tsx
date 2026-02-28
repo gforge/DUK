@@ -39,14 +39,14 @@ import { useTranslation } from 'react-i18next'
 import * as client from '../../../api/client'
 import { useApi } from '../../../hooks/useApi'
 import { useSnack } from '../../../store/snackContext'
+import ConfirmDialog from '../../common/ConfirmDialog'
 import type { JourneyTemplate, JourneyTemplateEntry } from '../../../api/schemas'
 import type { EntryDiff } from '../../../api/service/journeyTemplates'
 import EntryEditorDialog from './EntryEditorDialog'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function formatOffsetDays(
   days: number,
-  t: (key: string, opts?: any) => string,
+  t: (key: string, opts?: Record<string, unknown>) => string,
 ): {
   label: string
   tooltip: string
@@ -87,6 +87,11 @@ export default function JourneyTemplatesTab({
     entry?: JourneyTemplateEntry
   } | null>(null)
 
+  const [entryDeleteConfirm, setEntryDeleteConfirm] = useState<{
+    template: JourneyTemplate
+    entryId: string
+  } | null>(null)
+
   const { data: questionnaires } = useApi(() => client.getQuestionnaireTemplates(), [])
   const { data: instructionTemplates } = useApi(() => client.getInstructionTemplates(), [])
 
@@ -106,7 +111,13 @@ export default function JourneyTemplatesTab({
   }
 
   const handleDeleteEntry = async (template: JourneyTemplate, entryId: string) => {
-    if (!confirm(t('journey.editor.confirmDeleteEntry'))) return
+    setEntryDeleteConfirm({ template, entryId })
+  }
+
+  const executeDeleteEntry = async () => {
+    if (!entryDeleteConfirm) return
+    const { template, entryId } = entryDeleteConfirm
+    setEntryDeleteConfirm(null)
     const entries = template.entries.filter((e) => e.id !== entryId)
     try {
       await client.saveJourneyTemplate({ ...template, entries })
@@ -423,6 +434,15 @@ export default function JourneyTemplatesTab({
           }}
         />
       )}
+
+      {/* Entry delete confirmation */}
+      <ConfirmDialog
+        open={!!entryDeleteConfirm}
+        title={t('common.delete')}
+        message={t('journey.editor.confirmDeleteEntry')}
+        onConfirm={executeDeleteEntry}
+        onCancel={() => setEntryDeleteConfirm(null)}
+      />
     </>
   )
 
@@ -443,7 +463,7 @@ function DeriveDialog({
 }) {
   const { t } = useTranslation()
   const { showSnack } = useSnack()
-  const [name, setName] = useState(`${parentTemplate.name} (kopia)`)
+  const [name, setName] = useState(`${parentTemplate.name} ${t('journey.deriveCopy')}`)
   const [saving, setSaving] = useState(false)
 
   const handleSubmit = async () => {
@@ -623,7 +643,7 @@ function EditTemplateDialog({
   const [name, setName] = useState(template?.name ?? '')
   const [description, setDescription] = useState(template?.description ?? '')
   const [referenceDateLabel, setReferenceDateLabel] = useState(
-    template?.referenceDateLabel ?? 'Startdatum',
+    template?.referenceDateLabel ?? t('journey.referenceDateDefault'),
   )
   const [saving, setSaving] = useState(false)
 
@@ -637,12 +657,12 @@ function EditTemplateDialog({
               ...template,
               name: name.trim(),
               description: description.trim() || undefined,
-              referenceDateLabel: referenceDateLabel.trim() || 'Startdatum',
+              referenceDateLabel: referenceDateLabel.trim() || t('journey.referenceDateDefault'),
             }
           : {
               name: name.trim(),
               description: description.trim() || undefined,
-              referenceDateLabel: referenceDateLabel.trim() || 'Startdatum',
+              referenceDateLabel: referenceDateLabel.trim() || t('journey.referenceDateDefault'),
               entries: [],
             },
       )

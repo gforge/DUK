@@ -1,0 +1,60 @@
+@startuml
+title Research Consent — Grant & Revoke Sequence
+
+actor Clinician
+participant "JourneyTab\n(UI)" as UI
+participant "ConsentDialog /\nRevokeConsentDialog" as Dialog
+participant "react-markdown" as MD
+participant "client/\nresearchConsents" as Client
+participant "service/\nresearchConsents" as Service
+participant "patchStore" as Store
+
+== Grant Consent ==
+
+Clinician -> UI : Click module chip\n(amber = no consent)
+UI -> Dialog : Open ConsentDialog\n(studyInfoMarkdown, moduleId,\npatientId, journeyId)
+Dialog -> MD : Render studyInfoMarkdown
+MD --> Dialog : Formatted study information
+Dialog --> Clinician : Display info + unchecked checkbox
+Clinician -> Dialog : Tick checkbox\n"I confirm the patient has been informed"
+Dialog -> Dialog : Enable Confirm button
+Clinician -> Dialog : Click Confirm
+Dialog -> Client : grantConsent(\n  patientId,\n  researchModuleId,\n  patientJourneyId,\n  grantedByUserId\n)
+Client -> Service : grantConsent(...)
+Service -> Service : Check: active consent\nalready exists for\npatient + module + journey?
+alt Consent already exists (idempotent)
+  Service --> Client : existing Consent (unchanged)
+else No active consent
+  Service -> Store : patchStore:\n  append new Consent {\n    grantedAt: now(),\n    grantedByUserId,\n    revokedAt: null\n  }
+  Store --> Service : updated AppState
+  Service --> Client : new Consent
+end
+Client --> Dialog : Consent record
+Dialog --> UI : Close, refetch journeys
+UI -> UI : Consent chip turns green\n(active consent)
+
+== Revoke Consent ==
+
+Clinician -> UI : Click revoke on green chip
+UI -> Dialog : Open RevokeConsentDialog\n(consentId)
+Dialog --> Clinician : Show confirmation step
+Clinician -> Dialog : Confirm revocation
+Dialog -> Client : revokeConsent(consentId, revokedByUserId)
+Client -> Service : revokeConsent(consentId, revokedByUserId)
+Service -> Service : Find Consent by id\n(throws if not found)
+Service -> Store : patchStore:\n  revokedAt = now()\n  revokedByUserId = userId
+Store --> Service : updated AppState
+
+note right of Store
+  The original Consent record
+  is never deleted — it serves
+  as a permanent audit trail.
+  A new grant creates a fresh record.
+end note
+
+Service --> Client : revoked Consent
+Client --> Dialog : Consent record
+Dialog --> UI : Close, refetch journeys
+UI -> UI : Consent chip turns amber\n(no active consent)
+
+@enduml

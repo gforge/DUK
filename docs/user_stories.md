@@ -54,6 +54,8 @@ This document captures the key user stories for the Duk demo application. The li
 2. Case detail page renders the suggested action dynamically.
 3. Audit log captures these contact events.
 
+> _Related code_: `src/components/case/NurseContactActions.tsx`, `src/api/service/audit.ts` (`logContactEvent`), audit i18n keys `audit.actions.CONTACTED` / `audit.actions.REMINDER_SENT`.
+
 ---
 
 ## US4 – Patient app experience
@@ -70,8 +72,10 @@ This document captures the key user stories for the Duk demo application. The li
 1. Patient view exists and respects feature flags.
 2. Patient actions update the appropriate timestamps.
 3. Triggers are pushed into the dashboard queues.
+4. Due questionnaire steps are listed with template name, scheduled date, and overdue indicator.
+5. The questionnaire form renders all five question types (SCALE, BOOLEAN, TEXT, SELECT, NUMBER) and validates required fields before submission.
 
----
+> _Related code_: `src/pages/PatientView.tsx`, `src/components/patientView/PatientDueForms.tsx`, `src/components/patientView/PatientQuestionnaireForm.tsx`, `src/components/patientView/PatientActions.tsx`.
 
 ## US5 – Configurable triage policy without eval
 
@@ -241,3 +245,128 @@ These stories map directly to the workflows and components described in the desi
 3. Resolved instructions are visible and expandable.
 
 > _Related code_: `src/pages/PatientView.tsx`, `src/components/journey/JourneyTimeline.tsx`.
+
+---
+
+## US14 – Pause & resume a patient journey
+
+**As a** clinician **I want** to temporarily pause a patient’s journey when clinical circumstances prevent scheduled follow-ups (e.g. hospitalisation, patient travel), and later resume it so that all remaining steps shift forward by the accumulated pause duration:
+
+- a pause button is available on the journey tab; clicking it shows a confirmation dialog
+- while suspended, the timeline shows a banner with the number of days paused so far and a resume button
+- all scheduled step dates in the paused journey shift forward dynamically — no manual rescheduling needed
+- resuming the journey records the total elapsed pause days and restores ACTIVE status
+
+**Acceptance criteria**
+
+1. `pauseJourney(journeyId)` transitions `status` from `ACTIVE` → `SUSPENDED`, sets `pausedAt` to the current timestamp, and does not rewrite any step dates in the store.
+2. `resumeJourney(journeyId)` transitions `status` from `SUSPENDED` → `ACTIVE`, computes whole elapsed days, accumulates into `totalPausedDays`, and clears `pausedAt`.
+3. `getEffectiveSteps` shifts every scheduled date by `totalPausedDays + currentPauseDays`; for a currently-suspended journey `currentPauseDays` is computed live without a store write.
+4. The `JourneyTab` component shows a paused-days banner and a resume button while the journey is `SUSPENDED`.
+5. Pausing a non-ACTIVE journey and resuming a non-SUSPENDED journey both throw with a descriptive error.
+6. Unit tests verify status transitions, `totalPausedDays` accumulation, and the step-date shift.
+
+> _Related code_: `src/api/service/patientJourneys.ts`, `src/api/service/journeyResolver.ts`, `src/components/case/JourneyTab.tsx`, `src/tests/journey.test.ts`.
+
+---
+
+## US15 – Multiple parallel journeys per patient
+
+**As a** clinician **I want** to assign multiple concurrent care journeys to a patient (e.g. one for a wrist fracture and one for a hip fracture) and have the UI present them clearly without duplicating questionnaires:
+
+- the journey tab on a case detail shows all journeys in labelled tabs, sorted ACTIVE → SUSPENDED → COMPLETED
+- each tab has an independent timeline and pause/resume controls
+- when the same questionnaire is due in two parallel journeys the dashboard only shows it once
+
+**Acceptance criteria**
+
+1. `assignPatientJourney` creates a new `PatientJourney` record regardless of existing journeys; there is no single-journey-per-patient constraint.
+2. `JourneyTab` (CaseDetail) renders all journeys for the patient as MUI `Tabs` sorted by status (ACTIVE first), newest first within each group.
+3. `PatientCareplan` (PatientView) renders the same multi-tab layout for the patient self-view.
+4. `getMergedDueStepsForPatient(patientId, date)` deduplicates due steps across all ACTIVE journeys by `templateEntryId`.
+5. Unit tests verify that `getMergedDueStepsForPatient` deduplicates correctly when two journeys share the same questionnaire.
+
+> _Related code_: `src/api/service/journeyResolver.ts`, `src/components/case/JourneyTab.tsx`, `src/components/patientView/PatientCareplan.tsx`, `src/tests/journey.test.ts`.
+
+---
+
+## US16 – Research consent — grant & revoke
+
+**As a** clinician **I want** to formally capture informed consent before enrolling a patient in a research module, and to be able to revoke that consent if the patient withdraws:
+
+- each research module has a `studyInfoMarkdown` field with study information rendered as formatted text in a consent dialog
+- the clinician must tick a checkbox (“I confirm the patient has been informed”) before the confirm button is enabled
+- granting consent creates an auditable record with timestamp and granting user
+- revoking consent shows a confirmation dialog and records `revokedAt` + `revokedByUserId`; the original grant record is preserved as an audit trail
+- consent chips on the journey tab are colour-coded (green = active consent, amber = not yet consented)
+
+**Acceptance criteria**
+
+1. `ResearchModuleSchema` includes `studyInfoMarkdown: string`; the Journey Editor’s Research Modules tab exposes a multiline text field for editing it.
+2. `grantConsent(patientId, moduleId, journeyId, userId)` is idempotent: if an active (non-revoked) consent record already exists for the same patient + module + journey, the existing record is returned unchanged; no duplicate is created.
+3. `revokeConsent(consentId, userId)` sets `revokedAt: now()` and `revokedByUserId`. The record is never deleted.
+4. `ConsentDialog` renders `studyInfoMarkdown` via `react-markdown` and requires a checkbox before the confirm button is enabled.
+5. `RevokeConsentDialog` shows a one-step confirmation before calling `revokeConsent`.
+6. `hasActiveConsent(patientId, moduleId, journeyId)` returns `false` after revocation; granting again creates a new record.
+7. Unit tests in `researchConsents.test.ts` cover grant idempotency, revocation, `hasActiveConsent`, and `getActiveConsent`.
+
+> _Related code_: `src/api/service/researchConsents.ts`, `src/api/client/researchConsents.ts`, `src/components/journey/ConsentDialog.tsx`, `src/components/journey/editor/ResearchModulesTab.tsx`, `src/tests/researchConsents.test.ts`.
+
+---
+
+## US17 – Global patient search
+
+**As a** clinician **I want** to find any patient quickly from anywhere in the application without navigating to the patients list:
+
+- a search button is permanently visible in the top navigation bar
+- clicking it opens a dialog with an autofocused text field
+- results filter by patient name or personal number in real time
+- selecting a result navigates directly to the patient detail page
+
+**Acceptance criteria**
+
+1. `GlobalSearch` button is shown in the TopBar for NURSE, DOCTOR, and PAL roles only.
+2. Patients are fetched once on first open; subsequent opens reuse the cached list without a network round-trip.
+3. Up to 10 matching results are shown; filtering is case-insensitive and matches against `displayName` and `personalNumber`.
+4. Selecting a result navigates to `/patients/:id`.
+
+> _Related code_: `src/components/layout/GlobalSearch.tsx`, `src/components/layout/TopBar.tsx`.
+
+---
+
+## US18 – Clinician patient detail page
+
+**As a** clinician **I want** to view a consolidated summary of a single patient, their cases, journeys, and research consents on one page:
+
+- clicking a patient row in the patients table navigates to `/patients/:id`
+- the page shows patient demographics, all cases (with status, category, triggers), all journeys (template, status, start date), and research consents
+- clicking a case row navigates to the case detail
+
+**Acceptance criteria**
+
+1. `/patients/:id` renders `PatientDetail.tsx`; previously this route rendered the patient list again.
+2. Breadcrumb navigation shows Patients → patient name and supports back navigation.
+3. Cases table shows status chip, category, trigger count, and last activity timestamp; clicking a row navigates to `/cases/:id`.
+4. Journeys table shows template name, status chip, and start date.
+5. Research consents table shows study name, granted date, and revoked date (or “Active” indicator).
+
+> _Related code_: `src/pages/PatientDetail.tsx`, `src/router/index.tsx`.
+
+---
+
+## US19 – Print-ready journal view
+
+**As a** clinician **I want** to print a patient’s journal entries directly from the browser so I can place a paper copy in a physical file:
+
+- a print button in the Journal tab triggers the browser’s native print dialog
+- the navigation chrome (top bar, side navigation) is hidden in the print layout
+- the journal content spans the full page width with appropriate margins
+
+**Acceptance criteria**
+
+1. `JournalTab` renders a print icon button that calls `window.print()`; the button itself is hidden in the print output (`displayPrint: 'none'`).
+2. `TopBar` is hidden on print (`displayPrint: 'none'` on the `AppBar`).
+3. `SideNav` is hidden on print (wrapped in a `Box` with `displayPrint: 'none'`).
+4. `AppShell` removes the left margin and toolbar spacer for print so the main content fills the full width.
+
+> _Related code_: `src/components/case/JournalTab.tsx`, `src/components/layout/TopBar.tsx`, `src/components/layout/SideNav.tsx`, `src/components/layout/AppShell.tsx`.

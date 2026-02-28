@@ -6,6 +6,8 @@ export const researchModules: ResearchModule[] = [
     id: 'rm-move-2026',
     name: 'MOVE-2026 Supplementary PROMs',
     studyName: 'MOVE-2026',
+    studyInfoMarkdown:
+      '## MOVE-2026\n\nDenna studie utvärderar utsäkten efter höftledsoperation under 24 månader.\n\nDeltagande är frivilligt och kan avbräkts när som helst utan att det påverkar din vård.',
     entries: [
       {
         id: 'rme-move-1',

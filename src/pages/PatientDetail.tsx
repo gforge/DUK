@@ -1,0 +1,330 @@
+import React from 'react'
+import {
+  Alert,
+  Box,
+  Breadcrumbs,
+  Chip,
+  CircularProgress,
+  Divider,
+  Link as MuiLink,
+  Paper,
+  Stack,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  Typography,
+} from '@mui/material'
+import PersonIcon from '@mui/icons-material/Person'
+import RouteIcon from '@mui/icons-material/Route'
+import AssignmentIcon from '@mui/icons-material/Assignment'
+import NavigateNextIcon from '@mui/icons-material/NavigateNext'
+import { Link, useParams, useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
+import { format } from 'date-fns'
+import { useApi } from '../hooks/useApi'
+import * as client from '../api/client'
+import StatusChip from '../components/common/StatusChip'
+import { formatPersonnummer } from '../api/utils/personnummer'
+
+export default function PatientDetail() {
+  const { id } = useParams<{ id: string }>()
+  const { t } = useTranslation()
+  const navigate = useNavigate()
+
+  const { data: patient, loading, error } = useApi(() => client.getPatient(id!), [id])
+  const { data: cases } = useApi(() => client.getCasesByPatient(id!), [id])
+  const { data: journeys } = useApi(() => client.getPatientJourneys(id!), [id])
+  const { data: journeyTemplates } = useApi(() => client.getJourneyTemplates(), [])
+  const { data: consents } = useApi(() => client.getResearchConsents(id!), [id])
+
+  if (loading) {
+    return (
+      <Box display="flex" justifyContent="center" mt={8}>
+        <CircularProgress />
+      </Box>
+    )
+  }
+
+  if (error || !patient) {
+    return (
+      <Box p={3}>
+        <Alert severity="error">{t('patientDetail.notFound')}</Alert>
+      </Box>
+    )
+  }
+
+  const templateName = (templateId: string) =>
+    journeyTemplates?.find((jt) => jt.id === templateId)?.name ?? templateId
+
+  const sortedCases = [...(cases ?? [])].sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+  )
+
+  const sortedJourneys = [...(journeys ?? [])].sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+  )
+
+  const statusColor = (status: string) => {
+    switch (status) {
+      case 'ACTIVE':
+        return 'primary'
+      case 'SUSPENDED':
+        return 'warning'
+      case 'COMPLETED':
+        return 'default'
+      default:
+        return 'default'
+    }
+  }
+
+  return (
+    <Box>
+      {/* Breadcrumbs */}
+      <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />} sx={{ mb: 2 }}>
+        <MuiLink
+          component={Link}
+          to="/patients"
+          underline="hover"
+          color="inherit"
+          sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
+        >
+          <PersonIcon fontSize="small" />
+          {t('patients.title')}
+        </MuiLink>
+        <Typography color="text.primary" fontWeight={600}>
+          {patient.displayName}
+        </Typography>
+      </Breadcrumbs>
+
+      {/* Patient summary */}
+      <Paper variant="outlined" sx={{ p: 2.5, borderRadius: 2, mb: 3 }}>
+        <Stack direction="row" alignItems="center" gap={1.5} mb={1}>
+          <PersonIcon color="primary" />
+          <Typography variant="h5" fontWeight={700}>
+            {patient.displayName}
+          </Typography>
+        </Stack>
+        <Stack direction="row" gap={4} flexWrap="wrap">
+          <Box>
+            <Typography variant="caption" color="text.secondary">
+              {t('patients.personalNumber')}
+            </Typography>
+            <Typography variant="body2" fontWeight={500}>
+              {formatPersonnummer(patient.personalNumber)}
+            </Typography>
+          </Box>
+          <Box>
+            <Typography variant="caption" color="text.secondary">
+              {t('patients.dateOfBirth')}
+            </Typography>
+            <Typography variant="body2" fontWeight={500}>
+              {patient.dateOfBirth}
+            </Typography>
+          </Box>
+          {patient.lastOpenedAt && (
+            <Box>
+              <Typography variant="caption" color="text.secondary">
+                {t('patient.lastOpened')}
+              </Typography>
+              <Typography variant="body2" fontWeight={500}>
+                {format(new Date(patient.lastOpenedAt), 'dd MMM yyyy HH:mm')}
+              </Typography>
+            </Box>
+          )}
+          <Box>
+            <Typography variant="caption" color="text.secondary">
+              {t('patientDetail.registered')}
+            </Typography>
+            <Typography variant="body2" fontWeight={500}>
+              {format(new Date(patient.createdAt), 'dd MMM yyyy')}
+            </Typography>
+          </Box>
+        </Stack>
+      </Paper>
+
+      {/* Cases */}
+      <Paper variant="outlined" sx={{ p: 2.5, borderRadius: 2, mb: 3 }}>
+        <Stack direction="row" alignItems="center" gap={1} mb={1.5}>
+          <AssignmentIcon color="primary" fontSize="small" />
+          <Typography variant="subtitle1" fontWeight={600}>
+            {t('patientDetail.cases')}
+          </Typography>
+          <Chip label={sortedCases.length} size="small" variant="outlined" />
+        </Stack>
+
+        {sortedCases.length === 0 ? (
+          <Typography variant="body2" color="text.secondary">
+            {t('patientDetail.noCases')}
+          </Typography>
+        ) : (
+          <Table size="small">
+            <TableHead>
+              <TableRow>
+                <TableCell>{t('case.status')}</TableCell>
+                <TableCell>{t('case.category')}</TableCell>
+                <TableCell>{t('patientDetail.triggers')}</TableCell>
+                <TableCell>{t('patientDetail.created')}</TableCell>
+                <TableCell>{t('patientDetail.lastActivity')}</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {sortedCases.map((c) => (
+                <TableRow
+                  key={c.id}
+                  hover
+                  sx={{ cursor: 'pointer' }}
+                  onClick={() => navigate(`/cases/${c.id}`)}
+                >
+                  <TableCell>
+                    <StatusChip status={c.status} />
+                  </TableCell>
+                  <TableCell>
+                    <Chip label={t(`category.${c.category}`)} size="small" variant="outlined" />
+                  </TableCell>
+                  <TableCell>
+                    {c.triggers.length > 0 ? (
+                      <Stack direction="row" gap={0.5} flexWrap="wrap">
+                        {c.triggers.map((tr) => (
+                          <Chip
+                            key={tr}
+                            label={t(`trigger.${tr}`)}
+                            size="small"
+                            color="error"
+                            variant="outlined"
+                            sx={{ height: 20, fontSize: 10 }}
+                          />
+                        ))}
+                      </Stack>
+                    ) : (
+                      <Typography variant="caption" color="text.secondary">
+                        —
+                      </Typography>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <Typography variant="caption">
+                      {format(new Date(c.createdAt), 'dd MMM yyyy')}
+                    </Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Typography variant="caption">
+                      {format(new Date(c.lastActivityAt), 'dd MMM yyyy HH:mm')}
+                    </Typography>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
+      </Paper>
+
+      {/* Journeys */}
+      <Paper variant="outlined" sx={{ p: 2.5, borderRadius: 2, mb: 3 }}>
+        <Stack direction="row" alignItems="center" gap={1} mb={1.5}>
+          <RouteIcon color="primary" fontSize="small" />
+          <Typography variant="subtitle1" fontWeight={600}>
+            {t('patientDetail.journeys')}
+          </Typography>
+          <Chip label={sortedJourneys.length} size="small" variant="outlined" />
+        </Stack>
+
+        {sortedJourneys.length === 0 ? (
+          <Typography variant="body2" color="text.secondary">
+            {t('patientDetail.noJourneys')}
+          </Typography>
+        ) : (
+          <Table size="small">
+            <TableHead>
+              <TableRow>
+                <TableCell>{t('patientDetail.journeyTemplate')}</TableCell>
+                <TableCell>{t('case.status')}</TableCell>
+                <TableCell>{t('patientDetail.startDate')}</TableCell>
+                <TableCell>{t('patientDetail.created')}</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {sortedJourneys.map((j) => (
+                <TableRow key={j.id}>
+                  <TableCell>
+                    <Typography variant="body2" fontWeight={500}>
+                      {templateName(j.journeyTemplateId)}
+                    </Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Chip
+                      label={t(`journey.journeyStatus.${j.status}`)}
+                      size="small"
+                      color={statusColor(j.status) as 'primary' | 'warning' | 'default'}
+                      variant="outlined"
+                    />
+                  </TableCell>
+                  <TableCell>{j.startDate}</TableCell>
+                  <TableCell>
+                    <Typography variant="caption">
+                      {format(new Date(j.createdAt), 'dd MMM yyyy')}
+                    </Typography>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
+      </Paper>
+
+      {/* Research consents */}
+      {consents && consents.length > 0 && (
+        <Paper variant="outlined" sx={{ p: 2.5, borderRadius: 2, mb: 3 }}>
+          <Stack direction="row" alignItems="center" gap={1} mb={1.5}>
+            <Typography variant="subtitle1" fontWeight={600}>
+              {t('patientDetail.consents')}
+            </Typography>
+            <Chip label={consents.length} size="small" variant="outlined" />
+          </Stack>
+          <Table size="small">
+            <TableHead>
+              <TableRow>
+                <TableCell>{t('patientDetail.consentStudy')}</TableCell>
+                <TableCell>{t('case.status')}</TableCell>
+                <TableCell>{t('patientDetail.grantedAt')}</TableCell>
+                <TableCell>{t('patientDetail.revokedAt')}</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {consents.map((c) => (
+                <TableRow key={c.id}>
+                  <TableCell>{c.researchModuleId}</TableCell>
+                  <TableCell>
+                    <Chip
+                      label={c.revokedAt ? t('patientDetail.revoked') : t('patientDetail.active')}
+                      size="small"
+                      color={c.revokedAt ? 'default' : 'success'}
+                      variant="outlined"
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Typography variant="caption">
+                      {format(new Date(c.grantedAt), 'dd MMM yyyy')}
+                    </Typography>
+                  </TableCell>
+                  <TableCell>
+                    {c.revokedAt ? (
+                      <Typography variant="caption">
+                        {format(new Date(c.revokedAt), 'dd MMM yyyy')}
+                      </Typography>
+                    ) : (
+                      <Typography variant="caption" color="text.secondary">
+                        —
+                      </Typography>
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </Paper>
+      )}
+    </Box>
+  )
+}

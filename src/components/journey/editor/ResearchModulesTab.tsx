@@ -74,6 +74,7 @@ function ModuleEditorDialog({ module, questionnaires, onSave, onClose }: ModuleE
 
   const [name, setName] = useState(module?.name ?? '')
   const [studyName, setStudyName] = useState(module?.studyName ?? '')
+  const [studyInfoMarkdown, setStudyInfoMarkdown] = useState(module?.studyInfoMarkdown ?? '')
   const [entryDrafts, setEntryDrafts] = useState<EntryDraft[]>(
     module ? moduleToEntryDrafts(module) : [],
   )
@@ -115,7 +116,13 @@ function ModuleEditorDialog({ module, questionnaires, onSave, onClose }: ModuleE
         replaceStepId: e.mode === 'REPLACE' && e.replaceStepId ? e.replaceStepId : undefined,
         offsetDays: e.mode === 'ADDITIVE' && e.offsetDays !== '' ? Number(e.offsetDays) : undefined,
       }))
-    onSave({ id: module?.id, name: name.trim(), studyName: studyName.trim(), entries })
+    onSave({
+      id: module?.id,
+      name: name.trim(),
+      studyName: studyName.trim(),
+      studyInfoMarkdown: studyInfoMarkdown.trim(),
+      entries,
+    })
   }
 
   return (
@@ -144,6 +151,17 @@ function ModuleEditorDialog({ module, questionnaires, onSave, onClose }: ModuleE
               fullWidth
             />
           </Stack>
+
+          <TextField
+            label={t('journey.research.studyInfo')}
+            value={studyInfoMarkdown}
+            onChange={(e) => setStudyInfoMarkdown(e.target.value)}
+            size="small"
+            fullWidth
+            multiline
+            minRows={3}
+            helperText={t('journey.research.studyInfoHint')}
+          />
 
           <Stack direction="row" alignItems="center" justifyContent="space-between">
             <Typography variant="overline" color="text.secondary">

@@ -11,6 +11,7 @@ import { useApi } from '../hooks/useApi'
 import { useEditorUndo } from '../hooks/useEditorUndo'
 import * as client from '../api/client'
 import { useSnack } from '../store/snackContext'
+import ConfirmDialog from '../components/common/ConfirmDialog'
 import JourneyTemplatesTab from '../components/journey/editor/JourneyTemplatesTab'
 import ResearchModulesTab from '../components/journey/editor/ResearchModulesTab'
 import PatientJourneysTable from '../components/journey/editor/PatientJourneysTable'
@@ -37,6 +38,11 @@ export default function JourneyEditor() {
   const { t } = useTranslation()
   const { showSnack } = useSnack()
   const [tab, setTab] = useState(0)
+  const [confirmAction, setConfirmAction] = useState<{
+    title: string
+    message: string
+    onConfirm: () => void
+  } | null>(null)
 
   const {
     data: journeyTemplates,
@@ -84,21 +90,33 @@ export default function JourneyEditor() {
   // ── Journey template handlers ──────────────────────────────────────────────
 
   const handleDeleteTemplate = async (templateId: string, name: string) => {
-    if (!confirm(t('journey.editor.confirmDeleteTemplate', { name }))) return
-    pushUndo(t('journey.editor.undoDelete', { name }))
-    await client.deleteJourneyTemplate(templateId)
-    showSnack(t('journey.editor.templateDeleted'), 'success')
-    refetchJT()
+    setConfirmAction({
+      title: t('common.delete'),
+      message: t('journey.editor.confirmDeleteTemplate', { name }),
+      onConfirm: async () => {
+        setConfirmAction(null)
+        pushUndo(t('journey.editor.undoDelete', { name }))
+        await client.deleteJourneyTemplate(templateId)
+        showSnack(t('journey.editor.templateDeleted'), 'success')
+        refetchJT()
+      },
+    })
   }
 
   // ── Research module handlers ───────────────────────────────────────────────
 
   const handleDeleteModule = async (moduleId: string, name: string) => {
-    if (!confirm(t('journey.editor.confirmDeleteModule', { name }))) return
-    pushUndo(t('journey.editor.undoDelete', { name }))
-    await client.deleteResearchModule(moduleId)
-    showSnack(t('journey.editor.moduleDeleted'), 'success')
-    refetchRM()
+    setConfirmAction({
+      title: t('common.delete'),
+      message: t('journey.editor.confirmDeleteModule', { name }),
+      onConfirm: async () => {
+        setConfirmAction(null)
+        pushUndo(t('journey.editor.undoDelete', { name }))
+        await client.deleteResearchModule(moduleId)
+        showSnack(t('journey.editor.moduleDeleted'), 'success')
+        refetchRM()
+      },
+    })
   }
 
   const handleSaveModule = async (module: Parameters<typeof client.saveResearchModule>[0]) => {
@@ -111,11 +129,17 @@ export default function JourneyEditor() {
   // ── Instruction template handlers ─────────────────────────────────────────
 
   const handleDeleteInstruction = async (id: string, name: string) => {
-    if (!confirm(t('journey.editor.confirmDeleteInstruction', { name }))) return
-    pushUndo(t('journey.editor.undoDelete', { name }))
-    await client.deleteInstructionTemplate(id)
-    showSnack(t('journey.editor.instructionDeleted'), 'success')
-    refetchIT()
+    setConfirmAction({
+      title: t('common.delete'),
+      message: t('journey.editor.confirmDeleteInstruction', { name }),
+      onConfirm: async () => {
+        setConfirmAction(null)
+        pushUndo(t('journey.editor.undoDelete', { name }))
+        await client.deleteInstructionTemplate(id)
+        showSnack(t('journey.editor.instructionDeleted'), 'success')
+        refetchIT()
+      },
+    })
   }
 
   const handleSaveInstruction = async (data: {
@@ -133,11 +157,17 @@ export default function JourneyEditor() {
   // ── Questionnaire template handlers ──────────────────────────────────────
 
   const handleDeleteQuestionnaire = async (id: string, name: string) => {
-    if (!confirm(t('journey.editor.confirmDeleteInstruction', { name }))) return
-    pushUndo(t('journey.editor.undoDelete', { name }))
-    await client.deleteQuestionnaireTemplate(id)
-    showSnack(t('journey.editor.instructionDeleted'), 'success')
-    refetchQT()
+    setConfirmAction({
+      title: t('common.delete'),
+      message: t('journey.editor.confirmDeleteInstruction', { name }),
+      onConfirm: async () => {
+        setConfirmAction(null)
+        pushUndo(t('journey.editor.undoDelete', { name }))
+        await client.deleteQuestionnaireTemplate(id)
+        showSnack(t('journey.editor.instructionDeleted'), 'success')
+        refetchQT()
+      },
+    })
   }
 
   const handleSaveQuestionnaire = async (
@@ -270,6 +300,14 @@ export default function JourneyEditor() {
           </TabPanel>
         </Box>
       </Paper>
+
+      <ConfirmDialog
+        open={!!confirmAction}
+        title={confirmAction?.title ?? ''}
+        message={confirmAction?.message ?? ''}
+        onConfirm={() => confirmAction?.onConfirm()}
+        onCancel={() => setConfirmAction(null)}
+      />
     </Box>
   )
 }

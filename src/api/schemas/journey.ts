@@ -96,10 +96,28 @@ export const ResearchModuleSchema = z.object({
   id: z.string(),
   name: z.string(),
   studyName: z.string(),
+  /** Markdown content shown to the patient in the consent dialog. */
+  studyInfoMarkdown: z.string().default(''),
   entries: z.array(ResearchModuleEntrySchema),
   createdAt: z.string().datetime(),
 })
 export type ResearchModule = z.infer<typeof ResearchModuleSchema>
+
+/**
+ * Records a patient's informed consent to participate in a research module.
+ * Consent may be revoked; revoked consents are retained for audit purposes.
+ */
+export const ConsentSchema = z.object({
+  id: z.string(),
+  patientId: z.string(),
+  researchModuleId: z.string(),
+  patientJourneyId: z.string(),
+  grantedAt: z.string().datetime(),
+  grantedByUserId: z.string(),
+  revokedAt: z.string().datetime().nullable().default(null),
+  revokedByUserId: z.string().nullable().default(null),
+})
+export type Consent = z.infer<typeof ConsentSchema>
 
 export const JourneyModificationSchema = z.object({
   id: z.string(),
@@ -115,6 +133,12 @@ export const JourneyModificationSchema = z.object({
   previousStartDate: z.string().optional(),
   /** New YYYY-MM-DD anchor date — all step offsets recalculate from this date. */
   newStartDate: z.string().optional(),
+  /**
+   * Present on REMOVE_STEP when the step is removed because it overlaps with a
+   * step in an existing parallel journey. Records which journey the patient will
+   * fill this form through instead, providing an audit trail for the merge.
+   */
+  mergedFromJourneyId: z.string().optional(),
 })
 export type JourneyModification = z.infer<typeof JourneyModificationSchema>
 
@@ -140,6 +164,18 @@ export const PatientJourneySchema = z.object({
   modifications: z.array(JourneyModificationSchema),
   /** Completion records for recurring steps — drives the next-occurrence date calculation. */
   recurringCompletions: z.array(RecurringCompletionSchema).default([]),
+  /**
+   * ISO datetime of when the current suspension started.
+   * null when the journey is not paused.
+   * Set by pauseJourney(), cleared by resumeJourney().
+   */
+  pausedAt: z.string().datetime().nullable().default(null),
+  /**
+   * Accumulated whole-day paused duration from all past suspensions.
+   * Does NOT include the current ongoing pause (add daysSince(pausedAt) for that).
+   * Every resumeJourney() call adds the completed pause duration here and clears pausedAt.
+   */
+  totalPausedDays: z.number().int().default(0),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
 })

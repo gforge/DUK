@@ -61,6 +61,8 @@ t('audit.actions.SEEK_CONTACT')
 t('audit.actions.JOURNAL_DRAFT_CREATED')
 t('audit.actions.JOURNAL_DRAFT_APPROVED')
 t('audit.actions.CASE_CLOSED')
+t('audit.actions.CONTACTED')
+t('audit.actions.REMINDER_SENT')
 
 // ─── Questionnaire label keys (used via t(question.labelKey)) ─────────────────
 t('questionnaire.numbness_fingers')

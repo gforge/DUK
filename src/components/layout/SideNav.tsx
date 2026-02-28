@@ -88,7 +88,7 @@ export default function SideNav({ drawerWidth, mobileOpen, onClose, isMobile }: 
     <Box>
       <Toolbar sx={{ minHeight: 56 }} />
       <Divider />
-      <List component="nav" aria-label="main navigation">
+      <List component="nav" aria-label={t('common.mainNavigation')}>
         {navItems.map((item) => {
           const visible = item.roles.some((r) => isRole(r))
           if (!visible) return null
@@ -116,7 +116,7 @@ export default function SideNav({ drawerWidth, mobileOpen, onClose, isMobile }: 
   )
 
   return (
-    <>
+    <Box sx={{ displayPrint: 'none' }}>
       {/* Mobile drawer */}
       <Drawer
         variant="temporary"
@@ -147,6 +147,6 @@ export default function SideNav({ drawerWidth, mobileOpen, onClose, isMobile }: 
       >
         {drawerContent}
       </Drawer>
-    </>
+    </Box>
   )
 }

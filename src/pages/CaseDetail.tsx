@@ -28,6 +28,7 @@ import AuditLogTab from '../components/case/AuditLogTab'
 import JourneyTab from '../components/case/JourneyTab'
 import StatusChip from '../components/common/StatusChip'
 import AutoWarningsBadge from '../components/common/AutoWarningsBadge'
+import NurseContactActions from '../components/case/NurseContactActions'
 
 interface TabPanelProps {
   children: React.ReactNode
@@ -144,6 +145,9 @@ export default function CaseDetail() {
 
       {/* Patient card */}
       {patient && <PatientCard patient={patient} caseData={caseData} />}
+
+      {/* Nurse contact action panel — shown when SEEK_CONTACT / NOT_OPENED triggers are active */}
+      <NurseContactActions caseData={caseData} onRefetch={refetchCase} />
 
       {/* Tabs */}
       <Paper variant="outlined" sx={{ mt: 2, borderRadius: 2 }}>

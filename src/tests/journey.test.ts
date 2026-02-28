@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import { initStore } from '../api/storage'
+import { initStore, patchStore } from '../api/storage'
 import { SEED_STATE } from '../api/seed'
 import * as service from '../api/service'
 
@@ -466,5 +466,96 @@ describe('recordRecurringCompletion', () => {
     service.recordRecurringCompletion(journey.id, 'some-step', 0, '2024-06-01')
     const updated = service.recordRecurringCompletion(journey.id, 'some-step', 0, '2024-06-01')
     expect(updated.recurringCompletions).toHaveLength(1)
+  })
+})
+
+// ─── pauseJourney / resumeJourney ─────────────────────────────────────────────
+
+describe('pauseJourney / resumeJourney', () => {
+  it('sets status to SUSPENDED and records pausedAt', () => {
+    const before = service.getPatientJourneys('p-1')[0]
+    expect(before.status).toBe('ACTIVE')
+    const paused = service.pauseJourney(before.id)
+    expect(paused.status).toBe('SUSPENDED')
+    expect(paused.pausedAt).toBeTruthy()
+    expect(paused.totalPausedDays).toBe(0)
+  })
+
+  it('throws when pausing a non-ACTIVE journey', () => {
+    const j = service.getPatientJourneys('p-1')[0]
+    service.pauseJourney(j.id)
+    expect(() => service.pauseJourney(j.id)).toThrow()
+  })
+
+  it('resumes correctly and accumulates totalPausedDays', () => {
+    const j = service.getPatientJourneys('p-1')[0]
+    service.pauseJourney(j.id)
+    const resumed = service.resumeJourney(j.id)
+    expect(resumed.status).toBe('ACTIVE')
+    expect(resumed.pausedAt).toBeNull()
+    // totalPausedDays must be >= 0 (typically 0 for an immediate resume in tests)
+    expect(resumed.totalPausedDays).toBeGreaterThanOrEqual(0)
+  })
+
+  it('throws when resuming a non-SUSPENDED journey', () => {
+    const j = service.getPatientJourneys('p-1')[0]
+    expect(() => service.resumeJourney(j.id)).toThrow()
+  })
+
+  it('step scheduled dates shift forward by accumulated pause days', () => {
+    const journey = service.getPatientJourneys('p-1')[0]
+
+    // Get baseline step dates while ACTIVE
+    const stepsBefore = service.getEffectiveSteps(journey.id)
+
+    // Manually inject a 7-day pause via direct store patch so we can test the shift
+    // without having to wait 7 real days in a test.
+    patchStore((s) => ({
+      ...s,
+      patientJourneys: s.patientJourneys.map((j) =>
+        j.id === journey.id ? { ...j, totalPausedDays: 7 } : j,
+      ),
+    }))
+
+    const stepsAfter = service.getEffectiveSteps(journey.id)
+
+    // Every step's scheduledDate should be 7 days later than before
+    for (let i = 0; i < stepsBefore.length; i++) {
+      const beforeMs = new Date(stepsBefore[i].scheduledDate).getTime()
+      const afterMs = new Date(stepsAfter[i].scheduledDate).getTime()
+      expect(afterMs - beforeMs).toBe(7 * 86_400_000)
+    }
+  })
+})
+
+// ─── getMergedDueStepsForPatient ──────────────────────────────────────────────
+
+describe('getMergedDueStepsForPatient', () => {
+  it('returns empty array when patient has no journeys', () => {
+    const result = service.getMergedDueStepsForPatient('nonexistent-patient', '2026-01-01')
+    expect(result).toEqual([])
+  })
+
+  it('deduplicates steps with the same templateId from parallel journeys', () => {
+    // Assign a second journey with the same template to p-1
+    const original = service.getPatientJourneys('p-1')[0]
+    service.assignPatientJourney('p-1', original.journeyTemplateId, original.startDate)
+
+    // On the startDate + 1 day (first step for jt-standard), both journeys should
+    // have the same form due.  getMergedDueStepsForPatient should deduplicate.
+    const dueDate = original.startDate // first step offset=1, window=2 → covers startDate
+    const firstStepDate = new Date(new Date(original.startDate).getTime() + 1 * 86_400_000)
+      .toISOString()
+      .slice(0, 10)
+    const merged = service.getMergedDueStepsForPatient('p-1', firstStepDate)
+
+    // For each templateId there should be exactly one merged step
+    const templateIds = merged.map((s) => s.templateId)
+    const uniqueIds = [...new Set(templateIds)]
+    expect(templateIds.length).toBe(uniqueIds.length)
+
+    // The merged step covering both journeys should have journeyIds.length >= 2
+    const bothJourneys = merged.find((s) => s.journeyIds.length >= 2)
+    expect(bothJourneys).toBeTruthy()
   })
 })

@@ -3,6 +3,7 @@ import {
   Alert,
   Box,
   Button,
+  Checkbox,
   Chip,
   CircularProgress,
   Collapse,
@@ -11,6 +12,8 @@ import {
   DialogContent,
   DialogTitle,
   FormControl,
+  FormControlLabel,
+  FormGroup,
   InputLabel,
   MenuItem,
   Select,
@@ -29,6 +32,7 @@ import {
 import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt'
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
+import ScienceIcon from '@mui/icons-material/Science'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import ExpandLessIcon from '@mui/icons-material/ExpandLess'
 import { useTranslation } from 'react-i18next'
@@ -65,13 +69,18 @@ export default function RegisterPatientDialog({ open, onClose, onCreated }: Prop
   const [journeyTemplateId, setJourneyTemplateId] = useState('')
   const [startDate, setStartDate] = useState(new Date().toISOString().slice(0, 10))
 
+  // Step 2 — research module enrollment
+  const [selectedModuleIds, setSelectedModuleIds] = useState<string[]>([])
+
   const { data: journeyTemplates } = useApi(() => client.getJourneyTemplates(), [])
+  const { data: researchModules } = useApi(() => client.getResearchModules(), [])
   const { data: demoHints } = useApi(() => client.getDemoRegisterHints(), [])
   const { data: existingPatients } = useApi(() => client.getPatients(), [])
 
   const steps = [
     t('patients.register.stepPatient'),
     t('patients.register.stepJourney'),
+    t('patients.register.stepStudies'),
     t('patients.register.stepConfirm'),
   ]
 
@@ -86,6 +95,7 @@ export default function RegisterPatientDialog({ open, onClose, onCreated }: Prop
     setDateOfBirth('')
     setJourneyTemplateId('')
     setStartDate(new Date().toISOString().slice(0, 10))
+    setSelectedModuleIds([])
     setError(null)
     setHintOpen(false)
     onClose()
@@ -151,7 +161,7 @@ export default function RegisterPatientDialog({ open, onClose, onCreated }: Prop
         personalNumber,
         dateOfBirth: effectiveDob,
       })
-      await client.assignPatientJourney(patient.id, journeyTemplateId, startDate)
+      await client.assignPatientJourney(patient.id, journeyTemplateId, startDate, selectedModuleIds)
       showSnack(t('patients.register.success'), 'success')
       onCreated()
       handleClose()
@@ -422,8 +432,55 @@ export default function RegisterPatientDialog({ open, onClose, onCreated }: Prop
           </Stack>
         )}
 
-        {/* ── Step 2: Review ── */}
+        {/* ── Step 2: Research modules ── */}
         {step === 2 && (
+          <Stack gap={2}>
+            <Typography variant="body2" color="text.secondary">
+              {t('patients.register.studiesHint')}
+            </Typography>
+            {!researchModules || researchModules.length === 0 ? (
+              <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
+                {t('patients.register.noStudies')}
+              </Typography>
+            ) : (
+              <FormGroup>
+                {researchModules.map((rm) => (
+                  <FormControlLabel
+                    key={rm.id}
+                    control={
+                      <Checkbox
+                        checked={selectedModuleIds.includes(rm.id)}
+                        onChange={(e) =>
+                          setSelectedModuleIds((prev) =>
+                            e.target.checked ? [...prev, rm.id] : prev.filter((id) => id !== rm.id),
+                          )
+                        }
+                      />
+                    }
+                    label={
+                      <Stack gap={0}>
+                        <Stack direction="row" alignItems="center" gap={0.5}>
+                          <ScienceIcon fontSize="small" color="secondary" />
+                          <Typography variant="body2" fontWeight={600}>
+                            {rm.studyName}
+                          </Typography>
+                        </Stack>
+                        {rm.name !== rm.studyName && (
+                          <Typography variant="caption" color="text.secondary" sx={{ ml: 3.5 }}>
+                            {rm.name}
+                          </Typography>
+                        )}
+                      </Stack>
+                    }
+                  />
+                ))}
+              </FormGroup>
+            )}
+          </Stack>
+        )}
+
+        {/* ── Step 3: Review ── */}
+        {step === 3 && (
           <Stack gap={1.5}>
             <Typography variant="subtitle2" fontWeight={600}>
               {t('patients.register.reviewTitle')}
@@ -452,6 +509,19 @@ export default function RegisterPatientDialog({ open, onClose, onCreated }: Prop
                 </Typography>
               </Stack>
             </Box>
+            <Box sx={{ border: 1, borderColor: 'divider', borderRadius: 1, p: 1.5 }}>
+              <Stack gap={0.5}>
+                <Typography variant="body2">
+                  <strong>{t('patients.register.reviewStudies')}</strong>{' '}
+                  {selectedModuleIds.length === 0
+                    ? t('patients.register.noStudiesSelected')
+                    : researchModules
+                        ?.filter((rm) => selectedModuleIds.includes(rm.id))
+                        .map((rm) => rm.studyName)
+                        .join(', ')}
+                </Typography>
+              </Stack>
+            </Box>
           </Stack>
         )}
       </DialogContent>
@@ -465,7 +535,7 @@ export default function RegisterPatientDialog({ open, onClose, onCreated }: Prop
             {t('common.back')}
           </Button>
         )}
-        {step < 2 ? (
+        {step < 3 ? (
           <Button variant="contained" onClick={handleNext} disableElevation>
             {t('common.next')}
           </Button>

@@ -1,0 +1,58 @@
+@startuml
+title Multiple Parallel Journeys — Rendering & Deduplication
+
+actor Clinician
+participant "JourneyTab\n(CaseDetail UI)" as JT
+participant "PatientCareplan\n(PatientView UI)" as PC
+participant "client/\npatientJourneys" as Client
+participant "service/\njourneyResolver" as Resolver
+participant "getEffectiveSteps" as GES
+participant "getMergedDueSteps\nForPatient" as MDS
+
+== Clinician view (CaseDetail / JourneyTab) ==
+
+Clinician -> JT : Open case detail\n(journeys tab)
+JT -> Client : getPatientJourneys(patientId)
+Client --> JT : PatientJourney[]\n(e.g. wrist + hip programmes)
+JT -> JT : Sort journeys:\n  ACTIVE → SUSPENDED → COMPLETED\n  newest-first within group
+JT -> JT : Render MUI Tabs\n  Tab 1: "Handled Radius (ACTIVE)"\n  Tab 2: "Höft (ACTIVE)"\n  ...
+Clinician -> JT : Click tab for journey N
+JT -> Client : getEffectiveSteps(journeyId_N)
+Client -> GES : getEffectiveSteps(journey)
+GES -> GES : Apply totalPauseShift\nApply modifications\nOverlay research module entries\nHydrate resolvedInstruction
+GES --> Client : EffectiveStep[]
+Client --> JT : EffectiveStep[]
+JT -> JT : Render JourneyTimeline\n+ pause/resume controls\n+ consent chips
+
+== Patient self-view (PatientCareplan) ==
+
+Clinician -> PC : Switch to patient role\n-> /patient
+PC -> Client : getPatientJourneys(patientId)
+Client --> PC : PatientJourney[]
+PC -> PC : Same tab sort and render\n(read-only; no pause/consent controls)
+
+== Dashboard / Worklist — form deduplication ==
+
+JT -> MDS : getMergedDueStepsForPatient(\n  patientId, today\n)
+MDS -> Resolver : For each ACTIVE journey:\n  getEffectiveSteps(journey)
+
+loop per Active Journey
+  Resolver -> GES : getEffectiveSteps(journey_i)
+  GES --> Resolver : EffectiveStep[]
+  Resolver -> Resolver : Filter steps where\n  scheduledDate is within\n  today's window
+end
+
+Resolver -> Resolver : Deduplicate by templateEntryId\n(keep first occurrence;\ndiscard duplicates from\nparallel journeys)
+Resolver --> MDS : MergedDueStep[]\n(no duplicate questionnaires)
+MDS --> JT : Merged due steps for\ndashboard/worklist display
+
+note right of Resolver
+  Key invariant:
+  The same questionnaire
+  (templateEntryId) is shown
+  at most once per day, even
+  when two parallel journeys
+  both schedule it.
+end note
+
+@enduml

@@ -25,6 +25,7 @@ import type { Case } from '../../api/schemas'
 import * as client from '../../api/client'
 import { useRole } from '../../store/roleContext'
 import { useSnack } from '../../store/snackContext'
+import ConfirmDialog from '../common/ConfirmDialog'
 
 interface Props {
   caseData: Case
@@ -36,11 +37,16 @@ export default function BookingsList({ caseData, onChange }: Props) {
   const { currentUser } = useRole()
   const { showSnack } = useSnack()
 
-  const [editing, setEditing] = useState<null | { id: string; scheduledAt: string; role?: string; note?: string }>(
-    null,
-  )
+  const [editing, setEditing] = useState<null | {
+    id: string
+    scheduledAt: string
+    role?: string
+    note?: string
+  }>(null)
+  const [cancelTarget, setCancelTarget] = useState<string | null>(null)
 
   async function handleCancel(bookingId: string) {
+    setCancelTarget(null)
     try {
       await client.cancelBooking(caseData.id, bookingId, currentUser.id, currentUser.role)
       showSnack(t('triage.bookingCancelSuccess'), 'success')
@@ -122,7 +128,8 @@ export default function BookingsList({ caseData, onChange }: Props) {
             <Box sx={{ flex: 1 }}>
               <Typography variant="body2">{t(`nextStep.${b.type}`) ?? b.type}</Typography>
               <Typography variant="caption" color="text.secondary">
-                {new Date(b.scheduledAt).toLocaleString()} — {b.role ? t(`role.${b.role}`) : t('common.notSet')}
+                {new Date(b.scheduledAt).toLocaleString()} —{' '}
+                {b.role ? t(`role.${b.role}`) : t('common.notSet')}
               </Typography>
               {b.note && (
                 <Typography variant="caption" display="block">
@@ -130,16 +137,37 @@ export default function BookingsList({ caseData, onChange }: Props) {
                 </Typography>
               )}
             </Box>
-            <IconButton size="small" onClick={() => setEditing({ id: b.id, scheduledAt: b.scheduledAt, role: b.role, note: b.note })} aria-label={t('common.edit')}>
+            <IconButton
+              size="small"
+              onClick={() =>
+                setEditing({ id: b.id, scheduledAt: b.scheduledAt, role: b.role, note: b.note })
+              }
+              aria-label={t('common.edit')}
+            >
               <EditIcon fontSize="small" />
             </IconButton>
-            <IconButton size="small" onClick={() => downloadICal(b as any)} aria-label={t('triage.exportIcal')}>
+            <IconButton
+              size="small"
+              onClick={() => downloadICal(b as any)}
+              aria-label={t('triage.exportIcal')}
+            >
               <EventAvailableIcon fontSize="small" />
             </IconButton>
-            <IconButton size="small" component="a" href={toGoogleCalendarLink(b as any)} target="_blank" rel="noreferrer" aria-label={t('triage.addToGoogle')}>
+            <IconButton
+              size="small"
+              component="a"
+              href={toGoogleCalendarLink(b as any)}
+              target="_blank"
+              rel="noreferrer"
+              aria-label={t('triage.addToGoogle')}
+            >
               <OpenInNewIcon fontSize="small" />
             </IconButton>
-            <IconButton size="small" onClick={() => handleCancel(b.id)} aria-label={t('common.delete')}>
+            <IconButton
+              size="small"
+              onClick={() => setCancelTarget(b.id)}
+              aria-label={t('common.delete')}
+            >
               <CancelIcon fontSize="small" />
             </IconButton>
           </Paper>
@@ -166,7 +194,9 @@ export default function BookingsList({ caseData, onChange }: Props) {
                 onChange={(e) => setEditing((s) => (s ? { ...s, role: e.target.value } : s))}
                 label={t('triage.assignRole')}
               >
-                <MenuItem value=""><em>{t('common.notSet')}</em></MenuItem>
+                <MenuItem value="">
+                  <em>{t('common.notSet')}</em>
+                </MenuItem>
                 <MenuItem value="NURSE">{t('role.NURSE')}</MenuItem>
                 <MenuItem value="DOCTOR">{t('role.DOCTOR')}</MenuItem>
                 <MenuItem value="PAL">{t('role.PAL')}</MenuItem>
@@ -184,9 +214,19 @@ export default function BookingsList({ caseData, onChange }: Props) {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setEditing(null)}>{t('common.cancel')}</Button>
-          <Button onClick={handleSave} variant="contained">{t('common.save')}</Button>
+          <Button onClick={handleSave} variant="contained">
+            {t('common.save')}
+          </Button>
         </DialogActions>
       </Dialog>
+
+      <ConfirmDialog
+        open={!!cancelTarget}
+        title={t('triage.bookingCancelTitle')}
+        message={t('triage.bookingCancelConfirm')}
+        onConfirm={() => cancelTarget && handleCancel(cancelTarget)}
+        onCancel={() => setCancelTarget(null)}
+      />
     </Box>
   )
 }

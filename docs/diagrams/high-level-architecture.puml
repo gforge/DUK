@@ -19,6 +19,8 @@ package "Service Layer" {
     [Journal Renderer] <<src/api/journalRenderer.ts>>
     [Journey Resolver]
     [Instruction Templates]
+    [Research Consents]
+    [Patient Journeys]
   }
 }
 
@@ -33,14 +35,30 @@ package "Persistence" {
 [src/api/service] --> [Journal Renderer]
 [src/api/service] --> [Journey Resolver]
 [src/api/service] --> [Instruction Templates]
+[src/api/service] --> [Research Consents]
+[src/api/service] --> [Patient Journeys]
 [src/api/service] --> [In-memory store]
 [In-memory store] --> [localStorage]
 
 note bottom of [Journey Resolver]
   Computes effective steps,
   hydrates instructions,
-  handles template derivation
-  & SWITCH_TEMPLATE
+  handles template derivation,
+  SWITCH_TEMPLATE,
+  pause-shift calculation,
+  getMergedDueStepsForPatient
+end note
+
+note bottom of [Research Consents]
+  grantConsent (idempotent),
+  revokeConsent, hasActiveConsent,
+  audit trail via revokedAt
+end note
+
+note bottom of [Patient Journeys]
+  assignPatientJourney,
+  pauseJourney, resumeJourney,
+  totalPausedDays accumulation
 end note
 
 @enduml

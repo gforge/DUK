@@ -81,6 +81,8 @@ export function buildRealisticSeed(): AppState {
         researchModuleIds: [],
         modifications: [],
         recurringCompletions: [],
+        pausedAt: null,
+        totalPausedDays: 0,
         createdAt,
         updatedAt: createdAt,
       })

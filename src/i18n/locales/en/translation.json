@@ -2,6 +2,21 @@
   "app": {
     "disclaimer": "DEMO – All data is fictional/pseudonymized. No real patient data."
   },
+  "notFound": {
+    "title": "Page not found",
+    "message": "The address you tried to reach does not exist. Please check that the URL is correct.",
+    "goHome": "Go to dashboard"
+  },
+  "nurseContact": {
+    "contacted": "Contacted",
+    "reminded": "Reminder sent",
+    "contactedDone": "Contact event logged",
+    "remindedDone": "Reminder event logged",
+    "suggestion": {
+      "SEEK_CONTACT": "The patient is requesting contact. Reach out by phone or via the system.",
+      "NOT_OPENED": "The patient has not opened the form. Send a reminder or call the patient."
+    }
+  },
   "audit": {
     "action": "Event",
     "actions": {
@@ -12,7 +27,9 @@
       "JOURNAL_DRAFT_CREATED": "Journal Draft Created",
       "SEEK_CONTACT": "Seeking Contact",
       "STATUS_CHANGED": "Status Changed",
-      "TRIAGED": "Triaged"
+      "TRIAGED": "Triaged",
+      "CONTACTED": "Patient Contacted",
+      "REMINDER_SENT": "Reminder Sent"
     },
     "details": "Details",
     "noEvents": "No events",
@@ -64,7 +81,16 @@
     "notSet": "Not set",
     "save": "Save",
     "saving": "Saving…",
-    "yes": "Yes"
+    "yes": "Yes",
+    "patientFilter": "Patient filter",
+    "mainNavigation": "Main navigation",
+    "openNavigationMenu": "Open navigation menu",
+    "errorGeneric": "An error occurred. Please try again.",
+    "print": "Print",
+    "rowsPerPage": "Rows per page",
+    "search": "Search",
+    "searchPatients": "Search patient (name or personal number)…",
+    "searchNoResults": "No patients found"
   },
   "dashboard": {
     "filterAll": "All",
@@ -187,6 +213,18 @@
     "recurringStep": "Recurring follow-up occurrence",
     "type": "Type",
     "window": "Window",
+    "pause": "Pause journey",
+    "resume": "Resume journey",
+    "pauseConfirmTitle": "Pause patient journey?",
+    "pauseConfirmBody": "The timeline will be frozen while the journey is paused. All upcoming steps will shift forward until the journey is resumed.",
+    "pauseSuccess": "Journey paused",
+    "resumeSuccess": "Journey resumed",
+    "pausedBanner": "Journey paused for {{days}} day",
+    "pausedBanner_other": "Journey paused for {{days}} days",
+    "pausedBannerToday": "Journey paused today",
+    "pausedDaysShort": "+{{days}}d paused",
+    "deriveCopy": "(copy)",
+    "referenceDateDefault": "Start date",
     "journeyStatus": {
       "label": "Status",
       "ACTIVE": "Active",
@@ -205,12 +243,28 @@
       "editModule": "Edit module",
       "moduleSaved": "Research module saved",
       "studyName": "Study name",
+      "studyInfo": "Study information (shown to patient)",
+      "studyInfoHint": "Markdown text displayed to the patient in the consent dialog.",
       "entries": "entries",
       "addEntry": "Add entry",
       "noEntries": "No entries defined.",
       "entryMode": "Mode",
       "entryModeValue": "REPLACE",
-      "replaceStepHint": "Select the original step id to replace"
+      "replaceStepHint": "Select the original step id to replace",
+      "consent": {
+        "dialogTitle": "Consent – {{studyName}}",
+        "infoLabel": "Study information",
+        "checkbox": "The patient has been informed and consents to participate in the study",
+        "grant": "Record consent",
+        "granted": "Consent recorded {{date}}",
+        "grantedBy": "by {{user}}",
+        "revoke": "Revoke consent",
+        "revokeConfirmTitle": "Revoke consent?",
+        "revokeConfirmBody": "The patient's consent to \"{{studyName}}\" will be revoked. The action is audited.",
+        "revoked": "Consent revoked {{date}}",
+        "revokeSuccess": "Consent revoked",
+        "grantSuccess": "Consent recorded"
+      }
     },
     "modify": {
       "action": "Modify Journey",
@@ -221,7 +275,7 @@
       "newStartDate": "New start date",
       "newStartDateHint": "e.g. surgery date — all steps will be recalculated relative to this date.",
       "dateReset": "Start date changed: {{from}} → {{to}}",
-      "offsetDays": "Day offset (from surgery date)",
+      "offsetDays": "Days since start",
       "questionnaire": "Questionnaire template",
       "reason": "Clinical reason (required)",
       "reasonPlaceholder": "e.g. Patient reporting increased swelling — adding extra review",
@@ -298,6 +352,7 @@
       "offsetDaysHint": "Number of days after the start date (e.g. surgery date) when this step is scheduled",
       "windowDays": "Time window (±days)",
       "windowDaysHint": "The patient can respond up to ±N days from the scheduled date and still be counted as \"on time\"",
+      "windowDaysSuggest": "Suggested: {{n}} days",
       "dashboardCategory": "Dashboard category",
       "noForm": "— No form (instruction-only step) —",
       "noFormHint": "Leave empty for a pure instruction step.",
@@ -430,7 +485,23 @@
     "title": "Patient View",
     "triggers": "Triggers",
     "carePlan": "My Care Plan",
-    "noCarePlan": "No care plan assigned."
+    "noCarePlan": "No care plan assigned.",
+    "researchStudies": "Research Studies",
+    "consentPending": "Consent pending",
+    "consentGranted": "Consent granted {{date}}",
+    "consentWithdraw": "Withdraw Consent",
+    "readAndConsent": "Read & consent",
+    "form": {
+      "dueForms": "Forms to fill in",
+      "noFormsDue": "No forms due right now.",
+      "fillIn": "Fill in",
+      "fillIn_name": "Fill in {{name}}",
+      "submit": "Submit",
+      "submitted": "Form submitted successfully",
+      "required": "Required field",
+      "overdue": "Overdue",
+      "unknownType": "Unknown question type: {{type}}"
+    }
   },
   "patients": {
     "title": "Patients",
@@ -448,6 +519,7 @@
       "title": "Register New Patient",
       "stepPatient": "Patient Details",
       "stepJourney": "Assign Journey",
+      "stepStudies": "Research",
       "stepConfirm": "Confirm",
       "requiredFields": "Please fill in all required fields.",
       "fetchFromRegister": "Fetch from register",
@@ -464,10 +536,44 @@
       "reviewTitle": "Review and confirm",
       "confirm": "Register",
       "success": "Patient registered",
+      "noStudies": "No research modules configured.",
+      "studiesHint": "The patient can confirm consent from their own page after login.",
+      "reviewStudies": "Research:",
+      "noStudiesSelected": "None selected",
       "demoHintTitle": "Demo: available persons in register",
       "demoHintDescription": "Click a row to fill in the personal number automatically.",
       "demoHintAlreadyRegistered": "already registered"
+    },
+    "conflicts": {
+      "step": "Conflicts",
+      "title": "Overlapping forms",
+      "hint": "The following forms are already scheduled in an existing programme. Checked items will be skipped in the new programme — the patient will fill them through the earlier programme instead.",
+      "none": "No overlapping forms detected. The new programme will run independently.",
+      "overlapDays": "{{count}}-day overlap",
+      "overlapDays_one": "1-day overlap",
+      "checkConflicts": "Check for overlaps",
+      "scheduledOn": "Scheduled on",
+      "existingOn": "existing on"
     }
+  },
+  "patientDetail": {
+    "notFound": "Patient not found.",
+    "registered": "Registered",
+    "cases": "Cases",
+    "noCases": "No cases for this patient.",
+    "triggers": "Triggers",
+    "created": "Created",
+    "lastActivity": "Last Activity",
+    "journeys": "Journeys",
+    "noJourneys": "No journeys assigned.",
+    "journeyTemplate": "Journey Template",
+    "startDate": "Start Date",
+    "consents": "Research Consents",
+    "consentStudy": "Study",
+    "grantedAt": "Granted",
+    "revokedAt": "Revoked",
+    "revoked": "Revoked",
+    "active": "Active"
   },
   "policy": {
     "selectTemplate": "Select follow-up template",
@@ -567,6 +673,7 @@
     "deadlineRequired": "Deadline is required for this action",
     "deadlineResolved": "→ {{date}}",
     "error": "Triage error",
+    "requiresClinician": "Triage requires clinical staff access.",
     "followUp": "Set to Follow-Up",
     "internalNote": "Internal note (optional)",
     "more": "More information",
@@ -620,6 +727,8 @@
     "bookingNote": "Booking indication (optional)",
     "bookings": "Bookings",
     "bookingCancelSuccess": "Booking cancelled",
+    "bookingCancelTitle": "Cancel booking",
+    "bookingCancelConfirm": "Are you sure you want to cancel this booking? This action cannot be undone.",
     "bookingUpdated": "Booking updated",
     "editBooking": "Edit booking",
     "bookingExport": {

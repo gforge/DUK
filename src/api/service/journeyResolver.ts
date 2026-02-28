@@ -40,8 +40,18 @@ export function getEffectiveSteps(journeyId: string): EffectiveStep[] {
   if (!template) return []
 
   const startMs = new Date(journey.startDate).getTime()
+
+  // Whilst the journey is suspended, add the current ongoing pause days on top of
+  // the already-accumulated total.  This keeps all future step dates shifting
+  // forward in real time without writing to the store on every render.
+  const currentPauseDays =
+    journey.status === 'SUSPENDED' && journey.pausedAt
+      ? Math.floor((Date.now() - new Date(journey.pausedAt).getTime()) / 86_400_000)
+      : 0
+  const totalPauseShift = (journey.totalPausedDays ?? 0) + currentPauseDays
+
   const toDate = (offsetDays: number) =>
-    new Date(startMs + offsetDays * 86_400_000).toISOString().slice(0, 10)
+    new Date(startMs + (offsetDays + totalPauseShift) * 86_400_000).toISOString().slice(0, 10)
 
   const resolveInstruction = (entry: JourneyTemplateEntry): string | undefined => {
     if (entry.instructionTemplateId) {
@@ -60,9 +70,10 @@ export function getEffectiveSteps(journeyId: string): EffectiveStep[] {
       // Expand into recurring occurrences up to the horizon.
       // Occurrence N+1 is scheduled at max(nominal, prevCompletion + intervalDays)
       // so that a late completion doesn't shorten the gap to the next follow-up.
+      // The pause shift is baked in so that pausing/resuming pushes the whole series forward.
       const intervalMs = e.recurrenceIntervalDays * 86_400_000
-      const horizonMs = startMs + RECURRENCE_HORIZON_DAYS * 86_400_000
-      let occMs = startMs + e.offsetDays * 86_400_000
+      const horizonMs = startMs + (RECURRENCE_HORIZON_DAYS + totalPauseShift) * 86_400_000
+      let occMs = startMs + (e.offsetDays + totalPauseShift) * 86_400_000
       let occIdx = 0
       while (occMs <= horizonMs) {
         const scheduledDate = new Date(occMs).toISOString().slice(0, 10)
@@ -167,6 +178,49 @@ export function getEffectiveSteps(journeyId: string): EffectiveStep[] {
 }
 
 /**
+ * Resolves base effective steps for a journey template + start date without
+ * requiring a stored PatientJourney. Used for conflict detection before a
+ * journey is created. Only template entries are resolved — no modifications,
+ * research overlays or pause shifts apply.
+ */
+export function getEffectiveStepsForTemplate(
+  templateId: string,
+  startDate: string,
+): EffectiveStep[] {
+  const template = getStore().journeyTemplates.find((t) => t.id === templateId)
+  if (!template) return []
+
+  const startMs = new Date(startDate).getTime()
+  const toDate = (offsetDays: number) =>
+    new Date(startMs + offsetDays * 86_400_000).toISOString().slice(0, 10)
+
+  const steps: EffectiveStep[] = []
+  for (const e of template.entries) {
+    if (e.recurrenceIntervalDays !== undefined) {
+      // For conflict detection we only need the first occurrence.
+      steps.push({
+        ...e,
+        id: `${e.id}__r0`,
+        isAdded: false,
+        isResearch: false,
+        isRecurring: true,
+        occurrenceIndex: 0,
+        scheduledDate: toDate(e.offsetDays),
+      })
+    } else {
+      steps.push({
+        ...e,
+        isAdded: false,
+        isResearch: false,
+        isRecurring: false,
+        scheduledDate: toDate(e.offsetDays),
+      })
+    }
+  }
+  return steps.sort((a, b) => a.offsetDays - b.offsetDays || a.order - b.order)
+}
+
+/**
  * Builds the policy evaluation scope, also injecting semantic score aliases
  * from the patient's active journey steps (e.g. PNRS_week4, OSS_week8).
  */
@@ -203,4 +257,58 @@ export function buildPolicyScopeWithAliases(
   }
 
   return scope
+}
+
+// ---------------------------------------------------------------------------
+// Form deduplication
+// ---------------------------------------------------------------------------
+
+/**
+ * An effective step that may span multiple patient journeys.
+ * When a patient has parallel active/suspended journeys that both schedule the
+ * same questionnaire template within overlapping windows on `date`, the steps
+ * are merged into a single entry to avoid showing the form twice.
+ */
+export type MergedDueStep = EffectiveStep & {
+  /** All journey IDs whose window for this template is open on `date`. */
+  journeyIds: string[]
+}
+
+/**
+ * Returns questionnaire steps that are due for a patient on a given date,
+ * merged across all their active/suspended journeys so each questionnaire
+ * template appears at most once regardless of how many parallel journeys
+ * schedule it on the same day.
+ */
+export function getMergedDueStepsForPatient(patientId: string, date: string): MergedDueStep[] {
+  const state = getStore()
+  const journeys = state.patientJourneys.filter(
+    (j) => j.patientId === patientId && (j.status === 'ACTIVE' || j.status === 'SUSPENDED'),
+  )
+
+  const byTemplate = new Map<string, MergedDueStep>()
+
+  for (const journey of journeys) {
+    for (const step of getEffectiveSteps(journey.id)) {
+      if (!step.templateId) continue
+      const windowStart = shiftDate(step.scheduledDate, -step.windowDays)
+      const windowEnd = shiftDate(step.scheduledDate, step.windowDays)
+      if (date < windowStart || date > windowEnd) continue
+
+      const existing = byTemplate.get(step.templateId)
+      if (existing) {
+        if (!existing.journeyIds.includes(journey.id)) existing.journeyIds.push(journey.id)
+      } else {
+        byTemplate.set(step.templateId, { ...step, journeyIds: [journey.id] })
+      }
+    }
+  }
+
+  return Array.from(byTemplate.values()).sort(
+    (a, b) => a.scheduledDate.localeCompare(b.scheduledDate) || a.order - b.order,
+  )
+}
+
+function shiftDate(ymd: string, days: number): string {
+  return new Date(new Date(ymd).getTime() + days * 86_400_000).toISOString().slice(0, 10)
 }

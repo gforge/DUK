@@ -5,26 +5,30 @@ state ACTIVE
 state SUSPENDED
 state COMPLETED
 
-[*] --> ACTIVE : assignPatientJourney
+[*] --> ACTIVE : assignPatientJourney\n(pausedAt=null, totalPausedDays=0)
 
-ACTIVE --> SUSPENDED : suspend
-SUSPENDED --> ACTIVE : resume
+ACTIVE --> SUSPENDED : pauseJourney\n(records pausedAt=now())
+SUSPENDED --> ACTIVE : resumeJourney\n(totalPausedDays += elapsedDays,\npausedAt=null)
 ACTIVE --> COMPLETED : complete
 SUSPENDED --> COMPLETED : complete
 
 ACTIVE --> ACTIVE : SWITCH_TEMPLATE\n(change template\n& optional date reset)
 
+note right of SUSPENDED
+  Step dates shift dynamically by
+  totalPausedDays + currentPauseDays
+  (calculated in getEffectiveSteps;
+  no store write until resumeJourney)
+end note
+
 note right of ACTIVE
-  Transitions enforced by
-  updatePatientJourneyStatus
-  in src/api/service/
-  patientJourneys.ts
+  pauseJourney / resumeJourney in
+  src/api/service/patientJourneys.ts
 end note
 
 note bottom of ACTIVE
-  SWITCH_TEMPLATE modifies
-  journeyTemplateId and
-  optionally resets startDate.
+  SWITCH_TEMPLATE modifies journeyTemplateId
+  and optionally resets startDate.
   Recorded in modifications[].
 end note
 

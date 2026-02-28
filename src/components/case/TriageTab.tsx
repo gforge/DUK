@@ -62,8 +62,7 @@ export default function TriageTab({ caseData, onTriaged }: TriageTabProps) {
   if (!canTriage) {
     return (
       <Alert severity="info">
-        {t('role.currentRole')}: {t(`role.${currentUser.role}`)}. Triage requires clinical staff
-        access.
+        {t('role.currentRole')}: {t(`role.${currentUser.role}`)}. {t('triage.requiresClinician')}
       </Alert>
     )
   }

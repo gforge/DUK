@@ -1,6 +1,6 @@
 import * as service from '../service'
 import type { PatientJourney, JourneyModification, PatientJourneyStatus } from '../schemas'
-import type { EffectiveStep } from '../service'
+import type { EffectiveStep, MergedDueStep, JourneyStepConflict } from '../service'
 import { withDelay } from './delay'
 
 export const getPatientJourneys = (patientId?: string): Promise<PatientJourney[]> =>
@@ -14,15 +14,28 @@ export const assignPatientJourney = (
   journeyTemplateId: string,
   startDate: string,
   researchModuleIds?: string[],
+  mergedStepIds?: { stepId: string; fromJourneyId: string }[],
 ): Promise<PatientJourney> =>
   withDelay(() =>
-    service.assignPatientJourney(patientId, journeyTemplateId, startDate, researchModuleIds),
+    service.assignPatientJourney(
+      patientId,
+      journeyTemplateId,
+      startDate,
+      researchModuleIds,
+      mergedStepIds,
+    ),
   )
 
 export const updatePatientJourneyStatus = (
   journeyId: string,
   status: PatientJourneyStatus,
 ): Promise<PatientJourney> => withDelay(() => service.updatePatientJourneyStatus(journeyId, status))
+
+export const pauseJourney = (journeyId: string): Promise<PatientJourney> =>
+  withDelay(() => service.pauseJourney(journeyId))
+
+export const resumeJourney = (journeyId: string): Promise<PatientJourney> =>
+  withDelay(() => service.resumeJourney(journeyId))
 
 export const modifyPatientJourney = (
   journeyId: string,
@@ -53,3 +66,24 @@ export const recordRecurringCompletion = (
   withDelay(() =>
     service.recordRecurringCompletion(journeyId, stepId, occurrenceIndex, completedAt),
   )
+
+/**
+ * Returns questionnaire steps due for a patient on the given date (YYYY-MM-DD),
+ * merged across all their parallel journeys so each form template appears at most once.
+ */
+export const getMergedDueStepsForPatient = (
+  patientId: string,
+  date: string,
+): Promise<MergedDueStep[]> => withDelay(() => service.getMergedDueStepsForPatient(patientId, date))
+
+/**
+ * Detects which steps in a prospective new journey would overlap (same
+ * questionnaire, intersecting due windows) with the patient’s existing journeys.
+ * Call before assignPatientJourney to offer the clinician conflict resolution.
+ */
+export const detectJourneyConflicts = (
+  patientId: string,
+  templateId: string,
+  startDate: string,
+): Promise<JourneyStepConflict[]> =>
+  withDelay(() => service.detectJourneyConflicts(patientId, templateId, startDate))

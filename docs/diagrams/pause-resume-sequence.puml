@@ -1,0 +1,49 @@
+@startuml
+title Journey Pause & Resume — Sequence
+
+actor Clinician
+participant "JourneyTab\n(UI)" as UI
+participant "client/\npatientJourneys" as Client
+participant "service/\npatientJourneys" as Service
+participant "journeyResolver\n(getEffectiveSteps)" as Resolver
+participant "patchStore" as Store
+
+== Pause Journey ==
+
+Clinician -> UI : Click "Pause journey"
+UI -> UI : Show confirmation dialog
+Clinician -> UI : Confirm pause
+UI -> Client : pauseJourney(journeyId)
+Client -> Service : pauseJourney(journeyId)
+Service -> Service : Guard: status must be ACTIVE\n(throws if not)
+Service -> Store : patchStore:\n  status = SUSPENDED\n  pausedAt = now()
+Store --> Service : updated PatientJourney
+Service --> Client : PatientJourney
+Client --> UI : PatientJourney
+UI -> UI : Show paused-days banner\n+ Resume button
+UI -> Resolver : getEffectiveSteps(journeyId)
+Resolver -> Resolver : currentPauseDays = floor(\n  (Date.now() - pausedAt) / 86400000\n)
+Resolver -> Resolver : totalPauseShift =\n  totalPausedDays + currentPauseDays
+Resolver --> UI : EffectiveStep[] with dates\nshifted by totalPauseShift
+
+note right of Resolver
+  No store write — shift is
+  computed dynamically on
+  every call to getEffectiveSteps
+  while status === SUSPENDED
+end note
+
+== Resume Journey ==
+
+Clinician -> UI : Click "Resume journey"
+UI -> Client : resumeJourney(journeyId)
+Client -> Service : resumeJourney(journeyId)
+Service -> Service : Guard: status must be SUSPENDED\n(throws if not)
+Service -> Service : elapsedDays = floor(\n  (Date.now() - pausedAt) / 86400000\n)
+Service -> Store : patchStore:\n  totalPausedDays += elapsedDays\n  pausedAt = null\n  status = ACTIVE
+Store --> Service : updated PatientJourney
+Service --> Client : PatientJourney
+Client --> UI : PatientJourney
+UI -> UI : Hide banner, show\nnormal timeline
+
+@enduml

@@ -56,13 +56,30 @@ Effective step computation
 
 Selection rule (current behavior)
 
-- The UI selects the latest `PatientJourney` with `status === ACTIVE` for a patient when computing effective steps.
-- If none are ACTIVE, fallback is to template defaults (no active journey).
+- The UI renders **all journeys** for a patient in MUI `Tabs` sorted ACTIVE → SUSPENDED → COMPLETED (newest first within each group). The old "latest ACTIVE" single-journey selection is retained only for legacy compatibility.
+- For the dashboard worklist, `getMergedDueStepsForPatient(patientId, date)` is used instead of per-journey selection — see “Parallel journeys & form deduplication” below.
+
+Journey pause & resume
+
+- `pauseJourney(journeyId)` (service layer) guards `status === 'ACTIVE'`, sets `status: 'SUSPENDED'` and `pausedAt: now()`. **No step dates are written to the store.**
+- `resumeJourney(journeyId)` guards `status === 'SUSPENDED'`, computes `elapsedDays = Math.floor((Date.now() − new Date(pausedAt).getTime()) / 86_400_000)`, adds to `totalPausedDays`, clears `pausedAt: null`, sets `status: 'ACTIVE'`.
+- `getEffectiveSteps` computes a dynamic shift: `currentPauseDays = status === 'SUSPENDED' && pausedAt ? Math.floor((Date.now() − new Date(pausedAt).getTime()) / 86_400_000) : 0`. The total shift `totalPauseShift = totalPausedDays + currentPauseDays` is added to every step’s scheduled date and recurring step offsets.
+- While a journey is suspended the `JourneyTab` shows a paused-days banner and a resume button. All dates in the timeline appear shifted forward, giving clinicians an accurate preview of resumed dates.
+
+![Pause Resume Sequence](../diagrams/pause-resume-sequence.svg)
+
+Parallel journeys & form deduplication
+
+- `getMergedDueStepsForPatient(patientId, date)` in `src/api/service/journeyResolver.ts` collects all due steps from every ACTIVE journey for the patient, then deduplicates by `templateEntryId`.
+- Deduplication is by `templateEntryId` (not by step date): if two parallel journeys both schedule the same questionnaire in an overlapping window only one step is included in the merged result — the questionnaire is never shown twice on the dashboard.
+- `JourneyTab` (CaseDetail view) and `PatientCareplan` (patient self-view) render all journeys as MUI `Tabs`. Within each tab, `getEffectiveSteps` is called for that specific journey.
+
+![Multi Journey Tabs](../diagrams/multi-journey-tabs.svg)
 
 Patient journey status transitions
 
-- `updatePatientJourneyStatus(journeyId, status)` allows explicit status changes: ACTIVE → SUSPENDED, SUSPENDED → ACTIVE, ACTIVE/SUSPENDED → COMPLETED.
-- Service-layer guards enforce valid transitions.
+- `pauseJourney(journeyId)` and `resumeJourney(journeyId)` replace the former `updatePatientJourneyStatus` freeze/unfreeze approach with explicit, pause-aware service functions.
+- `assignPatientJourney` always initialises `pausedAt: null, totalPausedDays: 0`.
 
 Scheduling & cases
 
@@ -77,4 +94,5 @@ Patient registration flow
 
 Patient care plan view
 
-- The patient view (`/patient` role=PATIENT) shows a "My Care Plan" section with the read-only `JourneyTimeline` for the patient's active journey, including resolved instructions.
+- The patient view (`/patient` role=PATIENT) shows a "My Care Plan" section with MUI `Tabs` for all journeys (ACTIVE → SUSPENDED → COMPLETED), each rendering a read-only `JourneyTimeline` for that journey.
+- Resolved instructions are visible and expandable within each journey tab.

@@ -141,6 +141,31 @@ const MIGRATIONS: Migration[] = [
       }
     },
   },
+  {
+    from: 4,
+    to: 5,
+    up: (s) => ({
+      ...s,
+      schemaVersion: 5,
+      // Backfill pause tracking on all existing patient journeys.
+      patientJourneys: Array.isArray(s['patientJourneys'])
+        ? (s['patientJourneys'] as Record<string, unknown>[]).map((j) => ({
+            ...j,
+            pausedAt: j['pausedAt'] ?? null,
+            totalPausedDays: j['totalPausedDays'] ?? 0,
+          }))
+        : [],
+      // Backfill studyInfoMarkdown on all existing research modules.
+      researchModules: Array.isArray(s['researchModules'])
+        ? (s['researchModules'] as Record<string, unknown>[]).map((m) => ({
+            ...m,
+            studyInfoMarkdown: m['studyInfoMarkdown'] ?? '',
+          }))
+        : [],
+      // Initialise empty consent log.
+      researchConsents: s['researchConsents'] ?? [],
+    }),
+  },
 ]
 
 // ---------------------------------------------------------------------------

@@ -43,6 +43,7 @@ import type {
   InstructionTemplate,
 } from '../../../api/schemas'
 import { slugify } from '../../../utils/slugify'
+import { suggestWindowDays } from '../../../utils/journeyUtils'
 
 type InstructionMode = 'NONE' | 'TEMPLATE' | 'FREETEXT'
 
@@ -96,6 +97,9 @@ export default function EntryEditorDialog({
   const [stepKeyLocked, setStepKeyLocked] = useState(!!entry?.stepKey)
   const [offsetDays, setOffsetDays] = useState<number | ''>(entry?.offsetDays ?? '')
   const [windowDays, setWindowDays] = useState<number | ''>(entry?.windowDays ?? 2)
+  // windowDays is auto-suggested from offsetDays when creating, unless the user
+  // has manually set a different value.
+  const [windowDaysManuallySet, setWindowDaysManuallySet] = useState(!!entry)
   const [dashboardCategory, setDashboardCategory] = useState<string>(
     entry?.dashboardCategory ?? 'CONTROL',
   )
@@ -201,7 +205,13 @@ export default function EntryEditorDialog({
               label={t('journey.entry.offsetDays')}
               type="number"
               value={offsetDays}
-              onChange={(e) => setOffsetDays(e.target.value === '' ? '' : Number(e.target.value))}
+              onChange={(e) => {
+                const v = e.target.value === '' ? '' : Number(e.target.value)
+                setOffsetDays(v)
+                if (!windowDaysManuallySet && v !== '') {
+                  setWindowDays(suggestWindowDays(v as number))
+                }
+              }}
               size="small"
               sx={{ minWidth: 130 }}
               required
@@ -212,11 +222,18 @@ export default function EntryEditorDialog({
               label={t('journey.entry.windowDays')}
               type="number"
               value={windowDays}
-              onChange={(e) => setWindowDays(e.target.value === '' ? '' : Number(e.target.value))}
+              onChange={(e) => {
+                setWindowDays(e.target.value === '' ? '' : Number(e.target.value))
+                setWindowDaysManuallySet(true)
+              }}
               size="small"
               sx={{ minWidth: 110 }}
               inputProps={{ min: 0 }}
-              helperText={t('journey.entry.windowDaysHint')}
+              helperText={
+                !windowDaysManuallySet && offsetDays !== ''
+                  ? t('journey.entry.windowDaysSuggest', { n: suggestWindowDays(offsetDays as number) })
+                  : t('journey.entry.windowDaysHint')
+              }
             />
             <FormControl size="small" sx={{ minWidth: 160 }}>
               <InputLabel>{t('journey.entry.dashboardCategory')}</InputLabel>

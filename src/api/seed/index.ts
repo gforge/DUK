@@ -30,4 +30,5 @@ export const SEED_STATE: AppState = {
   researchModules,
   patientJourneys,
   instructionTemplates,
+  researchConsents: [],
 }

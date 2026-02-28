@@ -46,9 +46,14 @@ src/
 │   ├── seedFaker.ts            # ~1 000-patient faker seed (dynamically imported)
 │   ├── service/                # Pure business logic — reads getStore(), writes setStore()/patchStore()
 │   │   ├── cases.ts, patients.ts, journal.ts, policy.ts, …
+│   │   ├── patientJourneys.ts  # assignPatientJourney, pauseJourney, resumeJourney, …
+│   │   ├── journeyResolver.ts  # getEffectiveSteps, getMergedDueStepsForPatient
+│   │   ├── researchConsents.ts # grantConsent, revokeConsent, hasActiveConsent, …
 │   │   ├── seed.ts             # exportState / importState / resetAndReseed
 │   │   └── utils.ts            # uuid(), now(), evaluatePolicyRules(), computeScores(), …
 │   ├── client/                 # Async wrappers adding 100–400 ms simulated delay
+│   │   ├── patientJourneys.ts  # pauseJourney, resumeJourney, getMergedDueStepsForPatient
+│   │   ├── researchConsents.ts # grantConsent, revokeConsent, getResearchConsents, …
 │   │   └── index.ts            # Re-exports all client functions
 │   ├── policyParser/           # Hand-written recursive-descent expression parser (no eval)
 │   └── journalRenderer.ts      # Safe Mustache-like template renderer
@@ -57,7 +62,7 @@ src/
 │   ├── common/                 # StatusChip, RoleSwitcher, MigrationErrorOverlay, …
 │   ├── dashboard/              # QueueColumn, CaseListItem, DashboardToolbar
 │   ├── case/                   # PatientCard, TriageTab, FormResponsesTab, JournalTab, AuditLogTab, JourneyTab
-│   ├── journey/                # JourneyTimeline, ModifyJourneyDialog, editor tabs
+│   ├── journey/                # JourneyTimeline, ModifyJourneyDialog, ConsentDialog, editor tabs
 │   ├── policy/                 # PolicyRuleForm, PolicyRuleList
 │   └── demo/                   # SeedPanel, ExportPanel, ImportPanel
 ├── hooks/
@@ -105,11 +110,11 @@ All state lives in one JSON blob at `localStorage` key `duk_app_state`. Access f
 
 ### Schema versioning & migrations
 
-`CURRENT_SCHEMA_VERSION` in `src/api/schemaVersion.ts` is an integer that must be bumped whenever `AppStateSchema` changes in a breaking way. Every seed sets `schemaVersion: CURRENT_SCHEMA_VERSION`.
+`CURRENT_SCHEMA_VERSION` in `src/api/schemaVersion.ts` is an integer that must be bumped whenever `AppStateSchema` changes in a breaking way. Currently **v5**. Every seed sets `schemaVersion: CURRENT_SCHEMA_VERSION`.
 
 At boot, `main.tsx` calls `runMigrations(raw)` from `src/api/migrations.ts`:
 
-- Returns `{ ok: true, state: AppState }` on success (migrates v0 → v1 → … → current).
+- Returns `{ ok: true, state: AppState }` on success (migrates v0 → v1 → v2 → v3 → v4 → v5).
 - Returns `{ ok: false, reason, storedVersion, rawState }` when migration is impossible (downgrade or no chain).
 - On failure, `<App migrationError={...}>` renders `<MigrationErrorOverlay>` — a full-screen blocking UI with download-as-JSON and clear-and-restart actions.
 
@@ -153,14 +158,44 @@ All types derive from Zod schemas in `src/api/schemas/`. Never write manual type
 
 Key schemas:
 
-- `AppStateSchema` — flat object with 15 top-level fields + `schemaVersion: z.number().int().default(0)`
+- `AppStateSchema` — flat object with top-level arrays for all entities + `schemaVersion: z.number().int().default(0)` + `researchConsents: ConsentSchema[]`
 - `CaseSchema` — `id`, `patientId`, `category` (`ACUTE|SUBACUTE|CONTROL`), `status` (`NEW|NEEDS_REVIEW|TRIAGED|FOLLOWING_UP|CLOSED`), `triggers[]`, `policyWarnings[]`, etc.
 - `PatientSchema` — `id`, `displayName`, `personalNumber` (Swedish), `dateOfBirth`, `palId?`, etc.
 - `UserSchema` — `id`, `name`, `role` (`PATIENT|NURSE|DOCTOR|PAL`)
 - `JourneyTemplateSchema` — template for a follow-up journey with ordered entries (`offsetDays`, `windowDays`, `scoreAliases`, etc.)
-- `PatientJourneySchema` — active assignment of a template to a patient with `status` (`ACTIVE|COMPLETED|CANCELLED`) and `modifications[]`
+- `PatientJourneySchema` — assignment of a template to a patient with `status` (`ACTIVE|SUSPENDED|COMPLETED`), `modifications[]`, `pausedAt: string | null`, `totalPausedDays: number`
+- `ResearchModuleSchema` — `id`, `name`, `studyInfoMarkdown: string` (Markdown shown in the consent dialog), `entries[]`
+- `ConsentSchema` — `id`, `patientId`, `researchModuleId`, `patientJourneyId`, `grantedAt`, `grantedByUserId`, `revokedAt: string | null`, `revokedByUserId: string | null` — stored in `AppState.researchConsents`
 - `PolicyRuleSchema` — `id`, `name`, `expression` (parsed by policyParser), `severity`, `enabled`
 - All enum values are in `src/api/schemas/enums.ts`
+
+---
+
+## Journey pause & resume
+
+`pauseJourney(journeyId)` and `resumeJourney(journeyId)` are in `src/api/service/patientJourneys.ts`.
+
+- **Pause**: guards `status === 'ACTIVE'`, sets `status: 'SUSPENDED'` and `pausedAt: now()`. No step dates are written to the store.
+- **Resume**: guards `status === 'SUSPENDED'`, computes `elapsedDays = Math.floor((Date.now() − new Date(pausedAt)) / 86_400_000)`, adds to `totalPausedDays`, clears `pausedAt: null`, sets `status: 'ACTIVE'`.
+- **Effective-date shift**: `getEffectiveSteps` in `journeyResolver.ts` computes `totalPauseShift = totalPausedDays + currentPauseDays` (where `currentPauseDays` is the live elapsed time for a currently-suspended journey), and adds this shift to every step's `scheduledDate`. No store write occurs until `resumeJourney` is called.
+- The `JourneyTab` (clinician CaseDetail view) shows a pause/resume button and a paused-days banner while suspended.
+
+## Research consent model
+
+Consents for research modules are managed via `src/api/service/researchConsents.ts` and stored in `AppState.researchConsents`.
+
+- **Grant**: `grantConsent(patientId, researchModuleId, patientJourneyId, grantedByUserId)` — idempotent; if an active (non-revoked) consent already exists for the same patient + module + journey, it is returned unchanged. Otherwise a new `Consent` record is created with `grantedAt: now()`.
+- **Revoke**: `revokeConsent(consentId, revokedByUserId)` — sets `revokedAt: now()` and `revokedByUserId`. The original record is preserved as an audit trail; a new grant after revocation creates a fresh record.
+- **Query helpers**: `hasActiveConsent(patientId, moduleId, journeyId)`, `getActiveConsent(...)`, `getResearchConsents(patientId?, moduleId?)`.
+- **UI**: `ConsentDialog` (`src/components/journey/ConsentDialog.tsx`) renders `studyInfoMarkdown` via `react-markdown`, requires the user to check a checkbox before enabling confirm. `RevokeConsentDialog` shows a confirmation step. Both are used inside `JourneyTab`.
+- `studyInfoMarkdown` on `ResearchModuleSchema` is edited in the Journey Editor's Research Modules tab.
+
+## Multiple parallel journeys
+
+A patient can have any number of concurrent `PatientJourney` records (e.g., wrist fracture + hip fracture programmes running in parallel).
+
+- `JourneyTab` (CaseDetail) and `PatientCareplan` (PatientView) both render **all journeys** for the patient in MUI `Tabs`, sorted ACTIVE → SUSPENDED → COMPLETED, newest first within each status group. The previously-used "latest ACTIVE" single-journey selection is replaced by this multi-tab view.
+- **Form deduplication**: `getMergedDueStepsForPatient(patientId, date)` in `journeyResolver.ts` collects due steps from all ACTIVE journeys and deduplicates by `templateEntryId` so the same questionnaire is never shown twice on the dashboard, even when two parallel journeys schedule the same form on overlapping windows.
 
 ---
 
@@ -267,15 +302,16 @@ Do not add `eval` or dynamic code execution under any circumstances.
 
 The router (`src/router/index.tsx`) uses `HashRouter` for static-site compatibility. All page components are **lazy-loaded**. Routes:
 
-| Path              | Page                         |
-| ----------------- | ---------------------------- |
-| `/dashboard`      | Dashboard (default redirect) |
-| `/cases/:id`      | CaseDetail                   |
-| `/patients`       | Patients list                |
-| `/patients/:id`   | PatientView                  |
-| `/policy`         | PolicyEditor                 |
-| `/journey-editor` | JourneyEditor                |
-| `/demo-tools`     | DemoTools                    |
+| Path          | Page                                           |
+| ------------- | ---------------------------------------------- |
+| `/dashboard`  | Dashboard (default redirect)                   |
+| `/cases/:id`  | CaseDetail                                     |
+| `/patient`    | PatientView (self-service, role=PATIENT only)  |
+| `/patients`   | Patients list (clinicians)                     |
+| `/policy`     | PolicyEditor                                   |
+| `/journeys`   | JourneyEditor                                  |
+| `/worklist`   | Worklist (structured task list for clinicians) |
+| `/demo-tools` | DemoTools                                      |
 
 ---
 

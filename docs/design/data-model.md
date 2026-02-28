@@ -35,6 +35,8 @@ PatientJourney (src/api/schemas/journey.ts)
 - journeyTemplateId: string
 - startDate: string (ISO; may be reset via SWITCH_TEMPLATE with newStartDate)
 - status: enum (ACTIVE, SUSPENDED, COMPLETED)
+- pausedAt: string | null (ISO; set when SUSPENDED, cleared on resume)
+- totalPausedDays: number (accumulated whole-day pauses from all previous pause/resume cycles)
 - researchModuleIds: string[]
 - modifications: JourneyModification[]
 - createdAt, updatedAt: string (ISO)
@@ -115,9 +117,33 @@ AuditEvent (src/api/schemas/audit.ts)
 
 - id, caseId, userId, userRole, action, details (free-form), timestamp
 
+ResearchModule (src/api/schemas/journey.ts)
+
+- id: string
+- name: string
+- studyInfoMarkdown: string (Markdown rendered in ConsentDialog to inform the patient/clinician before granting consent)
+- entries: ResearchModuleEntry[] (questionnaire steps overlaid on the journey timeline)
+
+Consent (src/api/schemas/journey.ts)
+
+- id: string (uuid)
+- patientId: string
+- researchModuleId: string
+- patientJourneyId: string
+- grantedAt: string (ISO)
+- grantedByUserId: string
+- revokedAt: string | null (ISO; null = still active)
+- revokedByUserId: string | null
+
+All `Consent` records are stored in `AppState.researchConsents`. A revoked consent is never deleted — it stays as a permanent audit trail and a new grant creates a fresh record.
+
+![Consent Lifecycle](../diagrams/consent-lifecycle.svg)
+
 Notes
 
-- The codebase stores journeys by `patientId` and the UI resolves the most relevant ACTIVE journey when computing effective steps. There is no explicit Case→PatientJourney foreign key.
+- The codebase stores journeys by `patientId` and the UI renders all journeys in tabbed views sorted ACTIVE → SUSPENDED → COMPLETED. There is no explicit Case→PatientJourney foreign key.
+- `getMergedDueStepsForPatient(patientId, date)` deduplicates due steps across parallel journeys by `templateEntryId` for dashboard display.
 - `InstructionTemplate` entities are stored in `AppState.instructionTemplates` and referenced from `JourneyTemplateEntry.instructionTemplateId`.
 - `JourneyTemplate.parentTemplateId` tracks derivation lineage; `derivedAt` marks the last sync point for `computeParentDiff`.
 - The `EffectiveStep` type (returned by `getEffectiveSteps`) includes a `resolvedInstruction?: string` field hydrated from `instructionTemplateId` (preferred) or `instructionText`.
+- Effective step dates are shifted by `totalPausedDays + currentPauseDays` dynamically in `getEffectiveSteps`; no dates are rewritten to the store during display.

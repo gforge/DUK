@@ -26,9 +26,10 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           p: { xs: 2, md: 3 },
           width: { md: `calc(100% - ${DRAWER_WIDTH}px)` },
           ml: { md: `${DRAWER_WIDTH}px` },
+          '@media print': { ml: 0, width: '100%', p: 2 },
         }}
       >
-        <Toolbar />
+        <Toolbar sx={{ displayPrint: 'none' }} />
         {children}
       </Box>
     </Box>

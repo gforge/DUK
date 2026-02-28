@@ -12,6 +12,7 @@ import {
   ResearchModuleSchema,
   PatientJourneySchema,
   InstructionTemplateSchema,
+  ConsentSchema,
 } from './journey'
 
 export const AppStateSchema = z.object({
@@ -30,5 +31,6 @@ export const AppStateSchema = z.object({
   researchModules: z.array(ResearchModuleSchema),
   patientJourneys: z.array(PatientJourneySchema),
   instructionTemplates: z.array(InstructionTemplateSchema),
+  researchConsents: z.array(ConsentSchema).default([]),
 })
 export type AppState = z.infer<typeof AppStateSchema>

@@ -87,7 +87,7 @@ export default function DashboardToolbar({
             exclusive
             onChange={(_, v) => v && onPalFilter(v)}
             size="small"
-            aria-label="patient filter"
+            aria-label={t('common.patientFilter')}
           >
             <ToggleButton value="all" aria-label={t('dashboard.filterAll')}>
               {t('dashboard.filterAll')}
