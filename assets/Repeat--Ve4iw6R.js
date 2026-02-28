@@ -1,1 +1,0 @@
-import{c,j as s}from"./index-3vCCvlqp.js";const o=c(s.jsx("path",{d:"M19.8 18.4 14 10.67V6.5l1.35-1.69c.26-.33.03-.81-.39-.81H9.04c-.42 0-.65.48-.39.81L10 6.5v4.17L4.2 18.4c-.49.66-.02 1.6.8 1.6h14c.82 0 1.29-.94.8-1.6"})),a=c(s.jsx("path",{d:"M7 7h10v3l4-4-4-4v3H5v6h2zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2z"}));export{a as R,o as S};
