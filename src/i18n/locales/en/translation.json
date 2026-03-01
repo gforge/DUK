@@ -634,6 +634,38 @@
     "TRIAGED": "Triaged"
   },
   "triage": {
+    "actionDesc": {
+      "CLOSE_NOW": "Close the case without further action",
+      "DIGITAL_CONTROL": "Patient completes a digital follow-up form",
+      "DOCTOR_VISIT": "Patient visits a doctor at the clinic",
+      "NURSE_VISIT": "Patient visits a nurse at the clinic",
+      "PHONE_CALL": "Nurse calls the patient by phone",
+      "PHYSIO_VISIT": "Patient visits a physiotherapist"
+    },
+    "actionLabel": {
+      "CLOSE_NOW": "Close checkpoint",
+      "DIGITAL_CONTROL": "Digital control",
+      "DOCTOR_VISIT": "Doctor visit",
+      "NURSE_VISIT": "Nurse visit",
+      "PHONE_CALL": "Phone call",
+      "PHYSIO_VISIT": "Physio visit"
+    },
+    "actionRole": {
+      "CLOSE_NOW": "Clinician",
+      "DIGITAL_CONTROL": "Nurse",
+      "DOCTOR_VISIT": "Doctor",
+      "NURSE_VISIT": "Nurse",
+      "PHONE_CALL": "Nurse",
+      "PHYSIO_VISIT": "Physiotherapist"
+    },
+    "actionTooltip": {
+      "CLOSE_NOW": "Close case immediately without follow-up",
+      "DIGITAL_CONTROL": "Send a digital follow-up form to the patient",
+      "DOCTOR_VISIT": "Book a doctor appointment",
+      "NURSE_VISIT": "Book a nurse appointment",
+      "PHONE_CALL": "Book a phone consultation",
+      "PHYSIO_VISIT": "Book a physiotherapist appointment"
+    },
     "addToGoogle": "Add to Google Calendar",
     "assignRole": "Book to",
     "backToActions": "Choose different action",

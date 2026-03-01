@@ -634,6 +634,38 @@
     "TRIAGED": "Triagerad"
   },
   "triage": {
+    "actionDesc": {
+      "CLOSE_NOW": "Stäng ärendet utan ytterligare åtgärd",
+      "DIGITAL_CONTROL": "Patienten besvarar digitalt uppföljningsformulär",
+      "DOCTOR_VISIT": "Patient besöker läkare på mottagningen",
+      "NURSE_VISIT": "Patient besöker sjuksköterska på mottagningen",
+      "PHONE_CALL": "Sjuksköterska ringer upp patienten",
+      "PHYSIO_VISIT": "Patient besöker fysioterapeut"
+    },
+    "actionLabel": {
+      "CLOSE_NOW": "Stäng kontrollpunkt",
+      "DIGITAL_CONTROL": "Digital kontroll",
+      "DOCTOR_VISIT": "Läkarbesök",
+      "NURSE_VISIT": "Sköterskebesök",
+      "PHONE_CALL": "Telefonkontakt",
+      "PHYSIO_VISIT": "Fysiobesök"
+    },
+    "actionRole": {
+      "CLOSE_NOW": "Kliniker",
+      "DIGITAL_CONTROL": "Sjuksköterska",
+      "DOCTOR_VISIT": "Läkare",
+      "NURSE_VISIT": "Sjuksköterska",
+      "PHONE_CALL": "Sjuksköterska",
+      "PHYSIO_VISIT": "Fysioterapeut"
+    },
+    "actionTooltip": {
+      "CLOSE_NOW": "Stäng ärendet direkt utan uppföljning",
+      "DIGITAL_CONTROL": "Skicka digitalt uppföljningsformulär till patienten",
+      "DOCTOR_VISIT": "Boka ett läkarbesök",
+      "NURSE_VISIT": "Boka ett sjuksköterskebesök",
+      "PHONE_CALL": "Boka en telefonkonsultation",
+      "PHYSIO_VISIT": "Boka ett besök hos fysioterapeut"
+    },
     "addToGoogle": "Lägg till i Google Kalender",
     "assignRole": "Bokas till",
     "backToActions": "Välj annan åtgärd",

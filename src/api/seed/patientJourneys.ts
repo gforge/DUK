@@ -8,7 +8,7 @@ export const patientJourneys: PatientJourney[] = [
     journeyTemplateId: 'jt-standard',
     startDate: isoDate(daysAgo(14)),
     status: 'ACTIVE',
-    researchModuleIds: ['rm-move-2026'],
+    researchModuleIds: [],
     modifications: [],
     recurringCompletions: [],
     pausedAt: null,
