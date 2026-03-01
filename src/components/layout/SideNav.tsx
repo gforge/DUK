@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react'
+import React from 'react'
 import {
   Drawer,
   List,
@@ -20,6 +20,7 @@ import AssignmentIcon from '@mui/icons-material/Assignment'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useRole } from '../../store/roleContext'
+import { useNavItems } from '../../hooks/useNavItems'
 
 interface SideNavProps {
   drawerWidth: number
@@ -38,59 +39,18 @@ export default function SideNav({
   const navigate = useNavigate()
   const location = useLocation()
   const { isRole } = useRole()
-  const navItems = useMemo(
-    () => [
-      {
-        label: t('nav.dashboard'),
-        icon: <DashboardIcon />,
-        path: '/dashboard',
-        roles: ['NURSE', 'DOCTOR', 'PAL'] as const,
-      },
-      {
-        label: t('patient.title'),
-        icon: <PersonIcon />,
-        path: '/patient',
-        roles: ['PATIENT'] as const,
-      },
-      {
-        label: t('nav.worklist'),
-        icon: <AssignmentIcon />,
-        path: '/worklist',
-        roles: ['NURSE', 'DOCTOR', 'PAL'] as const,
-      },
-      {
-        label: t('nav.policy'),
-        icon: <PolicyIcon />,
-        path: '/policy',
-        roles: ['NURSE', 'DOCTOR', 'PAL'] as const,
-      },
-      {
-        label: t('nav.patients'),
-        icon: <PeopleIcon />,
-        path: '/patients',
-        roles: ['NURSE', 'DOCTOR', 'PAL'] as const,
-      },
-      {
-        label: t('nav.journeys'),
-        icon: <RouteIcon />,
-        path: '/journeys',
-        roles: ['NURSE', 'DOCTOR', 'PAL'] as const,
-      },
-      {
-        label: t('nav.demoTools'),
-        icon: <BuildIcon />,
-        path: '/demo-tools',
-        roles: ['NURSE', 'DOCTOR', 'PAL', 'PATIENT'] as const,
-      },
-    ],
-    [t],
-  )
+  const { navItems } = useNavItems()
 
-  const accessiblePaths = useMemo(
-    () =>
-      navItems.filter((item) => item.roles.some((role) => isRole(role))).map((item) => item.path),
-    [navItems, isRole],
-  )
+  const pathIcons: Record<string, React.ReactNode> = {
+    '/dashboard': <DashboardIcon />,
+    '/patient': <PersonIcon />,
+    '/worklist': <AssignmentIcon />,
+    '/policy': <PolicyIcon />,
+    '/patients': <PeopleIcon />,
+    '/journeys': <RouteIcon />,
+    '/demo-tools': <BuildIcon />,
+  }
+
   const handleNav = (path: string) => {
     navigate(path)
     if (isMobile) onClose()
@@ -113,7 +73,7 @@ export default function SideNav({
                 aria-current={active ? 'page' : undefined}
               >
                 <ListItemIcon sx={{ minWidth: 36, color: active ? 'primary.main' : 'inherit' }}>
-                  {item.icon}
+                  {pathIcons[item.path]}
                 </ListItemIcon>
                 <ListItemText
                   primary={item.label}
@@ -126,17 +86,6 @@ export default function SideNav({
       </List>
     </Box>
   )
-
-  useEffect(() => {
-    if (!accessiblePaths.length) return
-    const allowed = accessiblePaths.some((path) => location.pathname.startsWith(path))
-    if (!allowed) {
-      console.warn(
-        `Current path "${location.pathname}" is not accessible with the current role. Redirecting to "${accessiblePaths[0]}".`,
-      )
-      navigate(accessiblePaths[0], { replace: true })
-    }
-  }, [accessiblePaths, location.pathname, navigate])
 
   return (
     <Box sx={{ displayPrint: 'none' }}>
