@@ -30,7 +30,7 @@ export default function PatientCareplan({
   patientId,
 }: Readonly<Props>) {
   const { t } = useTranslation()
-  const { role } = useRole()
+  const { currentUser } = useRole()
   const sortedJourneys = [...journeys].sort(
     (a, b) =>
       (STATUS_ORDER[a.status] ?? 3) - (STATUS_ORDER[b.status] ?? 3) ||
@@ -214,7 +214,7 @@ export default function PatientCareplan({
                           color="error"
                           variant="outlined"
                           onClick={() =>
-                            role === 'PATIENT'
+                            currentUser.role === 'PATIENT'
                               ? setDeclineTarget({
                                   module: rm,
                                   journeyId: selectedJourney?.id ?? '',
@@ -242,7 +242,7 @@ export default function PatientCareplan({
                           >
                             {t('patient.readAndConsent')}
                           </Button>
-                          {role === 'PATIENT' && (
+                          {currentUser.role === 'PATIENT' && (
                             <Button
                               size="small"
                               color="warning"

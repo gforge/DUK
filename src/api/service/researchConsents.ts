@@ -40,6 +40,7 @@ export function grantConsent(
     grantedByUserId,
     revokedAt: null,
     revokedByUserId: null,
+    withdrawalReason: null,
   }
   setStore({ ...state, researchConsents: [...state.researchConsents, consent] })
   return consent
