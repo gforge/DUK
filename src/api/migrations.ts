@@ -166,6 +166,21 @@ const MIGRATIONS: Migration[] = [
       researchConsents: s['researchConsents'] ?? [],
     }),
   },
+  {
+    from: 5,
+    to: 6,
+    up: (s) => ({
+      ...s,
+      schemaVersion: 6,
+      // Backfill withdrawalReason on all existing consent records.
+      researchConsents: Array.isArray(s['researchConsents'])
+        ? (s['researchConsents'] as Record<string, unknown>[]).map((c) => ({
+            ...c,
+            withdrawalReason: c['withdrawalReason'] ?? null,
+          }))
+        : [],
+    }),
+  },
 ]
 
 // ---------------------------------------------------------------------------

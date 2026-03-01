@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Box, Typography } from '@mui/material'
+import { Alert, Box, Typography } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 import { useRole } from '../store/roleContext'
 import { useNavigate } from 'react-router-dom'
@@ -16,28 +16,32 @@ import type { QuestionnaireTemplate } from '../api/schemas'
 
 export default function PatientView() {
   const { t } = useTranslation()
-  const { currentUser, isRole } = useRole()
+  const { currentUser, isRole, currentPatientId } = useRole()
   const navigate = useNavigate()
 
   useEffect(() => {
     if (!isRole('PATIENT')) navigate('/dashboard', { replace: true })
   }, [isRole, navigate])
 
+  const patientId = currentPatientId ?? currentUser.id
   const {
     data: cases,
     loading,
     error,
     refetch,
-  } = useApi(() => client.getCasesByPatient(currentUser.id), [currentUser.id])
+  } = useApi(
+    () => (patientId ? client.getCasesByPatient(patientId) : Promise.resolve([])),
+    [patientId],
+  )
 
   const { data: patient, loading: patientLoading } = useApi(
-    () => client.getPatient(currentUser.id),
-    [currentUser.id],
+    () => (patientId ? client.getPatient(patientId) : Promise.resolve(undefined)),
+    [patientId],
   )
 
   const { data: journeys } = useApi(
-    () => client.getPatientJourneys(currentUser.id),
-    [currentUser.id],
+    () => (patientId ? client.getPatientJourneys(patientId) : Promise.resolve([])),
+    [patientId],
   )
   const { data: journeyTemplates } = useApi(() => client.getJourneyTemplates(), [])
 
@@ -46,6 +50,7 @@ export default function PatientView() {
     step: MergedDueStep
     template: QuestionnaireTemplate
   } | null>(null)
+  const [dueFormsRefresh, setDueFormsRefresh] = useState(0)
 
   if (!isRole('PATIENT')) return null
 
@@ -59,11 +64,12 @@ export default function PatientView() {
         <PatientQuestionnaireForm
           step={activeForm.step}
           template={activeForm.template}
-          patientId={currentUser.id}
+          patientId={patientId}
           caseId={activeCase.id}
           onDone={() => {
             setActiveForm(null)
             refetch()
+            setDueFormsRefresh((prev) => prev + 1)
           }}
           onCancel={() => setActiveForm(null)}
         />
@@ -77,20 +83,25 @@ export default function PatientView() {
         {t('patient.myPage')}
       </Typography>
 
+      <Alert severity="info" sx={{ mb: 3 }}>
+        {t('patient.viewTemporaryWarning')}
+      </Alert>
+
       <PatientSummaryCard patient={patient} loading={patientLoading} />
 
-      <PatientActions userId={currentUser.id} cases={cases} onRefetch={refetch} />
+      <PatientActions patientId={patientId} cases={cases} onRefetch={refetch} />
 
       {/* Due questionnaire forms */}
       <PatientDueForms
-        patientId={currentUser.id}
+        patientId={patientId}
+        refreshKey={dueFormsRefresh}
         onSelectForm={(step, template) => setActiveForm({ step, template })}
       />
 
       <PatientCareplan
         journeys={journeys ?? []}
         journeyTemplates={journeyTemplates ?? []}
-        patientId={currentUser.id}
+        patientId={patientId}
       />
 
       <Typography variant="subtitle1" fontWeight={600} gutterBottom>

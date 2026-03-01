@@ -295,6 +295,20 @@ export function getMergedDueStepsForPatient(patientId: string, date: string): Me
       const windowEnd = shiftDate(step.scheduledDate, step.windowDays)
       if (date < windowStart || date > windowEnd) continue
 
+      // Skip steps that the patient already submitted a response for.
+      // journeyStepId in stored responses is always the base id (without __r<N>).
+      const baseStepId = step.id.replace(/__r\d+$/, '')
+      const alreadySubmitted = state.formResponses.some(
+        (r) =>
+          r.patientId === patientId &&
+          r.patientJourneyId === journey.id &&
+          (r.journeyStepId
+            ? r.journeyStepId === baseStepId &&
+              (step.occurrenceIndex === undefined || r.occurrenceIndex === step.occurrenceIndex)
+            : r.templateId === step.templateId),
+      )
+      if (alreadySubmitted) continue
+
       const existing = byTemplate.get(step.templateId)
       if (existing) {
         if (!existing.journeyIds.includes(journey.id)) existing.journeyIds.push(journey.id)

@@ -10,10 +10,11 @@ import type { QuestionnaireTemplate } from '../../api/schemas'
 
 interface Props {
   patientId: string
+  refreshKey?: number
   onSelectForm: (step: MergedDueStep, template: QuestionnaireTemplate) => void
 }
 
-export default function PatientDueForms({ patientId, onSelectForm }: Props) {
+export default function PatientDueForms({ patientId, refreshKey, onSelectForm }: Readonly<Props>) {
   const { t } = useTranslation()
   const today = new Date().toISOString().slice(0, 10)
 
@@ -21,7 +22,7 @@ export default function PatientDueForms({ patientId, onSelectForm }: Props) {
     data: dueSteps,
     loading,
     error,
-  } = useApi(() => client.getMergedDueStepsForPatient(patientId, today), [patientId])
+  } = useApi(() => client.getMergedDueStepsForPatient(patientId, today), [patientId, refreshKey])
 
   const { data: templates } = useApi(() => client.getQuestionnaireTemplates(), [])
 

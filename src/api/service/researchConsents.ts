@@ -47,13 +47,23 @@ export function grantConsent(
 
 /**
  * Revokes an existing consent. The consent record is retained for audit purposes
- * with `revokedAt` and `revokedByUserId` set.
+ * with `revokedAt` and `revokedByUserId` set. An optional `reason` is stored in
+ * `withdrawalReason` to satisfy GCP ICH E6 audit-trail requirements.
  */
-export function revokeConsent(consentId: string, revokedByUserId: string): Consent {
+export function revokeConsent(
+  consentId: string,
+  revokedByUserId: string,
+  reason?: string,
+): Consent {
   const state = getStore()
   const consent = state.researchConsents.find((c) => c.id === consentId)
   if (!consent) throw new Error(`Consent ${consentId} not found`)
-  const updated: Consent = { ...consent, revokedAt: now(), revokedByUserId }
+  const updated: Consent = {
+    ...consent,
+    revokedAt: now(),
+    revokedByUserId,
+    withdrawalReason: reason ?? consent.withdrawalReason,
+  }
   setStore({
     ...state,
     researchConsents: state.researchConsents.map((c) => (c.id === consentId ? updated : c)),
@@ -93,4 +103,50 @@ export function getActiveConsent(
       c.patientJourneyId === patientJourneyId &&
       c.revokedAt === null,
   )
+}
+
+/**
+ * Records a patient's explicit decision NOT to participate in a research module.
+ *
+ * GCP ICH E6 compliance: every consent decision — including a decline — must be
+ * captured in a durable, auditable record. If the patient has an existing active
+ * consent (e.g. re-approached after prior grant), that consent is revoked instead
+ * of creating a duplicate record. Otherwise a new consent record is created with
+ * `revokedAt` set to the same timestamp as `grantedAt`, unambiguously marking it
+ * as a decline rather than a post-consent withdrawal.
+ *
+ * The optional `reason` is stored in `withdrawalReason`.
+ */
+export function declineConsent(
+  patientId: string,
+  researchModuleId: string,
+  patientJourneyId: string,
+  userId: string,
+  reason?: string,
+): Consent {
+  const state = getStore()
+  const existing = state.researchConsents.find(
+    (c) =>
+      c.patientId === patientId &&
+      c.researchModuleId === researchModuleId &&
+      c.patientJourneyId === patientJourneyId &&
+      c.revokedAt === null,
+  )
+  if (existing) {
+    return revokeConsent(existing.id, userId, reason)
+  }
+  const ts = now()
+  const consent: Consent = {
+    id: uuid(),
+    patientId,
+    researchModuleId,
+    patientJourneyId,
+    grantedAt: ts,
+    grantedByUserId: userId,
+    revokedAt: ts, // same timestamp = explicit decline, not a post-consent withdrawal
+    revokedByUserId: userId,
+    withdrawalReason: reason ?? null,
+  }
+  setStore({ ...state, researchConsents: [...state.researchConsents, consent] })
+  return consent
 }

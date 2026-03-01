@@ -226,10 +226,10 @@ const { data, loading, error, refetch } = useApi(() => client.getSomething(id), 
 ### Role-based UI
 
 ```tsx
-const { role, user } = useRole()
+const { user } = useRole()
 ```
 
-`role` is `'PATIENT' | 'NURSE' | 'DOCTOR' | 'PAL'`. PAL is a Doctor with restricted patient filter. Guard admin-only UI with `role !== 'PATIENT'`.
+`user.role` is `'PATIENT' | 'NURSE' | 'DOCTOR' | 'PAL'`. PAL is a Doctor with restricted patient filter. Guard admin-only UI with `user.role !== 'PATIENT'`.
 
 ### Notifications
 
@@ -247,7 +247,7 @@ showSnack(t('some.key'), 'success') // 'success' | 'error' | 'info' | 'warning'
 - Always add keys to **both** locale files when adding new UI text. Never inline raw strings in JSX.
 - Key naming convention: `camelCaseSection.camelCaseKey` — e.g. `patient.displayName`, `case.status`, `demoTools.exportTitle`.
 - For enums rendered in the UI, use the pattern `t('enumSection.ENUM_VALUE')` — e.g. `t('status.NEW')`, `t('category.ACUTE')`.
-- Run `npm run generate:i18n` to extract missing keys (uses i18next-cli).
+- Run `npm run generate:i18n` to extract missing keys (uses i18next-cli). Run this after adding or changing UI text; it updates both `src/i18n/locales/sv/translation.json` and `src/i18n/locales/en/translation.json`. Run before opening a PR so locale files stay in sync then search for all `__NOT_TRANSLATED__` placeholders and fill them in.
 
 ---
 
@@ -284,17 +284,18 @@ Do not add `eval` or dynamic code execution under any circumstances.
 
 ## Scripts
 
-| Command                   | Purpose                                    |
-| ------------------------- | ------------------------------------------ |
-| `npm run dev`             | Vite dev server at `http://localhost:5173` |
-| `npm run build`           | Type-check + Vite production build         |
-| `npm test`                | Run all Vitest tests once                  |
-| `npm run test:watch`      | Vitest watch mode                          |
-| `npm run typecheck`       | `tsc --noEmit`                             |
-| `npm run lint`            | ESLint with zero warnings allowed          |
-| `npm run format`          | Prettier on `src/`                         |
-| `npm run generate:i18n`   | Extract i18n keys                          |
-| `npm run diagrams:render` | Render PlantUML diagrams to SVG via Docker |
+| Command                   | Purpose                                                                                                                          |
+| ------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `npm run dev`             | Vite dev server at `http://localhost:5173`                                                                                       |
+| `npm run build`           | Type-check + Vite production build                                                                                               |
+| `npm test`                | Run all Vitest tests once                                                                                                        |
+| `npm run test:watch`      | Vitest watch mode                                                                                                                |
+| `npm run typecheck`       | `tsc --noEmit`                                                                                                                   |
+| `npm run lint`            | ESLint with zero warnings allowed                                                                                                |
+| `npm run format`          | Prettier on `src/`                                                                                                               |
+| `npm run generate:i18n`   | Extract i18n keys                                                                                                                |
+| `npm run generate:i18n`   | Extract i18n keys into `src/i18n/locales/*/translation.json` — run after adding or changing UI text; updates both `sv` and `en`. |
+| `npm run diagrams:render` | Render PlantUML diagrams to SVG via Docker                                                                                       |
 
 ---
 

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useMemo } from 'react'
 import {
   Drawer,
   List,
@@ -28,57 +28,69 @@ interface SideNavProps {
   isMobile: boolean
 }
 
-export default function SideNav({ drawerWidth, mobileOpen, onClose, isMobile }: SideNavProps) {
+export default function SideNav({
+  drawerWidth,
+  mobileOpen,
+  onClose,
+  isMobile,
+}: Readonly<SideNavProps>) {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const location = useLocation()
   const { isRole } = useRole()
+  const navItems = useMemo(
+    () => [
+      {
+        label: t('nav.dashboard'),
+        icon: <DashboardIcon />,
+        path: '/dashboard',
+        roles: ['NURSE', 'DOCTOR', 'PAL'] as const,
+      },
+      {
+        label: t('patient.title'),
+        icon: <PersonIcon />,
+        path: '/patient',
+        roles: ['PATIENT'] as const,
+      },
+      {
+        label: t('nav.worklist'),
+        icon: <AssignmentIcon />,
+        path: '/worklist',
+        roles: ['NURSE', 'DOCTOR', 'PAL'] as const,
+      },
+      {
+        label: t('nav.policy'),
+        icon: <PolicyIcon />,
+        path: '/policy',
+        roles: ['NURSE', 'DOCTOR', 'PAL'] as const,
+      },
+      {
+        label: t('nav.patients'),
+        icon: <PeopleIcon />,
+        path: '/patients',
+        roles: ['NURSE', 'DOCTOR', 'PAL'] as const,
+      },
+      {
+        label: t('nav.journeys'),
+        icon: <RouteIcon />,
+        path: '/journeys',
+        roles: ['NURSE', 'DOCTOR', 'PAL'] as const,
+      },
+      {
+        label: t('nav.demoTools'),
+        icon: <BuildIcon />,
+        path: '/demo-tools',
+        roles: ['NURSE', 'DOCTOR', 'PAL', 'PATIENT'] as const,
+      },
+    ],
+    [t],
+  )
 
-  const navItems = [
-    {
-      label: t('nav.dashboard'),
-      icon: <DashboardIcon />,
-      path: '/dashboard',
-      roles: ['NURSE', 'DOCTOR', 'PAL'] as const,
-    },
-    {
-      label: t('patient.title'),
-      icon: <PersonIcon />,
-      path: '/patient',
-      roles: ['PATIENT'] as const,
-    },
-    {
-      label: t('nav.worklist'),
-      icon: <AssignmentIcon />,
-      path: '/worklist',
-      roles: ['NURSE', 'DOCTOR', 'PAL'] as const,
-    },
-    {
-      label: t('nav.policy'),
-      icon: <PolicyIcon />,
-      path: '/policy',
-      roles: ['NURSE', 'DOCTOR', 'PAL'] as const,
-    },
-    {
-      label: t('nav.patients'),
-      icon: <PeopleIcon />,
-      path: '/patients',
-      roles: ['NURSE', 'DOCTOR', 'PAL'] as const,
-    },
-    {
-      label: t('nav.journeys'),
-      icon: <RouteIcon />,
-      path: '/journeys',
-      roles: ['NURSE', 'DOCTOR', 'PAL'] as const,
-    },
-    {
-      label: t('nav.demoTools'),
-      icon: <BuildIcon />,
-      path: '/demo-tools',
-      roles: ['NURSE', 'DOCTOR', 'PAL', 'PATIENT'] as const,
-    },
-  ]
-
+  const accessiblePaths = useMemo(
+    () =>
+      navItems.filter((item) => item.roles.some((role) => isRole(role))).map((item) => item.path),
+    [navItems, isRole],
+  )
   const handleNav = (path: string) => {
     navigate(path)
     if (isMobile) onClose()
@@ -114,6 +126,14 @@ export default function SideNav({ drawerWidth, mobileOpen, onClose, isMobile }: 
       </List>
     </Box>
   )
+
+  useEffect(() => {
+    if (!accessiblePaths.length) return
+    const allowed = accessiblePaths.includes(location.pathname)
+    if (!allowed) {
+      navigate(accessiblePaths[0], { replace: true })
+    }
+  }, [accessiblePaths, location.pathname, navigate])
 
   return (
     <Box sx={{ displayPrint: 'none' }}>

@@ -15,8 +15,22 @@ export const grantConsent = (
     service.grantConsent(patientId, researchModuleId, patientJourneyId, grantedByUserId),
   )
 
-export const revokeConsent = (consentId: string, revokedByUserId: string): Promise<Consent> =>
-  withDelay(() => service.revokeConsent(consentId, revokedByUserId))
+export const revokeConsent = (
+  consentId: string,
+  revokedByUserId: string,
+  reason?: string,
+): Promise<Consent> => withDelay(() => service.revokeConsent(consentId, revokedByUserId, reason))
+
+export const declineConsent = (
+  patientId: string,
+  researchModuleId: string,
+  patientJourneyId: string,
+  userId: string,
+  reason?: string,
+): Promise<Consent> =>
+  withDelay(() =>
+    service.declineConsent(patientId, researchModuleId, patientJourneyId, userId, reason),
+  )
 
 export const hasActiveConsent = (
   patientId: string,

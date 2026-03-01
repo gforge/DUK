@@ -6,10 +6,17 @@ import { useTranslation } from 'react-i18next'
 import { useApi } from '../../hooks/useApi'
 import * as client from '../../api/client'
 import JourneyTimeline from '../journey/JourneyTimeline'
-import { ConsentDialog, RevokeConsentDialog } from '../journey/ConsentDialog'
+import { ConsentDialog, RevokeConsentDialog, DeclineConsentDialog } from '../journey/ConsentDialog'
+import { useRole } from '../../store/roleContext'
 import type { PatientJourney, JourneyTemplate, ResearchModule, Consent } from '../../api/schemas'
 
 const STATUS_ORDER: Record<string, number> = { ACTIVE: 0, SUSPENDED: 1, COMPLETED: 2 }
+
+const getStatusChipColor = (status: PatientJourney['status']) => {
+  if (status === 'ACTIVE') return 'primary'
+  if (status === 'SUSPENDED') return 'warning'
+  return 'default'
+}
 
 interface Props {
   journeys: PatientJourney[]
@@ -17,9 +24,13 @@ interface Props {
   patientId: string
 }
 
-export default function PatientCareplan({ journeys, journeyTemplates, patientId }: Props) {
+export default function PatientCareplan({
+  journeys,
+  journeyTemplates,
+  patientId,
+}: Readonly<Props>) {
   const { t } = useTranslation()
-
+  const { role } = useRole()
   const sortedJourneys = [...journeys].sort(
     (a, b) =>
       (STATUS_ORDER[a.status] ?? 3) - (STATUS_ORDER[b.status] ?? 3) ||
@@ -41,11 +52,21 @@ export default function PatientCareplan({ journeys, journeyTemplates, patientId 
     [patientId],
   )
 
-  const [consentTarget, setConsentTarget] = useState<{
+  // Track which journeyId had its auto-open dismissed so it does not reappear.
+  // Only ever updated from event handlers, never in an effect or during render.
+  const [dismissedAutoOpenJourneyId, setDismissedAutoOpenJourneyId] = useState<string | null>(null)
+
+  const [manualConsentTarget, setManualConsentTarget] = useState<{
     module: ResearchModule
     journeyId: string
   } | null>(null)
   const [revokeTarget, setRevokeTarget] = useState<Consent | null>(null)
+  const [declineTarget, setDeclineTarget] = useState<{
+    module: ResearchModule
+    journeyId: string
+    consentId?: string
+    mode: 'decline' | 'withdraw'
+  } | null>(null)
 
   const journeyName = selectedJourney
     ? journeyTemplates?.find((jt) => jt.id === selectedJourney.journeyTemplateId)?.name
@@ -54,6 +75,33 @@ export default function PatientCareplan({ journeys, journeyTemplates, patientId 
   // Modules enrolled for the currently selected journey
   const enrolledModules =
     researchModules?.filter((rm) => selectedJourney?.researchModuleIds?.includes(rm.id)) ?? []
+  const consentsList = consents ?? []
+  const getActiveConsent = (moduleId: string) =>
+    consentsList.find(
+      (c) =>
+        c.researchModuleId === moduleId &&
+        c.patientJourneyId === selectedJourney?.id &&
+        c.revokedAt === null,
+    ) ?? null
+  const firstPendingModule = enrolledModules.find((rm) => !getActiveConsent(rm.id))
+
+  // Auto-open: derived during render, no effect needed.
+  // Shows the consent dialog for the first pending module unless the user has
+  // already dismissed the auto-open for the current journey.
+  const autoConsentTarget =
+    selectedJourney && firstPendingModule && dismissedAutoOpenJourneyId !== selectedJourney.id
+      ? { module: firstPendingModule, journeyId: selectedJourney.id }
+      : null
+
+  const consentTarget = manualConsentTarget ?? autoConsentTarget
+
+  const handleConsentClose = () => {
+    // Mark auto-open as dismissed for this journey so it does not reappear.
+    if (!manualConsentTarget && selectedJourney) {
+      setDismissedAutoOpenJourneyId(selectedJourney.id)
+    }
+    setManualConsentTarget(null)
+  }
 
   return (
     <Paper variant="outlined" sx={{ mb: 3, borderRadius: 2, p: 2 }}>
@@ -90,13 +138,7 @@ export default function PatientCareplan({ journeys, journeyTemplates, patientId 
                         <Chip
                           label={t(`journey.journeyStatus.${j.status}`)}
                           size="small"
-                          color={
-                            j.status === 'ACTIVE'
-                              ? 'primary'
-                              : j.status === 'SUSPENDED'
-                                ? 'warning'
-                                : 'default'
-                          }
+                          color={getStatusChipColor(j.status)}
                           variant="outlined"
                           sx={{ height: 18, fontSize: 10 }}
                         />
@@ -127,12 +169,7 @@ export default function PatientCareplan({ journeys, journeyTemplates, patientId 
               </Stack>
               <Stack gap={1.5}>
                 {enrolledModules.map((rm) => {
-                  const activeConsent = consents?.find(
-                    (c) =>
-                      c.researchModuleId === rm.id &&
-                      c.patientJourneyId === selectedJourney?.id &&
-                      c.revokedAt === null,
-                  )
+                  const activeConsent = getActiveConsent(rm.id)
                   return (
                     <Stack
                       key={rm.id}
@@ -176,25 +213,52 @@ export default function PatientCareplan({ journeys, journeyTemplates, patientId 
                           size="small"
                           color="error"
                           variant="outlined"
-                          onClick={() => setRevokeTarget(activeConsent)}
+                          onClick={() =>
+                            role === 'PATIENT'
+                              ? setDeclineTarget({
+                                  module: rm,
+                                  journeyId: selectedJourney?.id ?? '',
+                                  consentId: activeConsent.id,
+                                  mode: 'withdraw',
+                                })
+                              : setRevokeTarget(activeConsent)
+                          }
                         >
                           {t('patient.consentWithdraw')}
                         </Button>
                       ) : (
-                        <Button
-                          size="small"
-                          variant="contained"
-                          color="secondary"
-                          disableElevation
-                          onClick={() =>
-                            setConsentTarget({
-                              module: rm,
-                              journeyId: selectedJourney?.id ?? '',
-                            })
-                          }
-                        >
-                          {t('patient.readAndConsent')}
-                        </Button>
+                        <>
+                          <Button
+                            size="small"
+                            variant="contained"
+                            color="secondary"
+                            disableElevation
+                            onClick={() =>
+                              setManualConsentTarget({
+                                module: rm,
+                                journeyId: selectedJourney?.id ?? '',
+                              })
+                            }
+                          >
+                            {t('patient.readAndConsent')}
+                          </Button>
+                          {role === 'PATIENT' && (
+                            <Button
+                              size="small"
+                              color="warning"
+                              variant="outlined"
+                              onClick={() =>
+                                setDeclineTarget({
+                                  module: rm,
+                                  journeyId: selectedJourney?.id ?? '',
+                                  mode: 'decline',
+                                })
+                              }
+                            >
+                              {t('journey.research.consent.decline')}
+                            </Button>
+                          )}
+                        </>
                       )}
                     </Stack>
                   )
@@ -209,13 +273,13 @@ export default function PatientCareplan({ journeys, journeyTemplates, patientId 
       {consentTarget && (
         <ConsentDialog
           open
-          onClose={() => setConsentTarget(null)}
+          onClose={handleConsentClose}
           module={consentTarget.module}
           patientId={patientId}
           journeyId={consentTarget.journeyId}
           onGranted={() => {
             refetchConsents()
-            setConsentTarget(null)
+            setManualConsentTarget(null)
           }}
         />
       )}
@@ -230,6 +294,22 @@ export default function PatientCareplan({ journeys, journeyTemplates, patientId 
           onRevoked={() => {
             refetchConsents()
             setRevokeTarget(null)
+          }}
+        />
+      )}
+      {declineTarget && (
+        <DeclineConsentDialog
+          open
+          onClose={() => setDeclineTarget(null)}
+          studyName={declineTarget.module.studyName}
+          mode={declineTarget.mode}
+          patientId={patientId}
+          researchModuleId={declineTarget.module.id}
+          journeyId={declineTarget.journeyId}
+          consentId={declineTarget.consentId}
+          onDone={() => {
+            refetchConsents()
+            setDeclineTarget(null)
           }}
         />
       )}

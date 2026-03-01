@@ -121,6 +121,12 @@ export const ConsentSchema = z.object({
   grantedByUserId: z.string(),
   revokedAt: z.string().datetime().nullable().default(null),
   revokedByUserId: z.string().nullable().default(null),
+  /**
+   * Free-text reason supplied by the patient when withdrawing consent or declining
+   * participation. Stored for GCP ICH E6 audit-trail purposes. May be null when
+   * no reason was given or for consents recorded before this field was introduced.
+   */
+  withdrawalReason: z.string().nullable().default(null),
 })
 export type Consent = z.infer<typeof ConsentSchema>
 

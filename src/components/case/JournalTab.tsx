@@ -24,9 +24,9 @@ import JournalDraftCard from './journal/JournalDraftCard'
 import BookingsList from './BookingsList'
 
 interface JournalTabProps {
-  caseData: Case
-  patient?: Patient
-  onCaseChange?: () => void
+  readonly caseData: Case
+  readonly patient?: Patient
+  readonly onCaseChange?: () => void
 }
 
 export default function JournalTab({ caseData, patient: _patient, onCaseChange }: JournalTabProps) {
@@ -97,7 +97,11 @@ export default function JournalTab({ caseData, patient: _patient, onCaseChange }
     <Box>
       <Stack direction="row" justifyContent="flex-end" sx={{ mb: 1, displayPrint: 'none' }}>
         <Tooltip title={t('common.print')}>
-          <IconButton size="small" onClick={() => window.print()} aria-label={t('common.print')}>
+          <IconButton
+            size="small"
+            onClick={() => globalThis.print()}
+            aria-label={t('common.print')}
+          >
             <PrintIcon fontSize="small" />
           </IconButton>
         </Tooltip>

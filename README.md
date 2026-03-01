@@ -136,14 +136,15 @@ src/
 
 ## Available Scripts
 
-| Command              | Description                               |
-| -------------------- | ----------------------------------------- |
-| `npm run dev`        | Start dev server at http://localhost:5173 |
-| `npm run build`      | Type-check + build for production         |
-| `npm run preview`    | Preview production build                  |
-| `npm test`           | Run all tests once                        |
-| `npm run test:watch` | Run tests in watch mode                   |
-| `npm run format`     | Format source files with Prettier         |
+| Command                 | Description                                                                                                                                   |
+| ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `npm run dev`           | Start dev server at http://localhost:5173                                                                                                     |
+| `npm run build`         | Type-check + build for production                                                                                                             |
+| `npm run preview`       | Preview production build                                                                                                                      |
+| `npm test`              | Run all tests once                                                                                                                            |
+| `npm run test:watch`    | Run tests in watch mode                                                                                                                       |
+| `npm run format`        | Format source files with Prettier                                                                                                             |
+| `npm run generate:i18n` | Extract i18n keys into `src/i18n/locales/*/translation.json` — run after adding or changing UI text; updates both `sv` and `en` locale files. |
 
 ---
 

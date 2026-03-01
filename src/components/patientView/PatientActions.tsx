@@ -17,12 +17,12 @@ import * as client from '../../api/client'
 import type { Case } from '../../api/schemas'
 
 interface Props {
-  userId: string
+  patientId: string
   cases: Case[] | null
   onRefetch: () => void
 }
 
-export default function PatientActions({ userId, cases, onRefetch }: Props) {
+export default function PatientActions({ patientId, cases, onRefetch }: Readonly<Props>) {
   const { t } = useTranslation()
   const { showSnack } = useSnack()
   const [loading, setLoading] = useState(false)
@@ -31,7 +31,7 @@ export default function PatientActions({ userId, cases, onRefetch }: Props) {
   async function handleOpenApp() {
     setLoading(true)
     try {
-      await client.patientOpenedApp(userId)
+      await client.patientOpenedApp(patientId)
       await onRefetch()
       showSnack(t('patient.appOpenedSuccess'), 'success')
     } catch {
@@ -45,7 +45,7 @@ export default function PatientActions({ userId, cases, onRefetch }: Props) {
     if (!cases?.[0]) return
     setLoading(true)
     try {
-      await client.seekContact(userId, cases[0].id)
+      await client.seekContact(patientId, cases[0].id)
       await onRefetch()
       showSnack(t('patient.contactRequested'), 'success')
     } catch {
