@@ -129,8 +129,11 @@ export default function SideNav({
 
   useEffect(() => {
     if (!accessiblePaths.length) return
-    const allowed = accessiblePaths.includes(location.pathname)
+    const allowed = accessiblePaths.some((path) => location.pathname.startsWith(path))
     if (!allowed) {
+      console.warn(
+        `Current path "${location.pathname}" is not accessible with the current role. Redirecting to "${accessiblePaths[0]}".`,
+      )
       navigate(accessiblePaths[0], { replace: true })
     }
   }, [accessiblePaths, location.pathname, navigate])
