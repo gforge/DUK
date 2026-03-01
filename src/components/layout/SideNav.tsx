@@ -9,7 +9,9 @@ import {
   Toolbar,
   Divider,
   Box,
+  Typography,
 } from '@mui/material'
+import { version } from '../../../package.json'
 import DashboardIcon from '@mui/icons-material/Dashboard'
 import PolicyIcon from '@mui/icons-material/GppMaybe'
 import BuildIcon from '@mui/icons-material/Build'
@@ -57,7 +59,7 @@ export default function SideNav({
   }
 
   const drawerContent = (
-    <Box>
+    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <Toolbar sx={{ minHeight: 56 }} />
       <Divider />
       <List component="nav" aria-label={t('common.mainNavigation')}>
@@ -84,6 +86,11 @@ export default function SideNav({
           )
         })}
       </List>
+      <Box sx={{ mt: 'auto', px: 2, py: 1.5 }}>
+        <Typography variant="caption" sx={{ color: 'text.disabled' }}>
+          v{version}
+        </Typography>
+      </Box>
     </Box>
   )
 
