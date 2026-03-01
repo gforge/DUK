@@ -451,7 +451,11 @@
     "contacted": "Kontaktad",
     "contactedDone": "Kontakt loggad i händelselogg",
     "reminded": "Påminnelse skickad",
-    "remindedDone": "Påminnelse loggad i händelselogg"
+    "remindedDone": "Påminnelse loggad i händelselogg",
+    "suggestion": {
+      "SEEK_CONTACT": "Patienten önskar bli kontaktad. Kontakta patienten eller skicka en påminnelse.",
+      "NOT_OPENED": "Patienten har inte öppnat formuläret. Kontakta patienten eller skicka en påminnelse."
+    }
   },
   "patient": {
     "appOpenedSuccess": "App markerad som öppnad",

@@ -451,7 +451,11 @@
     "contacted": "Contacted",
     "contactedDone": "Contact event logged",
     "reminded": "Reminder sent",
-    "remindedDone": "Reminder event logged"
+    "remindedDone": "Reminder event logged",
+    "suggestion": {
+      "SEEK_CONTACT": "The patient is requesting contact. Please reach out or send a reminder.",
+      "NOT_OPENED": "The patient has not opened the form. Consider contacting them or sending a reminder."
+    }
   },
   "patient": {
     "appOpenedSuccess": "App marked as opened",

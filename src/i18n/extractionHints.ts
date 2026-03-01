@@ -52,6 +52,10 @@ t('trigger.LOW_QOL')
 t('trigger.SEEK_CONTACT')
 t('trigger.ABNORMAL_ANSWER')
 
+// ─── Nurse contact suggestion banners ────────────────────────────────────────
+t('nurseContact.suggestion.SEEK_CONTACT')
+t('nurseContact.suggestion.NOT_OPENED')
+
 // ─── Audit actions ────────────────────────────────────────────────────────────
 t('audit.actions.CASE_CREATED')
 t('audit.actions.STATUS_CHANGED')
