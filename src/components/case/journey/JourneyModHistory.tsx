@@ -1,6 +1,7 @@
 import React from 'react'
 import { Box, Divider, Paper, Stack, Typography } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
+import CancelIcon from '@mui/icons-material/Cancel'
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline'
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz'
 import { useTranslation } from 'react-i18next'
@@ -10,11 +11,12 @@ const MOD_ICON: Record<string, React.ReactNode> = {
   ADD_STEP: <AddIcon fontSize="small" />,
   REMOVE_STEP: <RemoveCircleOutlineIcon fontSize="small" />,
   SWITCH_TEMPLATE: <SwapHorizIcon fontSize="small" />,
+  CANCEL: <CancelIcon fontSize="small" color="error" />,
 }
 
 interface Props {
-  modifications: JourneyModification[]
-  journeyTemplates?: JourneyTemplate[] | null
+  readonly modifications: JourneyModification[]
+  readonly journeyTemplates?: JourneyTemplate[] | null
 }
 
 export default function JourneyModHistory({ modifications, journeyTemplates }: Props) {

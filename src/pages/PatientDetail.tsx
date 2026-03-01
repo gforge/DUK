@@ -19,6 +19,7 @@ import {
 import PersonIcon from '@mui/icons-material/Person'
 import RouteIcon from '@mui/icons-material/Route'
 import AssignmentIcon from '@mui/icons-material/Assignment'
+import ScienceIcon from '@mui/icons-material/Science'
 import NavigateNextIcon from '@mui/icons-material/NavigateNext'
 import { Link, useParams, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -26,6 +27,7 @@ import { format } from 'date-fns'
 import { useApi } from '../hooks/useApi'
 import * as client from '../api/client'
 import StatusChip from '../components/common/StatusChip'
+import PatientJourneyResearchCard from '../components/patients/PatientJourneyResearchCard'
 import { formatPersonnummer } from '../api/utils/personnummer'
 
 export default function PatientDetail() {
@@ -35,9 +37,21 @@ export default function PatientDetail() {
 
   const { data: patient, loading, error } = useApi(() => client.getPatient(id!), [id])
   const { data: cases } = useApi(() => client.getCasesByPatient(id!), [id])
-  const { data: journeys } = useApi(() => client.getPatientJourneys(id!), [id])
+  const { data: journeys, refetch: refetchJourneys } = useApi(
+    () => client.getPatientJourneys(id!),
+    [id],
+  )
   const { data: journeyTemplates } = useApi(() => client.getJourneyTemplates(), [])
-  const { data: consents } = useApi(() => client.getResearchConsents(id!), [id])
+  const { data: researchModules } = useApi(() => client.getResearchModules(), [])
+  const { data: consents, refetch: refetchConsents } = useApi(
+    () => client.getResearchConsents(id!),
+    [id],
+  )
+
+  const handleResearchChanged = () => {
+    refetchJourneys()
+    refetchConsents()
+  }
 
   if (loading) {
     return (
@@ -66,14 +80,13 @@ export default function PatientDetail() {
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
   )
 
-  const statusColor = (status: string) => {
+  const journeyStatusColor = (status: string): 'primary' | 'warning' | 'default' => {
     switch (status) {
       case 'ACTIVE':
         return 'primary'
       case 'SUSPENDED':
         return 'warning'
       case 'COMPLETED':
-        return 'default'
       default:
         return 'default'
     }
@@ -256,7 +269,7 @@ export default function PatientDetail() {
                     <Chip
                       label={t(`journey.journeyStatus.${j.status}`)}
                       size="small"
-                      color={statusColor(j.status) as 'primary' | 'warning' | 'default'}
+                      color={journeyStatusColor(j.status)}
                       variant="outlined"
                     />
                   </TableCell>
@@ -273,56 +286,41 @@ export default function PatientDetail() {
         )}
       </Paper>
 
-      {/* Research consents */}
-      {consents && consents.length > 0 && (
+      {/* Research studies per journey */}
+      {researchModules && researchModules.length > 0 && sortedJourneys.length > 0 && (
         <Paper variant="outlined" sx={{ p: 2.5, borderRadius: 2, mb: 3 }}>
-          <Stack direction="row" alignItems="center" gap={1} mb={1.5}>
+          <Stack direction="row" alignItems="center" gap={1} mb={2}>
+            <ScienceIcon color="secondary" fontSize="small" />
             <Typography variant="subtitle1" fontWeight={600}>
-              {t('patientDetail.consents')}
+              {t('patients.research.sectionTitle')}
             </Typography>
-            <Chip label={consents.length} size="small" variant="outlined" />
           </Stack>
-          <Table size="small">
-            <TableHead>
-              <TableRow>
-                <TableCell>{t('patientDetail.consentStudy')}</TableCell>
-                <TableCell>{t('case.status')}</TableCell>
-                <TableCell>{t('patientDetail.grantedAt')}</TableCell>
-                <TableCell>{t('patientDetail.revokedAt')}</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {consents.map((c) => (
-                <TableRow key={c.id}>
-                  <TableCell>{c.researchModuleId}</TableCell>
-                  <TableCell>
-                    <Chip
-                      label={c.revokedAt ? t('patientDetail.revoked') : t('patientDetail.active')}
-                      size="small"
-                      color={c.revokedAt ? 'default' : 'success'}
-                      variant="outlined"
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="caption">
-                      {format(new Date(c.grantedAt), 'dd MMM yyyy')}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    {c.revokedAt ? (
-                      <Typography variant="caption">
-                        {format(new Date(c.revokedAt), 'dd MMM yyyy')}
-                      </Typography>
-                    ) : (
-                      <Typography variant="caption" color="text.secondary">
-                        —
-                      </Typography>
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+          <Stack gap={3}>
+            {sortedJourneys.map((j, idx) => (
+              <Box key={j.id}>
+                <Stack direction="row" alignItems="center" gap={1} mb={1}>
+                  <Typography variant="body2" fontWeight={600}>
+                    {templateName(j.journeyTemplateId)}
+                  </Typography>
+                  <Chip
+                    label={t(`journey.journeyStatus.${j.status}`)}
+                    size="small"
+                    color={journeyStatusColor(j.status)}
+                    variant="outlined"
+                    sx={{ height: 18, fontSize: 10 }}
+                  />
+                </Stack>
+                <PatientJourneyResearchCard
+                  journey={j}
+                  patientId={id!}
+                  allModules={researchModules}
+                  consents={consents ?? []}
+                  onChanged={handleResearchChanged}
+                />
+                {idx < sortedJourneys.length - 1 && <Divider sx={{ mt: 2 }} />}
+              </Box>
+            ))}
+          </Stack>
         </Paper>
       )}
     </Box>

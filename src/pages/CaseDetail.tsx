@@ -31,9 +31,9 @@ import AutoWarningsBadge from '../components/common/AutoWarningsBadge'
 import NurseContactActions from '../components/case/NurseContactActions'
 
 interface TabPanelProps {
-  children: React.ReactNode
-  value: number
-  index: number
+  readonly children: React.ReactNode
+  readonly value: number
+  readonly index: number
 }
 
 function TabPanel({ children, value, index }: TabPanelProps) {
@@ -87,7 +87,10 @@ export default function CaseDetail() {
     ),
   )
 
-  const handleBack = useCallback(() => navigate('/dashboard'), [navigate])
+  const handleBack = useCallback(
+    () => navigate(caseData ? `/patients/${caseData.patientId}` : '/patients'),
+    [navigate, caseData],
+  )
 
   const loading = caseLoading || patientLoading
 
@@ -116,15 +119,18 @@ export default function CaseDetail() {
         <Link
           component="button"
           variant="body2"
-          onClick={handleBack}
+          onClick={() => navigate('/dashboard')}
           underline="hover"
           sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
         >
           <ArrowBackIcon fontSize="inherit" />
           {t('nav.dashboard')}
         </Link>
-        <Typography variant="body2" color="text.primary">
+        <Link component="button" variant="body2" onClick={handleBack} underline="hover">
           {patient?.displayName ?? caseData.patientId}
+        </Link>
+        <Typography variant="body2" color="text.primary">
+          {t('case.title')}
         </Typography>
       </Breadcrumbs>
 
@@ -144,7 +150,12 @@ export default function CaseDetail() {
       </Stack>
 
       {/* Patient card */}
-      {patient && <PatientCard patient={patient} caseData={caseData} />}
+      {patient && (
+        <PatientCard
+          patient={patient}
+          caseData={caseData}
+        />
+      )}
 
       {/* Nurse contact action panel — shown when SEEK_CONTACT / NOT_OPENED triggers are active */}
       <NurseContactActions caseData={caseData} onRefetch={refetchCase} />

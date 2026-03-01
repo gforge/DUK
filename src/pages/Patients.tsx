@@ -8,13 +8,11 @@ import * as client from '../api/client'
 import { useRole } from '../store/roleContext'
 import PatientTable from '../components/patients/PatientTable'
 import RegisterPatientDialog from '../components/patients/RegisterPatientDialog'
-import AssignJourneyDialog from '../components/patients/AssignJourneyDialog'
 
 export default function Patients() {
   const { t } = useTranslation()
   const { isRole } = useRole()
   const [registerOpen, setRegisterOpen] = useState(false)
-  const [assignTarget, setAssignTarget] = useState<{ id: string; name: string } | null>(null)
   const [search, setSearch] = useState('')
 
   const { data: patients, loading, error, refetch } = useApi(() => client.getPatients(), [])
@@ -72,7 +70,6 @@ export default function Patients() {
           journeys={allJourneys ?? []}
           journeyTemplates={journeyTemplates ?? []}
           isClinician={isClinician}
-          onAssign={setAssignTarget}
         />
       )}
 
@@ -81,16 +78,6 @@ export default function Patients() {
         onClose={() => setRegisterOpen(false)}
         onCreated={refetch}
       />
-
-      {assignTarget && (
-        <AssignJourneyDialog
-          open={!!assignTarget}
-          onClose={() => setAssignTarget(null)}
-          patientId={assignTarget.id}
-          patientName={assignTarget.name}
-          onAssigned={refetch}
-        />
-      )}
     </Box>
   )
 }

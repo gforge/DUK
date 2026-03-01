@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import {
   Button,
-  Chip,
   Table,
   TableBody,
   TableCell,
@@ -10,27 +9,21 @@ import {
   TablePagination,
   Typography,
 } from '@mui/material'
-import RouteIcon from '@mui/icons-material/Route'
+import ChevronRightIcon from '@mui/icons-material/ChevronRight'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import type { Patient, PatientJourney, JourneyTemplate } from '../../api/schemas'
 import { formatPersonnummer } from '../../api/utils/personnummer'
+import JourneyChips from './JourneyChips'
 
 interface Props {
-  patients: Patient[]
-  journeys: PatientJourney[]
-  journeyTemplates: JourneyTemplate[]
-  isClinician: boolean
-  onAssign: (target: { id: string; name: string }) => void
+  readonly patients: Patient[]
+  readonly journeys: PatientJourney[]
+  readonly journeyTemplates: JourneyTemplate[]
+  readonly isClinician: boolean
 }
 
-export default function PatientTable({
-  patients,
-  journeys,
-  journeyTemplates,
-  isClinician,
-  onAssign,
-}: Props) {
+export default function PatientTable({ patients, journeys, journeyTemplates, isClinician }: Props) {
   const { t } = useTranslation()
   const navigate = useNavigate()
 
@@ -41,17 +34,6 @@ export default function PatientTable({
   const maxPage = Math.max(0, Math.ceil(patients.length / rowsPerPage) - 1)
   const safePage = Math.min(page, maxPage)
   const visible = patients.slice(safePage * rowsPerPage, (safePage + 1) * rowsPerPage)
-
-  const activeJourneyCount = (patientId: string) =>
-    journeys.filter((j) => j.patientId === patientId && j.status === 'ACTIVE').length
-
-  const latestJourneyName = (patientId: string): string | null => {
-    const sorted = journeys
-      .filter((j) => j.patientId === patientId)
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-    if (!sorted.length) return null
-    return journeyTemplates.find((jt) => jt.id === sorted[0].journeyTemplateId)?.name ?? null
-  }
 
   return (
     <>
@@ -76,8 +58,7 @@ export default function PatientTable({
             </TableRow>
           )}
           {visible.map((patient) => {
-            const count = activeJourneyCount(patient.id)
-            const name = latestJourneyName(patient.id)
+            const patientJourneys = journeys.filter((j) => j.patientId === patient.id)
             return (
               <TableRow
                 key={patient.id}
@@ -93,33 +74,20 @@ export default function PatientTable({
                 <TableCell>{formatPersonnummer(patient.personalNumber)}</TableCell>
                 <TableCell>{patient.dateOfBirth}</TableCell>
                 <TableCell>
-                  {name ? (
-                    <Chip
-                      size="small"
-                      icon={<RouteIcon />}
-                      label={`${name}${count > 1 ? ` +${count - 1}` : ''}`}
-                      color={count > 0 ? 'primary' : 'default'}
-                      variant="outlined"
-                      sx={{ fontSize: 11 }}
-                    />
-                  ) : (
-                    <Typography variant="caption" color="text.secondary">
-                      {t('patients.noJourney')}
-                    </Typography>
-                  )}
+                  <JourneyChips journeys={patientJourneys} journeyTemplates={journeyTemplates} />
                 </TableCell>
                 {isClinician && (
                   <TableCell align="right">
                     <Button
                       size="small"
-                      variant="outlined"
-                      startIcon={<RouteIcon />}
+                      variant="text"
+                      endIcon={<ChevronRightIcon />}
                       onClick={(e) => {
                         e.stopPropagation()
-                        onAssign({ id: patient.id, name: patient.displayName })
+                        navigate(`/patients/${patient.id}`)
                       }}
                     >
-                      {t('patients.assignJourney')}
+                      {t('patients.openView')}
                     </Button>
                   </TableCell>
                 )}

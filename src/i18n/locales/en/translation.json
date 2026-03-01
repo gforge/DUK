@@ -170,7 +170,8 @@
     "modType": {
       "ADD_STEP": "Step added",
       "REMOVE_STEP": "Step removed",
-      "SWITCH_TEMPLATE": "Template switched"
+      "SWITCH_TEMPLATE": "Template switched",
+      "CANCEL": "Cancelled"
     },
     "noActiveJourney": "No active journey assigned to this patient.",
     "noSteps": "No steps defined.",
@@ -215,6 +216,13 @@
     "window": "Window",
     "pause": "Pause journey",
     "resume": "Resume journey",
+    "cancel": "Cancel journey",
+    "cancelConfirmTitle": "Cancel journey?",
+    "cancelConfirmBodyNoData": "No data has been recorded for this journey. It will be permanently deleted.",
+    "cancelConfirmBodyHasData": "This journey has recorded data. It will be marked as completed and all remaining planned follow-ups will be removed.",
+    "cancelReasonLabel": "Reason (required)",
+    "cancelSuccess": "Journey closed and archived",
+    "cancelSuccessDeleted": "Journey deleted",
     "pauseConfirmTitle": "Pause patient journey?",
     "pauseConfirmBody": "The timeline will be frozen while the journey is paused. All upcoming steps will shift forward until the journey is resumed.",
     "pauseSuccess": "Journey paused",
@@ -511,6 +519,7 @@
     "activeJourney": "Active Journey",
     "noResults": "No patients found",
     "noJourney": "No journey",
+    "openView": "View patient",
     "assignJourney": "Assign Journey",
     "journeyAssigned": "Journey assigned",
     "searchPlaceholder": "Search by name or personal number…",
@@ -554,6 +563,15 @@
       "checkConflicts": "Check for overlaps",
       "scheduledOn": "Scheduled on",
       "existingOn": "existing on"
+    },
+    "research": {
+      "sectionTitle": "Research studies",
+      "addStudy": "Enroll in study",
+      "selectStudy": "Select study",
+      "noStudies": "No research studies linked to this journey",
+      "enrollAndConsent": "Enroll and record consent",
+      "skipConsent": "Skip consent",
+      "consentStep": "Consent ({{current}} of {{total}})"
     }
   },
   "patientDetail": {

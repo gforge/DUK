@@ -86,11 +86,21 @@ Scheduling & cases
 - Cases may be created from a scheduled follow-up (entry) or from patient-initiated contacts; the mapping is performed when the FormResponse is saved and service logic assigns/creates a `Case` where appropriate.
 - There is no automatic background job advancing entries; scheduled follow-ups become visible in the dashboard based on computed dates.
 
+Journey cancellation
+
+- `cancelJourney(journeyId, reason, userId)` is the single entry point for removing a journey. Behaviour depends on whether the journey has recorded data:
+  - **No data** (no `FormResponse.patientJourneyId === journeyId` and `recurringCompletions.length === 0`): the journey record is deleted entirely from `AppState.patientJourneys`. The operation is permanent.
+  - **Has data**: status is set to `COMPLETED`, `pausedAt` is cleared, and a `CANCEL` modification is appended with the clinician-supplied reason. The record is preserved as an audit trail and remains visible in history tabs under the `COMPLETED` group.
+- `CANCEL` is a `JourneyModificationType` (alongside `ADD_STEP`, `REMOVE_STEP`, `SWITCH_TEMPLATE`). It carries no step-specific payload — only `reason` and `addedByUserId`.
+- Form responses and recurring completions are **never deleted** regardless of outcome.
+- The `JourneyHeader` shows an "Avbryt resa" button for `ACTIVE` and `SUSPENDED` journeys. `CancelJourneyDialog` enforces a minimum-length reason and shows a severity-appropriate alert (`error` for delete, `warning` for archive).
+- `JourneyModHistory` renders `CANCEL` entries with a red `CancelIcon`.
+
 Patient registration flow
 
-- The `/patients` page provides a 3-step registration wizard: patient details → journey assignment (template + reference date) → review & confirm.
-- `createPatient` creates the patient record, then `assignPatientJourney` links them to a journey template with the selected start date.
-- An "Assign Journey" action is also available on the patient table for existing patients without journeys.
+- The `/patients` page lists all patients in a searchable, paginated table. A **"Visa patient"** button per row navigates to `/patients/:id`. The quick-assign journey button has been removed; journey management is done from the patient detail page instead.
+- A registration wizard (3-step: patient details → journey assignment → confirm) is available for creating new patients.
+- `createPatient` creates the patient record; `assignPatientJourney` links them to a journey template with the selected start date.
 
 Patient care plan view
 

@@ -2,6 +2,8 @@ import { getStore, setStore } from '../storage'
 import { uuid, now } from './utils'
 import type { PatientJourney, JourneyModification } from '../schemas'
 
+export type CancelJourneyResult = { deleted: true } | { deleted: false; journey: PatientJourney }
+
 /** Returns whole days between two ISO datetimes (or between datetime and now). */
 function wholeElapsedDays(isoStart: string, isoEnd?: string): number {
   const endMs = isoEnd ? new Date(isoEnd).getTime() : Date.now()
@@ -24,15 +26,18 @@ export function assignPatientJourney(
 
   // Convert merged step IDs into REMOVE_STEP modifications so the new
   // journey never shows forms that will be filled through a parallel journey.
-  const mergeModifications: JourneyModification[] = mergedStepIds.map(({ stepId, fromJourneyId }) => ({
-    id: uuid(),
-    type: 'REMOVE_STEP' as const,
-    addedByUserId: 'system',
-    addedAt: now(),
-    reason: 'Merged with existing journey — form will be collected through the earlier programme.',
-    stepId,
-    mergedFromJourneyId: fromJourneyId,
-  }))
+  const mergeModifications: JourneyModification[] = mergedStepIds.map(
+    ({ stepId, fromJourneyId }) => ({
+      id: uuid(),
+      type: 'REMOVE_STEP' as const,
+      addedByUserId: 'system',
+      addedAt: now(),
+      reason:
+        'Merged with existing journey — form will be collected through the earlier programme.',
+      stepId,
+      mergedFromJourneyId: fromJourneyId,
+    }),
+  )
 
   const journey: PatientJourney = {
     id: uuid(),
@@ -182,6 +187,50 @@ export function unenrollResearchModule(journeyId: string, moduleId: string): Pat
  *
  * Idempotent: calling it twice for the same stepId + occurrenceIndex is a no-op.
  */
+/**
+ * Cancels a patient journey.
+ * - No recorded data (no form responses, no recurringCompletions) → journey is deleted entirely.
+ * - Has data → journey is marked COMPLETED with a CANCEL modification so history is preserved.
+ */
+export function cancelJourney(
+  journeyId: string,
+  reason: string,
+  userId: string,
+): CancelJourneyResult {
+  const state = getStore()
+  const journey = state.patientJourneys.find((j) => j.id === journeyId)
+  if (!journey) throw new Error(`Journey ${journeyId} not found`)
+
+  const hasData =
+    state.formResponses.some((r) => r.patientJourneyId === journeyId) ||
+    (journey.recurringCompletions?.length ?? 0) > 0
+
+  if (!hasData) {
+    setStore({ ...state, patientJourneys: state.patientJourneys.filter((j) => j.id !== journeyId) })
+    return { deleted: true }
+  }
+
+  const mod: JourneyModification = {
+    id: uuid(),
+    type: 'CANCEL',
+    addedByUserId: userId,
+    addedAt: now(),
+    reason,
+  }
+  const updated: PatientJourney = {
+    ...journey,
+    status: 'COMPLETED',
+    pausedAt: null,
+    modifications: [...journey.modifications, mod],
+    updatedAt: now(),
+  }
+  setStore({
+    ...state,
+    patientJourneys: state.patientJourneys.map((j) => (j.id === journeyId ? updated : j)),
+  })
+  return { deleted: false, journey: updated }
+}
+
 export function recordRecurringCompletion(
   journeyId: string,
   stepId: string,

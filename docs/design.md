@@ -70,6 +70,14 @@ Journey pause & resume
 - `getEffectiveSteps` dynamically computes `totalPauseShift = totalPausedDays + currentPauseDays` and applies it to every step's scheduled date. Nothing is written to the store during display — the shift is a pure calculation.
 - The `JourneyTab` (clinician view) shows a pause/resume button and a live paused-days banner while a journey is suspended.
 
+Journey cancellation
+
+- Clinicians can cancel a journey using the "Avbryt resa" button, visible on `ACTIVE` and `SUSPENDED` journeys in `JourneyHeader`.
+- **No recorded data** (no linked form responses, no recurring completions): the journey is deleted entirely from the store and disappears from all views.
+- **Has recorded data**: the journey is marked `COMPLETED` and a `CANCEL` `JourneyModification` with mandatory reason text (≥ 5 characters) is appended. The record is preserved as an audit trail.
+- `CancelJourneyDialog` shows a severity-appropriate alert (`error` for delete, `warning` for archive) and disables confirm until a valid reason is entered.
+- Form responses are never deleted regardless of outcome.
+
 Multiple parallel journeys
 
 - A patient may have many concurrent `PatientJourney` records (e.g. wrist fracture programme + hip fracture programme running simultaneously).
@@ -102,6 +110,8 @@ Clinician patient detail page
 - `/patients/:id` renders `PatientDetail.tsx` — a dedicated single-patient view for clinicians.
 - Sections: breadcrumb navigation (Patients → patient name), patient summary card (name, PNR, DOB, `lastOpenedAt`, `createdAt`), cases table (clickable rows → `/cases/:id`; shows status, category, trigger count, last activity), journeys table (template name, status chip, start date), and research consents table (study name, granted/revoked dates).
 - Data is fetched from five client calls: `getPatient`, `getCasesByPatient`, `getPatientJourneys`, `getJourneyTemplates`, `getResearchConsents`.
+- The patient avatar icon in `PatientCard` (on `CaseDetail`) is clickable and navigates to `/patients/:id`. The `CaseDetail` breadcrumb also links: Dashboard → Patient name → Case detail.
+- `PatientTable` on `/patients` shows a "Visa patient" button per row (navigates to `/patients/:id`) and a `JourneyChips` status summary. The quick-assign journey button has been removed; journey management is handled from the patient detail page.
 
 Global patient search
 
@@ -146,7 +156,9 @@ Mapping to implementation
 - Patient CRUD: [src/api/service/patients.ts](src/api/service/patients.ts) (`createPatient`)
 - Case services & transitions: [src/api/service/cases.ts](src/api/service/cases.ts)
 - Journey resolution: [src/api/service/journeyResolver.ts](src/api/service/journeyResolver.ts) (`getEffectiveSteps`, `getMergedDueStepsForPatient`)
-- Journey pause & resume: [src/api/service/patientJourneys.ts](src/api/service/patientJourneys.ts) (`pauseJourney`, `resumeJourney`)
+- Journey pause & resume: [src/api/service/patientJourneys.ts](src/api/service/patientJourneys.ts) (`pauseJourney`, `resumeJourney`, `cancelJourney`)
+- Journey cancellation UI: [src/components/case/JourneyTab/CancelJourneyDialog.tsx](src/components/case/JourneyTab/CancelJourneyDialog.tsx)
+- JourneyTab sub-components: [src/components/case/JourneyTab/](src/components/case/JourneyTab/) (`useJourneyActions`, `JourneyHeader`, `JourneySelectorTabs`, `PauseConfirmDialog`, `CancelJourneyDialog`)
 - Research consent: [src/api/service/researchConsents.ts](src/api/service/researchConsents.ts) (`grantConsent`, `revokeConsent`, `hasActiveConsent`)
 - Consent UI: [src/components/journey/ConsentDialog.tsx](src/components/journey/ConsentDialog.tsx)
 - Policy parser: [src/api/policyParser/parser.ts](src/api/policyParser/parser.ts)

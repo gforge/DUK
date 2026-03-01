@@ -77,7 +77,7 @@ InstructionTemplate (src/api/schemas/journey.ts) — NEW
 JourneyModification (embedded in PatientJourney.modifications[])
 
 - id: string
-- type: enum (ADD_STEP, REMOVE_STEP, SWITCH_TEMPLATE)
+- type: enum (ADD_STEP, REMOVE_STEP, SWITCH_TEMPLATE, CANCEL)
 - addedByUserId: string
 - reason: string
 - addedAt: string (ISO)
@@ -85,6 +85,7 @@ JourneyModification (embedded in PatientJourney.modifications[])
 - stepId: string | undefined (for REMOVE_STEP)
 - previousTemplateId, newTemplateId: string | undefined (for SWITCH_TEMPLATE)
 - previousStartDate, newStartDate: string | undefined (for SWITCH_TEMPLATE with date reset)
+- mergedFromJourneyId: string | undefined (audit trail for parallel-journey merge conflicts)
 
 FormResponse (src/api/schemas/forms.ts)
 
@@ -95,6 +96,9 @@ FormResponse (src/api/schemas/forms.ts)
 - answers: Record<string, number | string | boolean>
 - scores: Record<string, number> (computed using scoringRules)
 - submittedAt: string (ISO)
+- patientJourneyId: string | undefined (FK → PatientJourney.id; present when submitted via a journey step)
+- journeyStepId: string | undefined (FK → JourneyTemplateEntry.id or recurring `__rN` id; present when submitted via a journey step)
+- occurrenceIndex: number | undefined (which recurrence instance; present for recurring steps)
 
 QuestionnaireTemplate (src/api/schemas/questionnaire.ts)
 
@@ -147,3 +151,4 @@ Notes
 - `JourneyTemplate.parentTemplateId` tracks derivation lineage; `derivedAt` marks the last sync point for `computeParentDiff`.
 - The `EffectiveStep` type (returned by `getEffectiveSteps`) includes a `resolvedInstruction?: string` field hydrated from `instructionTemplateId` (preferred) or `instructionText`.
 - Effective step dates are shifted by `totalPausedDays + currentPauseDays` dynamically in `getEffectiveSteps`; no dates are rewritten to the store during display.
+- `cancelJourney` uses `FormResponse.patientJourneyId` and `PatientJourney.recurringCompletions` to determine whether a journey has recorded data and should be archived (→ `COMPLETED` + `CANCEL` modification) vs. deleted entirely.

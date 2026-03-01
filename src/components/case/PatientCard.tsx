@@ -1,22 +1,23 @@
 import React from 'react'
-import { Paper, Stack, Box, Typography, Chip, Divider } from '@mui/material'
+import { Paper, Stack, Box, Typography, Chip, Divider, Tooltip } from '@mui/material'
 import PersonIcon from '@mui/icons-material/Person'
+import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { format } from 'date-fns'
 import { formatPersonnummer } from '../../api/utils/personnummer'
 import TriggerChips from '../common/TriggerChips'
-import StatusChip from '../common/StatusChip'
 import DeadlineLabel from '../common/DeadlineLabel'
 import AutoWarningsBadge from '../common/AutoWarningsBadge'
 import type { Case, Patient } from '../../api/schemas'
 
 interface PatientCardProps {
-  patient: Patient
-  caseData: Case
+  readonly patient: Patient
+  readonly caseData: Case
 }
 
 export default function PatientCard({ patient, caseData }: PatientCardProps) {
   const { t } = useTranslation()
+  const navigate = useNavigate()
 
   const lastOpened = patient.lastOpenedAt
     ? format(new Date(patient.lastOpenedAt), 'dd MMM yyyy HH:mm')
@@ -27,21 +28,27 @@ export default function PatientCard({ patient, caseData }: PatientCardProps) {
       <Stack direction={{ xs: 'column', sm: 'row' }} gap={2}>
         {/* Patient info */}
         <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1, flex: 1 }}>
-          <Box
-            sx={{
-              bgcolor: 'primary.light',
-              color: 'primary.contrastText',
-              borderRadius: '50%',
-              width: 40,
-              height: 40,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0,
-            }}
-          >
-            <PersonIcon fontSize="small" />
-          </Box>
+          <Tooltip title={t('patients.openView')}>
+            <Box
+              onClick={() => navigate(`/patients/${patient.id}`)}
+              sx={{
+                bgcolor: 'primary.light',
+                color: 'primary.contrastText',
+                borderRadius: '50%',
+                width: 40,
+                height: 40,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+                cursor: 'pointer',
+                '&:hover': { bgcolor: 'primary.main' },
+                transition: 'background-color 0.2s',
+              }}
+            >
+              <PersonIcon fontSize="small" />
+            </Box>
+          </Tooltip>
           <Box>
             <Typography variant="subtitle1" fontWeight={700}>
               {patient.displayName}

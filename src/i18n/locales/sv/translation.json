@@ -137,15 +137,15 @@
     "importTitle": "Importera tillstånd",
     "reseed": "Återskapa seed-data",
     "reset": "Rensa all data",
-    "resetDescription": "Ladda en seed-mall eller töm all data.",
+    "resetDescription": "Ladda låtsasdata eller töm all data.",
     "resetSuccess": "Data rensad",
     "resetTitle": "Seed-mallar",
-    "reseedFaker": "Ladda stor faker (~1 000)",
-    "reseedFakerSuccess": "Stor seed laddad (~1 000 patienter)",
-    "reseedMinimal": "Ladda minimal (~10)",
-    "reseedMinimalSuccess": "Minimal seed laddad",
-    "reseedRealistic": "Ladda realistisk (~320)",
-    "reseedRealisticSuccess": "Realistisk seed laddad (~320 patienter)",
+    "reseedFaker": "Ladda stort dataset (~1 000)",
+    "reseedFakerSuccess": "Stort dataset laddat (~1 000 patienter)",
+    "reseedMinimal": "Ladda minimalt dataset (~10, detaljerad)",
+    "reseedMinimalSuccess": "Minimalt dataset laddat",
+    "reseedRealistic": "Ladda realistiskt dataset (~320)",
+    "reseedRealisticSuccess": "Realistiskt dataset laddat (~320 patienter)",
     "seedPresetsLabel": "Seed-mallar",
     "title": "Demo-verktyg",
     "warning": "Obs! Dessa verktyg ändrar appens interna tillstånd och är avsedda för demonstration."
@@ -164,7 +164,8 @@
     "modType": {
       "ADD_STEP": "Steg lagt till",
       "REMOVE_STEP": "Steg borttaget",
-      "SWITCH_TEMPLATE": "Mall bytt"
+      "SWITCH_TEMPLATE": "Mall bytt",
+      "CANCEL": "Avbruten"
     },
     "noActiveJourney": "Ingen aktiv patientresa tilldelad.",
     "noSteps": "Inga steg definierade.",
@@ -207,6 +208,13 @@
     "recurringStep": "Återkommande uppföljningstillfälle",
     "type": "Typ",
     "window": "Fönster",
+    "cancel": "Avbryt resa",
+    "cancelConfirmTitle": "Avbryt resa?",
+    "cancelConfirmBodyNoData": "Resan har ingen registrerad data och kommer att raderas helt.",
+    "cancelConfirmBodyHasData": "Resan har registrerad data. Den avslutas och kvarvarande planerade uppföljningar tas bort.",
+    "cancelReasonLabel": "Anledning (obligatorisk)",
+    "cancelSuccess": "Resa avslutad och arkiverad",
+    "cancelSuccessDeleted": "Resa raderad",
     "pause": "Pausa resa",
     "resume": "Återuppta resa",
     "pauseConfirmTitle": "Pausa patientresa?",
@@ -504,6 +512,7 @@
     "activeJourney": "Aktiv patientresa",
     "noResults": "Inga patienter hittades",
     "noJourney": "Ingen resa",
+    "openView": "Visa patient",
     "assignJourney": "Tilldela resa",
     "journeyAssigned": "Patientresa tilldelad",
     "searchPlaceholder": "Sök namn eller personnummer…",
@@ -547,6 +556,15 @@
       "checkConflicts": "Kontrollera överlapp",
       "scheduledOn": "Schemalagd",
       "existingOn": "befintlig"
+    },
+    "research": {
+      "sectionTitle": "Forskningsstudier",
+      "addStudy": "Inkludera i studie",
+      "selectStudy": "Välj studie",
+      "noStudies": "Inga forskningsstudier kopplade till denna resa",
+      "enrollAndConsent": "Inkludera och ge samtycke",
+      "skipConsent": "Hoppa över samtycke",
+      "consentStep": "Samtycke ({{current}} av {{total}})"
     }
   },
   "patientDetail": {

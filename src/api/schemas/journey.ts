@@ -4,7 +4,12 @@ import { CaseCategorySchema } from './enums'
 export const PatientJourneyStatusSchema = z.enum(['ACTIVE', 'COMPLETED', 'SUSPENDED'])
 export type PatientJourneyStatus = z.infer<typeof PatientJourneyStatusSchema>
 
-export const JourneyModificationTypeSchema = z.enum(['ADD_STEP', 'REMOVE_STEP', 'SWITCH_TEMPLATE'])
+export const JourneyModificationTypeSchema = z.enum([
+  'ADD_STEP',
+  'REMOVE_STEP',
+  'SWITCH_TEMPLATE',
+  'CANCEL',
+])
 export type JourneyModificationType = z.infer<typeof JourneyModificationTypeSchema>
 
 /**

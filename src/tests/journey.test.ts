@@ -559,3 +559,96 @@ describe('getMergedDueStepsForPatient', () => {
     expect(bothJourneys).toBeTruthy()
   })
 })
+
+// ─── cancelJourney ────────────────────────────────────────────────────────────
+
+describe('cancelJourney', () => {
+  it('deletes the journey entirely when no form responses or recurring completions exist', () => {
+    const before = service.getPatientJourneys().find((j) => j.id === 'pj-1')
+    expect(before).toBeDefined()
+
+    const result = service.cancelJourney('pj-1', 'Ångrad tilldelning', 'user-pal-1')
+    expect(result).toEqual({ deleted: true })
+
+    const after = service.getPatientJourneys().find((j) => j.id === 'pj-1')
+    expect(after).toBeUndefined()
+  })
+
+  it('marks the journey COMPLETED and appends a CANCEL modification when form responses exist', () => {
+    patchStore((s) => ({
+      ...s,
+      formResponses: [
+        ...s.formResponses,
+        {
+          id: 'fr-cancel-test',
+          patientId: 'p-1',
+          caseId: 'case-1',
+          templateId: 'qt-oss',
+          answers: {},
+          scores: {},
+          submittedAt: new Date().toISOString(),
+          patientJourneyId: 'pj-1',
+        },
+      ],
+    }))
+
+    const result = service.cancelJourney(
+      'pj-1',
+      'Patient avböjde fortsatt uppföljning',
+      'user-pal-1',
+    )
+    expect(result.deleted).toBe(false)
+    if (result.deleted) return
+
+    expect(result.journey.status).toBe('COMPLETED')
+    const mods = result.journey.modifications
+    const cancelMod = mods[mods.length - 1]
+    expect(cancelMod.type).toBe('CANCEL')
+    expect(cancelMod.reason).toBe('Patient avböjde fortsatt uppföljning')
+    expect(cancelMod.addedByUserId).toBe('user-pal-1')
+
+    // Journey still exists in store
+    const stored = service.getPatientJourneys().find((j) => j.id === 'pj-1')
+    expect(stored?.status).toBe('COMPLETED')
+  })
+
+  it('marks the journey COMPLETED when recurringCompletions are present', () => {
+    service.recordRecurringCompletion('pj-1', 'jte-std-1', 0, '2025-01-01')
+
+    const result = service.cancelJourney('pj-1', 'Steg redan genomförda', 'user-pal-1')
+    expect(result.deleted).toBe(false)
+    if (result.deleted) return
+    expect(result.journey.status).toBe('COMPLETED')
+  })
+
+  it('clears pausedAt when cancelling a suspended journey', () => {
+    service.pauseJourney('pj-1')
+
+    patchStore((s) => ({
+      ...s,
+      formResponses: [
+        ...s.formResponses,
+        {
+          id: 'fr-cancel-suspended',
+          patientId: 'p-1',
+          caseId: 'case-1',
+          templateId: 'qt-oss',
+          answers: {},
+          scores: {},
+          submittedAt: new Date().toISOString(),
+          patientJourneyId: 'pj-1',
+        },
+      ],
+    }))
+
+    const result = service.cancelJourney('pj-1', 'Avslutad under paus', 'user-pal-1')
+    expect(result.deleted).toBe(false)
+    if (result.deleted) return
+    expect(result.journey.pausedAt).toBeNull()
+    expect(result.journey.status).toBe('COMPLETED')
+  })
+
+  it('throws for an unknown journey id', () => {
+    expect(() => service.cancelJourney('nonexistent', 'reason', 'user-pal-1')).toThrow()
+  })
+})

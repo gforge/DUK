@@ -1,5 +1,5 @@
 import React from 'react'
-import { Box, Button, Divider, Paper, Stack, Typography } from '@mui/material'
+import { Button, Divider, Paper, Stack, Typography } from '@mui/material'
 import RestoreIcon from '@mui/icons-material/Restore'
 import PeopleIcon from '@mui/icons-material/People'
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome'
@@ -18,7 +18,7 @@ interface Props {
   onSeedAction: (action: ConfirmAction) => void
 }
 
-export default function SeedPanel({ loading, onSeedAction }: Props) {
+export default function SeedPanel({ loading, onSeedAction }: Readonly<Props>) {
   const { t } = useTranslation()
 
   return (
@@ -33,12 +33,13 @@ export default function SeedPanel({ loading, onSeedAction }: Props) {
       <Typography variant="caption" color="text.secondary" display="block" sx={{ mt: 2, mb: 0.5 }}>
         {t('demoTools.seedPresetsLabel')}
       </Typography>
-      <Stack direction="row" spacing={1} flexWrap="wrap" sx={{ mb: 2 }}>
+      <Stack direction="row" flexWrap="wrap" sx={{ mb: 2, rowGap: 1.5, columnGap: 1.5 }}>
         <Button
           variant="outlined"
           startIcon={<RestoreIcon />}
           onClick={() => onSeedAction('reseed-minimal')}
           disabled={loading}
+          sx={{ width: { xs: '100%', sm: 'auto' }, whiteSpace: 'normal', textTransform: 'none' }}
         >
           {t('demoTools.reseedMinimal')}
         </Button>
@@ -48,6 +49,7 @@ export default function SeedPanel({ loading, onSeedAction }: Props) {
           startIcon={<PeopleIcon />}
           onClick={() => onSeedAction('reseed-realistic')}
           disabled={loading}
+          sx={{ width: { xs: '100%', sm: 'auto' }, whiteSpace: 'normal', textTransform: 'none' }}
         >
           {t('demoTools.reseedRealistic')}
         </Button>
@@ -57,6 +59,7 @@ export default function SeedPanel({ loading, onSeedAction }: Props) {
           startIcon={<AutoAwesomeIcon />}
           onClick={() => onSeedAction('reseed-faker')}
           disabled={loading}
+          sx={{ width: { xs: '100%', sm: 'auto' }, whiteSpace: 'normal', textTransform: 'none' }}
         >
           {t('demoTools.reseedFaker')}
         </Button>
@@ -72,6 +75,7 @@ export default function SeedPanel({ loading, onSeedAction }: Props) {
         color="error"
         onClick={() => onSeedAction('reset')}
         disabled={loading}
+        sx={{ mt: 2 }}
       >
         {t('demoTools.reset')}
       </Button>
