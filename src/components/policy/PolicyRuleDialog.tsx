@@ -26,7 +26,10 @@ const SEVERITIES = ['LOW', 'MEDIUM', 'HIGH'] as const
 export { SEVERITIES }
 
 /** General variables not tied to a specific journey template. */
-const GENERAL_VARS: { name: string; labelKey: string }[] = [
+const GENERAL_VARS: {
+  name: string
+  labelKey: 'policy.varNumResponses' | 'policy.varDaysSinceTherapy'
+}[] = [
   { name: 'numResponsesTotal', labelKey: 'policy.varNumResponses' },
   { name: 'daysSinceTherapy', labelKey: 'policy.varDaysSinceTherapy' },
 ]

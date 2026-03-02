@@ -143,7 +143,7 @@ export default function TriageForm({ caseData, onSubmit }: Props) {
           {t('triage.selectedAction')}:
         </Typography>
         <Chip
-          label={t(`triage.actionLabel.${selectedAction}`)}
+          label={t(`triage.actionLabel.${selectedAction!}`)}
           size="small"
           color={isClose ? 'default' : 'primary'}
         />

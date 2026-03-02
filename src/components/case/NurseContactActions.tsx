@@ -26,7 +26,9 @@ export default function NurseContactActions({ caseData, onRefetch }: Props) {
 
   const isClinician = isRole('NURSE', 'DOCTOR', 'PAL')
   // Pick the first matching trigger to drive the suggestion text
-  const primaryTrigger = caseData.triggers.find((tr) => CONTACT_TRIGGERS.has(tr))
+  const primaryTrigger = caseData.triggers.find((tr): tr is 'SEEK_CONTACT' | 'NOT_OPENED' =>
+    CONTACT_TRIGGERS.has(tr),
+  )
 
   if (!isClinician || !primaryTrigger || caseData.status === 'CLOSED') return null
 

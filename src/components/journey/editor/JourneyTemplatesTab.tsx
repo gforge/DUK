@@ -44,9 +44,11 @@ import type { JourneyTemplate, JourneyTemplateEntry } from '../../../api/schemas
 import type { EntryDiff } from '../../../api/service/journeyTemplates'
 import EntryEditorDialog from './EntryEditorDialog'
 
+type SimpleTFn = (key: string, opts?: Record<string, unknown>) => string
+
 function formatOffsetDays(
   days: number,
-  t: (key: string, opts?: Record<string, unknown>) => string,
+  t: SimpleTFn,
 ): {
   label: string
   tooltip: string
@@ -287,7 +289,10 @@ export default function JourneyTemplatesTab({
                           </TableCell>
                           <TableCell sx={{ whiteSpace: 'nowrap' }}>
                             {(() => {
-                              const { label, tooltip } = formatOffsetDays(entry.offsetDays, t)
+                              const { label, tooltip } = formatOffsetDays(
+                                entry.offsetDays,
+                                t as unknown as SimpleTFn,
+                              )
                               return (
                                 <Tooltip title={tooltip} disableHoverListener={!tooltip}>
                                   <span>

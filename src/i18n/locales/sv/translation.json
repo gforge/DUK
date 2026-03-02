@@ -48,11 +48,11 @@
   },
   "category": {
     "ACUTE": "Akut",
-    "ACUTE_desc": "0–2 veckor",
+    "ACUTE_desc": "Kräver snabb klinisk bedömning (0-2 veckors kontroller)",
     "CONTROL": "Kontroll",
-    "CONTROL_desc": "9v+",
+    "CONTROL_desc": "Rutinkontroll, ingen aktiv oro ",
     "SUBACUTE": "Subakut",
-    "SUBACUTE_desc": "3–8 veckor"
+    "SUBACUTE_desc": "Planerad uppföljning inom dagar till veckor"
   },
   "common": {
     "back": "Tillbaka",
@@ -270,7 +270,10 @@
       "windowDaysSuggest": "Förslag: {{n}} dagar"
     },
     "journeyStatus": {
-      "label": "Status"
+      "ACTIVE": "Aktiv",
+      "COMPLETED": "Avslutad",
+      "label": "Status",
+      "SUSPENDED": "Pausad"
     },
     "label": "Etikett",
     "modificationHistory": "Justeringshistorik",
@@ -300,6 +303,12 @@
       "switchTemplate": "Byt mall",
       "title": "Justera patientresa",
       "windowDays": "Fönster (±dagar)"
+    },
+    "modType": {
+      "ADD_STEP": "Steg tillagt",
+      "CANCEL": "Avbruten",
+      "REMOVE_STEP": "Steg borttaget",
+      "SWITCH_TEMPLATE": "Mall bytt"
     },
     "noActiveJourney": "Ingen aktiv patientresa tilldelad.",
     "noSteps": "Inga steg definierade.",
@@ -398,6 +407,11 @@
     "scoreAliases": "Poängalias",
     "scoreAliasesHint": "Mappar råa poängnycklar till semantiska namn för policyuttryck",
     "startDate": "Startdatum",
+    "status": {
+      "OVERDUE": "Försenad",
+      "SUBMITTED": "Skickat",
+      "UPCOMING": "Kommande"
+    },
     "step": "Steg",
     "steps": "steg",
     "study": "Studie",
@@ -453,8 +467,8 @@
     "reminded": "Påminnelse skickad",
     "remindedDone": "Påminnelse loggad i händelselogg",
     "suggestion": {
-      "SEEK_CONTACT": "Patienten önskar bli kontaktad. Kontakta patienten eller skicka en påminnelse.",
-      "NOT_OPENED": "Patienten har inte öppnat formuläret. Kontakta patienten eller skicka en påminnelse."
+      "NOT_OPENED": "Patienten har inte öppnat formuläret. Kontakta patienten eller skicka en påminnelse.",
+      "SEEK_CONTACT": "Patienten önskar bli kontaktad. Kontakta patienten eller skicka en påminnelse."
     }
   },
   "patient": {
@@ -590,10 +604,15 @@
     "severity": "Allvarlighetsgrad",
     "syntaxCombineTitle": "Kombinera villkor",
     "syntaxDescription": "Varje regel utvärderas automatiskt när ett patientformulär skickas in. Klicka på ett mätvärde nedan för att infoga det i uttrycket.",
+    "syntaxExample1": "PNRS_week4 > 7 — Smärtpoäng vid vecka 4 är hög",
+    "syntaxExample2": "OSS_week4 < OSS_baseline — Funktion sämre än vid baseline",
+    "syntaxExample3": "trigger.HIGH_PAIN == true — Hög smärtflagga utlöst",
     "syntaxExamplesTitle": "Exempel",
     "syntaxTitle": "Hur skriver man ett policyuttryck?",
     "title": "Triagepolicyer",
-    "toggleEnabled": "Aktivera/inaktivera regel"
+    "toggleEnabled": "Aktivera/inaktivera regel",
+    "varDaysSinceTherapy": "Dagar sedan terapi",
+    "varNumResponses": "Totalt antal svar"
   },
   "questionnaire": {
     "eq_anxiety": "Oro/nedstämdhet",
@@ -616,6 +635,13 @@
     "pain_now": "Smärta just nu (0–10)",
     "wound_discharge": "Sekret från såret?",
     "wound_healed": "Är såret läkt?"
+  },
+  "questionType": {
+    "BOOLEAN": "Ja/Nej",
+    "NUMBER": "Siffra",
+    "SCALE": "Skala",
+    "SELECT": "Flerval",
+    "TEXT": "Fritext"
   },
   "role": {
     "currentRole": "Aktiv roll",

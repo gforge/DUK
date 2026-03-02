@@ -48,11 +48,11 @@
   },
   "category": {
     "ACUTE": "Acute",
-    "ACUTE_desc": "0–2 weeks",
+    "ACUTE_desc": "Requires prompt clinical assessment",
     "CONTROL": "Control",
-    "CONTROL_desc": "9w+",
+    "CONTROL_desc": "Routine monitoring, no active concern",
     "SUBACUTE": "Subacute",
-    "SUBACUTE_desc": "3–8 weeks"
+    "SUBACUTE_desc": "Scheduled follow-up within days to weeks"
   },
   "common": {
     "back": "Back",
@@ -270,7 +270,10 @@
       "windowDaysSuggest": "Suggested: {{n}} days"
     },
     "journeyStatus": {
-      "label": "Status"
+      "ACTIVE": "Active",
+      "COMPLETED": "Completed",
+      "label": "Status",
+      "SUSPENDED": "Paused"
     },
     "label": "Label",
     "modificationHistory": "Modification History",
@@ -300,6 +303,12 @@
       "switchTemplate": "Switch Template",
       "title": "Modify Journey",
       "windowDays": "Window (±days)"
+    },
+    "modType": {
+      "ADD_STEP": "Step added",
+      "CANCEL": "Cancelled",
+      "REMOVE_STEP": "Step removed",
+      "SWITCH_TEMPLATE": "Template switched"
     },
     "noActiveJourney": "No active journey assigned to this patient.",
     "noSteps": "No steps defined.",
@@ -398,6 +407,11 @@
     "scoreAliases": "Score aliases",
     "scoreAliasesHint": "Maps raw score keys to semantic names used in policy expressions across journeys",
     "startDate": "Start date",
+    "status": {
+      "OVERDUE": "Overdue",
+      "SUBMITTED": "Submitted",
+      "UPCOMING": "Upcoming"
+    },
     "step": "Step",
     "steps": "steps",
     "study": "Study",
@@ -453,8 +467,8 @@
     "reminded": "Reminder sent",
     "remindedDone": "Reminder event logged",
     "suggestion": {
-      "SEEK_CONTACT": "The patient is requesting contact. Please reach out or send a reminder.",
-      "NOT_OPENED": "The patient has not opened the form. Consider contacting them or sending a reminder."
+      "NOT_OPENED": "The patient has not opened the form. Consider contacting them or sending a reminder.",
+      "SEEK_CONTACT": "The patient is requesting contact. Please reach out or send a reminder."
     }
   },
   "patient": {
@@ -590,10 +604,15 @@
     "severity": "Severity",
     "syntaxCombineTitle": "Combine conditions",
     "syntaxDescription": "Each rule is evaluated automatically when a patient submits a form. Click a measurement below to insert it into the expression.",
+    "syntaxExample1": "PNRS_week4 > 7 — Pain score at week 4 is high",
+    "syntaxExample2": "OSS_week4 < OSS_baseline — Function worse than at baseline",
+    "syntaxExample3": "trigger.HIGH_PAIN == true — High pain flag was triggered",
     "syntaxExamplesTitle": "Examples",
     "syntaxTitle": "How do I write a policy expression?",
     "title": "Triage Policies",
-    "toggleEnabled": "Enable/disable rule"
+    "toggleEnabled": "Enable/disable rule",
+    "varDaysSinceTherapy": "Days since therapy",
+    "varNumResponses": "Total responses"
   },
   "questionnaire": {
     "eq_anxiety": "Anxiety/Depression",
@@ -616,6 +635,13 @@
     "pain_now": "Pain right now (0–10)",
     "wound_discharge": "Discharge from wound?",
     "wound_healed": "Is the wound healed?"
+  },
+  "questionType": {
+    "BOOLEAN": "Yes / No",
+    "NUMBER": "Number",
+    "SCALE": "Scale",
+    "SELECT": "Multiple choice",
+    "TEXT": "Free text"
   },
   "role": {
     "currentRole": "Current Role",
