@@ -9,6 +9,7 @@ export function createReview(
   userRole: Role,
   source: 'JOURNEY' | 'MANUAL' = 'MANUAL',
   initialNote?: string,
+  journeyStepLabel?: string,
 ): ClinicalReview {
   const review: ClinicalReview = {
     id: uuid(),
@@ -21,6 +22,7 @@ export function createReview(
     reviewedByRole: undefined,
     note: initialNote ?? null,
     source,
+    journeyStepLabel,
   }
 
   return patchStore((state) => {

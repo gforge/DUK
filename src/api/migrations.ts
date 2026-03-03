@@ -205,6 +205,15 @@ const MIGRATIONS: Migration[] = [
       // `outcome` is optional on ClinicalReviewSchema — no backfill needed.
     }),
   },
+  {
+    from: 8,
+    to: 9,
+    up: (s) => ({
+      ...s,
+      schemaVersion: 9,
+      // `journeyStepLabel` is optional on ClinicalReviewSchema — no backfill needed.
+    }),
+  },
 ]
 
 // ---------------------------------------------------------------------------

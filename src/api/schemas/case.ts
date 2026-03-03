@@ -30,6 +30,8 @@ export const ClinicalReviewSchema = z.object({
   outcome: ReviewOutcomeSchema.optional(),
   note: z.string().nullable().default(null),
   source: z.enum(['JOURNEY', 'MANUAL']).default('MANUAL'),
+  /** Label of the journey step this review was ordered for (e.g. '2 veckor', '6 månader'). */
+  journeyStepLabel: z.string().optional(),
 })
 export type ClinicalReview = z.infer<typeof ClinicalReviewSchema>
 

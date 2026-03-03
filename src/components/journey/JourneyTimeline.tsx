@@ -68,6 +68,7 @@ interface JourneyTimelineProps {
     stepId: string,
     reviewType: string,
     description?: string,
+    stepLabel?: string,
   ) => Promise<string>
   /** When provided filled chips can be clicked to cancel/remove the review. */
   readonly onRemoveReview?: (reviewId: string) => Promise<void>
@@ -85,6 +86,7 @@ export default function JourneyTimeline({
   const [expandedInstructions, setExpandedInstructions] = useState<Set<string>>(new Set())
   const [reviewDialog, setReviewDialog] = useState<{
     stepId: string
+    stepLabel: string
     reviewType: ReviewTypeKey
   } | null>(null)
   const [description, setDescription] = useState('')
@@ -103,9 +105,9 @@ export default function JourneyTimeline({
     })
   }
 
-  const openDialog = (stepId: string, reviewType: ReviewTypeKey) => {
+  const openDialog = (stepId: string, reviewType: ReviewTypeKey, stepLabel: string) => {
     setDescription('')
-    setReviewDialog({ stepId, reviewType })
+    setReviewDialog({ stepId, stepLabel, reviewType })
   }
 
   const closeDialog = () => {
@@ -121,6 +123,7 @@ export default function JourneyTimeline({
         reviewDialog.stepId,
         reviewDialog.reviewType,
         description || undefined,
+        reviewDialog.stepLabel,
       )
       const key = `${reviewDialog.stepId}:${reviewDialog.reviewType}`
       setAddedReviews((prev) => {
@@ -290,7 +293,7 @@ export default function JourneyTimeline({
                         canRemove && addedEntry
                           ? () => void handleRemoveChip(key, addedEntry.reviewId)
                           : canAdd
-                            ? () => openDialog(step.id, reviewType)
+                            ? () => openDialog(step.id, reviewType, step.label)
                             : undefined
                       return (
                         <Tooltip key={reviewType} title={tooltipTitle}>

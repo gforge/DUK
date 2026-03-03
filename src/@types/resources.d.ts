@@ -668,7 +668,8 @@ interface Resources {
       "remove": "Ta bort beställning",
       "reviewedAt": "Granskat",
       "reviewedBy": "Granskat av",
-      "type": "Typ"
+      "type": "Typ",
+      "visit": "Besök"
     },
     "reviewOutcome": {
       "OK": "OK",

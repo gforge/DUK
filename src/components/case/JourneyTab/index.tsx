@@ -85,6 +85,7 @@ export default function JourneyTab({ caseData }: JourneyTabProps) {
     stepId: string,
     reviewType: string,
     description?: string,
+    stepLabel?: string,
   ): Promise<string> => {
     const review = await client.createReview(
       caseData.id,
@@ -93,6 +94,7 @@ export default function JourneyTab({ caseData }: JourneyTabProps) {
       currentUser.role,
       'JOURNEY',
       description,
+      stepLabel,
     )
     return review.id
   }

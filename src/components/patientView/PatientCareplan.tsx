@@ -115,6 +115,7 @@ export default function PatientCareplan({
     stepId: string,
     reviewType: string,
     description?: string,
+    stepLabel?: string,
   ): Promise<string> => {
     if (!currentCase) return ''
     const review = await client.createReview(
@@ -124,6 +125,7 @@ export default function PatientCareplan({
       currentUser.role,
       'JOURNEY',
       description,
+      stepLabel,
     )
     return review.id
   }

@@ -9,8 +9,11 @@ export const createReview = (
   userRole: Role,
   source?: 'JOURNEY' | 'MANUAL',
   initialNote?: string,
+  journeyStepLabel?: string,
 ): Promise<ClinicalReview> =>
-  withDelay(() => service.createReview(caseId, type, userId, userRole, source, initialNote))
+  withDelay(() =>
+    service.createReview(caseId, type, userId, userRole, source, initialNote, journeyStepLabel),
+  )
 
 export const completeReview = (
   reviewId: string,

@@ -666,7 +666,8 @@
     "remove": "Cancel order",
     "reviewedAt": "Reviewed",
     "reviewedBy": "Reviewed by",
-    "type": "Type"
+    "type": "Type",
+    "visit": "Visit"
   },
   "reviewOutcome": {
     "OK": "OK",

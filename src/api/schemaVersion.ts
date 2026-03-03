@@ -4,4 +4,4 @@
  * Bump this integer whenever a migration entry is added to `src/api/migrations.ts`.
  * The seeds and every newly-written state object must carry this version.
  */
-export const CURRENT_SCHEMA_VERSION = 8
+export const CURRENT_SCHEMA_VERSION = 9

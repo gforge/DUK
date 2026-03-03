@@ -213,6 +213,15 @@ export default function ClinicalReviewPanel({ caseData, onRefetch }: Props) {
                         variant="outlined"
                         sx={{ mb: 0.5 }}
                       />
+                      {review.journeyStepLabel && (
+                        <Typography
+                          variant="caption"
+                          color="text.secondary"
+                          sx={{ display: 'block', mb: 0.25 }}
+                        >
+                          {t('review.visit')}: <strong>{review.journeyStepLabel}</strong>
+                        </Typography>
+                      )}
                       <Stack direction="row" alignItems="center" gap={0.5}>
                         <RoleIcon role={review.createdByRole} sx={{ fontSize: 16 }} />
                         <Typography variant="caption" color="text.secondary">
@@ -275,6 +284,7 @@ export default function ClinicalReviewPanel({ caseData, onRefetch }: Props) {
               <TableHead>
                 <TableRow>
                   <TableCell>{t('review.type')}</TableCell>
+                  <TableCell>{t('review.visit')}</TableCell>
                   <TableCell>{t('review.outcome')}</TableCell>
                   <TableCell>{t('review.reviewedBy')}</TableCell>
                   <TableCell>{t('review.reviewedAt')}</TableCell>
@@ -289,6 +299,9 @@ export default function ClinicalReviewPanel({ caseData, onRefetch }: Props) {
                         <CheckCircleIcon fontSize="small" color="success" />
                         <Chip label={t(`reviewType.${review.type}`)} size="small" />
                       </Stack>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="body2">{review.journeyStepLabel ?? '-'}</Typography>
                     </TableCell>
                     <TableCell>
                       {review.outcome ? (
