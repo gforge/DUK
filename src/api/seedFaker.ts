@@ -13,6 +13,7 @@ import {
   isoTsOffset as isoTs,
 } from './seed/seedHelpers'
 import type { Cohort } from './seed/seedHelpers'
+import { ensureAllUsers } from './utils/userGenerator'
 
 // Placement cohorts — same shape as seedRealistic, scaled up
 
@@ -110,6 +111,7 @@ export async function buildFakerSeed(): Promise<AppState> {
         createdAt,
         scheduledAt: createdAt,
         lastActivityAt: isoTs(-faker.number.int({ min: 0, max: 5 })),
+        reviews: [],
       })
 
       journeys.push({
@@ -139,7 +141,7 @@ export async function buildFakerSeed(): Promise<AppState> {
     }
   }
 
-  return {
+  const baseState = {
     ...SEED_STATE,
     patients,
     cases,
@@ -147,5 +149,10 @@ export async function buildFakerSeed(): Promise<AppState> {
     journalDrafts: [],
     patientJourneys: journeys,
     auditEvents,
+  }
+
+  return {
+    ...baseState,
+    users: ensureAllUsers(baseState),
   }
 }

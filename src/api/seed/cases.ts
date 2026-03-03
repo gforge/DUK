@@ -25,6 +25,7 @@ export const cases: Case[] = [
     lastActivityAt: iso(daysAgo(1)),
     createdAt: iso(daysAgo(2)),
     formSeriesId: 'fs-1',
+    reviews: [],
   },
   {
     id: 'case-2',
@@ -54,6 +55,7 @@ export const cases: Case[] = [
     lastActivityAt: iso(daysAgo(1)),
     createdAt: iso(daysAgo(3)),
     formSeriesId: 'fs-1',
+    reviews: [],
   },
   {
     id: 'case-7',
@@ -67,6 +69,7 @@ export const cases: Case[] = [
     lastActivityAt: iso(daysAgo(1)),
     createdAt: iso(daysAgo(1)),
     formSeriesId: 'fs-1',
+    reviews: [],
   },
   // ── SUBACUTE ───────────────────────────────────────────────────────────────
   {
@@ -87,6 +90,7 @@ export const cases: Case[] = [
     lastActivityAt: iso(daysAgo(2)),
     createdAt: iso(daysAgo(21)),
     formSeriesId: 'fs-2',
+    reviews: [],
   },
   {
     id: 'case-4',
@@ -100,6 +104,7 @@ export const cases: Case[] = [
     lastActivityAt: iso(daysAgo(5)),
     createdAt: iso(daysAgo(25)),
     formSeriesId: 'fs-2',
+    reviews: [],
   },
   {
     id: 'case-8',
@@ -127,6 +132,7 @@ export const cases: Case[] = [
     lastActivityAt: iso(daysAgo(1)),
     createdAt: iso(daysAgo(18)),
     formSeriesId: 'fs-2',
+    reviews: [],
   },
   // ── CONTROL ────────────────────────────────────────────────────────────────
   {
@@ -156,6 +162,7 @@ export const cases: Case[] = [
     lastActivityAt: iso(daysAgo(3)),
     createdAt: iso(daysAgo(63)),
     formSeriesId: 'fs-3',
+    reviews: [],
   },
   {
     id: 'case-6',
@@ -174,6 +181,7 @@ export const cases: Case[] = [
     lastActivityAt: iso(daysAgo(7)),
     createdAt: iso(daysAgo(90)),
     formSeriesId: 'fs-3',
+    reviews: [],
   },
   {
     id: 'case-9',
@@ -187,6 +195,7 @@ export const cases: Case[] = [
     lastActivityAt: iso(daysAgo(5)),
     createdAt: iso(daysAgo(70)),
     formSeriesId: 'fs-3',
+    reviews: [],
   },
   {
     id: 'case-10',
@@ -205,6 +214,7 @@ export const cases: Case[] = [
     lastActivityAt: iso(daysAgo(2)),
     createdAt: iso(daysAgo(100)),
     formSeriesId: 'fs-3',
+    reviews: [],
   },
   // ── Proximal humerus cases ─────────────────────────────────────────────
   {
@@ -220,6 +230,7 @@ export const cases: Case[] = [
     lastActivityAt: iso(daysAgo(1)),
     createdAt: iso(daysAgo(2)),
     formSeriesId: 'fs-1',
+    reviews: [],
   },
   {
     id: 'case-12',
@@ -250,6 +261,7 @@ export const cases: Case[] = [
     lastActivityAt: iso(daysAgo(2)),
     createdAt: iso(daysAgo(35)),
     formSeriesId: 'fs-2',
+    reviews: [],
   },
   // ── Distal radius cases ───────────────────────────────────────────────
   {
@@ -257,7 +269,7 @@ export const cases: Case[] = [
     patientId: 'p-13',
     category: 'ACUTE',
     status: 'NEEDS_REVIEW',
-    triggers: ['HIGH_PAIN', 'ABNORMAL_ANSWER'],
+    triggers: ['HIGH_PAIN', 'ABNORMAL_ANSWER', 'XRAY_PENDING'],
     policyWarnings: [
       {
         ruleId: 'rule-dr-1',
@@ -274,13 +286,27 @@ export const cases: Case[] = [
     lastActivityAt: iso(daysAgo(1)),
     createdAt: iso(daysAgo(14)),
     formSeriesId: 'fs-1',
+    reviews: [
+      {
+        id: 'rev-dr-1',
+        type: 'XRAY',
+        createdAt: iso(daysAgo(5)),
+        createdByUserId: 'user-nurse-1',
+        createdByRole: 'NURSE',
+        reviewedAt: null,
+        reviewedByUserId: undefined,
+        reviewedByRole: undefined,
+        note: null,
+        source: 'JOURNEY',
+      },
+    ],
   },
   {
     id: 'case-14',
     patientId: 'p-14',
     category: 'SUBACUTE',
     status: 'NEEDS_REVIEW',
-    triggers: ['LOW_FUNCTION', 'HIGH_PAIN'],
+    triggers: ['LOW_FUNCTION', 'HIGH_PAIN', 'LAB_PENDING'],
     policyWarnings: [
       {
         ruleId: 'rule-dr-2',
@@ -303,5 +329,19 @@ export const cases: Case[] = [
     lastActivityAt: iso(daysAgo(3)),
     createdAt: iso(daysAgo(52)),
     formSeriesId: 'fs-2',
+    reviews: [
+      {
+        id: 'rev-dr-2',
+        type: 'LAB',
+        createdAt: iso(daysAgo(7)),
+        createdByUserId: 'user-nurse-1',
+        createdByRole: 'NURSE',
+        reviewedAt: null,
+        reviewedByUserId: undefined,
+        reviewedByRole: undefined,
+        note: 'Väntar på blodprover för inflammation-markörer',
+        source: 'MANUAL',
+      },
+    ],
   },
 ]

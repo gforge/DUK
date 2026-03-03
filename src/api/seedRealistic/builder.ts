@@ -9,6 +9,30 @@ import {
 import { makePrng } from './prng'
 import { FIRST_NAMES, LAST_NAMES, personalNumber } from './namePools'
 import { COHORTS } from './cohorts'
+import { ensureAllUsers } from '../utils/userGenerator'
+
+function generateReviews(rng: ReturnType<typeof makePrng>, caseId: string, createdAt: string) {
+  const reviews = []
+  const reviewProb = 0.15 // ~15% of cases have pending reviews
+
+  if (rng.bool(reviewProb)) {
+    const type: 'LAB' | 'XRAY' = rng.bool(0.5) ? 'LAB' : 'XRAY'
+    reviews.push({
+      id: `${caseId}-rev-${rng.int(0, 9999)}`,
+      type,
+      createdAt,
+      createdByUserId: '???',
+      createdByRole: 'NURSE' as const,
+      source: 'MANUAL' as const,
+      reviewedAt: null,
+      reviewedByUserId: undefined,
+      reviewedByRole: undefined,
+      note: null,
+    })
+  }
+
+  return reviews
+}
 
 export function buildRealisticSeed(): AppState {
   const rng = makePrng(0xdeadbeef)
@@ -33,21 +57,35 @@ export function buildRealisticSeed(): AppState {
 
       const palId = PAL_IDS[idx % PAL_IDS.length]
       const hasTriggers = rng.bool(cohort.triggerProb)
-      const triggers = hasTriggers ? [TRIGGERS[rng.int(0, TRIGGERS.length - 1)]] : []
+      const baseTriggers = hasTriggers ? [TRIGGERS[rng.int(0, TRIGGERS.length - 1)]] : []
       const isComplex = rng.bool(cohort.complexProb)
       const journeyTemplateId = isComplex ? 'jt-complex' : 'jt-standard'
 
-      const status =
-        triggers.length > 0
-          ? 'NEEDS_REVIEW'
-          : rng.bool(0.3)
-            ? 'TRIAGED'
-            : rng.bool(0.5)
-              ? 'FOLLOWING_UP'
-              : 'NEW'
-
       const startDate = isoDate(-cohort.startDaysAgo)
       const createdAt = isoTs(-cohort.startDaysAgo)
+
+      // Generate reviews for this case
+      const reviews = generateReviews(rng, caseId, createdAt)
+
+      // Add review triggers if there are pending reviews
+      const triggers = [...baseTriggers]
+      if (reviews.length > 0) {
+        const pendingReviews = reviews.filter((r) => r.reviewedAt === null)
+        const reviewTypes = new Set(pendingReviews.map((r) => r.type))
+        if (reviewTypes.has('LAB')) triggers.push('LAB_PENDING' as any)
+        if (reviewTypes.has('XRAY')) triggers.push('XRAY_PENDING' as any)
+      }
+
+      let status: Case['status']
+      if (triggers.length > 0) {
+        status = 'NEEDS_REVIEW'
+      } else if (rng.bool(0.3)) {
+        status = 'TRIAGED'
+      } else if (rng.bool(0.5)) {
+        status = 'FOLLOWING_UP'
+      } else {
+        status = 'NEW'
+      }
 
       patients.push({
         id: pid,
@@ -63,13 +101,14 @@ export function buildRealisticSeed(): AppState {
         id: caseId,
         patientId: pid,
         category: 'CONTROL',
-        status: status as Case['status'],
+        status,
         triggers: triggers as Case['triggers'],
         policyWarnings: [],
         createdByUserId: palId,
         createdAt,
         scheduledAt: createdAt,
         lastActivityAt: isoTs(-rng.int(0, 3)),
+        reviews,
       })
 
       journeys.push({
@@ -99,7 +138,7 @@ export function buildRealisticSeed(): AppState {
     }
   }
 
-  return {
+  const baseState = {
     ...SEED_STATE,
     patients,
     cases,
@@ -107,5 +146,10 @@ export function buildRealisticSeed(): AppState {
     journalDrafts: [],
     patientJourneys: journeys,
     auditEvents,
+  }
+
+  return {
+    ...baseState,
+    users: ensureAllUsers(baseState),
   }
 }

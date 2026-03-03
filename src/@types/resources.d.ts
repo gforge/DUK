@@ -71,6 +71,7 @@ interface Resources {
       "no": "Nej",
       "notSet": "Ej satt",
       "openNavigationMenu": "Öppna navigeringsmeny",
+      "optional": "valfritt",
       "patientFilter": "Patientfilter",
       "print": "Skriv ut",
       "rowsPerPage": "Rader per sida",
@@ -500,6 +501,7 @@ interface Resources {
       "noCases": "Inga aktiva uppföljningar",
       "noMessage": "Inget meddelande",
       "openApp": "Öppna appen",
+      "pendingReviews": "Väntande svar på prov och röntgen",
       "personalNumber": "Personnummer",
       "readAndConsent": "Läs och ge samtycke",
       "researchStudies": "Forskningsstudier",
@@ -508,6 +510,7 @@ interface Resources {
       "seekContactTitle": "Söka kontakt",
       "title": "Patientvy",
       "triggers": "Triggers",
+      "viewDetails": "Se detaljer",
       "viewTemporaryWarning": "Patientvyn är tillfällig och ska inte användas i produktion."
     },
     "patientDetail": {
@@ -645,6 +648,36 @@ interface Resources {
       "wound_discharge": "Sekret från såret?",
       "wound_healed": "Är såret läkt?"
     },
+    "review": {
+      "addReview": "Lägg till granskning",
+      "comment": "Kommentar",
+      "commentPlaceholder": "Notering från granskningen",
+      "commentRequired": "Kommentar krävs för detta utfall",
+      "completed": "Granskade",
+      "created": "Granskning skapad",
+      "createdAt": "Granskning skapad {{date}}",
+      "deleted": "Granskning borttagen",
+      "markReviewed": "Markera granskat",
+      "note": "Notering",
+      "outcome": "Utfall",
+      "pending": "Väntar på granskning",
+      "reviewedAt": "Granskat",
+      "reviewedBy": "Granskat av",
+      "type": "Typ"
+    },
+    "reviewOutcome": {
+      "OK": "OK",
+      "PROBLEM": "Problem",
+      "UNCERTAIN": "Osäker"
+    },
+    "reviewType": {
+      "LAB": "Provsvar",
+      "LAB_one": "__NOT_TRANSLATED__",
+      "LAB_other": "__NOT_TRANSLATED__",
+      "XRAY": "Röntgen",
+      "XRAY_one": "__NOT_TRANSLATED__",
+      "XRAY_other": "__NOT_TRANSLATED__"
+    },
     "role": {
       "DOCTOR": "Läkare",
       "NURSE": "Sjuksköterska",
@@ -741,11 +774,13 @@ interface Resources {
       "ABNORMAL_ANSWER": "Avvikande svar",
       "HIGH_PAIN": "Hög smärta",
       "INFECTION_SUSPECTED": "Infektionsmisstanke",
+      "LAB_PENDING": "Provsvar väntar",
       "LOW_FUNCTION": "Låg funktion",
       "LOW_QOL": "Låg livskvalitet",
       "NOT_OPENED": "Ej öppnat appen",
       "NO_RESPONSE": "Ej svarat",
-      "SEEK_CONTACT": "Söker kontakt"
+      "SEEK_CONTACT": "Söker kontakt",
+      "XRAY_PENDING": "Röntgen väntar"
     },
     "worklist": {
       "book": "Boka",

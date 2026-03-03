@@ -18,8 +18,16 @@ export const TriggerTypeSchema = z.enum([
   'LOW_QOL',
   'SEEK_CONTACT',
   'ABNORMAL_ANSWER',
+  'LAB_PENDING',
+  'XRAY_PENDING',
 ])
 export type TriggerType = z.infer<typeof TriggerTypeSchema>
+
+export const ReviewTypeSchema = z.enum(['LAB', 'XRAY'])
+export type ReviewType = z.infer<typeof ReviewTypeSchema>
+
+export const ReviewOutcomeSchema = z.enum(['OK', 'UNCERTAIN', 'PROBLEM'])
+export type ReviewOutcome = z.infer<typeof ReviewOutcomeSchema>
 
 export const NextStepSchema = z.enum([
   'DIGITAL_CONTROL',

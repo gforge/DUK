@@ -72,7 +72,7 @@ export default function CaseDetail() {
     if (!didAutoSelectTab.current && caseData) {
       didAutoSelectTab.current = true
       if (['NEW', 'NEEDS_REVIEW'].includes(caseData.status)) {
-        setActiveTab(2)
+        setActiveTab(2) // eslint-disable-line react-hooks/set-state-in-effect
       }
     }
   }, [caseData])
@@ -150,12 +150,7 @@ export default function CaseDetail() {
       </Stack>
 
       {/* Patient card */}
-      {patient && (
-        <PatientCard
-          patient={patient}
-          caseData={caseData}
-        />
-      )}
+      {patient && <PatientCard patient={patient} caseData={caseData} />}
 
       {/* Nurse contact action panel — shown when SEEK_CONTACT / NOT_OPENED triggers are active */}
       <NurseContactActions caseData={caseData} onRefetch={refetchCase} />

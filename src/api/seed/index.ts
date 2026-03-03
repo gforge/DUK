@@ -13,8 +13,9 @@ import { journeyTemplates } from './journeyTemplates'
 import { researchModules } from './researchModules'
 import { patientJourneys } from './patientJourneys'
 import { instructionTemplates } from './instructionTemplates'
+import { ensureAllUsers } from '../utils/userGenerator'
 
-export const SEED_STATE: AppState = {
+const baseSeedState: AppState = {
   schemaVersion: CURRENT_SCHEMA_VERSION,
   users,
   patients,
@@ -31,4 +32,9 @@ export const SEED_STATE: AppState = {
   patientJourneys,
   instructionTemplates,
   researchConsents: [],
+}
+
+export const SEED_STATE: AppState = {
+  ...baseSeedState,
+  users: ensureAllUsers(baseSeedState),
 }

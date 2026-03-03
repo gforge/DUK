@@ -7,6 +7,7 @@ import { useApi } from '../../hooks/useApi'
 import * as client from '../../api/client'
 import JourneyTimeline from '../journey/JourneyTimeline'
 import { ConsentDialog, RevokeConsentDialog, DeclineConsentDialog } from '../journey/ConsentDialog'
+import PatientClinicalReviews from './PatientClinicalReviews'
 import { useRole } from '../../store/roleContext'
 import type { PatientJourney, JourneyTemplate, ResearchModule, Consent } from '../../api/schemas'
 
@@ -68,6 +69,18 @@ export default function PatientCareplan({
     mode: 'decline' | 'withdraw'
   } | null>(null)
 
+  // Review creation from journey step
+  const [reviewCreationTarget, setReviewCreationTarget] = useState<{
+    stepId: string
+    reviewType: string
+  } | null>(null)
+  const [addingReview, setAddingReview] = useState(false)
+
+  // Get currentCase from selectedJourney's first associated case
+  const { data: cases } = useApi(() => client.getCasesByPatient(patientId), [patientId])
+  const currentCase =
+    cases?.find((c) => c.status === 'NEW' || c.status === 'NEEDS_REVIEW') ?? cases?.[0]
+
   const journeyName = selectedJourney
     ? journeyTemplates?.find((jt) => jt.id === selectedJourney.journeyTemplateId)?.name
     : undefined
@@ -101,6 +114,26 @@ export default function PatientCareplan({
       setDismissedAutoOpenJourneyId(selectedJourney.id)
     }
     setManualConsentTarget(null)
+  }
+
+  const handleAddReview = async (stepId: string, reviewType: string) => {
+    if (!currentCase) return
+    setReviewCreationTarget({ stepId, reviewType })
+    setAddingReview(true)
+    try {
+      await client.createReview(
+        currentCase.id,
+        reviewType as 'LAB' | 'XRAY',
+        currentUser.id,
+        currentUser.role,
+        'JOURNEY',
+      )
+      setReviewCreationTarget(null)
+    } catch (error) {
+      console.error('Error creating review:', error)
+    } finally {
+      setAddingReview(false)
+    }
   }
 
   return (
@@ -154,7 +187,13 @@ export default function PatientCareplan({
               steps={effectiveSteps ?? []}
               formResponses={[]}
               journeyName={sortedJourneys.length > 1 ? undefined : journeyName}
+              onAddReview={handleAddReview}
             />
+          </Box>
+
+          {/* Clinical reviews section */}
+          <Box sx={{ mt: 2 }}>
+            <PatientClinicalReviews patientId={patientId} />
           </Box>
 
           {/* Research studies section */}

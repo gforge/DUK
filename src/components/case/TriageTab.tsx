@@ -6,11 +6,12 @@ import { useRole } from '../../store/roleContext'
 import { useSnack } from '../../store/snackContext'
 import * as client from '../../api/client'
 import TriageForm from './triage/TriageForm'
+import ClinicalReviewPanel from './ClinicalReviewPanel'
 import type { TriageForm as TriageFormData } from './triage/TriageForm'
 
 interface TriageTabProps {
-  caseData: Case
-  onTriaged: () => void
+  readonly caseData: Case
+  readonly onTriaged: () => void
 }
 
 export default function TriageTab({ caseData, onTriaged }: TriageTabProps) {
@@ -70,7 +71,10 @@ export default function TriageTab({ caseData, onTriaged }: TriageTabProps) {
   return (
     <Box>
       {(caseData.status === 'NEW' || caseData.status === 'NEEDS_REVIEW') && (
-        <TriageForm caseData={caseData} onSubmit={onSubmit} />
+        <>
+          <ClinicalReviewPanel caseData={caseData} onRefetch={onTriaged} />
+          <TriageForm caseData={caseData} onSubmit={onSubmit} />
+        </>
       )}
 
       {caseData.status === 'TRIAGED' && (

@@ -13,6 +13,8 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import HourglassEmptyIcon from '@mui/icons-material/HourglassEmpty'
 import WarningAmberIcon from '@mui/icons-material/WarningAmber'
 import PhoneMissedIcon from '@mui/icons-material/PhoneMissed'
+import BiotechIcon from '@mui/icons-material/Biotech'
+import ImageIcon from '@mui/icons-material/Image'
 import { useTranslation } from 'react-i18next'
 import type { Case, CaseCategory, Patient } from '../../api/schemas'
 import type { SortMode } from './sortCases'
@@ -20,14 +22,14 @@ import CaseListItem from './CaseListItem'
 import { useRovingTabIndex } from '../../hooks/useRovingTabIndex'
 
 interface QueueColumnProps {
-  category: CaseCategory
-  cases: Case[]
-  waitingCases?: Case[]
-  patients: Map<string, Patient>
-  onRefresh: () => void
-  expanded: boolean
-  onToggle: () => void
-  sortMode: SortMode
+  readonly category: CaseCategory
+  readonly cases: Case[]
+  readonly waitingCases?: Case[]
+  readonly patients: Map<string, Patient>
+  readonly onRefresh: () => void
+  readonly expanded: boolean
+  readonly onToggle: () => void
+  readonly sortMode: SortMode
 }
 
 const CATEGORY_BORDER: Record<CaseCategory, string> = {
@@ -46,12 +48,15 @@ export default function QueueColumn({
   onToggle,
 }: QueueColumnProps) {
   const { t } = useTranslation()
+  const categoryLabel = t(`category.${category}`)
   const { getItemProps } = useRovingTabIndex(expanded ? cases.length + waitingCases.length : 0)
 
   const warningCount = cases.filter((c) => c.policyWarnings.length > 0).length
   const contactCount = cases.filter(
     (c) => c.triggers.includes('NO_RESPONSE') || c.triggers.includes('NOT_OPENED'),
   ).length
+  const labPendingCount = cases.filter((c) => c.triggers.includes('LAB_PENDING')).length
+  const xrayPendingCount = cases.filter((c) => c.triggers.includes('XRAY_PENDING')).length
 
   return (
     <Accordion
@@ -116,6 +121,28 @@ export default function QueueColumn({
               sx={{ fontSize: 11, height: 22 }}
             />
           )}
+          {labPendingCount > 0 && (
+            <Chip
+              icon={<BiotechIcon fontSize="inherit" />}
+              label={labPendingCount}
+              size="small"
+              color="info"
+              variant="outlined"
+              aria-label={t('trigger.LAB_PENDING')}
+              sx={{ fontSize: 11, height: 22 }}
+            />
+          )}
+          {xrayPendingCount > 0 && (
+            <Chip
+              icon={<ImageIcon fontSize="inherit" />}
+              label={xrayPendingCount}
+              size="small"
+              color="info"
+              variant="outlined"
+              aria-label={t('trigger.XRAY_PENDING')}
+              sx={{ fontSize: 11, height: 22 }}
+            />
+          )}
           {waitingCases.length > 0 && (
             <Chip
               icon={<HourglassEmptyIcon fontSize="inherit" />}
@@ -132,7 +159,7 @@ export default function QueueColumn({
 
       <AccordionDetails sx={{ p: 0 }} id={`queue-${category}-content`}>
         {/* Active case list */}
-        <Box role="list" aria-label={`${t(`category.${category}`)} queue`}>
+        <Box role="list" aria-label={`${categoryLabel} queue`}>
           {cases.length === 0 && waitingCases.length === 0 ? (
             <Box sx={{ px: 2, py: 3, textAlign: 'center' }}>
               <Typography variant="body2" color="text.secondary">
@@ -166,7 +193,7 @@ export default function QueueColumn({
             </Box>
             <Box
               role="list"
-              aria-label={`${t('dashboard.betweenPhase')} – ${t(`category.${category}`)}`}
+              aria-label={`${t('dashboard.betweenPhase')} – ${categoryLabel}`}
               sx={{ opacity: 0.65 }}
             >
               {waitingCases.map((c, idx) => (

@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { CaseCategorySchema } from './enums'
+import { CaseCategorySchema, ReviewTypeSchema } from './enums'
 
 export const PatientJourneyStatusSchema = z.enum(['ACTIVE', 'COMPLETED', 'SUSPENDED'])
 export type PatientJourneyStatus = z.infer<typeof PatientJourneyStatusSchema>
@@ -63,6 +63,10 @@ export const JourneyTemplateEntrySchema = z.object({
    * getEffectiveSteps expands this into multiple occurrences up to a 5-year horizon.
    */
   recurrenceIntervalDays: z.number().int().positive().optional(),
+  /**
+   * Types of clinical reviews (lab results, X-rays) that should be created when this step becomes active.
+   */
+  reviewTypes: z.array(ReviewTypeSchema).optional(),
 })
 export type JourneyTemplateEntry = z.infer<typeof JourneyTemplateEntrySchema>
 

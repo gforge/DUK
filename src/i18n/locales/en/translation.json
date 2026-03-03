@@ -69,6 +69,7 @@
     "no": "No",
     "notSet": "Not set",
     "openNavigationMenu": "Open navigation menu",
+    "optional": "optional",
     "patientFilter": "Patient filter",
     "print": "Print",
     "rowsPerPage": "Rows per page",
@@ -498,6 +499,7 @@
     "noCases": "No active follow-ups",
     "noMessage": "No message",
     "openApp": "Open App",
+    "pendingReviews": "Pending lab and imaging results",
     "personalNumber": "Personal Number",
     "readAndConsent": "Read & consent",
     "researchStudies": "Research Studies",
@@ -506,6 +508,7 @@
     "seekContactTitle": "Seek Contact",
     "title": "Patient View",
     "triggers": "Triggers",
+    "viewDetails": "View details",
     "viewTemporaryWarning": "This patient view is temporary and should not be used in production."
   },
   "patientDetail": {
@@ -643,6 +646,36 @@
     "SELECT": "Multiple choice",
     "TEXT": "Free text"
   },
+  "review": {
+    "addReview": "Add review",
+    "comment": "Comment",
+    "commentPlaceholder": "Review notes",
+    "commentRequired": "Comment required for this outcome",
+    "completed": "Reviewed",
+    "created": "Review created",
+    "createdAt": "Review created {{date}}",
+    "deleted": "Review deleted",
+    "markReviewed": "Mark as reviewed",
+    "note": "Note",
+    "outcome": "Outcome",
+    "pending": "Pending review",
+    "reviewedAt": "Reviewed",
+    "reviewedBy": "Reviewed by",
+    "type": "Type"
+  },
+  "reviewOutcome": {
+    "OK": "OK",
+    "PROBLEM": "Problem",
+    "UNCERTAIN": "Uncertain"
+  },
+  "reviewType": {
+    "LAB": "Lab Results",
+    "LAB_one": "__NOT_TRANSLATED__",
+    "LAB_other": "__NOT_TRANSLATED__",
+    "XRAY": "X-ray",
+    "XRAY_one": "__NOT_TRANSLATED__",
+    "XRAY_other": "__NOT_TRANSLATED__"
+  },
   "role": {
     "currentRole": "Current Role",
     "DOCTOR": "Doctor",
@@ -739,11 +772,13 @@
     "ABNORMAL_ANSWER": "Abnormal Answer",
     "HIGH_PAIN": "High Pain",
     "INFECTION_SUSPECTED": "Infection Suspected",
+    "LAB_PENDING": "Lab Pending",
     "LOW_FUNCTION": "Low Function",
     "LOW_QOL": "Low QoL",
     "NO_RESPONSE": "No Response",
     "NOT_OPENED": "App Not Opened",
-    "SEEK_CONTACT": "Seeking Contact"
+    "SEEK_CONTACT": "Seeking Contact",
+    "XRAY_PENDING": "X-ray Pending"
   },
   "worklist": {
     "book": "Book",

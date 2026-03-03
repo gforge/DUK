@@ -32,6 +32,7 @@ export const journeyTemplates: JourneyTemplate[] = [
           PNRS_day14: 'VAS (PNRS) vid dag 10–14',
           PNRS_NIGHT_day14: 'Nattsmärta (PNRS) vid dag 10–14',
         },
+        reviewTypes: ['XRAY'],
         instructionTemplateId: 'it-post-op-general',
       },
       {
@@ -141,6 +142,7 @@ export const journeyTemplates: JourneyTemplate[] = [
           PNRS_day14: 'VAS (PNRS) vid dag 10–14',
           PNRS_NIGHT_day14: 'Nattsmärta (PNRS) vid dag 10–14',
         },
+        reviewTypes: ['XRAY'],
         instructionTemplateId: 'it-post-op-general',
       },
       {

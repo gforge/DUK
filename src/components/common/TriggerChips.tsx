@@ -8,12 +8,14 @@ import PhoneMissedIcon from '@mui/icons-material/PhoneMissed'
 import SupportAgentIcon from '@mui/icons-material/SupportAgent'
 import BugReportIcon from '@mui/icons-material/BugReport'
 import ReportProblemIcon from '@mui/icons-material/ReportProblem'
+import BiotechIcon from '@mui/icons-material/Biotech'
+import ImageIcon from '@mui/icons-material/Image'
 import { useTranslation } from 'react-i18next'
 import type { TriggerType } from '../../api/schemas'
 
 interface TriggerChipsProps {
-  triggers: TriggerType[]
-  maxVisible?: number
+  readonly triggers: TriggerType[]
+  readonly maxVisible?: number
 }
 
 type TriggerConfig = {
@@ -30,6 +32,8 @@ const TRIGGER_CONFIG: Record<TriggerType, TriggerConfig> = {
   SEEK_CONTACT: { icon: <SupportAgentIcon fontSize="inherit" />, color: 'info' },
   INFECTION_SUSPECTED: { icon: <BugReportIcon fontSize="inherit" />, color: 'error' },
   ABNORMAL_ANSWER: { icon: <ReportProblemIcon fontSize="inherit" />, color: 'error' },
+  LAB_PENDING: { icon: <BiotechIcon fontSize="inherit" />, color: 'info' },
+  XRAY_PENDING: { icon: <ImageIcon fontSize="inherit" />, color: 'info' },
 }
 
 export default function TriggerChips({ triggers, maxVisible = 3 }: TriggerChipsProps) {

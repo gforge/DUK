@@ -5,6 +5,8 @@ import {
   CaseCategorySchema,
   TriggerTypeSchema,
   NextStepSchema,
+  ReviewTypeSchema,
+  ReviewOutcomeSchema,
 } from './enums'
 
 export const PolicyWarningSchema = z.object({
@@ -15,6 +17,21 @@ export const PolicyWarningSchema = z.object({
   expression: z.string(),
 })
 export type PolicyWarning = z.infer<typeof PolicyWarningSchema>
+
+export const ClinicalReviewSchema = z.object({
+  id: z.string(),
+  type: ReviewTypeSchema,
+  createdAt: z.string().datetime(),
+  createdByUserId: z.string(),
+  createdByRole: RoleSchema,
+  reviewedAt: z.string().datetime().nullable().default(null),
+  reviewedByUserId: z.string().optional(),
+  reviewedByRole: RoleSchema.optional(),
+  outcome: ReviewOutcomeSchema.optional(),
+  note: z.string().nullable().default(null),
+  source: z.enum(['JOURNEY', 'MANUAL']).default('MANUAL'),
+})
+export type ClinicalReview = z.infer<typeof ClinicalReviewSchema>
 
 export const CaseSchema = z.object({
   id: z.string(),
@@ -46,6 +63,7 @@ export const CaseSchema = z.object({
       }),
     )
     .optional(),
+  reviews: z.array(ClinicalReviewSchema).default([]),
   scheduledAt: z.string().datetime(),
   lastActivityAt: z.string().datetime(),
   createdAt: z.string().datetime(),

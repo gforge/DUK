@@ -181,6 +181,30 @@ const MIGRATIONS: Migration[] = [
         : [],
     }),
   },
+  {
+    from: 6,
+    to: 7,
+    up: (s) => ({
+      ...s,
+      schemaVersion: 7,
+      // Backfill reviews array on all existing cases.
+      cases: Array.isArray(s['cases'])
+        ? (s['cases'] as Record<string, unknown>[]).map((c) => ({
+            ...c,
+            reviews: c['reviews'] ?? [],
+          }))
+        : [],
+    }),
+  },
+  {
+    from: 7,
+    to: 8,
+    up: (s) => ({
+      ...s,
+      schemaVersion: 8,
+      // `outcome` is optional on ClinicalReviewSchema — no backfill needed.
+    }),
+  },
 ]
 
 // ---------------------------------------------------------------------------

@@ -8,6 +8,7 @@ import {
   Tooltip,
   Typography,
   useTheme,
+  type Theme,
 } from '@mui/material'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked'
@@ -16,6 +17,8 @@ import ScienceIcon from '@mui/icons-material/Science'
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 import RepeatIcon from '@mui/icons-material/Repeat'
+import BiotechIcon from '@mui/icons-material/Biotech'
+import ImageIcon from '@mui/icons-material/Image'
 import { useTranslation } from 'react-i18next'
 import type { EffectiveStep } from '../../api/service'
 import type { FormResponse } from '../../api/schemas'
@@ -30,18 +33,37 @@ function getStepStatus(step: EffectiveStep, responses: FormResponse[]): StepStat
   return 'UPCOMING'
 }
 
+interface StatusIconProps {
+  readonly status: StepStatus
+}
+
+const StatusIcon = ({ status }: StatusIconProps) => {
+  const theme = useTheme()
+  const statusColor: Record<StepStatus, string> = {
+    SUBMITTED: theme.palette.success.main,
+    UPCOMING: theme.palette.primary.main,
+    OVERDUE: theme.palette.error.main,
+  }
+  if (status === 'SUBMITTED') return <CheckCircleIcon sx={{ color: statusColor.SUBMITTED }} />
+  if (status === 'OVERDUE') return <ErrorIcon sx={{ color: statusColor.OVERDUE }} />
+  return <RadioButtonUncheckedIcon sx={{ color: statusColor.UPCOMING }} />
+}
+
 interface JourneyTimelineProps {
-  steps: EffectiveStep[]
-  formResponses: FormResponse[]
+  readonly steps: EffectiveStep[]
+  readonly formResponses: FormResponse[]
   /** Pass the name of the journey template for subtitle */
-  journeyName?: string
+  readonly journeyName?: string
+  /** Callback when user clicks to add a review for a step's reviewType */
+  readonly onAddReview?: (stepId: string, reviewType: string) => void
 }
 
 export default function JourneyTimeline({
   steps,
   formResponses,
   journeyName,
-}: JourneyTimelineProps) {
+  onAddReview,
+}: Readonly<JourneyTimelineProps>) {
   const { t } = useTranslation()
   const theme = useTheme()
   const [expandedInstructions, setExpandedInstructions] = useState<Set<string>>(new Set())
@@ -67,12 +89,6 @@ export default function JourneyTimeline({
     SUBMITTED: theme.palette.success.main,
     UPCOMING: theme.palette.primary.main,
     OVERDUE: theme.palette.error.main,
-  }
-
-  const StatusIcon = ({ status }: { status: StepStatus }) => {
-    if (status === 'SUBMITTED') return <CheckCircleIcon sx={{ color: statusColor.SUBMITTED }} />
-    if (status === 'OVERDUE') return <ErrorIcon sx={{ color: statusColor.OVERDUE }} />
-    return <RadioButtonUncheckedIcon sx={{ color: statusColor.UPCOMING }} />
   }
 
   return (
@@ -173,6 +189,31 @@ export default function JourneyTimeline({
                   {t('journey.scheduledDate')}: {step.scheduledDate}
                   {step.windowDays > 0 && ` ±${step.windowDays}d`}
                 </Typography>
+
+                {/* Clinical review types for this step */}
+                {step.reviewTypes && step.reviewTypes.length > 0 && (
+                  <Stack direction="row" gap={0.5} sx={{ mt: 0.5 }} flexWrap="wrap">
+                    {step.reviewTypes.map((reviewType) => (
+                      <Tooltip key={reviewType} title={t(`reviewType.${reviewType}`)}>
+                        <Chip
+                          icon={
+                            reviewType === 'LAB' ? (
+                              <BiotechIcon fontSize="small" />
+                            ) : (
+                              <ImageIcon fontSize="small" />
+                            )
+                          }
+                          label={t(`reviewType.${reviewType}`)}
+                          size="small"
+                          color="info"
+                          variant="outlined"
+                          sx={{ height: 22, fontSize: 11, cursor: 'pointer' }}
+                          onClick={() => onAddReview?.(step.id, reviewType)}
+                        />
+                      </Tooltip>
+                    ))}
+                  </Stack>
+                )}
 
                 {step.resolvedInstruction && (
                   <Box>
