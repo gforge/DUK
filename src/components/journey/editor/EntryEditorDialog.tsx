@@ -42,17 +42,11 @@ import type {
   QuestionnaireTemplate,
   InstructionTemplate,
 } from '../../../api/schemas'
+import { AliasRow, ScoreAliasEditor } from './entry-editor'
 import { slugify } from '../../../utils/slugify'
 import { suggestWindowDays } from '../../../utils/journeyUtils'
 
 type InstructionMode = 'NONE' | 'TEMPLATE' | 'FREETEXT'
-
-interface AliasRow {
-  _id: string
-  raw: string
-  alias: string
-  label: string
-}
 
 interface Props {
   entry?: JourneyTemplateEntry
@@ -126,12 +120,14 @@ export default function EntryEditorDialog({
 
   const isValid = label.trim() !== '' && offsetDays !== ''
 
-  const handleAddAlias = () => {
-    const suggestedRaw =
+  const handleAddAlias = (suggestedRaw?: string) => {
+    const raw =
+      suggestedRaw ||
       selectedQT?.scoringRules
         .map((r) => r.outputKey)
-        .find((k) => !aliasRows.some((row) => row.raw === k)) ?? ''
-    setAliasRows((prev) => [...prev, { _id: mkId(), raw: suggestedRaw, alias: '', label: '' }])
+        .find((k) => !aliasRows.some((row) => row.raw === k)) ||
+      ''
+    setAliasRows((prev) => [...prev, { _id: mkId(), raw, alias: '', label: '' }])
   }
 
   const handleUpdateAlias = (id: string, field: 'raw' | 'alias' | 'label', value: string) => {
@@ -231,7 +227,9 @@ export default function EntryEditorDialog({
               inputProps={{ min: 0 }}
               helperText={
                 !windowDaysManuallySet && offsetDays !== ''
-                  ? t('journey.entry.windowDaysSuggest', { n: suggestWindowDays(offsetDays as number) })
+                  ? t('journey.entry.windowDaysSuggest', {
+                      n: suggestWindowDays(offsetDays as number),
+                    })
                   : t('journey.entry.windowDaysHint')
               }
             />
@@ -421,96 +419,14 @@ export default function EntryEditorDialog({
 
           {/* ── Score aliases ── */}
           {templateId && (
-            <Box>
-              <Stack direction="row" alignItems="center" justifyContent="space-between" mb={0.5}>
-                <Typography variant="overline" color="text.secondary">
-                  {t('journey.scoreAliases')}
-                </Typography>
-                <Tooltip title={t('journey.entry.addAlias')}>
-                  <IconButton size="small" onClick={handleAddAlias}>
-                    <AddIcon fontSize="small" />
-                  </IconButton>
-                </Tooltip>
-              </Stack>
-              <Alert severity="info" sx={{ mb: 1.5, py: 0.5 }}>
-                <Typography variant="caption">{t('journey.entry.aliasHelp')}</Typography>
-              </Alert>
-              {aliasRows.length === 0 ? (
-                <Typography variant="caption" color="text.secondary">
-                  {t('journey.entry.noAliases')}
-                </Typography>
-              ) : (
-                <Table size="small">
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>{t('journey.entry.scoreAliasRaw')}</TableCell>
-                      <TableCell>{t('journey.entry.scoreAliasAlias')}</TableCell>
-                      <TableCell>{t('journey.entry.scoreAliasLabel')}</TableCell>
-                      <TableCell sx={{ width: 40 }} />
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {aliasRows.map((row) => (
-                      <TableRow key={row._id}>
-                        <TableCell>
-                          <Autocomplete
-                            freeSolo
-                            options={selectedQT?.scoringRules.map((r) => r.outputKey) ?? []}
-                            value={row.raw}
-                            onInputChange={(_, v) => handleUpdateAlias(row._id, 'raw', v)}
-                            size="small"
-                            renderOption={(props, option) => (
-                              <li {...props}>
-                                <Chip label={option} size="small" />
-                              </li>
-                            )}
-                            renderInput={(params) => (
-                              <TextField
-                                {...params}
-                                size="small"
-                                variant="standard"
-                                sx={{ minWidth: 120 }}
-                              />
-                            )}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <TextField
-                            value={row.alias}
-                            onChange={(e) => handleUpdateAlias(row._id, 'alias', e.target.value)}
-                            size="small"
-                            variant="standard"
-                            placeholder="eks. PNRS_week4"
-                            sx={{ minWidth: 130 }}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <TextField
-                            value={row.label}
-                            onChange={(e) => handleUpdateAlias(row._id, 'label', e.target.value)}
-                            size="small"
-                            variant="standard"
-                            placeholder={t('journey.entry.scoreAliasLabelHint')}
-                            sx={{ minWidth: 160 }}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <IconButton
-                            size="small"
-                            color="error"
-                            onClick={() => handleDeleteAlias(row._id)}
-                          >
-                            <DeleteOutlineIcon fontSize="small" />
-                          </IconButton>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              )}
-            </Box>
+            <ScoreAliasEditor
+              selectedQT={selectedQT}
+              aliasRows={aliasRows}
+              onAdd={handleAddAlias}
+              onUpdate={handleUpdateAlias}
+              onDelete={handleDeleteAlias}
+            />
           )}
-
           <Divider />
 
           {/* ── Instruction ── */}

@@ -1,5 +1,7 @@
 import { getStore } from '../storage'
 import { buildPolicyScope } from './utils'
+import { computeTotalPauseShift, toScheduledDate } from './journeyDates'
+import { applyResearchModules } from './journeyResearch'
 import type { JourneyTemplateEntry, CaseCategory, FormResponse } from '../schemas'
 
 /**
@@ -41,17 +43,10 @@ export function getEffectiveSteps(journeyId: string): EffectiveStep[] {
 
   const startMs = new Date(journey.startDate).getTime()
 
-  // Whilst the journey is suspended, add the current ongoing pause days on top of
-  // the already-accumulated total.  This keeps all future step dates shifting
-  // forward in real time without writing to the store on every render.
-  const currentPauseDays =
-    journey.status === 'SUSPENDED' && journey.pausedAt
-      ? Math.floor((Date.now() - new Date(journey.pausedAt).getTime()) / 86_400_000)
-      : 0
-  const totalPauseShift = (journey.totalPausedDays ?? 0) + currentPauseDays
+  // compute the combined pause shift including any current suspension
+  const totalPauseShift = computeTotalPauseShift(journey)
 
-  const toDate = (offsetDays: number) =>
-    new Date(startMs + (offsetDays + totalPauseShift) * 86_400_000).toISOString().slice(0, 10)
+  const toDate = (offsetDays: number) => toScheduledDate(startMs, offsetDays, totalPauseShift)
 
   const resolveInstruction = (entry: JourneyTemplateEntry): string | undefined => {
     if (entry.instructionTemplateId) {
@@ -127,52 +122,8 @@ export function getEffectiveSteps(journeyId: string): EffectiveStep[] {
   }
   steps = steps.filter((s) => !removedIds.has(s.id))
 
-  for (const moduleId of journey.researchModuleIds) {
-    const module = state.researchModules.find((m) => m.id === moduleId)
-    if (!module) continue
-    for (const entry of module.entries) {
-      if (entry.replaceStepId) {
-        const original = steps.find((s) => s.id === entry.replaceStepId)
-        const researchStep: EffectiveStep = {
-          id: entry.id,
-          label: entry.label,
-          offsetDays: original?.offsetDays ?? 0,
-          windowDays: original?.windowDays ?? 2,
-          order: original?.order ?? 999,
-          templateId: entry.templateId,
-          scoreAliases: original?.scoreAliases ?? {},
-          scoreAliasLabels: original?.scoreAliasLabels ?? {},
-          dashboardCategory: (original?.dashboardCategory ?? 'CONTROL') as CaseCategory,
-          isAdded: false,
-          isResearch: true,
-          isRecurring: false,
-          researchModuleId: moduleId,
-          replacesStepId: entry.replaceStepId,
-          scheduledDate: original?.scheduledDate ?? toDate(0),
-          resolvedInstruction: original?.resolvedInstruction,
-        }
-        steps = steps.filter((s) => s.id !== entry.replaceStepId)
-        steps.push(researchStep)
-      } else if (entry.offsetDays !== undefined) {
-        steps.push({
-          id: entry.id,
-          label: entry.label,
-          offsetDays: entry.offsetDays,
-          windowDays: 3,
-          order: entry.offsetDays,
-          templateId: entry.templateId,
-          scoreAliases: {},
-          scoreAliasLabels: {},
-          dashboardCategory: 'CONTROL',
-          isAdded: false,
-          isResearch: true,
-          isRecurring: false,
-          researchModuleId: moduleId,
-          scheduledDate: toDate(entry.offsetDays),
-        })
-      }
-    }
-  }
+  // apply any research‑module overlays / additions
+  steps = applyResearchModules(steps, journey, startMs, totalPauseShift)
 
   return steps.sort((a, b) => a.offsetDays - b.offsetDays || a.order - b.order)
 }
