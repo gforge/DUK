@@ -8,8 +8,9 @@ export const createReview = (
   userId: string,
   userRole: Role,
   source?: 'JOURNEY' | 'MANUAL',
+  initialNote?: string,
 ): Promise<ClinicalReview> =>
-  withDelay(() => service.createReview(caseId, type, userId, userRole, source))
+  withDelay(() => service.createReview(caseId, type, userId, userRole, source, initialNote))
 
 export const completeReview = (
   reviewId: string,

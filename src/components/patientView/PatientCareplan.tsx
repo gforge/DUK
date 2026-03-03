@@ -69,12 +69,7 @@ export default function PatientCareplan({
     mode: 'decline' | 'withdraw'
   } | null>(null)
 
-  // Review creation from journey step
-  const [reviewCreationTarget, setReviewCreationTarget] = useState<{
-    stepId: string
-    reviewType: string
-  } | null>(null)
-  const [addingReview, setAddingReview] = useState(false)
+  // Review creation from journey step — no extra state needed; dialog is inside JourneyTimeline
 
   // Get currentCase from selectedJourney's first associated case
   const { data: cases } = useApi(() => client.getCasesByPatient(patientId), [patientId])
@@ -116,24 +111,26 @@ export default function PatientCareplan({
     setManualConsentTarget(null)
   }
 
-  const handleAddReview = async (stepId: string, reviewType: string) => {
+  const handleAddReview = async (
+    stepId: string,
+    reviewType: string,
+    description?: string,
+  ): Promise<string> => {
+    if (!currentCase) return ''
+    const review = await client.createReview(
+      currentCase.id,
+      reviewType as 'LAB' | 'XRAY',
+      currentUser.id,
+      currentUser.role,
+      'JOURNEY',
+      description,
+    )
+    return review.id
+  }
+
+  const handleRemoveReview = async (reviewId: string): Promise<void> => {
     if (!currentCase) return
-    setReviewCreationTarget({ stepId, reviewType })
-    setAddingReview(true)
-    try {
-      await client.createReview(
-        currentCase.id,
-        reviewType as 'LAB' | 'XRAY',
-        currentUser.id,
-        currentUser.role,
-        'JOURNEY',
-      )
-      setReviewCreationTarget(null)
-    } catch (error) {
-      console.error('Error creating review:', error)
-    } finally {
-      setAddingReview(false)
-    }
+    await client.deleteReview(reviewId, currentCase.id)
   }
 
   return (
@@ -188,6 +185,7 @@ export default function PatientCareplan({
               formResponses={[]}
               journeyName={sortedJourneys.length > 1 ? undefined : journeyName}
               onAddReview={handleAddReview}
+              onRemoveReview={handleRemoveReview}
             />
           </Box>
 

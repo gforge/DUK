@@ -1,14 +1,20 @@
 import React, { useState } from 'react'
 import {
   Box,
+  Button,
   Chip,
+  CircularProgress,
   Collapse,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   IconButton,
   Stack,
+  TextField,
   Tooltip,
   Typography,
   useTheme,
-  type Theme,
 } from '@mui/material'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked'
@@ -49,13 +55,22 @@ const StatusIcon = ({ status }: StatusIconProps) => {
   return <RadioButtonUncheckedIcon sx={{ color: statusColor.UPCOMING }} />
 }
 
+const REVIEW_TYPES = ['LAB', 'XRAY'] as const
+type ReviewTypeKey = (typeof REVIEW_TYPES)[number]
+
 interface JourneyTimelineProps {
   readonly steps: EffectiveStep[]
   readonly formResponses: FormResponse[]
   /** Pass the name of the journey template for subtitle */
   readonly journeyName?: string
-  /** Callback when user clicks to add a review for a step's reviewType */
-  readonly onAddReview?: (stepId: string, reviewType: string) => void
+  /** When provided review chips are interactive; without it they are shown disabled. */
+  readonly onAddReview?: (
+    stepId: string,
+    reviewType: string,
+    description?: string,
+  ) => Promise<string>
+  /** When provided filled chips can be clicked to cancel/remove the review. */
+  readonly onRemoveReview?: (reviewId: string) => Promise<void>
 }
 
 export default function JourneyTimeline({
@@ -63,16 +78,68 @@ export default function JourneyTimeline({
   formResponses,
   journeyName,
   onAddReview,
+  onRemoveReview,
 }: Readonly<JourneyTimelineProps>) {
   const { t } = useTranslation()
   const theme = useTheme()
   const [expandedInstructions, setExpandedInstructions] = useState<Set<string>>(new Set())
+  const [reviewDialog, setReviewDialog] = useState<{
+    stepId: string
+    reviewType: ReviewTypeKey
+  } | null>(null)
+  const [description, setDescription] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+  // Track reviews added this session so chips turn filled immediately (key → { reviewId, description })
+  const [addedReviews, setAddedReviews] = useState<
+    Map<string, { reviewId: string; description?: string }>
+  >(new Map())
 
   const toggleInstruction = (id: string) => {
     setExpandedInstructions((prev) => {
       const next = new Set(prev)
       if (next.has(id)) next.delete(id)
       else next.add(id)
+      return next
+    })
+  }
+
+  const openDialog = (stepId: string, reviewType: ReviewTypeKey) => {
+    setDescription('')
+    setReviewDialog({ stepId, reviewType })
+  }
+
+  const closeDialog = () => {
+    setReviewDialog(null)
+    setDescription('')
+  }
+
+  const handleConfirmAdd = async () => {
+    if (!reviewDialog || !onAddReview) return
+    setSubmitting(true)
+    try {
+      const reviewId = await onAddReview(
+        reviewDialog.stepId,
+        reviewDialog.reviewType,
+        description || undefined,
+      )
+      const key = `${reviewDialog.stepId}:${reviewDialog.reviewType}`
+      setAddedReviews((prev) => {
+        const next = new Map(prev)
+        next.set(key, { reviewId, description: description.trim() || undefined })
+        return next
+      })
+      closeDialog()
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  const handleRemoveChip = async (key: string, reviewId: string) => {
+    if (!onRemoveReview) return
+    await onRemoveReview(reviewId)
+    setAddedReviews((prev) => {
+      const next = new Map(prev)
+      next.delete(key)
       return next
     })
   }
@@ -190,28 +257,69 @@ export default function JourneyTimeline({
                   {step.windowDays > 0 && ` ±${step.windowDays}d`}
                 </Typography>
 
-                {/* Clinical review types for this step */}
-                {step.reviewTypes && step.reviewTypes.length > 0 && (
+                {/* Review chips — always visible on non-submitted steps */}
+                {status !== 'SUBMITTED' && (
                   <Stack direction="row" gap={0.5} sx={{ mt: 0.5 }} flexWrap="wrap">
-                    {step.reviewTypes.map((reviewType) => (
-                      <Tooltip key={reviewType} title={t(`reviewType.${reviewType}`)}>
-                        <Chip
-                          icon={
-                            reviewType === 'LAB' ? (
-                              <BiotechIcon fontSize="small" />
-                            ) : (
-                              <ImageIcon fontSize="small" />
-                            )
-                          }
-                          label={t(`reviewType.${reviewType}`)}
-                          size="small"
-                          color="info"
-                          variant="outlined"
-                          sx={{ height: 22, fontSize: 11, cursor: 'pointer' }}
-                          onClick={() => onAddReview?.(step.id, reviewType)}
-                        />
-                      </Tooltip>
-                    ))}
+                    {REVIEW_TYPES.map((reviewType) => {
+                      const key = `${step.id}:${reviewType}`
+                      const addedEntry = addedReviews.get(key)
+                      const isAdded = !!addedEntry
+                      const isExpected = step.reviewTypes?.includes(reviewType)
+                      const canAdd = !!onAddReview && !isAdded
+                      const canRemove = isAdded && !!onRemoveReview
+                      const disabled = !canAdd && !canRemove
+                      let tooltipTitle: string
+                      if (isAdded && canRemove) {
+                        tooltipTitle =
+                          t('review.remove') +
+                          (addedEntry.description ? `: ${addedEntry.description}` : '')
+                      } else if (isAdded) {
+                        tooltipTitle = addedEntry.description ?? t(`reviewType.${reviewType}`)
+                      } else if (onAddReview) {
+                        tooltipTitle = isExpected
+                          ? t('review.expectedAtThisStep')
+                          : t('review.addReview')
+                      } else {
+                        tooltipTitle = t('review.notAvailableHere')
+                      }
+                      const chipLabel =
+                        isAdded && addedEntry.description
+                          ? t(`reviewType.${reviewType}`) + ': ' + addedEntry.description
+                          : t(`reviewType.${reviewType}`)
+                      const handleClick =
+                        canRemove && addedEntry
+                          ? () => void handleRemoveChip(key, addedEntry.reviewId)
+                          : canAdd
+                            ? () => openDialog(step.id, reviewType)
+                            : undefined
+                      return (
+                        <Tooltip key={reviewType} title={tooltipTitle}>
+                          {/* span needed so Tooltip works on disabled Chip */}
+                          <span>
+                            <Chip
+                              icon={
+                                reviewType === 'LAB' ? (
+                                  <BiotechIcon fontSize="small" />
+                                ) : (
+                                  <ImageIcon fontSize="small" />
+                                )
+                              }
+                              label={chipLabel}
+                              size="small"
+                              color="info"
+                              variant={isAdded ? 'filled' : 'outlined'}
+                              sx={{
+                                height: 22,
+                                fontSize: 11,
+                                ...(isExpected && !isAdded ? { borderStyle: 'dashed' } : {}),
+                              }}
+                              disabled={disabled}
+                              onClick={handleClick}
+                            />
+                          </span>
+                        </Tooltip>
+                      )
+                    })}
                   </Stack>
                 )}
 
@@ -261,6 +369,45 @@ export default function JourneyTimeline({
           )
         })}
       </Box>
+
+      {/* Add-review description dialog */}
+      <Dialog open={!!reviewDialog} onClose={closeDialog} maxWidth="xs" fullWidth>
+        <DialogTitle>{t('review.addReview')}</DialogTitle>
+        <DialogContent>
+          <Stack gap={2} sx={{ pt: 1 }}>
+            {reviewDialog && (
+              <Chip
+                icon={reviewDialog.reviewType === 'LAB' ? <BiotechIcon /> : <ImageIcon />}
+                label={t(`reviewType.${reviewDialog.reviewType}`)}
+                color="info"
+                sx={{ alignSelf: 'flex-start' }}
+              />
+            )}
+            <TextField
+              fullWidth
+              size="small"
+              autoFocus
+              label={t('review.description')}
+              placeholder={
+                reviewDialog?.reviewType === 'LAB'
+                  ? t('review.descriptionPlaceholderLAB')
+                  : t('review.descriptionPlaceholderXRAY')
+              }
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') void handleConfirmAdd()
+              }}
+            />
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={closeDialog}>{t('common.cancel')}</Button>
+          <Button variant="contained" onClick={() => void handleConfirmAdd()} disabled={submitting}>
+            {submitting ? <CircularProgress size={20} /> : t('common.confirm')}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   )
 }

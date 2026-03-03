@@ -3,6 +3,7 @@ import { Alert, Box, Paper, Skeleton, Stack } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 import { useApi } from '../../../hooks/useApi'
 import * as client from '../../../api/client'
+import { useRole } from '../../../store/roleContext'
 import JourneyTimeline from '../../journey/JourneyTimeline'
 import ModifyJourneyDialog from '../../journey/ModifyJourneyDialog'
 import JourneyModHistory from '../journey/JourneyModHistory'
@@ -22,6 +23,7 @@ interface JourneyTabProps {
 
 export default function JourneyTab({ caseData }: JourneyTabProps) {
   const { t } = useTranslation()
+  const { currentUser } = useRole()
 
   const [modifyOpen, setModifyOpen] = useState(false)
   const [selectedJourneyId, setSelectedJourneyId] = useState<string | null>(null)
@@ -78,6 +80,26 @@ export default function JourneyTab({ caseData }: JourneyTabProps) {
 
   // Capture mount time once via lazy initializer — avoids calling Date.now() during render
   const [mountedAt] = useState(Date.now)
+
+  const handleAddReview = async (
+    stepId: string,
+    reviewType: string,
+    description?: string,
+  ): Promise<string> => {
+    const review = await client.createReview(
+      caseData.id,
+      reviewType as 'LAB' | 'XRAY',
+      currentUser.id,
+      currentUser.role,
+      'JOURNEY',
+      description,
+    )
+    return review.id
+  }
+
+  const handleRemoveReview = async (reviewId: string): Promise<void> => {
+    await client.deleteReview(reviewId, caseData.id)
+  }
   const pausedDays = selectedJourney?.pausedAt
     ? Math.max(
         0,
@@ -148,6 +170,8 @@ export default function JourneyTab({ caseData }: JourneyTabProps) {
               steps={effectiveSteps ?? []}
               formResponses={formResponses ?? []}
               journeyName={currentTemplate?.description}
+              onAddReview={handleAddReview}
+              onRemoveReview={handleRemoveReview}
             />
           </Paper>
 

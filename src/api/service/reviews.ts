@@ -8,6 +8,7 @@ export function createReview(
   userId: string,
   userRole: Role,
   source: 'JOURNEY' | 'MANUAL' = 'MANUAL',
+  initialNote?: string,
 ): ClinicalReview {
   const review: ClinicalReview = {
     id: uuid(),
@@ -18,7 +19,7 @@ export function createReview(
     reviewedAt: null,
     reviewedByUserId: undefined,
     reviewedByRole: undefined,
-    note: null,
+    note: initialNote ?? null,
     source,
   }
 
