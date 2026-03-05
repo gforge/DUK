@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import React, { useRef } from 'react'
 import {
   Box,
@@ -76,6 +77,7 @@ export default function PolicyRuleDialog({
     values: formValues,
   })
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const watchedExpr = watch('expression')
   const exprError = watchedExpr ? validateExpression(watchedExpr) : null
 

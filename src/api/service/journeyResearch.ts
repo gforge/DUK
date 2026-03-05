@@ -1,6 +1,6 @@
 import { getStore } from '../storage'
 import { toScheduledDate } from './journeyDates'
-import type { JourneyTemplateEntry, CaseCategory, PatientJourney } from '../schemas'
+import type { CaseCategory, PatientJourney } from '@/api/schemas'
 import type { EffectiveStep } from './journeyResolver'
 
 /**

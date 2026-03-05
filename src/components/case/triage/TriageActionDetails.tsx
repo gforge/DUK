@@ -23,7 +23,6 @@ import type { TriageActionKey } from './actionConfig'
 import { ACTION_CONFIG } from './actionConfig'
 import { parseDeadlineInput, isDeadlineShorthand } from './parseDeadlineInput'
 import DeadlineQuickChips from './DeadlineQuickChips'
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
 
 const ROLES: Array<'NURSE' | 'DOCTOR' | 'PAL'> = ['NURSE', 'DOCTOR', 'PAL']
 

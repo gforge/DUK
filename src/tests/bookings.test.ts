@@ -20,7 +20,7 @@ describe('bookings service', () => {
       createdAt: new Date().toISOString(),
     }
 
-    const updated = service.createBooking(caseId, booking, SEED_STATE.users[0].id, 'PAL')
+    service.createBooking(caseId, booking, SEED_STATE.users[0].id, 'PAL')
     const s = getStore()
     const c = s.cases.find((c) => c.id === caseId)!
     expect(c.bookings).toBeDefined()

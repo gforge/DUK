@@ -1,5 +1,5 @@
 import { getStore, setStore } from '../storage'
-import { uuid, now, addAuditEvent } from './utils'
+import { now, addAuditEvent } from './utils'
 import { getEffectiveSteps } from './journeyResolver'
 import type { Case, CaseCategory, CaseStatus, TriageInput, Role } from '../schemas'
 

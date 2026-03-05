@@ -1,45 +1,28 @@
 import React, { useState } from 'react'
 import {
   Alert,
-  Box,
   Button,
-  Checkbox,
-  Chip,
-  CircularProgress,
-  Collapse,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
-  FormControl,
-  FormControlLabel,
-  FormGroup,
-  InputLabel,
-  MenuItem,
-  Select,
   Stack,
   Step,
   StepLabel,
   Stepper,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  TextField,
-  Typography,
 } from '@mui/material'
 import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt'
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
-import ScienceIcon from '@mui/icons-material/Science'
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import ExpandLessIcon from '@mui/icons-material/ExpandLess'
 import { useTranslation } from 'react-i18next'
 import { useApi } from '../../hooks/useApi'
 import { useSnack } from '../../store/snackContext'
 import * as client from '../../api/client'
 import { parsePersonnummer } from '../../api/utils/personnummer'
+
+// split steps to reduce component length
+import { Step0PatientDetails } from './register-dialog/Step0PatientDetails'
+import { Step1JourneyAssignment } from './register-dialog/Step1JourneyAssignment'
+import { Step2ResearchModules } from './register-dialog/Step2ResearchModules'
+import { Step3Review } from './register-dialog/Step3Review'
 
 interface Props {
   open: boolean
@@ -214,315 +197,59 @@ export default function RegisterPatientDialog({ open, onClose, onCreated }: Prop
 
         {/* ── Step 0: Patient details ── */}
         {step === 0 && (
-          <Stack gap={2}>
-            {/* Personnummer input + lookup button */}
-            <Stack direction="row" gap={1} alignItems="flex-start">
-              <TextField
-                label={t('patients.personalNumber')}
-                value={personalNumber}
-                onChange={(e) => {
-                  setPersonalNumber(e.target.value)
-                  setLookupStatus('idle')
-                  setRegisterName(null)
-                  setDisplayName('')
-                  setDateOfBirth('')
-                }}
-                size="small"
-                fullWidth
-                required
-                autoFocus
-                placeholder="YYYYMMDD-XXXX"
-              />
-              <Button
-                variant="outlined"
-                onClick={handleLookup}
-                disabled={lookupStatus === 'loading' || !personalNumber.trim()}
-                sx={{ whiteSpace: 'nowrap', flexShrink: 0, height: 40 }}
-              >
-                {lookupStatus === 'loading' ? (
-                  <CircularProgress size={18} />
-                ) : (
-                  t('patients.register.fetchFromRegister')
-                )}
-              </Button>
-            </Stack>
-
-            {/* Reservnummer notice */}
-            {pnrInfo.isValid && pnrInfo.isReservnummer && (
-              <Alert severity="info" sx={{ py: 0.5 }}>
-                {t('patients.register.reservnummerDetected')}
-              </Alert>
-            )}
-
-            {/* Lookup: found */}
-            {lookupStatus === 'found' && registerName && (
-              <Alert severity="success" icon={<CheckCircleOutlineIcon />} sx={{ py: 0.5 }}>
-                {t('patients.register.foundInRegister')}: <strong>{registerName}</strong>
-              </Alert>
-            )}
-
-            {/* Lookup: not found */}
-            {lookupStatus === 'not-found' && (
-              <Alert severity="warning" sx={{ py: 0.5 }}>
-                {t('patients.register.notFoundInRegister')}
-              </Alert>
-            )}
-
-            {/* Name field */}
-            {(lookupStatus === 'found' || lookupStatus === 'not-found') && (
-              <TextField
-                label={
-                  lookupStatus === 'found'
-                    ? t('patients.register.nameOverride')
-                    : t('patients.displayName')
-                }
-                value={displayName}
-                onChange={(e) => setDisplayName(e.target.value)}
-                size="small"
-                fullWidth
-                required={lookupStatus === 'not-found'}
-                placeholder={lookupStatus === 'found' ? (registerName ?? '') : 'Anna Johansson'}
-                helperText={
-                  lookupStatus === 'found' ? t('patients.register.nameOverrideHint') : undefined
-                }
-              />
-            )}
-
-            {/* Date of birth — only for reservnummer */}
-            {(lookupStatus === 'found' || lookupStatus === 'not-found') &&
-              pnrInfo.isReservnummer && (
-                <TextField
-                  label={t('patients.dateOfBirth')}
-                  value={dateOfBirth}
-                  onChange={(e) => setDateOfBirth(e.target.value)}
-                  size="small"
-                  type="date"
-                  fullWidth
-                  required
-                  InputLabelProps={{ shrink: true }}
-                />
-              )}
-
-            {/* Demo help box: available persons in the fake register */}
-            <Box
-              sx={{
-                border: 1,
-                borderColor: 'info.light',
-                borderRadius: 1,
-                bgcolor: 'info.50',
-                overflow: 'hidden',
-              }}
-            >
-              <Button
-                fullWidth
-                size="small"
-                onClick={() => setHintOpen((v) => !v)}
-                startIcon={<InfoOutlinedIcon color="info" />}
-                endIcon={hintOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-                sx={{
-                  justifyContent: 'flex-start',
-                  textTransform: 'none',
-                  color: 'info.dark',
-                  fontWeight: 600,
-                  px: 1.5,
-                  py: 1,
-                  borderRadius: 0,
-                }}
-              >
-                {t('patients.register.demoHintTitle')}
-              </Button>
-
-              <Collapse in={hintOpen}>
-                <Box sx={{ px: 1.5, pb: 1 }}>
-                  <Typography variant="caption" color="text.secondary" display="block" mb={1}>
-                    {t('patients.register.demoHintDescription')}
-                  </Typography>
-                  <Table size="small">
-                    <TableHead>
-                      <TableRow>
-                        <TableCell sx={{ py: 0.5, fontWeight: 600, fontSize: '0.7rem' }}>
-                          {t('patients.displayName')}
-                        </TableCell>
-                        <TableCell sx={{ py: 0.5, fontWeight: 600, fontSize: '0.7rem' }}>
-                          {t('patients.personalNumber')}
-                        </TableCell>
-                        <TableCell sx={{ py: 0.5 }} />
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {(demoHints ?? []).map((hint) => {
-                        const alreadyRegistered =
-                          registeredPnrs.has(hint.pnr12) || registeredPnrs.has(hint.pnr12.slice(2))
-                        return (
-                          <TableRow
-                            key={hint.pnr12}
-                            hover={!alreadyRegistered}
-                            sx={{
-                              cursor: alreadyRegistered ? 'default' : 'pointer',
-                              opacity: alreadyRegistered ? 0.5 : 1,
-                            }}
-                            onClick={() => !alreadyRegistered && fillPnr(hint.pnr)}
-                          >
-                            <TableCell sx={{ py: 0.5, fontSize: '0.75rem' }}>
-                              {hint.displayName}
-                            </TableCell>
-                            <TableCell
-                              sx={{ py: 0.5, fontSize: '0.75rem', fontFamily: 'monospace' }}
-                            >
-                              {hint.pnr}
-                            </TableCell>
-                            <TableCell sx={{ py: 0.5 }}>
-                              {alreadyRegistered && (
-                                <Chip
-                                  label={t('patients.register.demoHintAlreadyRegistered')}
-                                  size="small"
-                                  variant="outlined"
-                                  sx={{ fontSize: '0.65rem', height: 18 }}
-                                />
-                              )}
-                            </TableCell>
-                          </TableRow>
-                        )
-                      })}
-                    </TableBody>
-                  </Table>
-                </Box>
-              </Collapse>
-            </Box>
-          </Stack>
+          <Step0PatientDetails
+            personalNumber={personalNumber}
+            setPersonalNumber={setPersonalNumber}
+            lookupStatus={lookupStatus}
+            _lookupName={registerName}
+            displayName={displayName}
+            setDisplayName={setDisplayName}
+            dateOfBirth={dateOfBirth}
+            setDateOfBirth={setDateOfBirth}
+            registerName={registerName}
+            hintOpen={hintOpen}
+            setHintOpen={setHintOpen}
+            registeredPnrs={registeredPnrs}
+            demoHints={demoHints ?? []}
+            handleLookup={handleLookup}
+            onSelectPnr={fillPnr}
+          />
         )}
-
         {/* ── Step 1: Journey assignment ── */}
         {step === 1 && (
-          <Stack gap={2}>
-            <FormControl size="small" fullWidth required>
-              <InputLabel>{t('patients.register.selectTemplate')}</InputLabel>
-              <Select
-                value={journeyTemplateId}
-                onChange={(e) => setJourneyTemplateId(e.target.value)}
-                label={t('patients.register.selectTemplate')}
-              >
-                {journeyTemplates?.map((jt) => (
-                  <MenuItem key={jt.id} value={jt.id}>
-                    <Stack>
-                      <span>{jt.name}</span>
-                      {jt.description && (
-                        <Typography variant="caption" color="text.secondary">
-                          {jt.description}
-                        </Typography>
-                      )}
-                    </Stack>
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-            <TextField
-              label={selectedTemplate?.referenceDateLabel ?? t('patients.register.referenceDate')}
-              helperText={t('patients.register.referenceDateHint', {
-                label: selectedTemplate?.referenceDateLabel ?? t('patients.register.referenceDate'),
-              })}
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              size="small"
-              type="date"
-              fullWidth
-              required
-              InputLabelProps={{ shrink: true }}
-            />
-          </Stack>
+          <Step1JourneyAssignment
+            journeyTemplateId={journeyTemplateId}
+            setJourneyTemplateId={setJourneyTemplateId}
+            startDate={startDate}
+            setStartDate={setStartDate}
+            journeyTemplates={journeyTemplates}
+          />
         )}
 
         {/* ── Step 2: Research modules ── */}
         {step === 2 && (
-          <Stack gap={2}>
-            <Typography variant="body2" color="text.secondary">
-              {t('patients.register.studiesHint')}
-            </Typography>
-            {!researchModules || researchModules.length === 0 ? (
-              <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
-                {t('patients.register.noStudies')}
-              </Typography>
-            ) : (
-              <FormGroup>
-                {researchModules.map((rm) => (
-                  <FormControlLabel
-                    key={rm.id}
-                    control={
-                      <Checkbox
-                        checked={selectedModuleIds.includes(rm.id)}
-                        onChange={(e) =>
-                          setSelectedModuleIds((prev) =>
-                            e.target.checked ? [...prev, rm.id] : prev.filter((id) => id !== rm.id),
-                          )
-                        }
-                      />
-                    }
-                    label={
-                      <Stack gap={0}>
-                        <Stack direction="row" alignItems="center" gap={0.5}>
-                          <ScienceIcon fontSize="small" color="secondary" />
-                          <Typography variant="body2" fontWeight={600}>
-                            {rm.studyName}
-                          </Typography>
-                        </Stack>
-                        {rm.name !== rm.studyName && (
-                          <Typography variant="caption" color="text.secondary" sx={{ ml: 3.5 }}>
-                            {rm.name}
-                          </Typography>
-                        )}
-                      </Stack>
-                    }
-                  />
-                ))}
-              </FormGroup>
-            )}
-          </Stack>
+          <Step2ResearchModules
+            selectedModuleIds={selectedModuleIds}
+            setSelectedModuleIds={setSelectedModuleIds}
+            researchModules={researchModules}
+          />
         )}
 
         {/* ── Step 3: Review ── */}
         {step === 3 && (
-          <Stack gap={1.5}>
-            <Typography variant="subtitle2" fontWeight={600}>
-              {t('patients.register.reviewTitle')}
-            </Typography>
-            <Box sx={{ border: 1, borderColor: 'divider', borderRadius: 1, p: 1.5 }}>
-              <Stack gap={0.5}>
-                <Typography variant="body2">
-                  <strong>{t('patients.displayName')}:</strong> {effectiveName}
-                </Typography>
-                <Typography variant="body2">
-                  <strong>{t('patients.personalNumber')}:</strong> {personalNumber}
-                </Typography>
-                <Typography variant="body2">
-                  <strong>{t('patients.dateOfBirth')}:</strong> {pnrInfo.dateOfBirth ?? dateOfBirth}
-                </Typography>
-              </Stack>
-            </Box>
-            <Box sx={{ border: 1, borderColor: 'divider', borderRadius: 1, p: 1.5 }}>
-              <Stack gap={0.5}>
-                <Typography variant="body2">
-                  <strong>{t('nav.journeys')}:</strong> {selectedTemplate?.name}
-                </Typography>
-                <Typography variant="body2">
-                  <strong>{selectedTemplate?.referenceDateLabel ?? t('journey.startDate')}:</strong>{' '}
-                  {startDate}
-                </Typography>
-              </Stack>
-            </Box>
-            <Box sx={{ border: 1, borderColor: 'divider', borderRadius: 1, p: 1.5 }}>
-              <Stack gap={0.5}>
-                <Typography variant="body2">
-                  <strong>{t('patients.register.reviewStudies')}</strong>{' '}
-                  {selectedModuleIds.length === 0
-                    ? t('patients.register.noStudiesSelected')
-                    : researchModules
-                        ?.filter((rm) => selectedModuleIds.includes(rm.id))
-                        .map((rm) => rm.studyName)
-                        .join(', ')}
-                </Typography>
-              </Stack>
-            </Box>
-          </Stack>
+          <Step3Review
+            effectiveName={effectiveName}
+            personalNumber={personalNumber}
+            dateOfBirth={pnrInfo.dateOfBirth ?? dateOfBirth}
+            selectedTemplate={selectedTemplate}
+            startDate={startDate}
+            selectedModuleIds={selectedModuleIds}
+            researchModules={
+              researchModules
+                ? researchModules.map((rm) => ({ id: rm.id, studyName: rm.studyName }))
+                : null
+            }
+          />
         )}
       </DialogContent>
 

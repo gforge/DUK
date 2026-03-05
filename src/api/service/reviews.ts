@@ -1,6 +1,6 @@
-import { getStore, patchStore } from '../storage'
+import { getStore, patchStore } from '@/api/storage'
 import { uuid, now, addAuditEvent } from './utils'
-import type { ClinicalReview, ReviewType, Role, TriggerType, ReviewOutcome } from '../schemas'
+import type { ClinicalReview, ReviewType, Role, TriggerType, ReviewOutcome } from '@/api/schemas'
 
 export function createReview(
   caseId: string,

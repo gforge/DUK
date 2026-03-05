@@ -1,5 +1,5 @@
 import React from 'react'
-import { Box, Chip, Stack, Typography, Divider } from '@mui/material'
+import { Box, Chip, Stack, Typography } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 import type { Case } from '../../../api/schemas'
 import StatusChip from '../../common/StatusChip'

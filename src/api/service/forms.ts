@@ -1,14 +1,7 @@
-import { getStore, setStore } from '../storage'
-import {
-  uuid,
-  now,
-  computeScores,
-  buildPolicyScope,
-  evaluatePolicyRules,
-  addAuditEvent,
-} from './utils'
+import { getStore, setStore } from '@/api/storage'
+import { uuid, now, computeScores, evaluatePolicyRules, addAuditEvent } from './utils'
 import { buildPolicyScopeWithAliases } from './journeyResolver'
-import type { Case, FormResponse, TriggerType } from '../schemas'
+import type { Case, FormResponse, TriggerType } from '@/api/schemas'
 
 export function getFormResponses(caseId: string): FormResponse[] {
   return getStore().formResponses.filter((r) => r.caseId === caseId)

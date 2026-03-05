@@ -9,11 +9,10 @@ import GlobalSearch from './GlobalSearch'
 import { useRole } from '../../store/roleContext'
 
 interface TopBarProps {
-  drawerWidth: number
   onMenuClick: () => void
 }
 
-export default function TopBar({ drawerWidth, onMenuClick }: TopBarProps) {
+export default function TopBar({ onMenuClick }: TopBarProps) {
   const { t } = useTranslation()
   const { currentUser } = useRole()
 

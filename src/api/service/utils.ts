@@ -1,4 +1,3 @@
-import { getStore } from '../storage'
 import { evaluateExpression } from '../policyParser'
 import type {
   AppState,

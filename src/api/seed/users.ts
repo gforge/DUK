@@ -1,4 +1,4 @@
-import { iso, isoDate, daysAgo } from './shared'
+import { iso, daysAgo } from './shared'
 import type { User, Patient } from '../schemas'
 
 export const users: User[] = [

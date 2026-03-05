@@ -2,7 +2,7 @@ import { getStore } from '../storage'
 import { buildPolicyScope } from './utils'
 import { computeTotalPauseShift, toScheduledDate } from './journeyDates'
 import { applyResearchModules } from './journeyResearch'
-import type { JourneyTemplateEntry, CaseCategory, FormResponse } from '../schemas'
+import type { JourneyTemplateEntry, FormResponse } from '../schemas'
 
 /**
  * A resolved, ordered step for a specific patient — after modifications and research overlays.

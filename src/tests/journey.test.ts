@@ -280,7 +280,6 @@ describe('computeParentDiff', () => {
     // Modify parent entry label
     const templates = service.getJourneyTemplates()
     const parent = templates.find((t) => t.id === 'jt-standard')!
-    const entry0 = parent.entries[0]
     service.saveJourneyTemplate({
       ...parent,
       entries: parent.entries.map((e, i) => (i === 0 ? { ...e, label: 'Updated first step' } : e)),
@@ -543,7 +542,6 @@ describe('getMergedDueStepsForPatient', () => {
 
     // On the startDate + 1 day (first step for jt-standard), both journeys should
     // have the same form due.  getMergedDueStepsForPatient should deduplicate.
-    const dueDate = original.startDate // first step offset=1, window=2 → covers startDate
     const firstStepDate = new Date(new Date(original.startDate).getTime() + 1 * 86_400_000)
       .toISOString()
       .slice(0, 10)

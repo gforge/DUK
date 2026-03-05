@@ -18,7 +18,7 @@ import {
 import AddIcon from '@mui/icons-material/Add'
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 import { useTranslation } from 'react-i18next'
-import type { QuestionnaireTemplate } from '../../../api/schemas'
+import type { QuestionnaireTemplate } from '../../../../api/schemas'
 
 export interface AliasRow {
   _id: string
@@ -121,7 +121,7 @@ export function ScoreAliasEditor({ selectedQT, aliasRows, onAdd, onUpdate, onDel
       {selectedQT && selectedQT.scoringRules.length > 0 && (
         <Box sx={{ mt: 1 }}>
           <Typography variant="caption" color="text.secondary" sx={{ mb: 0.5, display: 'block' }}>
-            {t('journey.entry.tapRuleToAdd') as string}
+            {t('journey.entry.tapRuleToAdd' as any)}
           </Typography>
           <Stack direction="row" gap={0.5} flexWrap="wrap">
             {selectedQT.scoringRules.map((r: { outputKey: string }) => (

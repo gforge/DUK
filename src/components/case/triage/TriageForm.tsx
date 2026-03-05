@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import React, { useEffect, useRef } from 'react'
 import {
   Box,
@@ -17,7 +18,7 @@ import { TriageInputSchema } from '../../../api/schemas'
 import type { Case } from '../../../api/schemas'
 import { z } from 'zod'
 import { parseDeadlineInput } from './parseDeadlineInput'
-import { ACTION_CONFIG, ACTION_ORDER, type TriageActionKey } from './actionConfig'
+import { ACTION_CONFIG, type TriageActionKey } from './actionConfig'
 import TriageContextBar from './TriageContextBar'
 import TriageActionCards from './TriageActionCards'
 import TriageActionDetails from './TriageActionDetails'
@@ -109,6 +110,7 @@ export default function TriageForm({ caseData, onSubmit }: Props) {
     await onSubmit(resolved)
   }
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const deadlineRaw = watch('deadline') ?? ''
 
   // ─── Step 1: Action cards ──────────────────────────────────────────────────

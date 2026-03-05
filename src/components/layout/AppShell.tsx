@@ -12,7 +12,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh' }}>
-      <TopBar drawerWidth={DRAWER_WIDTH} onMenuClick={() => setMobileOpen((o) => !o)} />
+      <TopBar onMenuClick={() => setMobileOpen((o) => !o)} />
       <SideNav
         drawerWidth={DRAWER_WIDTH}
         mobileOpen={mobileOpen}
