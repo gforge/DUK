@@ -21,8 +21,8 @@ import RouteIcon from '@mui/icons-material/Route'
 import AssignmentIcon from '@mui/icons-material/Assignment'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { useRole } from '../../store/roleContext'
-import { useNavItems } from '../../hooks/useNavItems'
+import { useRole } from '@/store/roleContext'
+import { useNavItems } from '@/hooks/useNavItems'
 
 interface SideNavProps {
   drawerWidth: number

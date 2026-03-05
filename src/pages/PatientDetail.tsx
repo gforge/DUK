@@ -24,11 +24,11 @@ import NavigateNextIcon from '@mui/icons-material/NavigateNext'
 import { Link, useParams, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { format } from 'date-fns'
-import { useApi } from '../hooks/useApi'
-import * as client from '../api/client'
-import StatusChip from '../components/common/StatusChip'
-import PatientJourneyResearchCard from '../components/patients/PatientJourneyResearchCard'
-import { formatPersonnummer } from '../api/utils/personnummer'
+import { useApi } from '@/hooks/useApi'
+import * as client from '@/api/client'
+import StatusChip from '@/components/common/StatusChip'
+import PatientJourneyResearchCard from '@/components/patients/PatientJourneyResearchCard'
+import { formatPersonnummer } from '@/api/utils/personnummer'
 
 export default function PatientDetail() {
   const { id } = useParams<{ id: string }>()

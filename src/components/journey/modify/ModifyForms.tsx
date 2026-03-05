@@ -10,8 +10,8 @@ import {
   Typography,
 } from '@mui/material'
 import { useTranslation } from 'react-i18next'
-import type { EffectiveStep } from '../../../api/service'
-import type { QuestionnaireTemplate } from '../../../api/schemas'
+import type { EffectiveStep } from '@/api/service'
+import type { QuestionnaireTemplate } from '@/api/schemas'
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 
 // ─── Add Step ─────────────────────────────────────────────────────────────────

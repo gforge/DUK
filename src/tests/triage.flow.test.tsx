@@ -4,11 +4,11 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { I18nextProvider } from 'react-i18next'
 import i18n from '../i18n'
-import TriageActionCards from '../components/case/triage/TriageActionCards'
-import TriageContextBar from '../components/case/triage/TriageContextBar'
-import TriageForm from '../components/case/triage/TriageForm'
-import { SEED_STATE } from '../api/seed'
-import { initStore } from '../api/storage'
+import TriageActionCards from '@/components/case/triage/TriageActionCards'
+import TriageContextBar from '@/components/case/triage/TriageContextBar'
+import TriageForm from '@/components/case/triage/TriageForm'
+import { SEED_STATE } from '@/api/seed'
+import { initStore } from '@/api/storage'
 
 beforeAll(() => {
   initStore(structuredClone(SEED_STATE))

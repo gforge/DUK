@@ -12,8 +12,8 @@ import {
 import ChevronRightIcon from '@mui/icons-material/ChevronRight'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
-import type { Patient, PatientJourney, JourneyTemplate } from '../../api/schemas'
-import { formatPersonnummer } from '../../api/utils/personnummer'
+import type { Patient, PatientJourney, JourneyTemplate } from '@/api/schemas'
+import { formatPersonnummer } from '@/api/utils/personnummer'
 import JourneyChips from './JourneyChips'
 
 interface Props {

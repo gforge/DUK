@@ -16,10 +16,10 @@ import {
 } from '@mui/material'
 import ReactMarkdown from 'react-markdown'
 import { useTranslation } from 'react-i18next'
-import * as client from '../../api/client'
-import { useSnack } from '../../store/snackContext'
-import { useRole } from '../../store/roleContext'
-import type { ResearchModule, Consent } from '../../api/schemas'
+import * as client from '@/api/client'
+import { useSnack } from '@/store/snackContext'
+import { useRole } from '@/store/roleContext'
+import type { ResearchModule, Consent } from '@/api/schemas'
 
 // ---------------------------------------------------------------------------
 // Grant consent dialog

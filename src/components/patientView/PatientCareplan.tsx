@@ -3,13 +3,13 @@ import { Box, Button, Chip, Divider, Paper, Stack, Tab, Tabs, Typography } from 
 import RouteIcon from '@mui/icons-material/Route'
 import ScienceIcon from '@mui/icons-material/Science'
 import { useTranslation } from 'react-i18next'
-import { useApi } from '../../hooks/useApi'
-import * as client from '../../api/client'
+import { useApi } from '@/hooks/useApi'
+import * as client from '@/api/client'
 import JourneyTimeline from '../journey/JourneyTimeline'
 import { ConsentDialog, RevokeConsentDialog, DeclineConsentDialog } from '../journey/ConsentDialog'
 import PatientClinicalReviews from './PatientClinicalReviews'
-import { useRole } from '../../store/roleContext'
-import type { PatientJourney, JourneyTemplate, ResearchModule, Consent } from '../../api/schemas'
+import { useRole } from '@/store/roleContext'
+import type { PatientJourney, JourneyTemplate, ResearchModule, Consent } from '@/api/schemas'
 
 const STATUS_ORDER: Record<string, number> = { ACTIVE: 0, SUSPENDED: 1, COMPLETED: 2 }
 

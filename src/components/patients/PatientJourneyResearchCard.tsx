@@ -14,10 +14,10 @@ import {
 import ScienceIcon from '@mui/icons-material/Science'
 import AddIcon from '@mui/icons-material/Add'
 import { useTranslation } from 'react-i18next'
-import { useSnack } from '../../store/snackContext'
-import * as client from '../../api/client'
+import { useSnack } from '@/store/snackContext'
+import * as client from '@/api/client'
 import { ConsentDialog, RevokeConsentDialog } from '../journey/ConsentDialog'
-import type { PatientJourney, ResearchModule, Consent } from '../../api/schemas'
+import type { PatientJourney, ResearchModule, Consent } from '@/api/schemas'
 
 interface Props {
   readonly journey: PatientJourney

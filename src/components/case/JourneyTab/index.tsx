@@ -1,9 +1,9 @@
 import React, { useState, useMemo } from 'react'
 import { Alert, Box, Paper, Skeleton, Stack } from '@mui/material'
 import { useTranslation } from 'react-i18next'
-import { useApi } from '../../../hooks/useApi'
-import * as client from '../../../api/client'
-import { useRole } from '../../../store/roleContext'
+import { useApi } from '@/hooks/useApi'
+import * as client from '@/api/client'
+import { useRole } from '@/store/roleContext'
 import JourneyTimeline from '../../journey/JourneyTimeline'
 import ModifyJourneyDialog from '../../journey/ModifyJourneyDialog'
 import JourneyModHistory from '../journey/JourneyModHistory'
@@ -13,7 +13,7 @@ import JourneyHeader from './JourneyHeader'
 import CancelJourneyDialog from './CancelJourneyDialog'
 import PauseConfirmDialog from './PauseConfirmDialog'
 import { useJourneyActions } from './useJourneyActions'
-import type { Case } from '../../../api/schemas'
+import type { Case } from '@/api/schemas'
 
 const STATUS_ORDER: Record<string, number> = { ACTIVE: 0, SUSPENDED: 1, COMPLETED: 2 }
 

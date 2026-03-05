@@ -4,9 +4,9 @@ import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline'
 import DownloadIcon from '@mui/icons-material/Download'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import { useTranslation } from 'react-i18next'
-import { clearState } from '../../api/storage'
-import { CURRENT_SCHEMA_VERSION } from '../../api/schemaVersion'
-import type { MigrationResultErr } from '../../api/migrations'
+import { clearState } from '@/api/storage'
+import { CURRENT_SCHEMA_VERSION } from '@/api/schemaVersion'
+import type { MigrationResultErr } from '@/api/migrations'
 
 interface Props {
   error: MigrationResultErr

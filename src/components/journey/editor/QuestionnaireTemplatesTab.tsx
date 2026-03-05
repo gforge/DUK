@@ -23,7 +23,7 @@ import AddIcon from '@mui/icons-material/Add'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 import { useTranslation } from 'react-i18next'
-import type { QuestionnaireTemplate } from '../../../api/schemas'
+import type { QuestionnaireTemplate } from '@/api/schemas'
 import QuestionnaireEditorDialog from './QuestionnaireEditorDialog'
 
 interface Props {

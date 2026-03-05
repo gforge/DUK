@@ -3,10 +3,10 @@ import { Alert, Button, Chip, CircularProgress, Paper, Stack, Typography } from 
 import AssignmentIcon from '@mui/icons-material/Assignment'
 import ScheduleIcon from '@mui/icons-material/Schedule'
 import { useTranslation } from 'react-i18next'
-import { useApi } from '../../hooks/useApi'
-import * as client from '../../api/client'
-import type { MergedDueStep } from '../../api/service'
-import type { QuestionnaireTemplate } from '../../api/schemas'
+import { useApi } from '@/hooks/useApi'
+import * as client from '@/api/client'
+import type { MergedDueStep } from '@/api/service'
+import type { QuestionnaireTemplate } from '@/api/schemas'
 
 interface Props {
   patientId: string

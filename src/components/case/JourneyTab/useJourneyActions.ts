@@ -1,9 +1,9 @@
 import { useState, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
-import * as client from '../../../api/client'
-import { useSnack } from '../../../store/snackContext'
-import { useRole } from '../../../store/roleContext'
-import type { PatientJourney, JourneyModification } from '../../../api/schemas'
+import * as client from '@/api/client'
+import { useSnack } from '@/store/snackContext'
+import { useRole } from '@/store/roleContext'
+import type { PatientJourney, JourneyModification } from '@/api/schemas'
 
 interface UseJourneyActionsParams {
   readonly selectedJourney: PatientJourney | null

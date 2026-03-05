@@ -14,8 +14,8 @@ import {
 import BiotechIcon from '@mui/icons-material/Biotech'
 import ImageIcon from '@mui/icons-material/Image'
 import { useTranslation } from 'react-i18next'
-import { useApi } from '../../hooks/useApi'
-import * as client from '../../api/client'
+import { useApi } from '@/hooks/useApi'
+import * as client from '@/api/client'
 
 interface Props {
   patientId: string

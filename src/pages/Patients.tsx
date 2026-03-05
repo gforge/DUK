@@ -3,11 +3,11 @@ import { Alert, Box, Button, CircularProgress, Stack, TextField, Typography } fr
 import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt'
 import PersonIcon from '@mui/icons-material/Person'
 import { useTranslation } from 'react-i18next'
-import { useApi } from '../hooks/useApi'
-import * as client from '../api/client'
-import { useRole } from '../store/roleContext'
-import PatientTable from '../components/patients/PatientTable'
-import RegisterPatientDialog from '../components/patients/RegisterPatientDialog'
+import { useApi } from '@/hooks/useApi'
+import * as client from '@/api/client'
+import { useRole } from '@/store/roleContext'
+import PatientTable from '@/components/patients/PatientTable'
+import RegisterPatientDialog from '@/components/patients/RegisterPatientDialog'
 
 export default function Patients() {
   const { t } = useTranslation()

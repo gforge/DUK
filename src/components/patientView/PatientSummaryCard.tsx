@@ -2,8 +2,8 @@ import React from 'react'
 import { Card, CardContent, CircularProgress, Stack, Typography } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 import { format } from 'date-fns'
-import type { Patient } from '../../api/schemas'
-import { formatPersonnummer } from '../../api/utils/personnummer'
+import type { Patient } from '@/api/schemas'
+import { formatPersonnummer } from '@/api/utils/personnummer'
 
 interface Props {
   patient: Patient | null | undefined

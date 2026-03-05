@@ -16,10 +16,10 @@ import PhoneMissedIcon from '@mui/icons-material/PhoneMissed'
 import BiotechIcon from '@mui/icons-material/Biotech'
 import ImageIcon from '@mui/icons-material/Image'
 import { useTranslation } from 'react-i18next'
-import type { Case, CaseCategory, Patient } from '../../api/schemas'
+import type { Case, CaseCategory, Patient } from '@/api/schemas'
 import type { SortMode } from './sortCases'
 import CaseListItem from './CaseListItem'
-import { useRovingTabIndex } from '../../hooks/useRovingTabIndex'
+import { useRovingTabIndex } from '@/hooks/useRovingTabIndex'
 
 interface QueueColumnProps {
   readonly category: CaseCategory

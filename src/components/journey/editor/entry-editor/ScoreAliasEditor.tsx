@@ -18,7 +18,7 @@ import {
 import AddIcon from '@mui/icons-material/Add'
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 import { useTranslation } from 'react-i18next'
-import type { QuestionnaireTemplate } from '../../../../api/schemas'
+import type { QuestionnaireTemplate } from '@/api/schemas'
 
 export interface AliasRow {
   _id: string

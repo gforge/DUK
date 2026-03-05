@@ -37,7 +37,7 @@ import type {
   JourneyTemplateEntry,
   QuestionnaireTemplate,
   InstructionTemplate,
-} from '../../../api/schemas'
+} from '@/api/schemas'
 import { AliasRow, ScoreAliasEditor } from './entry-editor'
 import { slugify } from '../../../utils/slugify'
 import { suggestWindowDays } from '../../../utils/journeyUtils'

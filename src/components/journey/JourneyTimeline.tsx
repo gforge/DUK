@@ -26,8 +26,8 @@ import RepeatIcon from '@mui/icons-material/Repeat'
 import BiotechIcon from '@mui/icons-material/Biotech'
 import ImageIcon from '@mui/icons-material/Image'
 import { useTranslation } from 'react-i18next'
-import type { EffectiveStep } from '../../api/service'
-import type { FormResponse } from '../../api/schemas'
+import type { EffectiveStep } from '@/api/service'
+import type { FormResponse } from '@/api/schemas'
 
 type StepStatus = 'SUBMITTED' | 'UPCOMING' | 'OVERDUE'
 

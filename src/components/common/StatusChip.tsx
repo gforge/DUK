@@ -7,7 +7,7 @@ import TaskAltIcon from '@mui/icons-material/TaskAlt'
 import ScheduleIcon from '@mui/icons-material/Schedule'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import { useTranslation } from 'react-i18next'
-import type { CaseStatus } from '../../api/schemas'
+import type { CaseStatus } from '@/api/schemas'
 
 const STATUS_COLORS: Record<CaseStatus, ChipProps['color']> = {
   NEW: 'default',

@@ -4,11 +4,11 @@ import PersonIcon from '@mui/icons-material/Person'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { format } from 'date-fns'
-import { formatPersonnummer } from '../../api/utils/personnummer'
+import { formatPersonnummer } from '@/api/utils/personnummer'
 import TriggerChips from '../common/TriggerChips'
 import DeadlineLabel from '../common/DeadlineLabel'
 import AutoWarningsBadge from '../common/AutoWarningsBadge'
-import type { Case, Patient } from '../../api/schemas'
+import type { Case, Patient } from '@/api/schemas'
 
 interface PatientCardProps {
   readonly patient: Patient

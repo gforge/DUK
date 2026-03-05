@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react'
-import type { Role, User } from '../api/schemas'
+import type { Role, User } from '@/api/schemas'
 
 const DEMO_USERS: User[] = [
   { id: 'user-pal-1', name: 'Dr. Sara Lindqvist (PAL)', role: 'PAL' },

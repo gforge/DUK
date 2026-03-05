@@ -11,7 +11,7 @@ import ReportProblemIcon from '@mui/icons-material/ReportProblem'
 import BiotechIcon from '@mui/icons-material/Biotech'
 import ImageIcon from '@mui/icons-material/Image'
 import { useTranslation } from 'react-i18next'
-import type { TriggerType } from '../../api/schemas'
+import type { TriggerType } from '@/api/schemas'
 
 interface TriggerChipsProps {
   readonly triggers: TriggerType[]

@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next'
 import RoleSwitcher from '../common/RoleSwitcher'
 import LanguageSwitcher from '../common/LanguageSwitcher'
 import GlobalSearch from './GlobalSearch'
-import { useRole } from '../../store/roleContext'
+import { useRole } from '@/store/roleContext'
 
 interface TopBarProps {
   onMenuClick: () => void

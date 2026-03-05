@@ -23,7 +23,7 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
 import AddIcon from '@mui/icons-material/Add'
 import { useTranslation } from 'react-i18next'
-import type { InstructionTemplate } from '../../../api/schemas'
+import type { InstructionTemplate } from '@/api/schemas'
 
 interface Props {
   instructionTemplates: InstructionTemplate[] | null

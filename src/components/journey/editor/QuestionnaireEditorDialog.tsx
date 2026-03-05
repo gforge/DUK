@@ -27,7 +27,7 @@ import {
 import AddIcon from '@mui/icons-material/Add'
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 import { useTranslation } from 'react-i18next'
-import type { QuestionnaireTemplate, Question } from '../../../api/schemas'
+import type { QuestionnaireTemplate, Question } from '@/api/schemas'
 
 const mkId = () => Date.now().toString(36) + '-' + Math.random().toString(36).slice(2)
 

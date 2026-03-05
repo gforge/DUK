@@ -18,7 +18,7 @@ import {
 } from '@mui/material'
 import WarningAmberIcon from '@mui/icons-material/WarningAmber'
 import { useTranslation } from 'react-i18next'
-import type { PolicyWarning } from '../../api/schemas'
+import type { PolicyWarning } from '@/api/schemas'
 import { format, parseISO } from 'date-fns'
 
 interface AutoWarningsBadgeProps {

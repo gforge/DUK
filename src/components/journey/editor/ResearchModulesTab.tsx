@@ -35,7 +35,7 @@ import type {
   ResearchModule,
   ResearchModuleEntry,
   QuestionnaireTemplate,
-} from '../../../api/schemas'
+} from '@/api/schemas'
 
 const mkId = () => Date.now().toString(36) + '-' + Math.random().toString(36).slice(2)
 

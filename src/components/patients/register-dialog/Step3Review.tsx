@@ -1,7 +1,7 @@
 import React from 'react'
 import { Box, Stack, Typography } from '@mui/material'
 import { useTranslation } from 'react-i18next'
-import type { JourneyTemplate } from '../../../api/schemas'
+import type { JourneyTemplate } from '@/api/schemas'
 
 interface Props {
   effectiveName: string

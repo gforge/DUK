@@ -13,10 +13,10 @@ import {
 } from '@mui/material'
 import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt'
 import { useTranslation } from 'react-i18next'
-import { useApi } from '../../hooks/useApi'
-import { useSnack } from '../../store/snackContext'
-import * as client from '../../api/client'
-import { parsePersonnummer } from '../../api/utils/personnummer'
+import { useApi } from '@/hooks/useApi'
+import { useSnack } from '@/store/snackContext'
+import * as client from '@/api/client'
+import { parsePersonnummer } from '@/api/utils/personnummer'
 
 // split steps to reduce component length
 import { Step0PatientDetails } from './register-dialog/Step0PatientDetails'

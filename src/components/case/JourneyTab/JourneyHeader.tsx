@@ -6,7 +6,7 @@ import PauseIcon from '@mui/icons-material/Pause'
 import PlayArrowIcon from '@mui/icons-material/PlayArrow'
 import RouteIcon from '@mui/icons-material/Route'
 import { useTranslation } from 'react-i18next'
-import type { JourneyTemplate, PatientJourney } from '../../../api/schemas'
+import type { JourneyTemplate, PatientJourney } from '@/api/schemas'
 
 function journeyStatusColor(status: string): 'primary' | 'warning' | 'default' {
   if (status === 'ACTIVE') return 'primary'

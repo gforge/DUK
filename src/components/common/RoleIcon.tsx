@@ -4,7 +4,7 @@ import LocalHospitalIcon from '@mui/icons-material/LocalHospital'
 import MedicalServicesIcon from '@mui/icons-material/MedicalServices'
 import BadgeIcon from '@mui/icons-material/Badge'
 import { useTranslation } from 'react-i18next'
-import type { Role } from '../../api/schemas'
+import type { Role } from '@/api/schemas'
 
 interface Props {
   readonly role: Role

@@ -20,11 +20,11 @@ import {
 import SendIcon from '@mui/icons-material/Send'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import { useTranslation } from 'react-i18next'
-import { useSnack } from '../../store/snackContext'
-import * as client from '../../api/client'
-import type { QuestionnaireTemplate, Question } from '../../api/schemas'
-import type { MergedDueStep } from '../../api/service'
-import type { JourneyStepContext } from '../../api/service/forms'
+import { useSnack } from '@/store/snackContext'
+import * as client from '@/api/client'
+import type { QuestionnaireTemplate, Question } from '@/api/schemas'
+import type { MergedDueStep } from '@/api/service'
+import type { JourneyStepContext } from '@/api/service/forms'
 
 interface Props {
   step: MergedDueStep

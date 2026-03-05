@@ -17,10 +17,10 @@ import SearchIcon from '@mui/icons-material/Search'
 import PersonIcon from '@mui/icons-material/Person'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
-import { useRole } from '../../store/roleContext'
-import * as client from '../../api/client'
-import type { Patient } from '../../api/schemas'
-import { formatPersonnummer } from '../../api/utils/personnummer'
+import { useRole } from '@/store/roleContext'
+import * as client from '@/api/client'
+import type { Patient } from '@/api/schemas'
+import { formatPersonnummer } from '@/api/utils/personnummer'
 
 const MAX_RESULTS = 10
 

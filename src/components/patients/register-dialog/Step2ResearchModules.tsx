@@ -2,7 +2,7 @@ import React from 'react'
 import { Checkbox, FormControlLabel, FormGroup, Stack, Typography } from '@mui/material'
 import ScienceIcon from '@mui/icons-material/Science'
 import { useTranslation } from 'react-i18next'
-import type { ResearchModule } from '../../../api/schemas'
+import type { ResearchModule } from '@/api/schemas'
 
 interface Props {
   selectedModuleIds: string[]

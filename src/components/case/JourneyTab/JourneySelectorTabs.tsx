@@ -1,7 +1,7 @@
 import React from 'react'
 import { Chip, Stack, Tab, Tabs } from '@mui/material'
 import { useTranslation } from 'react-i18next'
-import type { JourneyTemplate, PatientJourney } from '../../../api/schemas'
+import type { JourneyTemplate, PatientJourney } from '@/api/schemas'
 
 function journeyStatusColor(status: string): 'primary' | 'warning' | 'default' {
   if (status === 'ACTIVE') return 'primary'

@@ -22,7 +22,7 @@ import type {
   ResearchModule,
   JourneyTemplate,
   Patient,
-} from '../../../api/schemas'
+} from '@/api/schemas'
 
 const MOD_ICON: Record<string, React.ReactNode> = {
   ADD_STEP: <AddIcon fontSize="inherit" />,

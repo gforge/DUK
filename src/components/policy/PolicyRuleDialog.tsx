@@ -20,8 +20,8 @@ import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useTranslation } from 'react-i18next'
-import { validateExpression } from '../../api/policyParser'
-import type { PolicyVariable } from '../../api/service'
+import { validateExpression } from '@/api/policyParser'
+import type { PolicyVariable } from '@/api/service'
 
 const SEVERITIES = ['LOW', 'MEDIUM', 'HIGH'] as const
 export { SEVERITIES }

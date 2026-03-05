@@ -1,7 +1,7 @@
 import React, { Suspense, lazy } from 'react'
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { CircularProgress, Box } from '@mui/material'
-import AppShell from '../components/layout/AppShell'
+import AppShell from '@/components/layout/AppShell'
 
 const Dashboard = lazy(() => import('../pages/Dashboard'))
 const CaseDetail = lazy(() => import('../pages/CaseDetail'))

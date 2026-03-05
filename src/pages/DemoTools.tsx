@@ -13,12 +13,12 @@ import {
   LinearProgress,
 } from '@mui/material'
 import { useTranslation } from 'react-i18next'
-import { useSnack } from '../store/snackContext'
-import * as client from '../api/client'
-import SeedPanel from '../components/demo/SeedPanel'
-import ExportPanel from '../components/demo/ExportPanel'
-import ImportPanel from '../components/demo/ImportPanel'
-import type { ConfirmAction } from '../components/demo/SeedPanel'
+import { useSnack } from '@/store/snackContext'
+import * as client from '@/api/client'
+import SeedPanel from '@/components/demo/SeedPanel'
+import ExportPanel from '@/components/demo/ExportPanel'
+import ImportPanel from '@/components/demo/ImportPanel'
+import type { ConfirmAction } from '@/components/demo/SeedPanel'
 
 export default function DemoTools() {
   const { t } = useTranslation()

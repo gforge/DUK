@@ -5,7 +5,7 @@ import CancelIcon from '@mui/icons-material/Cancel'
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline'
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz'
 import { useTranslation } from 'react-i18next'
-import type { JourneyModification, JourneyTemplate } from '../../../api/schemas'
+import type { JourneyModification, JourneyTemplate } from '@/api/schemas'
 
 const MOD_ICON: Record<string, React.ReactNode> = {
   ADD_STEP: <AddIcon fontSize="small" />,

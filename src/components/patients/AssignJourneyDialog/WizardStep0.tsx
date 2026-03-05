@@ -14,7 +14,7 @@ import {
 } from '@mui/material'
 import ScienceIcon from '@mui/icons-material/Science'
 import { useTranslation } from 'react-i18next'
-import type { JourneyTemplate, ResearchModule } from '../../../api/schemas'
+import type { JourneyTemplate, ResearchModule } from '@/api/schemas'
 
 interface Props {
   readonly journeyTemplateId: string

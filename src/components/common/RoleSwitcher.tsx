@@ -12,8 +12,8 @@ import {
 import SwitchAccountIcon from '@mui/icons-material/SwitchAccount'
 import CheckIcon from '@mui/icons-material/Check'
 import { useTranslation } from 'react-i18next'
-import { useRole } from '../../store/roleContext'
-import type { User } from '../../api/schemas'
+import { useRole } from '@/store/roleContext'
+import type { User } from '@/api/schemas'
 
 export default function RoleSwitcher() {
   const { t } = useTranslation()

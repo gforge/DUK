@@ -17,7 +17,7 @@ import {
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
 import { useTranslation } from 'react-i18next'
-import type { PolicyRule } from '../../api/schemas'
+import type { PolicyRule } from '@/api/schemas'
 
 interface Props {
   rules: PolicyRule[]

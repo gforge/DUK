@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { pushSnapshot, applyUndo, peekSnapshot, type UndoSnapshot } from '../api/undoHistory'
+import { pushSnapshot, applyUndo, peekSnapshot, type UndoSnapshot } from '@/api/undoHistory'
 
 interface UseEditorUndoOptions {
   /** Called after a successful undo so the consumer can refetch data. */

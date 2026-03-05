@@ -15,7 +15,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import { useTranslation } from 'react-i18next'
 import { format } from 'date-fns'
 import StatusChip from '../common/StatusChip'
-import type { Case } from '../../api/schemas'
+import type { Case } from '@/api/schemas'
 
 interface Props {
   cases: Case[] | null

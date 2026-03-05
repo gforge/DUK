@@ -12,9 +12,9 @@ import {
 import SmartphoneIcon from '@mui/icons-material/Smartphone'
 import ContactPhoneIcon from '@mui/icons-material/ContactPhone'
 import { useTranslation } from 'react-i18next'
-import { useSnack } from '../../store/snackContext'
-import * as client from '../../api/client'
-import type { Case } from '../../api/schemas'
+import { useSnack } from '@/store/snackContext'
+import * as client from '@/api/client'
+import type { Case } from '@/api/schemas'
 
 interface Props {
   patientId: string
