@@ -28,7 +28,8 @@ import { useApi } from '@/hooks/useApi'
 import * as client from '@/api/client'
 import StatusChip from '@/components/common/StatusChip'
 import PatientJourneyResearchCard from '@/components/patients/PatientJourneyResearchCard'
-import { formatPersonnummer } from '@/api/utils/personnummer'
+import PatientSummary from '@/components/patients/PatientSummary'
+import CasesSection from '@/components/patients/CasesSection'
 
 export default function PatientDetail() {
   const { id } = useParams<{ id: string }>()
@@ -112,126 +113,10 @@ export default function PatientDetail() {
       </Breadcrumbs>
 
       {/* Patient summary */}
-      <Paper variant="outlined" sx={{ p: 2.5, borderRadius: 2, mb: 3 }}>
-        <Stack direction="row" alignItems="center" gap={1.5} mb={1}>
-          <PersonIcon color="primary" />
-          <Typography variant="h5" fontWeight={700}>
-            {patient.displayName}
-          </Typography>
-        </Stack>
-        <Stack direction="row" gap={4} flexWrap="wrap">
-          <Box>
-            <Typography variant="caption" color="text.secondary">
-              {t('patients.personalNumber')}
-            </Typography>
-            <Typography variant="body2" fontWeight={500}>
-              {formatPersonnummer(patient.personalNumber)}
-            </Typography>
-          </Box>
-          <Box>
-            <Typography variant="caption" color="text.secondary">
-              {t('patients.dateOfBirth')}
-            </Typography>
-            <Typography variant="body2" fontWeight={500}>
-              {patient.dateOfBirth}
-            </Typography>
-          </Box>
-          {patient.lastOpenedAt && (
-            <Box>
-              <Typography variant="caption" color="text.secondary">
-                {t('patient.lastOpened')}
-              </Typography>
-              <Typography variant="body2" fontWeight={500}>
-                {format(new Date(patient.lastOpenedAt), 'dd MMM yyyy HH:mm')}
-              </Typography>
-            </Box>
-          )}
-          <Box>
-            <Typography variant="caption" color="text.secondary">
-              {t('patientDetail.registered')}
-            </Typography>
-            <Typography variant="body2" fontWeight={500}>
-              {format(new Date(patient.createdAt), 'dd MMM yyyy')}
-            </Typography>
-          </Box>
-        </Stack>
-      </Paper>
+      <PatientSummary patient={patient} />
 
       {/* Cases */}
-      <Paper variant="outlined" sx={{ p: 2.5, borderRadius: 2, mb: 3 }}>
-        <Stack direction="row" alignItems="center" gap={1} mb={1.5}>
-          <AssignmentIcon color="primary" fontSize="small" />
-          <Typography variant="subtitle1" fontWeight={600}>
-            {t('patientDetail.cases')}
-          </Typography>
-          <Chip label={sortedCases.length} size="small" variant="outlined" />
-        </Stack>
-
-        {sortedCases.length === 0 ? (
-          <Typography variant="body2" color="text.secondary">
-            {t('patientDetail.noCases')}
-          </Typography>
-        ) : (
-          <Table size="small">
-            <TableHead>
-              <TableRow>
-                <TableCell>{t('case.status')}</TableCell>
-                <TableCell>{t('case.category')}</TableCell>
-                <TableCell>{t('patientDetail.triggers')}</TableCell>
-                <TableCell>{t('patientDetail.created')}</TableCell>
-                <TableCell>{t('patientDetail.lastActivity')}</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {sortedCases.map((c) => (
-                <TableRow
-                  key={c.id}
-                  hover
-                  sx={{ cursor: 'pointer' }}
-                  onClick={() => navigate(`/cases/${c.id}`)}
-                >
-                  <TableCell>
-                    <StatusChip status={c.status} />
-                  </TableCell>
-                  <TableCell>
-                    <Chip label={t(`category.${c.category}`)} size="small" variant="outlined" />
-                  </TableCell>
-                  <TableCell>
-                    {c.triggers.length > 0 ? (
-                      <Stack direction="row" gap={0.5} flexWrap="wrap">
-                        {c.triggers.map((tr) => (
-                          <Chip
-                            key={tr}
-                            label={t(`trigger.${tr}`)}
-                            size="small"
-                            color="error"
-                            variant="outlined"
-                            sx={{ height: 20, fontSize: 10 }}
-                          />
-                        ))}
-                      </Stack>
-                    ) : (
-                      <Typography variant="caption" color="text.secondary">
-                        —
-                      </Typography>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="caption">
-                      {format(new Date(c.createdAt), 'dd MMM yyyy')}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="caption">
-                      {format(new Date(c.lastActivityAt), 'dd MMM yyyy HH:mm')}
-                    </Typography>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        )}
-      </Paper>
+      <CasesSection cases={sortedCases} onRowClick={(caseId) => navigate(`/cases/${caseId}`)} />
 
       {/* Journeys */}
       <Paper variant="outlined" sx={{ p: 2.5, borderRadius: 2, mb: 3 }}>

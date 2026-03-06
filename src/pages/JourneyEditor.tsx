@@ -18,21 +18,7 @@ import PatientJourneysTable from '@/components/journey/editor/PatientJourneysTab
 import InstructionTemplatesTab from '@/components/journey/editor/InstructionTemplatesTab'
 import QuestionnaireTemplatesTab from '@/components/journey/editor/QuestionnaireTemplatesTab'
 
-function TabPanel({
-  children,
-  value,
-  index,
-}: {
-  children: React.ReactNode
-  value: number
-  index: number
-}) {
-  return (
-    <div role="tabpanel" hidden={value !== index} id={`journey-tabpanel-${index}`}>
-      {value === index && <Box sx={{ pt: 2 }}>{children}</Box>}
-    </div>
-  )
-}
+import TabPanel from '@/components/common/TabPanel'
 
 export default function JourneyEditor() {
   const { t } = useTranslation()
