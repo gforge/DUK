@@ -6,6 +6,7 @@ import PauseIcon from '@mui/icons-material/Pause'
 import PlayArrowIcon from '@mui/icons-material/PlayArrow'
 import RouteIcon from '@mui/icons-material/Route'
 import { useTranslation } from 'react-i18next'
+import { useJourneyStatusLabel } from '@/hooks/labels'
 import type { JourneyTemplate, PatientJourney } from '@/api/schemas'
 
 function journeyStatusColor(status: string): 'primary' | 'warning' | 'default' {
@@ -36,6 +37,7 @@ export default function JourneyHeader({
   onCancelClick,
 }: JourneyHeaderProps) {
   const { t } = useTranslation()
+  const getJourneyStatusLabel = useJourneyStatusLabel()
 
   return (
     <Stack direction="row" alignItems="flex-start" justifyContent="space-between" mb={1.5}>
@@ -47,7 +49,7 @@ export default function JourneyHeader({
           </Typography>
           {showStatusChip && (
             <Chip
-              label={t(`journey.journeyStatus.${journey.status}`)}
+              label={getJourneyStatusLabel(journey.status)}
               size="small"
               color={journeyStatusColor(journey.status)}
               variant="outlined"

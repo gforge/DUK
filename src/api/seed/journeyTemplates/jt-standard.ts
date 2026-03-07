@@ -16,6 +16,7 @@ export const jtStandard: JourneyTemplate = {
       dashboardCategory: 'ACUTE',
       scoreAliases: { PNRS_1: 'PNRS_baseline' },
       scoreAliasLabels: { PNRS_baseline: 'VAS (PNRS) vid dag 1–2' },
+      reviewTypes: ['LAB', 'XRAY'],
       instructionTemplateId: 'it-wound-care',
     },
     {

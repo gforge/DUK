@@ -23,6 +23,7 @@ import ScienceIcon from '@mui/icons-material/Science'
 import NavigateNextIcon from '@mui/icons-material/NavigateNext'
 import { Link, useParams, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { useJourneyStatusLabel } from '@/hooks/labels'
 import { format } from 'date-fns'
 import { useApi } from '@/hooks/useApi'
 import * as client from '@/api/client'
@@ -34,6 +35,7 @@ import CasesSection from '@/components/patients/CasesSection'
 export default function PatientDetail() {
   const { id } = useParams<{ id: string }>()
   const { t } = useTranslation()
+  const getJourneyStatusLabel = useJourneyStatusLabel()
   const navigate = useNavigate()
 
   const { data: patient, loading, error } = useApi(() => client.getPatient(id!), [id])
@@ -152,7 +154,7 @@ export default function PatientDetail() {
                   </TableCell>
                   <TableCell>
                     <Chip
-                      label={t(`journey.journeyStatus.${j.status}`)}
+                      label={getJourneyStatusLabel(j.status)}
                       size="small"
                       color={journeyStatusColor(j.status)}
                       variant="outlined"
@@ -188,7 +190,7 @@ export default function PatientDetail() {
                     {templateName(j.journeyTemplateId)}
                   </Typography>
                   <Chip
-                    label={t(`journey.journeyStatus.${j.status}`)}
+                    label={getJourneyStatusLabel(j.status)}
                     size="small"
                     color={journeyStatusColor(j.status)}
                     variant="outlined"

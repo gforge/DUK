@@ -60,3 +60,17 @@ export function useRole(): RoleContextValue {
   if (!ctx) throw new Error('useRole must be used within RoleProvider')
   return ctx
 }
+
+/**
+ * Same as `useRole` but returns `null` when called outside a provider instead of
+ * throwing. Useful for utility components that may be rendered in isolation by
+ * tests.
+ */
+// eslint-disable-next-line react-refresh/only-export-components
+export function useOptionalRole(): RoleContextValue | null {
+  try {
+    return useRole()
+  } catch {
+    return null
+  }
+}

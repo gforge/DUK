@@ -16,6 +16,7 @@ import PhoneMissedIcon from '@mui/icons-material/PhoneMissed'
 import BiotechIcon from '@mui/icons-material/Biotech'
 import ImageIcon from '@mui/icons-material/Image'
 import { useTranslation } from 'react-i18next'
+import { useCategoryLabel, useCategoryDescLabel } from '@/hooks/labels'
 import type { Case, CaseCategory, Patient } from '@/api/schemas'
 import type { SortMode } from './sortCases'
 import CaseListItem from './CaseListItem'
@@ -48,7 +49,9 @@ export default function QueueColumn({
   onToggle,
 }: QueueColumnProps) {
   const { t } = useTranslation()
-  const categoryLabel = t(`category.${category}`)
+  const getCategoryLabel = useCategoryLabel()
+  const getCategoryDescLabel = useCategoryDescLabel()
+  const categoryLabel = getCategoryLabel(category)
   const { getItemProps } = useRovingTabIndex(expanded ? cases.length + waitingCases.length : 0)
 
   const warningCount = cases.filter((c) => c.policyWarnings.length > 0).length
@@ -85,10 +88,10 @@ export default function QueueColumn({
         {/* Category title + desc */}
         <Box sx={{ flex: 1 }}>
           <Typography variant="subtitle1" fontWeight={700} component="span">
-            {t(`category.${category}`)}
+            {getCategoryLabel(category)}
           </Typography>
           <Typography variant="caption" color="text.secondary" sx={{ ml: 1 }}>
-            {t(`category.${category}_desc`)}
+            {getCategoryDescLabel(category)}
           </Typography>
         </Box>
 

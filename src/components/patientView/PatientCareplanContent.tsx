@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Box, Chip, Paper, Stack, Tab, Tabs, Typography } from '@mui/material'
 import RouteIcon from '@mui/icons-material/Route'
 import { useTranslation } from 'react-i18next'
+import { useJourneyStatusLabel } from '@/hooks/labels'
 import { useApi } from '@/hooks/useApi'
 import * as client from '@/api/client'
 import { JourneyTimeline } from '../journey'
@@ -30,6 +31,7 @@ export default function PatientCareplan({
   patientId,
 }: Readonly<Props>) {
   const { t } = useTranslation()
+  const getJourneyStatusLabel = useJourneyStatusLabel()
   const { currentUser } = useRole()
   const sortedJourneys = [...journeys].sort(
     (a, b) =>
@@ -56,6 +58,16 @@ export default function PatientCareplan({
   const { data: cases } = useApi(() => client.getCasesByPatient(patientId), [patientId])
   const journeyReviews =
     cases?.flatMap((c) => c.reviews ?? []).filter((review) => review.source === 'JOURNEY') ?? []
+
+  // Fetch form responses so JourneyTimeline can mark completed steps
+  const { data: patientFormResponses } = useApi(
+    () =>
+      client
+        .getCasesByPatient(patientId)
+        .then((allCases) => Promise.all(allCases.map((c) => client.getFormResponses(c.id))))
+        .then((arr) => arr.flat()),
+    [patientId],
+  )
 
   const journeyName = selectedJourney
     ? journeyTemplates?.find((jt) => jt.id === selectedJourney.journeyTemplateId)?.name
@@ -99,7 +111,7 @@ export default function PatientCareplan({
                       <Stack direction="row" alignItems="center" gap={0.5}>
                         <span>{tmpl?.name ?? j.journeyTemplateId}</span>
                         <Chip
-                          label={t(`journey.journeyStatus.${j.status}`)}
+                          label={getJourneyStatusLabel(j.status)}
                           size="small"
                           color={getStatusChipColor(j.status)}
                           variant="outlined"
@@ -115,7 +127,7 @@ export default function PatientCareplan({
           <Box>
             <JourneyTimeline
               steps={effectiveSteps ?? []}
-              formResponses={[]}
+              formResponses={patientFormResponses ?? []}
               reviews={journeyReviews}
               journeyName={sortedJourneys.length > 1 ? undefined : journeyName}
             />

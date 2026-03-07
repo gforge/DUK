@@ -12,11 +12,13 @@ import {
 import SwitchAccountIcon from '@mui/icons-material/SwitchAccount'
 import CheckIcon from '@mui/icons-material/Check'
 import { useTranslation } from 'react-i18next'
+import { useRoleLabel } from '@/hooks/labels'
 import { useRole } from '@/store/roleContext'
 import type { User } from '@/api/schemas'
 
 export default function RoleSwitcher() {
   const { t } = useTranslation()
+  const getRoleLabel = useRoleLabel()
   const { currentUser, setCurrentUser, availableUsers } = useRole()
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
 
@@ -59,7 +61,7 @@ export default function RoleSwitcher() {
             </ListItemIcon>
             <ListItemText
               primary={user.name}
-              secondary={t(`role.${user.role}`)}
+              secondary={getRoleLabel(user.role)}
               secondaryTypographyProps={{ fontSize: 11 }}
             />
           </MenuItem>

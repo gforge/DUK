@@ -14,6 +14,7 @@ import {
 import BiotechIcon from '@mui/icons-material/Biotech'
 import ImageIcon from '@mui/icons-material/Image'
 import { useTranslation } from 'react-i18next'
+import { useReviewTypeLabel } from '@/hooks/labels'
 import { useApi } from '@/hooks/useApi'
 import * as client from '@/api/client'
 
@@ -23,15 +24,19 @@ interface Props {
 
 export default function PatientClinicalReviews({ patientId }: Readonly<Props>) {
   const { t } = useTranslation()
+  const getReviewTypeLabel = useReviewTypeLabel()
   const [openDetails, setOpenDetails] = useState(false)
 
   // Fetch all cases to find reviews
   const { data: cases } = useApi(() => client.getCasesByPatient(patientId), [patientId])
 
-  // Collect all reviews from all cases (both pending and completed)
+  // Collect only MANUAL reviews — JOURNEY reviews are shown inline on each timeline step
   const allReviews = React.useMemo(() => {
     if (!cases) return []
-    return cases.flatMap((c) => c.reviews?.map((r) => ({ ...r, caseId: c.id })) ?? [])
+    return cases.flatMap(
+      (c) =>
+        c.reviews?.filter((r) => r.source === 'MANUAL').map((r) => ({ ...r, caseId: c.id })) ?? [],
+    )
   }, [cases])
 
   const allPendingReviews = allReviews.filter((r) => r.reviewedAt === null)
@@ -132,7 +137,7 @@ export default function PatientClinicalReviews({ patientId }: Readonly<Props>) {
                         <ImageIcon color="info" fontSize="small" />
                       )}
                       <Typography variant="body2" fontWeight={600}>
-                        {t(`reviewType.${review.type}`)}
+                        {getReviewTypeLabel(review.type)}
                       </Typography>
                       <Chip
                         label={t('review.pending')}
@@ -191,7 +196,7 @@ export default function PatientClinicalReviews({ patientId }: Readonly<Props>) {
                         <ImageIcon color="success" fontSize="small" />
                       )}
                       <Typography variant="body2" fontWeight={600}>
-                        {t(`reviewType.${review.type}`)}
+                        {getReviewTypeLabel(review.type)}
                       </Typography>
                       <Chip
                         label={t('review.completed')}

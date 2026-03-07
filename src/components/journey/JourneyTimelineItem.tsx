@@ -18,7 +18,8 @@ import ImageIcon from '@mui/icons-material/Image'
 import { useTranslation } from 'react-i18next'
 import type { EffectiveStep } from '@/api/service'
 import type { ClinicalReview } from '@/api/schemas'
-import { StatusIcon, StepStatus, ReviewTypeKey } from './JourneyTimelineContent'
+import { StatusIcon, ReviewTypeKey } from './JourneyTimelineContent'
+import { useStepStatusLabel, type StepStatus } from '@/hooks/labels'
 
 interface Props {
   step: EffectiveStep
@@ -53,6 +54,7 @@ export default function JourneyTimelineItem({
   openDialog,
 }: Props) {
   const { t } = useTranslation()
+  const getStepStatusLabel = useStepStatusLabel()
   const theme = useTheme()
 
   const statusColor: Record<StepStatus, string> = {
@@ -204,7 +206,7 @@ export default function JourneyTimelineItem({
           )}
 
           <Chip
-            label={t(`journey.status.${status}`)}
+            label={getStepStatusLabel(status)}
             size="small"
             sx={{
               height: 20,
@@ -221,7 +223,10 @@ export default function JourneyTimelineItem({
           {step.windowDays > 0 && ` ±${step.windowDays}d`}
         </Typography>
 
-        {status !== 'SUBMITTED' && (
+        {(status !== 'SUBMITTED' ||
+          REVIEW_TYPES.some((rt) =>
+            reviews.some((r) => r.type === rt && r.journeyStepLabel === step.label),
+          )) && (
           <Stack direction="row" gap={0.5} sx={{ mt: 0.5 }} flexWrap="wrap">
             {REVIEW_TYPES.map(reviewChip)}
           </Stack>

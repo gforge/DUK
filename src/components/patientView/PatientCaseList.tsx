@@ -13,6 +13,7 @@ import {
 } from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import { useTranslation } from 'react-i18next'
+import { useCategoryLabel, useTriggerLabel } from '@/hooks/labels'
 import { format } from 'date-fns'
 import StatusChip from '../common/StatusChip'
 import type { Case } from '@/api/schemas'
@@ -25,6 +26,8 @@ interface Props {
 
 export default function PatientCaseList({ cases, loading, error }: Props) {
   const { t } = useTranslation()
+  const getCategoryLabel = useCategoryLabel()
+  const getTriggerLabel = useTriggerLabel()
 
   if (loading) return <CircularProgress />
   if (error) return <Alert severity="error">{error}</Alert>
@@ -37,7 +40,7 @@ export default function PatientCaseList({ cases, loading, error }: Props) {
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
             <Stack direction="row" spacing={1.5} alignItems="center" flex={1}>
               <StatusChip status={c.status} />
-              <Chip label={t(`category.${c.category}`)} size="small" variant="outlined" />
+              <Chip label={getCategoryLabel(c.category)} size="small" variant="outlined" />
               <Typography variant="body2" color="text.secondary" sx={{ ml: 'auto', pr: 1 }}>
                 {format(new Date(c.createdAt), 'dd MMM yyyy')}
               </Typography>
@@ -55,7 +58,7 @@ export default function PatientCaseList({ cases, loading, error }: Props) {
                     {c.triggers.map((tr) => (
                       <Chip
                         key={tr}
-                        label={t(`trigger.${tr}`)}
+                        label={getTriggerLabel(tr)}
                         size="small"
                         color="error"
                         variant="outlined"

@@ -18,6 +18,7 @@ import {
 } from '@mui/material'
 import WarningAmberIcon from '@mui/icons-material/WarningAmber'
 import { useTranslation } from 'react-i18next'
+import { useSeverityLabel } from '@/hooks/labels'
 import type { PolicyWarning } from '@/api/schemas'
 import { format, parseISO } from 'date-fns'
 
@@ -34,6 +35,7 @@ const SEVERITY_COLOR: Record<PolicyWarning['severity'], 'error' | 'warning' | 'i
 
 export default function AutoWarningsBadge({ warnings, lastActivityAt }: AutoWarningsBadgeProps) {
   const { t } = useTranslation()
+  const getSeverityLabel = useSeverityLabel()
   const [open, setOpen] = useState(false)
 
   if (warnings.length === 0) return null
@@ -129,7 +131,7 @@ export default function AutoWarningsBadge({ warnings, lastActivityAt }: AutoWarn
                             fontSize: '0.65rem',
                           }}
                         >
-                          {t(`severity.${w.severity}`)}
+                          {getSeverityLabel(w.severity)}
                         </Typography>
                       </Box>
                     }

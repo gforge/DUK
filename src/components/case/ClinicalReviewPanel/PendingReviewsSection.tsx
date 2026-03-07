@@ -3,6 +3,7 @@ import { Box, Stack, Typography, Chip, Button, Alert, CircularProgress } from '@
 import PendingIcon from '@mui/icons-material/Pending'
 import DeleteIcon from '@mui/icons-material/Delete'
 import { useTranslation } from 'react-i18next'
+import { useReviewTypeLabel } from '@/hooks/labels'
 import { RoleIcon } from '../../common/RoleIcon'
 import type { ClinicalReview, User } from '@/api/schemas'
 
@@ -26,6 +27,7 @@ export default function PendingReviewsSection({
   onDelete,
 }: Props) {
   const { t } = useTranslation()
+  const getReviewTypeLabel = useReviewTypeLabel()
 
   if (reviews.length === 0) return null
 
@@ -51,7 +53,7 @@ export default function PendingReviewsSection({
                 <Stack direction="row" justifyContent="space-between" alignItems="start" gap={1}>
                   <Box>
                     <Chip
-                      label={t(`reviewType.${review.type}`)}
+                      label={getReviewTypeLabel(review.type)}
                       size="small"
                       variant="outlined"
                       sx={{ mb: 0.5 }}

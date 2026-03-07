@@ -6,7 +6,8 @@ import ErrorIcon from '@mui/icons-material/Error'
 import TaskAltIcon from '@mui/icons-material/TaskAlt'
 import ScheduleIcon from '@mui/icons-material/Schedule'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
-import { useTranslation } from 'react-i18next'
+import { useOptionalRole } from '@/store/roleContext'
+import { useStatusLabel } from '@/hooks/labels'
 import type { CaseStatus } from '@/api/schemas'
 
 const STATUS_COLORS: Record<CaseStatus, ChipProps['color']> = {
@@ -31,15 +32,23 @@ interface StatusChipProps {
 }
 
 export default function StatusChip({ status, size = 'small' }: StatusChipProps) {
-  const { t } = useTranslation()
+  const getStatusLabel = useStatusLabel()
+  // role context may not exist in isolated tests
+  let isPatientView = false
+  const roleCtx = useOptionalRole()
+  if (roleCtx && roleCtx.currentUser.role === 'PATIENT') {
+    isPatientView = true
+  }
+  const label = getStatusLabel(status, isPatientView)
+
   return (
     <Chip
       icon={STATUS_ICONS[status]}
-      label={t(`status.${status}`)}
+      label={label}
       color={STATUS_COLORS[status]}
       size={size}
       variant="filled"
-      aria-label={t(`status.${status}`)}
+      aria-label={label}
     />
   )
 }

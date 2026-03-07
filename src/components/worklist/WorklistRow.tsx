@@ -19,6 +19,7 @@ import CalendarMonthIcon from '@mui/icons-material/CalendarMonth'
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
 import { useTranslation } from 'react-i18next'
+import { useRoleLabel } from '@/hooks/labels'
 import { useNavigate } from 'react-router-dom'
 import DeadlineLabel from '@/components/common/DeadlineLabel'
 import StatusChip from '@/components/common/StatusChip'
@@ -44,6 +45,7 @@ export default function WorklistRow({
   onMarkDone,
 }: WorklistRowProps) {
   const { t } = useTranslation()
+  const getRoleLabel = useRoleLabel()
   const navigate = useNavigate()
   const [dialogOpen, setDialogOpen] = React.useState(false)
   const [scheduledAt, setScheduledAt] = React.useState('')
@@ -89,7 +91,7 @@ export default function WorklistRow({
           <StatusChip status={caseData.status} size="small" />
           {caseData.assignedRole && (
             <Chip
-              label={t(`role.${caseData.assignedRole}`)}
+              label={getRoleLabel(caseData.assignedRole)}
               size="small"
               variant="outlined"
               sx={{ height: 20, fontSize: 11 }}

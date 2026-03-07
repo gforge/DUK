@@ -6,11 +6,12 @@ import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked'
 import { useTranslation } from 'react-i18next'
 import type { EffectiveStep } from '@/api/service'
 import type { ClinicalReview, FormResponse } from '@/api/schemas'
+import { type StepStatus } from '@/hooks/labels'
 import JourneyTimelineItem from './JourneyTimelineItem'
 import AddReviewDialog from './AddReviewDialog'
 import ReviewDetailsDialog from './ReviewDetailsDialog'
 
-export type StepStatus = 'SUBMITTED' | 'UPCOMING' | 'OVERDUE'
+export type { StepStatus }
 
 export const REVIEW_TYPES = ['LAB', 'XRAY'] as const
 export type ReviewTypeKey = (typeof REVIEW_TYPES)[number]

@@ -188,7 +188,6 @@ interface Resources {
       "editor": {
         "addEntry": "Lägg till steg",
         "addInstruction": "Lägg till instruktion",
-        "confirmDeleteEntry": "Ta bort detta steg från mallen?",
         "confirmDeleteInstruction": "Ta bort instruktionsmall \"{{name}}\"?",
         "confirmDeleteModule": "Ta bort forskningsmodul \"{{name}}\"?",
         "confirmDeleteTemplate": "Ta bort resemall \"{{name}}\"?",
@@ -207,10 +206,8 @@ interface Resources {
         "editTemplate": "Redigera mall",
         "entryDeleted": "Steg borttaget",
         "entrySaved": "Steg sparat",
-        "instruction": "Instruktion",
         "instructionDeleted": "Instruktionsmall borttagen",
         "instructionSaved": "Instruktionsmall sparad",
-        "instructionTemplate": "Instruktionsmall",
         "moduleDeleted": "Forskningsmodul borttagen",
         "newQuestionnaire": "Nytt formulär",
         "newTemplate": "Ny mall",
@@ -244,31 +241,21 @@ interface Resources {
         "dashboardCategory": "Instrumentpanelskategori",
         "instruction": "Instruktion",
         "instructionFreetext": "Fritext",
-        "instructionFreetextHint": "Fritext visad för patient vid detta steg.",
         "instructionFromTemplate": "Från mall",
         "instructionNone": "Ingen",
-        "instructionPreview": "Förhandsgranska instruktionstext",
         "label": "Stegetikett",
         "noAliases": "Inga poängalias definierade.",
         "noForm": "— Inget formulär (instruktionssteg) —",
-        "noFormHint": "Lämna tomt för ett rent instruktionssteg.",
-        "noScoringRules": "Det här formuläret har inga beräkningsregler. Individuella frågenycklar visas ovan.",
         "offsetDays": "Dagar efter start",
-        "offsetDaysHint": "Antal dagar efter startdatum (t.ex. operationsdatum) då steget planeras",
-        "recurrenceEnabled": "Återkommande steg",
-        "recurrenceInterval": "Upprepningsintervall (dagar)",
         "scoreAliasAlias": "Alias (unikt namn)",
         "scoreAliasLabel": "Visningsnamn",
         "scoreAliasRaw": "Beräknat mätvärde",
-        "scoringOutputKeys": "Beräknade mätvärden — välj ett av dessa",
         "showFormDetails_one": "Visa formulärinnehåll ({{count}} fråga)",
         "showFormDetails_other": "Visa formulärinnehåll ({{count}} frågor)",
         "stepKey": "Steg-ID",
         "stepKeyHint": "Används i policyuttryck för att referera detta steg, t.ex. PNRS_vecka4. Genereras automatiskt från etiketten.",
         "stepKeyPlaceholder": "t.ex. vecka_4",
-        "windowDays": "Tidsfönster (±dagar)",
-        "windowDaysHint": "Patienten kan svara upp till ±N dagar från planerat datum och ändå räknas som \"i tid\"",
-        "windowDaysSuggest": "Förslag: {{n}} dagar"
+        "windowDays": "Tidsfönster (±dagar)"
       },
       "journeyStatus": {
         "ACTIVE": "Aktiv",
@@ -276,7 +263,6 @@ interface Resources {
         "SUSPENDED": "Pausad",
         "label": "Status"
       },
-      "label": "Etikett",
       "modType": {
         "ADD_STEP": "Steg tillagt",
         "CANCEL": "Avbruten",
@@ -682,11 +668,11 @@ interface Resources {
     },
     "reviewType": {
       "LAB": "Provsvar",
-      "LAB_one": "__NOT_TRANSLATED__",
-      "LAB_other": "__NOT_TRANSLATED__",
+      "LAB_one": "{{count}} labbsvar",
+      "LAB_other": "{{count}} labbsvar",
       "XRAY": "Röntgen",
-      "XRAY_one": "__NOT_TRANSLATED__",
-      "XRAY_other": "__NOT_TRANSLATED__"
+      "XRAY_one": "{{count}} röntgen",
+      "XRAY_other": "{{count}} röntgen"
     },
     "role": {
       "DOCTOR": "Läkare",
@@ -704,7 +690,7 @@ interface Resources {
     "status": {
       "CLOSED": "Stängd",
       "FOLLOWING_UP": "Uppföljning",
-      "NEEDS_REVIEW": "Kräver bedömning",
+      "NEEDS_REVIEW": "Nästa uppföljning",
       "NEW": "Ny kontrollpunkt",
       "TRIAGED": "Triagerad"
     },

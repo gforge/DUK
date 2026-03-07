@@ -3,6 +3,7 @@ import { Paper, Stack, Box, Typography, Chip, Divider, Tooltip } from '@mui/mate
 import PersonIcon from '@mui/icons-material/Person'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { useCategoryLabel, useRoleLabel, useNextStepLabel } from '@/hooks/labels'
 import { format } from 'date-fns'
 import { formatPersonnummer } from '@/api/utils/personnummer'
 import TriggerChips from '../common/TriggerChips'
@@ -17,6 +18,9 @@ interface PatientCardProps {
 
 export default function PatientCard({ patient, caseData }: PatientCardProps) {
   const { t } = useTranslation()
+  const getCategoryLabel = useCategoryLabel()
+  const getRoleLabel = useRoleLabel()
+  const getNextStepLabel = useNextStepLabel()
   const navigate = useNavigate()
 
   const lastOpened = patient.lastOpenedAt
@@ -82,7 +86,7 @@ export default function PatientCard({ patient, caseData }: PatientCardProps) {
                 {t('case.category')}
               </Typography>
               <Typography variant="body2" fontWeight={600}>
-                {t(`category.${caseData.category}`)}
+                {getCategoryLabel(caseData.category)}
               </Typography>
             </Box>
             <Box sx={{ width: '45%', minWidth: 100 }}>
@@ -90,7 +94,7 @@ export default function PatientCard({ patient, caseData }: PatientCardProps) {
                 {t('case.assignedTo')}
               </Typography>
               <Typography variant="body2" fontWeight={600}>
-                {caseData.assignedRole ? t(`role.${caseData.assignedRole}`) : t('common.notSet')}
+                {caseData.assignedRole ? getRoleLabel(caseData.assignedRole) : t('common.notSet')}
               </Typography>
             </Box>
             {caseData.nextStep && (
@@ -99,7 +103,7 @@ export default function PatientCard({ patient, caseData }: PatientCardProps) {
                   {t('triage.nextStep')}
                 </Typography>
                 <Typography variant="body2" fontWeight={600}>
-                  {t(`nextStep.${caseData.nextStep}`)}
+                  {getNextStepLabel(caseData.nextStep)}
                 </Typography>
               </Box>
             )}

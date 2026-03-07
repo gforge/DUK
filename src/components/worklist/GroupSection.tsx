@@ -1,6 +1,7 @@
 import React from 'react'
 import { Paper, Stack, Typography, Chip, Box, Divider } from '@mui/material'
 import { useTranslation } from 'react-i18next'
+import { useNextStepLabel } from '@/hooks/labels'
 import type { Case, Patient, NextStep } from '@/api/schemas'
 import WorklistRow from './WorklistRow'
 
@@ -22,6 +23,7 @@ export default function GroupSection({
   onMarkDone,
 }: GroupSectionProps) {
   const { t } = useTranslation()
+  const getNextStepLabel = useNextStepLabel()
 
   return (
     <Paper variant="outlined" sx={{ borderRadius: 2, overflow: 'hidden', mb: 2 }}>
@@ -35,7 +37,7 @@ export default function GroupSection({
         sx={{ bgcolor: 'action.selected' }}
       >
         <Typography variant="subtitle2" fontWeight={700}>
-          {t(`nextStep.${nextStep}`)}
+          {getNextStepLabel(nextStep)}
         </Typography>
         <Chip label={cases.length} size="small" color="default" />
       </Stack>

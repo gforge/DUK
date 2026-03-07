@@ -17,6 +17,7 @@ import {
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
 import { useTranslation } from 'react-i18next'
+import { useSeverityLabel } from '@/hooks/labels'
 import type { PolicyRule } from '@/api/schemas'
 
 interface Props {
@@ -32,6 +33,7 @@ const severityColor = (s: string) =>
 
 export default function PolicyRulesTable({ rules, deleting, onToggle, onEdit, onDelete }: Props) {
   const { t } = useTranslation()
+  const getSeverityLabel = useSeverityLabel()
 
   return (
     <Paper variant="outlined" sx={{ borderRadius: 2, overflow: 'hidden' }}>
@@ -79,7 +81,7 @@ export default function PolicyRulesTable({ rules, deleting, onToggle, onEdit, on
               </TableCell>
               <TableCell>
                 <Chip
-                  label={t(`severity.${rule.severity}`)}
+                  label={getSeverityLabel(rule.severity)}
                   size="small"
                   color={severityColor(rule.severity) as 'error' | 'warning' | 'success'}
                 />

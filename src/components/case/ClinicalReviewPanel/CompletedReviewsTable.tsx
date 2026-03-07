@@ -13,6 +13,7 @@ import {
 } from '@mui/material'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import { useTranslation } from 'react-i18next'
+import { useReviewTypeLabel, useReviewOutcomeLabel } from '@/hooks/labels'
 import { RoleIcon } from '../../common/RoleIcon'
 import type { ClinicalReview, User } from '@/api/schemas'
 
@@ -32,6 +33,8 @@ interface Props {
 
 export default function CompletedReviewsTable({ reviews, userMap }: Props) {
   const { t } = useTranslation()
+  const getReviewTypeLabel = useReviewTypeLabel()
+  const getReviewOutcomeLabel = useReviewOutcomeLabel()
 
   if (reviews.length === 0) return null
 
@@ -58,7 +61,7 @@ export default function CompletedReviewsTable({ reviews, userMap }: Props) {
                 <TableCell>
                   <Stack direction="row" gap={1} alignItems="center">
                     <CheckCircleIcon fontSize="small" color="success" />
-                    <Chip label={t(`reviewType.${review.type}`)} size="small" />
+                    <Chip label={getReviewTypeLabel(review.type)} size="small" />
                   </Stack>
                 </TableCell>
                 <TableCell>
@@ -67,7 +70,7 @@ export default function CompletedReviewsTable({ reviews, userMap }: Props) {
                 <TableCell>
                   {review.outcome ? (
                     <Chip
-                      label={t(`reviewOutcome.${review.outcome}`)}
+                      label={getReviewOutcomeLabel(review.outcome)}
                       size="small"
                       color={outcomeColor(review.outcome)}
                     />

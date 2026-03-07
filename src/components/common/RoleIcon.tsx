@@ -3,7 +3,7 @@ import PersonIcon from '@mui/icons-material/Person'
 import LocalHospitalIcon from '@mui/icons-material/LocalHospital'
 import MedicalServicesIcon from '@mui/icons-material/MedicalServices'
 import BadgeIcon from '@mui/icons-material/Badge'
-import { useTranslation } from 'react-i18next'
+import { useRoleLabel } from '@/hooks/labels'
 import type { Role } from '@/api/schemas'
 
 interface Props {
@@ -13,7 +13,7 @@ interface Props {
 }
 
 export function RoleIcon({ role, showTooltip = true, sx }: Props) {
-  const { t } = useTranslation()
+  const getRoleLabel = useRoleLabel()
 
   const getIcon = () => {
     switch (role) {
@@ -35,7 +35,7 @@ export function RoleIcon({ role, showTooltip = true, sx }: Props) {
   }
 
   return (
-    <Tooltip title={t(`role.${role}`)}>
+    <Tooltip title={getRoleLabel(role)}>
       <span>{icon}</span>
     </Tooltip>
   )

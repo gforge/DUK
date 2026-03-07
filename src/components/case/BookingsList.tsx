@@ -21,7 +21,8 @@ import CancelIcon from '@mui/icons-material/Cancel'
 import EventAvailableIcon from '@mui/icons-material/EventAvailable'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 import { useTranslation } from 'react-i18next'
-import type { Case, NextStep } from '@/api/schemas'
+import { useNextStepLabel, useRoleLabel } from '@/hooks/labels'
+import type { Case } from '@/api/schemas'
 import * as client from '@/api/client'
 import { useRole } from '@/store/roleContext'
 import { useSnack } from '@/store/snackContext'
@@ -36,6 +37,8 @@ export default function BookingsList({ caseData, onChange }: Props) {
   const { t } = useTranslation()
   const { currentUser } = useRole()
   const { showSnack } = useSnack()
+  const getNextStepLabel = useNextStepLabel()
+  const getRoleLabel = useRoleLabel()
 
   const [editing, setEditing] = useState<null | {
     id: string
@@ -60,7 +63,7 @@ export default function BookingsList({ caseData, onChange }: Props) {
     const start = new Date(b.scheduledAt)
     const end = new Date(start.getTime() + 30 * 60 * 1000)
     const fmt = (d: Date) => d.toISOString().replace(/[-:.]/g, '').split('.')[0] + 'Z'
-    const text = encodeURIComponent(t(`nextStep.${b.type as NextStep}`) ?? b.type)
+    const text = encodeURIComponent(getNextStepLabel(b.type as any) ?? b.type)
     const dates = `${fmt(start)}/${fmt(end)}`
     const details = encodeURIComponent(b.note ?? '')
     return `https://www.google.com/calendar/render?action=TEMPLATE&text=${text}&dates=${dates}&details=${details}`
@@ -71,7 +74,7 @@ export default function BookingsList({ caseData, onChange }: Props) {
     const end = new Date(start.getTime() + 30 * 60 * 1000)
     const fmt = (d: Date) => d.toISOString().replace(/[-:.]/g, '').split('.')[0] + 'Z'
     const uid = `${b.id}@duk.local`
-    const summary = t(`nextStep.${b.type as NextStep}`) ?? b.type
+    const summary = getNextStepLabel(b.type as any) ?? b.type
     const description = b.note ?? ''
     const ics = [
       'BEGIN:VCALENDAR',
@@ -126,12 +129,10 @@ export default function BookingsList({ caseData, onChange }: Props) {
         {(caseData.bookings ?? []).map((b) => (
           <Paper key={b.id} variant="outlined" sx={{ p: 1, display: 'flex', alignItems: 'center' }}>
             <Box sx={{ flex: 1 }}>
-              <Typography variant="body2">
-                {t(`nextStep.${b.type as NextStep}`) ?? b.type}
-              </Typography>
+              <Typography variant="body2">{getNextStepLabel(b.type as any) ?? b.type}</Typography>
               <Typography variant="caption" color="text.secondary">
                 {new Date(b.scheduledAt).toLocaleString()} —{' '}
-                {b.role ? t(`role.${b.role}`) : t('common.notSet')}
+                {b.role ? getRoleLabel(b.role as any) : t('common.notSet')}
               </Typography>
               {b.note && (
                 <Typography variant="caption" display="block">

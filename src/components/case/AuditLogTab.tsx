@@ -14,6 +14,7 @@ import {
   Stack,
 } from '@mui/material'
 import { useTranslation } from 'react-i18next'
+import { useRoleLabel } from '@/hooks/labels'
 import { useApi } from '@/hooks/useApi'
 import * as client from '@/api/client'
 import { format } from 'date-fns'
@@ -31,6 +32,7 @@ const ROLE_COLORS = {
 
 export default function AuditLogTab({ caseId }: AuditLogTabProps) {
   const { t } = useTranslation()
+  const getRoleLabel = useRoleLabel()
   const { data: events, loading, error } = useApi(() => client.getAuditEvents(caseId), [caseId])
 
   if (loading) return <CircularProgress />
@@ -72,7 +74,7 @@ export default function AuditLogTab({ caseId }: AuditLogTabProps) {
               <TableCell>
                 <Stack direction="row" gap={0.5} alignItems="center">
                   <Chip
-                    label={t(`role.${event.userRole}`)}
+                    label={getRoleLabel(event.userRole)}
                     size="small"
                     color={ROLE_COLORS[event.userRole]}
                     variant="outlined"

@@ -12,6 +12,7 @@ import {
 } from '@mui/material'
 import AssignmentIcon from '@mui/icons-material/Assignment'
 import { useTranslation } from 'react-i18next'
+import { useCategoryLabel, useTriggerLabel } from '@/hooks/labels'
 import { format } from 'date-fns'
 import StatusChip from '@/components/common/StatusChip'
 import type { Case } from '@/api/schemas'
@@ -23,6 +24,8 @@ interface CasesSectionProps {
 
 export default function CasesSection({ cases, onRowClick }: CasesSectionProps) {
   const { t } = useTranslation()
+  const getCategoryLabel = useCategoryLabel()
+  const getTriggerLabel = useTriggerLabel()
 
   return (
     <Paper variant="outlined" sx={{ p: 2.5, borderRadius: 2, mb: 3 }}>
@@ -61,7 +64,7 @@ export default function CasesSection({ cases, onRowClick }: CasesSectionProps) {
                   <StatusChip status={c.status} />
                 </TableCell>
                 <TableCell>
-                  <Chip label={t(`category.${c.category}`)} size="small" variant="outlined" />
+                  <Chip label={getCategoryLabel(c.category)} size="small" variant="outlined" />
                 </TableCell>
                 <TableCell>
                   {c.triggers.length > 0 ? (
@@ -69,7 +72,7 @@ export default function CasesSection({ cases, onRowClick }: CasesSectionProps) {
                       {c.triggers.map((tr) => (
                         <Chip
                           key={tr}
-                          label={t(`trigger.${tr}`)}
+                          label={getTriggerLabel(tr)}
                           size="small"
                           color="error"
                           variant="outlined"

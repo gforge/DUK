@@ -1,6 +1,6 @@
 import React from 'react'
 import { Chip, Stack, Tab, Tabs } from '@mui/material'
-import { useTranslation } from 'react-i18next'
+import { useJourneyStatusLabel } from '@/hooks/labels'
 import type { JourneyTemplate, PatientJourney } from '@/api/schemas'
 
 function journeyStatusColor(status: string): 'primary' | 'warning' | 'default' {
@@ -22,7 +22,7 @@ export default function JourneySelectorTabs({
   journeyTemplates,
   onChange,
 }: JourneySelectorTabsProps) {
-  const { t } = useTranslation()
+  const getJourneyStatusLabel = useJourneyStatusLabel()
 
   if (journeys.length <= 1) return null
 
@@ -44,7 +44,7 @@ export default function JourneySelectorTabs({
               <Stack direction="row" alignItems="center" gap={0.5}>
                 <span>{tmpl?.name ?? j.journeyTemplateId}</span>
                 <Chip
-                  label={t(`journey.journeyStatus.${j.status}`)}
+                  label={getJourneyStatusLabel(j.status)}
                   size="small"
                   color={journeyStatusColor(j.status)}
                   variant="outlined"

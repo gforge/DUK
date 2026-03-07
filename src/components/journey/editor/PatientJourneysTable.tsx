@@ -16,6 +16,7 @@ import AddIcon from '@mui/icons-material/Add'
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline'
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz'
 import { useTranslation } from 'react-i18next'
+import { useJourneyStatusLabel } from '@/hooks/labels'
 import type {
   JourneyModification,
   PatientJourney,
@@ -53,6 +54,7 @@ export default function PatientJourneysTable({
   researchModules,
 }: Props) {
   const { t } = useTranslation()
+  const getJourneyStatusLabel = useJourneyStatusLabel()
 
   const patientName = (id: string) => patients?.find((p) => p.id === id)?.displayName ?? id
   const templateName = (id: string) => journeyTemplates?.find((jt) => jt.id === id)?.name ?? id
@@ -89,7 +91,7 @@ export default function PatientJourneysTable({
             </TableCell>
             <TableCell>
               <Chip
-                label={t(`journey.journeyStatus.${pj.status}`)}
+                label={getJourneyStatusLabel(pj.status)}
                 size="small"
                 color={
                   pj.status === 'ACTIVE'

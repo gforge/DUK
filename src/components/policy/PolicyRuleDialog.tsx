@@ -20,6 +20,7 @@ import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useTranslation } from 'react-i18next'
+import { useSeverityLabel } from '@/hooks/labels'
 import { validateExpression } from '@/api/policyParser'
 import type { PolicyVariable } from '@/api/service'
 
@@ -70,6 +71,7 @@ export default function PolicyRuleDialog({
   variables = [],
 }: Props) {
   const { t } = useTranslation()
+  const getSeverityLabel = useSeverityLabel()
   const exprRef = useRef<HTMLInputElement>(null)
 
   const { control, handleSubmit, watch, formState, setValue, getValues } = useForm<RuleForm>({
@@ -228,7 +230,7 @@ export default function PolicyRuleDialog({
                 >
                   {SEVERITIES.map((s) => (
                     <MenuItem key={s} value={s}>
-                      {t(`severity.${s}`)}
+                      {getSeverityLabel(s)}
                     </MenuItem>
                   ))}
                 </TextField>

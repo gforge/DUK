@@ -1,6 +1,7 @@
 import React from 'react'
 import { Box, Button, Stack, Alert } from '@mui/material'
 import { useTranslation } from 'react-i18next'
+import { useRoleLabel } from '@/hooks/labels'
 import type { Case } from '@/api/schemas'
 import { useRole } from '@/store/roleContext'
 import { useSnack } from '@/store/snackContext'
@@ -18,6 +19,7 @@ export default function TriageTab({ caseData, onTriaged }: TriageTabProps) {
   const { t } = useTranslation()
   const { currentUser, isRole } = useRole()
   const { showSnack } = useSnack()
+  const getRoleLabel = useRoleLabel()
 
   const canTriage = isRole('NURSE', 'DOCTOR', 'PAL')
 
@@ -63,7 +65,7 @@ export default function TriageTab({ caseData, onTriaged }: TriageTabProps) {
   if (!canTriage) {
     return (
       <Alert severity="info">
-        {t('role.currentRole')}: {t(`role.${currentUser.role}`)}. {t('triage.requiresClinician')}
+        {t('role.currentRole')}: {getRoleLabel(currentUser.role)}. {t('triage.requiresClinician')}
       </Alert>
     )
   }
