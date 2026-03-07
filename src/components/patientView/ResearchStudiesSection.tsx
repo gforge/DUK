@@ -3,7 +3,7 @@ import { Button, Chip, Stack, Divider, Typography } from '@mui/material'
 import ScienceIcon from '@mui/icons-material/Science'
 import { useTranslation } from 'react-i18next'
 import type { ResearchModule, Consent } from '@/api/schemas'
-import { ConsentDialog, RevokeConsentDialog, DeclineConsentDialog } from '../journey/ConsentDialog'
+import { ConsentDialog, RevokeConsentDialog, DeclineConsentDialog } from '../journey'
 
 interface Props {
   patientId: string

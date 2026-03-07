@@ -16,7 +16,7 @@ import AddIcon from '@mui/icons-material/Add'
 import { useTranslation } from 'react-i18next'
 import { useSnack } from '@/store/snackContext'
 import * as client from '@/api/client'
-import { ConsentDialog, RevokeConsentDialog } from '../journey/ConsentDialog'
+import { ConsentDialog, RevokeConsentDialog } from '../journey'
 import type { PatientJourney, ResearchModule, Consent } from '@/api/schemas'
 
 interface Props {
@@ -190,11 +190,7 @@ export default function PatientJourneyResearchCard({
               </Button>
             </Stack>
           ) : (
-            <Button
-              size="small"
-              startIcon={<AddIcon />}
-              onClick={() => setEnrolling(true)}
-            >
+            <Button size="small" startIcon={<AddIcon />} onClick={() => setEnrolling(true)}>
               {t('patients.research.addStudy')}
             </Button>
           )}
@@ -220,7 +216,9 @@ export default function PatientJourneyResearchCard({
           open
           onClose={() => setRevokeTarget(null)}
           consent={revokeTarget}
-          studyName={allModules.find((rm) => rm.id === revokeTarget.researchModuleId)?.studyName ?? ''}
+          studyName={
+            allModules.find((rm) => rm.id === revokeTarget.researchModuleId)?.studyName ?? ''
+          }
           onRevoked={() => {
             onChanged()
             setRevokeTarget(null)

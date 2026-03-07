@@ -24,7 +24,7 @@ import EditIcon from '@mui/icons-material/Edit'
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 import { useTranslation } from 'react-i18next'
 import type { QuestionnaireTemplate } from '@/api/schemas'
-import QuestionnaireEditorDialog from './QuestionnaireEditorDialog'
+import { QuestionnaireEditorDialog } from './'
 
 interface Props {
   questionnaires: QuestionnaireTemplate[] | null
@@ -185,7 +185,7 @@ export default function QuestionnaireTemplatesTab({
       {editTarget !== null && (
         <QuestionnaireEditorDialog
           template={editTarget ?? undefined}
-          onSave={(data) => {
+          onSave={(data: any) => {
             onSave(data)
             setEditTarget(null)
           }}

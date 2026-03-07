@@ -12,11 +12,13 @@ import { useEditorUndo } from '@/hooks/useEditorUndo'
 import * as client from '@/api/client'
 import { useSnack } from '@/store/snackContext'
 import ConfirmDialog from '@/components/common/ConfirmDialog'
-import JourneyTemplatesTab from '@/components/journey/editor/JourneyTemplatesTab'
-import ResearchModulesTab from '@/components/journey/editor/ResearchModulesTab'
-import PatientJourneysTable from '@/components/journey/editor/PatientJourneysTable'
-import InstructionTemplatesTab from '@/components/journey/editor/InstructionTemplatesTab'
-import QuestionnaireTemplatesTab from '@/components/journey/editor/QuestionnaireTemplatesTab'
+import {
+  JourneyTemplatesTab,
+  ResearchModulesTab,
+  PatientJourneysTable,
+  InstructionTemplatesTab,
+  QuestionnaireTemplatesTab,
+} from '@/components/journey/editor'
 
 import TabPanel from '@/components/common/TabPanel'
 
