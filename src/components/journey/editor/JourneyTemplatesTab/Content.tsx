@@ -129,7 +129,6 @@ export function JourneyTemplatesTab({ journeyTemplates, loading, onDelete, onRef
           setDeriveTarget={setDeriveTarget}
           setTemplateInstructionsTarget={setTemplateInstructionsTarget}
           setEntryEditState={setEntryEditState}
-          handleSaveEntry={handleSaveEntry}
           handleDeleteEntry={handleDeleteEntry}
           handleDeleteInstruction={handleDeleteInstruction}
         />

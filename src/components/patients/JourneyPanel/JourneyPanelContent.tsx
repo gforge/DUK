@@ -154,11 +154,9 @@ export function JourneyPanelContent({
           open={modifyOpen}
           onClose={() => setModifyOpen(false)}
           journeyId={journey.id}
-          currentTemplateId={journey.journeyTemplateId}
           currentTemplateName={currentTemplate.name}
           currentStartDate={journey.startDate}
           steps={effectiveSteps ?? []}
-          journeyTemplates={journeyTemplates}
           questionnaireTemplates={questionnaireTemplates}
           onModify={handleModify}
         />

@@ -316,6 +316,7 @@
       "requiredFields": "Please fill in all required fields.",
       "saved": "Journey updated",
       "saving": "Saving…",
+      "scheduledOn": "Scheduled: {{date}}",
       "select": "Select",
       "stepLabel": "Step label",
       "stepLabelPlaceholder": "e.g. Day 20 extra check",

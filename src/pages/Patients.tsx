@@ -17,7 +17,7 @@ export default function Patients() {
   const [search, setSearch] = useState('')
 
   const navigate = useNavigate()
-  const { data: patients, loading, error, refetch } = useApi(() => client.getPatients(), [])
+  const { data: patients, loading, error } = useApi(() => client.getPatients(), [])
   const { data: allJourneys } = useApi(() => client.getPatientJourneys(), [])
   const { data: journeyTemplates } = useApi(() => client.getJourneyTemplates(), [])
 

@@ -12,7 +12,7 @@ import {
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import type { JourneyTemplate, QuestionnaireTemplate } from '@/api/schemas'
+import type { QuestionnaireTemplate } from '@/api/schemas'
 import type { EffectiveStep } from '@/api/service'
 
 import { AddStepForm, RemoveStepForm } from './modify/ModifyForms'
@@ -21,12 +21,10 @@ interface ModifyJourneyDialogProps {
   open: boolean
   onClose: () => void
   journeyId: string
-  currentTemplateId: string
   currentTemplateName: string
-  steps: EffectiveStep[]
-  journeyTemplates: JourneyTemplate[]
-  questionnaireTemplates: QuestionnaireTemplate[]
   currentStartDate: string
+  steps: EffectiveStep[]
+  questionnaireTemplates: QuestionnaireTemplate[]
   onModify: (
     type: 'ADD_STEP' | 'REMOVE_STEP' | 'CANCEL',
     payload: {
@@ -40,11 +38,9 @@ interface ModifyJourneyDialogProps {
 export default function ModifyJourneyDialog({
   open,
   onClose,
-  currentTemplateId,
-  currentTemplateName: _currentTemplateName,
-  currentStartDate: _currentStartDate,
+  currentTemplateName,
+  currentStartDate,
   steps,
-  journeyTemplates: _journeyTemplates,
   questionnaireTemplates,
   onModify,
 }: ModifyJourneyDialogProps) {
@@ -102,7 +98,9 @@ export default function ModifyJourneyDialog({
 
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
-      <DialogTitle>{t('journey.modify.title')}</DialogTitle>
+      <DialogTitle>
+        {t('journey.modify.title')} — {currentTemplateName}
+      </DialogTitle>
       <DialogContent sx={{ p: 0 }}>
         <Tabs
           value={tab}
@@ -134,6 +132,7 @@ export default function ModifyJourneyDialog({
               reason={addReason}
               setReason={setAddReason}
               questionnaireTemplates={questionnaireTemplates}
+              startDate={currentStartDate}
             />
           )}
           {tab === 1 && (

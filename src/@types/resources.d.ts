@@ -324,6 +324,7 @@ interface Resources {
         "requiredFields": "Fyll i alla obligatoriska fält.",
         "saved": "Patientresa uppdaterad",
         "saving": "Sparar…",
+        "scheduledOn": "Inplanerat: {{date}}",
         "select": "Välj",
         "stepLabel": "Stegetikett",
         "stepLabelPlaceholder": "T.ex. Dag 20 extra kontroll",

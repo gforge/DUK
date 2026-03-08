@@ -250,11 +250,9 @@ export default function JourneyTab({ caseData }: JourneyTabProps) {
               open={modifyOpen}
               onClose={() => setModifyOpen(false)}
               journeyId={selectedJourney.id}
-              currentTemplateId={selectedJourney.journeyTemplateId}
               currentTemplateName={currentTemplate?.name ?? ''}
               currentStartDate={selectedJourney.startDate}
               steps={effectiveSteps}
-              journeyTemplates={journeyTemplates}
               questionnaireTemplates={questionnaireTemplates}
               onModify={handleModify}
             />

@@ -9,6 +9,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material'
+import { addDays, format, parseISO } from 'date-fns'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -29,6 +30,7 @@ interface AddStepProps {
   reason: string
   setReason: (v: string) => void
   questionnaireTemplates: QuestionnaireTemplate[]
+  startDate: string
 }
 
 export function AddStepForm({
@@ -43,8 +45,14 @@ export function AddStepForm({
   reason,
   setReason,
   questionnaireTemplates,
+  startDate,
 }: AddStepProps) {
   const { t } = useTranslation()
+  const offsetNum = Number(offset)
+  const scheduledDate =
+    offset !== '' && !isNaN(offsetNum)
+      ? format(addDays(parseISO(startDate), offsetNum), 'dd MMM yyyy')
+      : null
   return (
     <Stack gap={2}>
       <TextField
@@ -64,6 +72,9 @@ export function AddStepForm({
           type="number"
           sx={{ flex: 1 }}
           inputProps={{ min: 0 }}
+          helperText={
+            scheduledDate ? t('journey.modify.scheduledOn', { date: scheduledDate }) : ' '
+          }
         />
         <TextField
           label={t('journey.modify.windowDays')}
