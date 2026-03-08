@@ -22,7 +22,7 @@ import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import * as client from '@/api/client'
-import type { Question,QuestionnaireTemplate } from '@/api/schemas'
+import type { Question, QuestionnaireTemplate } from '@/api/schemas'
 import type { MergedDueStep } from '@/api/service'
 import type { JourneyStepContext } from '@/api/service/forms'
 import { useSnack } from '@/store/snackContext'
@@ -85,13 +85,13 @@ export default function PatientQuestionnaireForm({
         step.journeyIds.length > 0 && step.occurrenceIndex !== undefined
           ? {
               patientJourneyId: step.journeyIds[0],
-              journeyStepId: step.id.replace(/__r\d+$/, ''),
+              journeyTemplateEntryId: step.id.replace(/__r\d+$/, ''),
               occurrenceIndex: step.occurrenceIndex,
             }
           : step.journeyIds.length > 0
             ? {
                 patientJourneyId: step.journeyIds[0],
-                journeyStepId: step.id.replace(/__r\d+$/, ''),
+                journeyTemplateEntryId: step.id.replace(/__r\d+$/, ''),
                 occurrenceIndex: 0,
               }
             : undefined

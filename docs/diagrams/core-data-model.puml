@@ -50,6 +50,21 @@ class PatientJourney {
   modifications[]
 }
 
+class Instruction {
+  id
+  patientJourneyId
+  journeyTemplateInstructionId?
+  instructionTemplateId
+  label?
+  startDayOffset
+  endDayOffset?
+  startAt
+  endAt?
+  status
+  acknowledgedAt?
+  completedAt?
+}
+
 class JourneyModification {
   id
   type
@@ -73,6 +88,7 @@ class JourneyTemplate {
   parentTemplateId
   derivedAt
   entries[]
+  instructions[]
 }
 
 class JourneyTemplateEntry {
@@ -85,8 +101,17 @@ class JourneyTemplateEntry {
   scoreAliases
   scoreAliasLabels
   dashboardCategory
-  instructionText?
-  instructionTemplateId?
+}
+
+class JourneyTemplateInstruction {
+  id
+  journeyTemplateId
+  instructionTemplateId
+  label?
+  startDayOffset
+  endDayOffset?
+  order
+  tags[]
 }
 
 class InstructionTemplate {
@@ -132,7 +157,7 @@ class FormResponse {
   answers
   scores
   patientJourneyId?
-  journeyStepId?
+  journeyTemplateEntryId?
 }
 
 class JournalDraft {
@@ -153,18 +178,23 @@ Case "1" -- "*" FormResponse : responses
 Case "1" -- "*" JournalDraft : drafts
 
 FormResponse "*" -- "0..1" PatientJourney : patientJourneyId
-FormResponse "*" -- "0..1" JourneyTemplateEntry : journeyStepId
+FormResponse "*" -- "0..1" JourneyTemplateEntry : journeyTemplateEntryId
 
 JourneyTemplate "1" -- "*" JourneyTemplateEntry : entries
+JourneyTemplate "1" -- "*" JourneyTemplateInstruction : instructions
 JourneyTemplate "0..1" -- "*" JourneyTemplate : parentTemplateId (derives)
+
+JourneyTemplateInstruction "*" -- "1" InstructionTemplate : instructionTemplateId
 
 PatientJourney "*" -- "1" JourneyTemplate : journeyTemplateId
 PatientJourney "1" -- "*" JourneyModification : modifications
+PatientJourney "1" -- "*" Instruction : instructions
+
+Instruction "*" -- "1" InstructionTemplate : instructionTemplateId
+Instruction "*" -- "0..1" JourneyTemplateInstruction : journeyTemplateInstructionId
 
 PatientJourney "*" -- "*" ResearchModule : researchModules
 Consent "*" -- "1" ResearchModule : researchModuleId
-
-JourneyTemplateEntry "*" -- "0..1" InstructionTemplate : instructionTemplateId
 
 legend right
   | Notation | Meaning |
@@ -202,7 +232,7 @@ note right of FormResponse
   Follow-up trigger semantics:
   JourneyTemplateEntry defines a due follow-up point.
   When a form is submitted, FormResponse may reference
-  patientJourneyId and journeyStepId.
+  patientJourneyId and journeyTemplateEntryId.
   Submission updates Case.triggers and policyWarnings,
   which then drive staff triage decisions.
 end note

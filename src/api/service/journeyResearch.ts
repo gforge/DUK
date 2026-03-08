@@ -37,7 +37,6 @@ export function applyResearchModules(
           researchModuleId: moduleId,
           replacesStepId: entry.replaceStepId,
           scheduledDate: original?.scheduledDate ?? toScheduledDate(startMs, 0, totalPauseShift),
-          resolvedInstruction: original?.resolvedInstruction,
         }
         steps = steps.filter((s) => s.id !== entry.replaceStepId)
         steps.push(researchStep)

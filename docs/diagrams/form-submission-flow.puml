@@ -39,7 +39,7 @@ UI -> UI : Show success snack\nrefetch due steps / case view
 
 note right of Forms
   Journey context may include:
-  patientJourneyId, journeyStepId,
+  patientJourneyId, journeyTemplateEntryId,
   occurrenceIndex
 end note
 

@@ -1,5 +1,5 @@
 import type { JourneyTemplate } from '../../schemas'
-import { daysAgo,iso } from '../shared'
+import { daysAgo, iso } from '../shared'
 
 export const jtMonitoring: JourneyTemplate = {
   id: 'jt-monitoring',
@@ -22,8 +22,6 @@ export const jtMonitoring: JourneyTemplate = {
         EQ5D_3m: 'EQ-5D index vid 3 månader',
         EQ_VAS_3m: 'EQ VAS vid 3 månader',
       },
-      instructionText:
-        'Baslinjemätning. Svara på frågorna om din smärta, rörlighet och livskvalitet. Dina svar hjälper teamet att följa din återhämtning.',
     },
     {
       id: 'jte-mon-2',
@@ -41,8 +39,26 @@ export const jtMonitoring: JourneyTemplate = {
         EQ5D_6m: 'EQ-5D index (halvår)',
         EQ_VAS_6m: 'EQ VAS (halvår)',
       },
-      instructionText:
-        'Halvårsuppföljning. Besvara frågorna om smärta, funktion och livskvalitet. Nästa uppföljning schemaläggs automatiskt 6 månader efter att du svarat.',
+    },
+  ],
+  instructions: [
+    {
+      id: 'jti-mon-1',
+      journeyTemplateId: 'jt-monitoring',
+      instructionTemplateId: 'it-monitoring-baseline',
+      label: '3 månader: Baslinjemätning',
+      startDayOffset: 90,
+      order: 1,
+      tags: ['monitoring', 'baseline'],
+    },
+    {
+      id: 'jti-mon-2',
+      journeyTemplateId: 'jt-monitoring',
+      instructionTemplateId: 'it-monitoring-recurring',
+      label: 'Halvårsuppföljning',
+      startDayOffset: 182,
+      order: 2,
+      tags: ['monitoring', 'recurring'],
     },
   ],
   createdAt: iso(daysAgo(30)),

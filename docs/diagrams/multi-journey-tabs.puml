@@ -1,5 +1,5 @@
 @startuml
-title Multiple Journeys — Combined Rendering And Deduplication (Legacy)
+title Multiple Journeys — Combined Rendering And Deduplication
 
 actor Clinician
 participant "JourneyTab\n(CaseDetail UI)" as JT
@@ -19,7 +19,7 @@ JT -> JT : Render MUI Tabs\n  Tab 1: "Handled Radius (ACTIVE)"\n  Tab 2: "Höft 
 Clinician -> JT : Click tab for journey N
 JT -> Client : getEffectiveSteps(journeyId_N)
 Client -> GES : getEffectiveSteps(journey)
-GES -> GES : Apply totalPauseShift\nApply modifications\nOverlay research module entries\nHydrate resolvedInstruction
+GES -> GES : Apply totalPauseShift\nApply modifications\nOverlay research module entries
 GES --> Client : EffectiveStep[]
 Client --> JT : EffectiveStep[]
 JT -> JT : Render JourneyTimeline\n+ pause/resume controls\n+ consent chips

@@ -1,4 +1,4 @@
-import { beforeEach,describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 
 import { SEED_STATE } from '@/api/seed'
 import * as service from '@/api/service'
@@ -8,34 +8,36 @@ beforeEach(() => {
   initStore(structuredClone(SEED_STATE))
 })
 
-// ─── resolvedInstruction hydration ──────────────────────────────────────────
+// ─── instructions separation ────────────────────────────────────────────────
 
-describe('resolvedInstruction', () => {
-  it('hydrates resolvedInstruction from instructionTemplateId', () => {
-    // Find a journey that uses a template with instructionTemplateId on entries
-    const templates = service.getJourneyTemplates()
-    const templateWithInstruction = templates.find((t) =>
-      t.entries.some((e) => e.instructionTemplateId),
-    )
-    if (!templateWithInstruction) return // skip if no seed has it
-
-    // Find or create a patient journey using this template
-    const journeys = service.getPatientJourneys()
-    let journey = journeys.find((j) => j.journeyTemplateId === templateWithInstruction.id)
-    if (!journey) {
-      journey = service.assignPatientJourney('p-1', templateWithInstruction.id, '2026-01-01')
-    }
-
+describe('instructions separation', () => {
+  it('effective steps do not include instruction content fields', () => {
+    const template = service.saveJourneyTemplate({
+      name: 'No Instruction Step Test',
+      referenceDateLabel: 'Startdatum',
+      entries: [
+        {
+          id: 'no-ins-step',
+          label: 'No instruction step',
+          offsetDays: 2,
+          windowDays: 1,
+          order: 1,
+          templateId: 'qt-wound-pain',
+          scoreAliases: {},
+          scoreAliasLabels: {},
+          dashboardCategory: 'ACUTE' as const,
+        },
+      ],
+      instructions: [],
+    })
+    const journey = service.assignPatientJourney('p-1', template.id, '2026-01-01')
     const steps = service.getEffectiveSteps(journey.id)
-    const withInstruction = steps.find((s) => s.resolvedInstruction)
-    expect(withInstruction).toBeDefined()
-    expect(withInstruction!.resolvedInstruction!.length).toBeGreaterThan(0)
+    expect(steps.every((s) => !('resolvedInstruction' in s))).toBe(true)
   })
 
-  it('falls back to instructionText when no instructionTemplateId', () => {
-    // Create a template with instructionText only
+  it('hydrates instruction content via instruction API', () => {
     const template = service.saveJourneyTemplate({
-      name: 'Instruction Text Test',
+      name: 'Instruction API Test',
       description: 'Test',
       referenceDateLabel: 'Startdatum',
       entries: [
@@ -49,13 +51,25 @@ describe('resolvedInstruction', () => {
           scoreAliases: {},
           scoreAliasLabels: {},
           dashboardCategory: 'ACUTE' as const,
-          instructionText: 'Custom inline instruction text',
+        },
+      ],
+      instructions: [
+        {
+          id: 'jti-1',
+          journeyTemplateId: 'temp',
+          instructionTemplateId: 'it-wound-care',
+          label: 'Wound care',
+          startDayOffset: 0,
+          endDayOffset: 14,
+          order: 1,
+          tags: [],
         },
       ],
     })
     const journey = service.assignPatientJourney('p-1', template.id, '2026-01-01')
-    const steps = service.getEffectiveSteps(journey.id)
-    expect(steps[0].resolvedInstruction).toBe('Custom inline instruction text')
+    const resolved = service.getResolvedInstructionsForJourney(journey.id)
+    expect(resolved.length).toBe(1)
+    expect(resolved[0].content.length).toBeGreaterThan(0)
   })
 
   it('expands a recurring entry into multiple occurrences up to the horizon', () => {

@@ -1,6 +1,12 @@
-import type { JourneyModification,PatientJourney } from '../schemas'
+import type {
+  Instruction,
+  JourneyModification,
+  JourneyTemplateInstruction,
+  PatientJourney,
+} from '../schemas'
 import { getStore, setStore } from '../storage'
-import { now,uuid } from './utils'
+import { computeTotalPauseShift, toScheduledDate } from './journeyDates'
+import { now, uuid } from './utils'
 
 export type CancelJourneyResult = { deleted: true } | { deleted: false; journey: PatientJourney }
 
@@ -53,7 +59,18 @@ export function assignPatientJourney(
     createdAt: now(),
     updatedAt: now(),
   }
-  setStore({ ...state, patientJourneys: [...state.patientJourneys, journey] })
+
+  const template = state.journeyTemplates.find((t) => t.id === journeyTemplateId)
+  const instantiatedInstructions = instantiateInstructionsForJourney(
+    journey,
+    template?.instructions ?? [],
+  )
+
+  setStore({
+    ...state,
+    patientJourneys: [...state.patientJourneys, journey],
+    instructions: [...(state.instructions ?? []), ...instantiatedInstructions],
+  })
   return journey
 }
 
@@ -112,9 +129,26 @@ export function resumeJourney(journeyId: string): PatientJourney {
     totalPausedDays: (journey.totalPausedDays ?? 0) + additionalDays,
     updatedAt: now(),
   }
+
+  const shift = computeTotalPauseShift(updated)
+  const startMs = new Date(updated.startDate).getTime()
+  const updatedInstructions = (state.instructions ?? []).map((ins) => {
+    if (ins.patientJourneyId !== journeyId) return ins
+    const startAt = toScheduledDate(startMs, ins.startDayOffset, shift)
+    const endAt =
+      ins.endDayOffset === undefined ? null : toScheduledDate(startMs, ins.endDayOffset, shift)
+    return {
+      ...ins,
+      startAt: `${startAt}T00:00:00.000Z`,
+      endAt: endAt ? `${endAt}T00:00:00.000Z` : null,
+      updatedAt: now(),
+    }
+  })
+
   setStore({
     ...state,
     patientJourneys: state.patientJourneys.map((j) => (j.id === journeyId ? updated : j)),
+    instructions: updatedInstructions,
   })
   return updated
 }
@@ -259,4 +293,40 @@ export function recordRecurringCompletion(
     patientJourneys: state.patientJourneys.map((j) => (j.id === journeyId ? updated : j)),
   })
   return updated
+}
+
+function instantiateInstructionsForJourney(
+  journey: PatientJourney,
+  templateInstructions: JourneyTemplateInstruction[],
+): Instruction[] {
+  const shift = computeTotalPauseShift(journey)
+  const startMs = new Date(journey.startDate).getTime()
+
+  return templateInstructions
+    .slice()
+    .sort((a, b) => a.order - b.order)
+    .map((ti) => {
+      const startAt = toScheduledDate(startMs, ti.startDayOffset, shift)
+      const endAt =
+        ti.endDayOffset === undefined ? null : toScheduledDate(startMs, ti.endDayOffset, shift)
+      return {
+        id: uuid(),
+        patientJourneyId: journey.id,
+        journeyTemplateInstructionId: ti.id,
+        instructionTemplateId: ti.instructionTemplateId,
+        label: ti.label,
+        startDayOffset: ti.startDayOffset,
+        endDayOffset: ti.endDayOffset,
+        startAt: `${startAt}T00:00:00.000Z`,
+        endAt: endAt ? `${endAt}T00:00:00.000Z` : null,
+        status: 'ACTIVE',
+        tags: ti.tags,
+        acknowledgedAt: null,
+        acknowledgedByUserId: null,
+        completedAt: null,
+        completedByUserId: null,
+        createdAt: now(),
+        updatedAt: now(),
+      }
+    })
 }

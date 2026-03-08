@@ -15,12 +15,11 @@ SWITCH_TEMPLATE);
 :Overlay research module
 entries if researchModuleIds
 are present;
-:Hydrate instructions
-(resolve instructionTemplateId
-→ content, or use
-instructionText fallback);
 :Compute effective steps per journey
 (getEffectiveSteps);
+:Resolve patient instructions
+from persisted Instruction
+records;
 :Merge & deduplicate due steps
 across parallel journeys by
 templateEntryId

@@ -6,6 +6,7 @@ import { FormResponseSchema } from './forms'
 import { JournalDraftSchema, JournalTemplateSchema } from './journal'
 import {
   ConsentSchema,
+  InstructionSchema,
   InstructionTemplateSchema,
   JourneyTemplateSchema,
   PatientJourneySchema,
@@ -13,7 +14,7 @@ import {
 } from './journey'
 import { PatientSchema } from './patient'
 import { PolicyRuleSchema } from './policy'
-import { FormSeriesSchema,QuestionnaireTemplateSchema } from './questionnaire'
+import { FormSeriesSchema, QuestionnaireTemplateSchema } from './questionnaire'
 import { UserSchema } from './users'
 
 export const AppStateSchema = z.object({
@@ -31,6 +32,7 @@ export const AppStateSchema = z.object({
   journeyTemplates: z.array(JourneyTemplateSchema),
   researchModules: z.array(ResearchModuleSchema),
   patientJourneys: z.array(PatientJourneySchema),
+  instructions: z.array(InstructionSchema).default([]),
   instructionTemplates: z.array(InstructionTemplateSchema),
   researchConsents: z.array(ConsentSchema).default([]),
 })

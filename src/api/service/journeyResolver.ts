@@ -1,4 +1,4 @@
-import type { FormResponse,JourneyTemplateEntry } from '../schemas'
+import type { FormResponse, JourneyTemplateEntry } from '../schemas'
 import { getStore } from '../storage'
 import { computeTotalPauseShift, toScheduledDate } from './journeyDates'
 import { applyResearchModules } from './journeyResearch'
@@ -6,7 +6,6 @@ import { buildPolicyScope } from './utils'
 
 /**
  * A resolved, ordered step for a specific patient — after modifications and research overlays.
- * resolvedInstruction is hydrated from instructionTemplateId (preferred) or instructionText.
  * Recurring entries (recurrenceIntervalDays set) are expanded into multiple EffectiveSteps,
  * each with a unique id (`${baseId}__r${occurrenceIndex}`) and an occurrenceIndex.
  */
@@ -20,7 +19,6 @@ export type EffectiveStep = JourneyTemplateEntry & {
   researchModuleId?: string
   replacesStepId?: string
   scheduledDate: string // YYYY-MM-DD relative to journey.startDate
-  resolvedInstruction?: string // hydrated instruction content (markdown)
 }
 
 /** Recurring step occurrences are expanded up to this many days from startDate. */
@@ -31,7 +29,6 @@ const RECURRENCE_HORIZON_DAYS = 5 * 365 // 5 years
  * Applies ADD_STEP / REMOVE_STEP modifications in chronological order.
  * SWITCH_TEMPLATE is already reflected in journey.journeyTemplateId and startDate.
  * Research module entries are then merged/inserted.
- * Instruction content is hydrated from instructionTemplateId or instructionText.
  */
 export function getEffectiveSteps(journeyId: string): EffectiveStep[] {
   const state = getStore()
@@ -47,16 +44,6 @@ export function getEffectiveSteps(journeyId: string): EffectiveStep[] {
   const totalPauseShift = computeTotalPauseShift(journey)
 
   const toDate = (offsetDays: number) => toScheduledDate(startMs, offsetDays, totalPauseShift)
-
-  const resolveInstruction = (entry: JourneyTemplateEntry): string | undefined => {
-    if (entry.instructionTemplateId) {
-      const it = (state.instructionTemplates ?? []).find(
-        (t) => t.id === entry.instructionTemplateId,
-      )
-      return it?.content ?? entry.instructionText
-    }
-    return entry.instructionText
-  }
 
   let steps: EffectiveStep[] = []
 
@@ -80,7 +67,6 @@ export function getEffectiveSteps(journeyId: string): EffectiveStep[] {
           isRecurring: true,
           occurrenceIndex: occIdx,
           scheduledDate,
-          resolvedInstruction: resolveInstruction(e),
         })
         // Next occurrence: advance by interval from this occurrence's scheduled date;
         // if this occurrence was already completed, advance from the actual completion date.
@@ -100,7 +86,6 @@ export function getEffectiveSteps(journeyId: string): EffectiveStep[] {
         isResearch: false,
         isRecurring: false,
         scheduledDate: toDate(e.offsetDays),
-        resolvedInstruction: resolveInstruction(e),
       })
     }
   }
@@ -116,7 +101,6 @@ export function getEffectiveSteps(journeyId: string): EffectiveStep[] {
         isResearch: false,
         isRecurring: false,
         scheduledDate: toDate(mod.entry.offsetDays),
-        resolvedInstruction: resolveInstruction(mod.entry),
       })
     }
   }
@@ -191,11 +175,10 @@ export function buildPolicyScopeWithAliases(
   for (const step of getEffectiveSteps(journey.id)) {
     if (Object.keys(step.scoreAliases).length === 0) continue
     const stepResponses = responses
-      .filter((r) =>
-        // Prefer exact step match via journeyStepId (set for responses submitted
-        // after step keys were introduced). Fall back to templateId for legacy
-        // responses that predate the journeyStepId field.
-        r.journeyStepId ? r.journeyStepId === step.id : r.templateId === step.templateId,
+      .filter(
+        (r) =>
+          // Responses submitted through a journey step are linked by template entry id.
+          r.journeyTemplateEntryId === step.id,
       )
       .sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime())
     const latest = stepResponses[0]
@@ -247,16 +230,14 @@ export function getMergedDueStepsForPatient(patientId: string, date: string): Me
       if (date < windowStart || date > windowEnd) continue
 
       // Skip steps that the patient already submitted a response for.
-      // journeyStepId in stored responses is always the base id (without __r<N>).
+      // Stored journeyTemplateEntryId is always the base id (without __r<N>).
       const baseStepId = step.id.replace(/__r\d+$/, '')
       const alreadySubmitted = state.formResponses.some(
         (r) =>
           r.patientId === patientId &&
           r.patientJourneyId === journey.id &&
-          (r.journeyStepId
-            ? r.journeyStepId === baseStepId &&
-              (step.occurrenceIndex === undefined || r.occurrenceIndex === step.occurrenceIndex)
-            : r.templateId === step.templateId),
+          r.journeyTemplateEntryId === baseStepId &&
+          (step.occurrenceIndex === undefined || r.occurrenceIndex === step.occurrenceIndex),
       )
       if (alreadySubmitted) continue
 

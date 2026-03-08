@@ -7,7 +7,10 @@ export const getJourneyTemplates = (): Promise<JourneyTemplate[]> =>
   withDelay(() => service.getJourneyTemplates())
 
 export const saveJourneyTemplate = (
-  template: Omit<JourneyTemplate, 'id' | 'createdAt'> & { id?: string },
+  template: Omit<JourneyTemplate, 'id' | 'createdAt' | 'instructions'> & {
+    id?: string
+    instructions?: JourneyTemplate['instructions']
+  },
 ): Promise<JourneyTemplate> => withDelay(() => service.saveJourneyTemplate(template))
 
 export const deleteJourneyTemplate = (templateId: string): Promise<void> =>

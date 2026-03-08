@@ -1,22 +1,11 @@
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
 import BiotechIcon from '@mui/icons-material/Biotech'
 import ImageIcon from '@mui/icons-material/Image'
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 import RepeatIcon from '@mui/icons-material/Repeat'
 import ScienceIcon from '@mui/icons-material/Science'
-import {
-  Box,
-  Chip,
-  Collapse,
-  IconButton,
-  Stack,
-  Tooltip,
-  Typography,
-  useTheme,
-} from '@mui/material'
+import { Box, Chip, Stack, Tooltip, Typography, useTheme } from '@mui/material'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-import ReactMarkdown from 'react-markdown'
 
 import type { ClinicalReview } from '@/api/schemas'
 import type { EffectiveStep } from '@/api/service'
@@ -39,8 +28,6 @@ interface Props {
   ) => Promise<string>
   onRemoveReview?: (reviewId: string) => Promise<void>
   setReviewDetails: (r: ClinicalReview | null) => void
-  expandedInstructions: Set<string>
-  toggleInstruction: (id: string) => void
   openDialog: (stepId: string, reviewType: ReviewTypeKey, stepLabel: string) => void
 }
 
@@ -53,8 +40,6 @@ export default function JourneyTimelineItem({
   onAddReview,
   onRemoveReview,
   setReviewDetails,
-  expandedInstructions,
-  toggleInstruction,
   openDialog,
 }: Props) {
   const { t } = useTranslation()
@@ -234,41 +219,6 @@ export default function JourneyTimelineItem({
           <Stack direction="row" gap={0.5} sx={{ mt: 0.5 }} flexWrap="wrap">
             {REVIEW_TYPES.map(reviewChip)}
           </Stack>
-        )}
-
-        {step.resolvedInstruction && (
-          <Box>
-            <Tooltip title={t('journey.toggleInstruction')}>
-              <IconButton
-                size="small"
-                onClick={() => toggleInstruction(step.id)}
-                sx={{ ml: -0.5, mt: 0.25 }}
-                aria-label={t('journey.toggleInstruction')}
-              >
-                <InfoOutlinedIcon
-                  fontSize="small"
-                  color={expandedInstructions.has(step.id) ? 'primary' : 'action'}
-                />
-              </IconButton>
-            </Tooltip>
-            <Collapse in={expandedInstructions.has(step.id)}>
-              <Box
-                sx={{
-                  mt: 0.5,
-                  p: 1.5,
-                  bgcolor: 'action.hover',
-                  borderRadius: 1,
-                  borderLeft: 3,
-                  borderColor: 'primary.light',
-                  '& p': { my: 0.5, typography: 'caption', color: 'text.secondary' },
-                  '& ul, & ol': { my: 0.5, pl: 2.5 },
-                  '& li': { my: 0 },
-                }}
-              >
-                <ReactMarkdown>{step.resolvedInstruction}</ReactMarkdown>
-              </Box>
-            </Collapse>
-          </Box>
         )}
       </Box>
     </Box>

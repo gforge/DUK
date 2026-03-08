@@ -2,7 +2,7 @@ import type { Case, FormResponse, TriggerType } from '@/api/schemas'
 import { getStore, setStore } from '@/api/storage'
 
 import { buildPolicyScopeWithAliases } from './journeyResolver'
-import { addAuditEvent,computeScores, evaluatePolicyRules, now, uuid } from './utils'
+import { addAuditEvent, computeScores, evaluatePolicyRules, now, uuid } from './utils'
 
 export function getFormResponses(caseId: string): FormResponse[] {
   return getStore().formResponses.filter((r) => r.caseId === caseId)
@@ -11,7 +11,7 @@ export function getFormResponses(caseId: string): FormResponse[] {
 export interface JourneyStepContext {
   patientJourneyId: string
   /** Base entry id (not the __r0 expanded variant). */
-  journeyStepId: string
+  journeyTemplateEntryId: string
   occurrenceIndex: number
 }
 
@@ -49,7 +49,7 @@ export function submitFormResponse(
     submittedAt: now(),
     ...(journeyContext && {
       patientJourneyId: journeyContext.patientJourneyId,
-      journeyStepId: journeyContext.journeyStepId,
+      journeyTemplateEntryId: journeyContext.journeyTemplateEntryId,
       occurrenceIndex: journeyContext.occurrenceIndex,
     }),
   }
@@ -71,11 +71,11 @@ export function submitFormResponse(
     const tmpl = journey
       ? state.journeyTemplates.find((t) => t.id === journey.journeyTemplateId)
       : undefined
-    const entry = tmpl?.entries.find((e) => e.id === journeyContext.journeyStepId)
+    const entry = tmpl?.entries.find((e) => e.id === journeyContext.journeyTemplateEntryId)
     if (journey && entry?.recurrenceIntervalDays !== undefined) {
       const alreadyRecorded = (journey.recurringCompletions ?? []).some(
         (c) =>
-          c.stepId === journeyContext.journeyStepId &&
+          c.stepId === journeyContext.journeyTemplateEntryId &&
           c.occurrenceIndex === journeyContext.occurrenceIndex,
       )
       if (!alreadyRecorded) {
@@ -84,7 +84,7 @@ export function submitFormResponse(
           recurringCompletions: [
             ...(journey.recurringCompletions ?? []),
             {
-              stepId: journeyContext.journeyStepId,
+              stepId: journeyContext.journeyTemplateEntryId,
               occurrenceIndex: journeyContext.occurrenceIndex,
               completedAt: now().slice(0, 10),
             },

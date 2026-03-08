@@ -1,5 +1,5 @@
 import type { InstructionTemplate } from '../schemas'
-import { daysAgo,iso } from './shared'
+import { daysAgo, iso } from './shared'
 
 export const instructionTemplates: InstructionTemplate[] = [
   {
@@ -79,5 +79,32 @@ export const instructionTemplates: InstructionTemplate[] = [
 **Vid oro:** Tveka inte att kontakta mottagningen.`,
     createdAt: iso(daysAgo(90)),
     updatedAt: iso(daysAgo(90)),
+  },
+  {
+    id: 'it-physio-week4-general',
+    name: 'Vecka 4 - Rörelseträning',
+    tags: ['physio', 'week4', 'rehab'],
+    content:
+      'Rörelseträning: aktiv assisterad flexion och abduktion upp till 90°. Motverka svullnad med höjning och fingerrörelser.',
+    createdAt: iso(daysAgo(90)),
+    updatedAt: iso(daysAgo(90)),
+  },
+  {
+    id: 'it-monitoring-baseline',
+    name: 'Baslinjemätning - Instruktion',
+    tags: ['monitoring', 'baseline'],
+    content:
+      'Baslinjemätning. Svara på frågorna om din smärta, rörlighet och livskvalitet. Dina svar hjälper teamet att följa din återhämtning.',
+    createdAt: iso(daysAgo(30)),
+    updatedAt: iso(daysAgo(30)),
+  },
+  {
+    id: 'it-monitoring-recurring',
+    name: 'Halvårsuppföljning - Instruktion',
+    tags: ['monitoring', 'recurring'],
+    content:
+      'Halvårsuppföljning. Besvara frågorna om smärta, funktion och livskvalitet. Nästa uppföljning schemaläggs automatiskt 6 månader efter att du svarat.',
+    createdAt: iso(daysAgo(30)),
+    updatedAt: iso(daysAgo(30)),
   },
 ]

@@ -3,6 +3,7 @@ import EditIcon from '@mui/icons-material/Edit'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import ForkRightIcon from '@mui/icons-material/ForkRight'
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
+import LibraryBooksIcon from '@mui/icons-material/LibraryBooks'
 import RepeatIcon from '@mui/icons-material/Repeat'
 import RouteIcon from '@mui/icons-material/Route'
 import SyncIcon from '@mui/icons-material/Sync'
@@ -35,6 +36,7 @@ interface Props {
   setSyncTarget: (jt: JourneyTemplate) => void
   setEditTarget: (jt: JourneyTemplate | undefined) => void
   setDeriveTarget: (jt: JourneyTemplate) => void
+  setTemplateInstructionsTarget: (jt: JourneyTemplate) => void
   setEntryEditState: React.Dispatch<
     React.SetStateAction<{
       template: JourneyTemplate
@@ -52,6 +54,7 @@ export function JourneyTemplatesTabList({
   setSyncTarget,
   setEditTarget,
   setDeriveTarget,
+  setTemplateInstructionsTarget,
   setEntryEditState: _setEntryEditState,
   handleSaveEntry: _handleSaveEntry,
   handleDeleteEntry: _handleDeleteEntry,
@@ -92,6 +95,11 @@ export function JourneyTemplatesTabList({
                 size="small"
                 variant="outlined"
               />
+              <Chip
+                label={`${jt.instructions.length} ${t('journey.editor.tabInstructions')}`}
+                size="small"
+                variant="outlined"
+              />
               {jt.parentTemplateId && (
                 <Tooltip title={t('journey.editor.syncFromParent')}>
                   <IconButton
@@ -126,6 +134,17 @@ export function JourneyTemplatesTabList({
                   }}
                 >
                   <ForkRightIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title={t('journey.editor.tabInstructions')}>
+                <IconButton
+                  size="small"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    setTemplateInstructionsTarget(jt)
+                  }}
+                >
+                  <LibraryBooksIcon fontSize="small" />
                 </IconButton>
               </Tooltip>
               <Tooltip title={t('common.delete')}>

@@ -13,7 +13,7 @@ import { patientJourneys } from './patientJourneys'
 import { policyRules } from './policyRules'
 import { questionnaireTemplates } from './questionnaireTemplates'
 import { researchModules } from './researchModules'
-import { patients,users } from './users'
+import { patients, users } from './users'
 
 const baseSeedState: AppState = {
   schemaVersion: CURRENT_SCHEMA_VERSION,
@@ -30,6 +30,7 @@ const baseSeedState: AppState = {
   journeyTemplates,
   researchModules,
   patientJourneys,
+  instructions: [],
   instructionTemplates,
   researchConsents: [],
 }

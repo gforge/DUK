@@ -36,7 +36,6 @@ export function JourneyTimeline({
   const { t } = useTranslation()
   const theme = useTheme()
 
-  const [expandedInstructions, setExpandedInstructions] = useState<Set<string>>(new Set())
   const [reviewDialog, setReviewDialog] = useState<{
     stepId: string
     stepLabel: string
@@ -48,15 +47,6 @@ export function JourneyTimeline({
   const [addedReviews, setAddedReviews] = useState<
     Map<string, { reviewId: string; description?: string }>
   >(new Map())
-
-  const toggleInstruction = (id: string) => {
-    setExpandedInstructions((prev) => {
-      const next = new Set(prev)
-      if (next.has(id)) next.delete(id)
-      else next.add(id)
-      return next
-    })
-  }
 
   const openDialog = (stepId: string, reviewType: ReviewTypeKey, stepLabel: string) => {
     setDescription('')
@@ -142,8 +132,6 @@ export function JourneyTimeline({
               onAddReview={onAddReview}
               onRemoveReview={handleRemoveChip}
               setReviewDetails={setReviewDetails}
-              expandedInstructions={expandedInstructions}
-              toggleInstruction={toggleInstruction}
               openDialog={openDialog}
             />
           )

@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next'
 import * as client from '@/api/client'
 import type { Case } from '@/api/schemas'
 import JourneyModHistory from '@/components/case/JourneyTab/JourneyModHistory'
-import { JourneyTimeline } from '@/components/journey'
+import { InstructionTimeline, JourneyTimeline } from '@/components/journey'
 import { ModifyJourneyDialog } from '@/components/journey'
 import { PatientJourneyResearchCard } from '@/components/patients'
 import { useApi } from '@/hooks/useApi'
@@ -56,6 +56,14 @@ export default function JourneyTab({ caseData }: JourneyTabProps) {
 
   const selectedJourney =
     sortedJourneys.find((j) => j.id === selectedJourneyId) ?? sortedJourneys[0] ?? null
+
+  const { data: resolvedInstructions } = useApi(
+    () =>
+      selectedJourney
+        ? client.getResolvedInstructionsForJourney(selectedJourney.id)
+        : Promise.resolve([]),
+    [selectedJourney?.id],
+  )
 
   const { data: effectiveSteps, refetch: refetchSteps } = useApi(
     () => (selectedJourney ? client.getEffectiveSteps(selectedJourney.id) : Promise.resolve([])),
@@ -170,6 +178,13 @@ export default function JourneyTab({ caseData }: JourneyTabProps) {
           />
 
           <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, mb: 2 }}>
+            <Box sx={{ mb: 2 }}>
+              <Alert severity="info" sx={{ mb: 1 }}>
+                {t('journey.instructionsSection')}
+              </Alert>
+              <InstructionTimeline instructions={resolvedInstructions ?? []} />
+            </Box>
+
             <JourneyTimeline
               steps={effectiveSteps ?? []}
               formResponses={formResponses ?? []}

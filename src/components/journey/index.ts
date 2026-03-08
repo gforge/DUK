@@ -2,6 +2,7 @@
 export * from './AddReviewDialog'
 export * from './ConsentDialog/index'
 export * from './editor/index'
+export * from './InstructionTimeline'
 export * from './JourneyTimeline/index'
 export * from './JourneyTimelineItem'
 export { default as ModifyJourneyDialog } from './ModifyJourneyDialog'

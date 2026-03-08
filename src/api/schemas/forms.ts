@@ -11,7 +11,7 @@ export const FormResponseSchema = z.object({
   imageUrl: z.string().optional(),
   /** Links this response to a specific journey step occurrence (for recurring completion tracking). */
   patientJourneyId: z.string().optional(),
-  journeyStepId: z.string().optional(),
+  journeyTemplateEntryId: z.string().optional(),
   occurrenceIndex: z.number().int().min(0).optional(),
 })
 export type FormResponse = z.infer<typeof FormResponseSchema>

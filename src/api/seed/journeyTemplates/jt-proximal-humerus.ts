@@ -1,5 +1,5 @@
 import type { JourneyTemplate } from '../../schemas'
-import { daysAgo,iso } from '../shared'
+import { daysAgo, iso } from '../shared'
 
 export const jtProximalHumerus: JourneyTemplate = {
   id: 'jt-proximal-humerus',
@@ -19,7 +19,6 @@ export const jtProximalHumerus: JourneyTemplate = {
       dashboardCategory: 'ACUTE',
       scoreAliases: { PNRS_1: 'PNRS_baseline' },
       scoreAliasLabels: { PNRS_baseline: 'VAS (PNRS) vid dag 1–2' },
-      instructionTemplateId: 'it-wound-care',
     },
     {
       id: 'jte-ph-2',
@@ -31,7 +30,6 @@ export const jtProximalHumerus: JourneyTemplate = {
       dashboardCategory: 'ACUTE',
       scoreAliases: { PNRS_2: 'PNRS_day14' },
       scoreAliasLabels: { PNRS_day14: 'VAS (PNRS) vid dag 10–14' },
-      instructionTemplateId: 'it-proximal-humerus',
     },
     {
       id: 'jte-ph-3',
@@ -46,7 +44,6 @@ export const jtProximalHumerus: JourneyTemplate = {
         PNRS_week4: 'VAS (PNRS) vid vecka 4',
         OSS_week4: 'OSS-poäng vid vecka 4',
       },
-      instructionTemplateId: 'it-proximal-humerus',
     },
     {
       id: 'jte-ph-4',
@@ -61,7 +58,6 @@ export const jtProximalHumerus: JourneyTemplate = {
         PNRS_week8: 'VAS (PNRS) vid vecka 6–8',
         OSS_week8: 'OSS-poäng vid vecka 6–8',
       },
-      instructionTemplateId: 'it-proximal-humerus',
     },
     {
       id: 'jte-ph-5',
@@ -92,6 +88,48 @@ export const jtProximalHumerus: JourneyTemplate = {
         EQ5D_1yr: 'EQ-5D index vid 1 år',
         EQ_VAS_1yr: 'EQ VAS vid 1 år',
       },
+    },
+  ],
+  instructions: [
+    {
+      id: 'jti-ph-1',
+      journeyTemplateId: 'jt-proximal-humerus',
+      instructionTemplateId: 'it-wound-care',
+      label: 'Dag 1–2: Sårvård',
+      startDayOffset: 1,
+      endDayOffset: 14,
+      order: 1,
+      tags: ['wound', 'acute'],
+    },
+    {
+      id: 'jti-ph-2',
+      journeyTemplateId: 'jt-proximal-humerus',
+      instructionTemplateId: 'it-proximal-humerus',
+      label: 'Dag 10–14: Axelspecifik fysioterapi',
+      startDayOffset: 10,
+      endDayOffset: 28,
+      order: 2,
+      tags: ['shoulder', 'physio'],
+    },
+    {
+      id: 'jti-ph-3',
+      journeyTemplateId: 'jt-proximal-humerus',
+      instructionTemplateId: 'it-proximal-humerus',
+      label: 'Vecka 4: Fysiokontroll',
+      startDayOffset: 28,
+      endDayOffset: 49,
+      order: 3,
+      tags: ['shoulder', 'physio'],
+    },
+    {
+      id: 'jti-ph-4',
+      journeyTemplateId: 'jt-proximal-humerus',
+      instructionTemplateId: 'it-proximal-humerus',
+      label: 'Vecka 6–8: Aktiv rörlighet',
+      startDayOffset: 49,
+      endDayOffset: 84,
+      order: 4,
+      tags: ['shoulder', 'physio'],
     },
   ],
   createdAt: iso(daysAgo(60)),

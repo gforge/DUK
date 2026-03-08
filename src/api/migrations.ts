@@ -214,6 +214,116 @@ const MIGRATIONS: Migration[] = [
       // `journeyStepLabel` is optional on ClinicalReviewSchema — no backfill needed.
     }),
   },
+  {
+    from: 9,
+    to: 10,
+    up: (s) => {
+      const nowIso = new Date().toISOString()
+
+      const toIsoFromYmd = (ymd: unknown): string => {
+        const text = typeof ymd === 'string' ? ymd : nowIso.slice(0, 10)
+        const parsed = new Date(`${text}T00:00:00.000Z`)
+        return Number.isNaN(parsed.getTime()) ? nowIso : parsed.toISOString()
+      }
+
+      const computePauseShift = (journey: Record<string, unknown>): number => {
+        const total =
+          typeof journey['totalPausedDays'] === 'number' ? Number(journey['totalPausedDays']) : 0
+        const isSuspended = journey['status'] === 'SUSPENDED'
+        const pausedAt = journey['pausedAt']
+        if (!isSuspended || typeof pausedAt !== 'string') return total
+        const currentPause = Math.floor((Date.now() - new Date(pausedAt).getTime()) / 86_400_000)
+        return total + (Number.isNaN(currentPause) ? 0 : currentPause)
+      }
+
+      const journeyTemplates: Record<string, unknown>[] = Array.isArray(s['journeyTemplates'])
+        ? (s['journeyTemplates'] as Record<string, unknown>[]).map((jt) => {
+            const existing = Array.isArray(jt['instructions'])
+              ? (jt['instructions'] as Record<string, unknown>[])
+              : []
+
+            return {
+              ...jt,
+              instructions: existing,
+            } as Record<string, unknown>
+          })
+        : []
+
+      const patientJourneys = Array.isArray(s['patientJourneys'])
+        ? (s['patientJourneys'] as Record<string, unknown>[])
+        : []
+
+      const templateById = new Map<string, Record<string, unknown>>()
+      for (const jt of journeyTemplates) {
+        if (typeof jt['id'] === 'string') templateById.set(jt['id'], jt)
+      }
+
+      const instructions = patientJourneys.flatMap((journey) => {
+        const journeyId = String(journey['id'] ?? '')
+        const templateId = String(journey['journeyTemplateId'] ?? '')
+        const template = templateById.get(templateId)
+        const templateInstructions =
+          template && Array.isArray(template['instructions'])
+            ? (template['instructions'] as Record<string, unknown>[])
+            : []
+
+        const startDateIso = toIsoFromYmd(journey['startDate'])
+        const startDateMs = new Date(startDateIso).getTime()
+        const pauseShift = computePauseShift(journey)
+
+        return templateInstructions.map((ti, idx) => {
+          const startOffset =
+            typeof ti['startDayOffset'] === 'number' ? Number(ti['startDayOffset']) : 0
+          const endOffset =
+            typeof ti['endDayOffset'] === 'number' ? Number(ti['endDayOffset']) : null
+          const startAt = new Date(
+            startDateMs + (startOffset + pauseShift) * 86_400_000,
+          ).toISOString()
+          const endAt =
+            endOffset === null
+              ? null
+              : new Date(startDateMs + (endOffset + pauseShift) * 86_400_000).toISOString()
+
+          return {
+            id: `ins-migrated-${journeyId}-${idx}`,
+            patientJourneyId: journeyId,
+            journeyTemplateInstructionId:
+              typeof ti['id'] === 'string' ? String(ti['id']) : undefined,
+            instructionTemplateId: String(ti['instructionTemplateId'] ?? ''),
+            label: typeof ti['label'] === 'string' ? ti['label'] : undefined,
+            startDayOffset: startOffset,
+            endDayOffset: endOffset === null ? undefined : endOffset,
+            startAt,
+            endAt,
+            status: 'ACTIVE',
+            tags: Array.isArray(ti['tags']) ? ti['tags'] : [],
+            acknowledgedAt: null,
+            acknowledgedByUserId: null,
+            completedAt: null,
+            completedByUserId: null,
+            createdAt: nowIso,
+            updatedAt: nowIso,
+          }
+        })
+      })
+
+      const formResponses = Array.isArray(s['formResponses'])
+        ? (s['formResponses'] as Record<string, unknown>[]).map((fr) => ({
+            ...fr,
+            journeyTemplateEntryId: fr['journeyTemplateEntryId'] ?? undefined,
+          }))
+        : []
+
+      return {
+        ...s,
+        schemaVersion: 10,
+        journeyTemplates,
+        patientJourneys,
+        instructions,
+        formResponses,
+      }
+    },
+  },
 ]
 
 // ---------------------------------------------------------------------------

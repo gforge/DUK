@@ -175,6 +175,7 @@ interface Resources {
       "selectTemplate": "Välj mall"
     },
     "journey": {
+      "activeNow": "Aktiv nu",
       "added": "Tillagd",
       "addedStep": "Manuellt tillagt steg",
       "cancel": "Avbryt resa",
@@ -257,6 +258,10 @@ interface Resources {
         "stepKeyPlaceholder": "t.ex. vecka_4",
         "windowDays": "Tidsfönster (±dagar)"
       },
+      "followUpSection": "Uppföljningssteg",
+      "instructionFallback": "Instruktion",
+      "instructionRange": "{{start}} - {{end}}",
+      "instructionsSection": "Aktiva instruktioner",
       "journeyStatus": {
         "ACTIVE": "Aktiv",
         "COMPLETED": "Avslutad",
@@ -298,6 +303,7 @@ interface Resources {
         "windowDays": "Fönster (±dagar)"
       },
       "noActiveJourney": "Ingen aktiv patientresa tilldelad.",
+      "noInstructions": "Inga instruktioner i den här resan.",
       "noSteps": "Inga steg definierade.",
       "offsetDays": "Offset (dagar)",
       "offsetFormat": {
@@ -312,6 +318,7 @@ interface Resources {
         "years_one": "{{count}} år",
         "years_other": "{{count}} år"
       },
+      "ongoing": "Löpande",
       "patient": "Patient",
       "pause": "Pausa resa",
       "pauseConfirmBody": "Tidslinjen fryses medan resan är pausad. Alla kommande steg skjuts fram tills du återupptar resan.",
@@ -411,7 +418,6 @@ interface Resources {
         "referenceDateLabel": "Referensdatumets namn",
         "referenceDateLabelHint": "Visas i registreringsdialogen istället för „Referensdatum“. T.ex. Operationsdatum, Skadedatum."
       },
-      "toggleInstruction": "Visa/dölj instruktioner",
       "type": "Typ",
       "window": "Fönster"
     },

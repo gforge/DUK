@@ -20,6 +20,7 @@ import { useSnack } from '@/store/snackContext'
 
 import { JourneyTemplatesTabDialogs } from './JourneyTemplatesTabDialogs'
 import { JourneyTemplatesTabList } from './JourneyTemplatesTabList'
+import { TemplateInstructionsDialog } from './TemplateInstructionsDialog'
 
 interface Props {
   journeyTemplates: JourneyTemplate[] | null
@@ -33,6 +34,8 @@ export function JourneyTemplatesTab({ journeyTemplates, loading, onDelete, onRef
   const { showSnack } = useSnack()
   const [deriveTarget, setDeriveTarget] = useState<JourneyTemplate | null>(null)
   const [syncTarget, setSyncTarget] = useState<JourneyTemplate | null>(null)
+  const [templateInstructionsTarget, setTemplateInstructionsTarget] =
+    useState<JourneyTemplate | null>(null)
   // null = closed, undefined = create new, JourneyTemplate = edit existing
   const [editTarget, setEditTarget] = useState<JourneyTemplate | null | undefined>(null)
 
@@ -111,6 +114,7 @@ export function JourneyTemplatesTab({ journeyTemplates, loading, onDelete, onRef
           setSyncTarget={setSyncTarget}
           setEditTarget={setEditTarget}
           setDeriveTarget={setDeriveTarget}
+          setTemplateInstructionsTarget={setTemplateInstructionsTarget}
           setEntryEditState={setEntryEditState}
           handleSaveEntry={handleSaveEntry}
           handleDeleteEntry={handleDeleteEntry}
@@ -136,6 +140,18 @@ export function JourneyTemplatesTab({ journeyTemplates, loading, onDelete, onRef
           instructionTemplates={instructionTemplates ?? []}
           onSave={(saved) => handleSaveEntry(entryEditState.template, saved)}
           onClose={handleCloseEntryEditor}
+        />
+      )}
+
+      {templateInstructionsTarget && instructionTemplates && (
+        <TemplateInstructionsDialog
+          template={templateInstructionsTarget}
+          instructionTemplates={instructionTemplates}
+          onClose={() => setTemplateInstructionsTarget(null)}
+          onSaved={() => {
+            setTemplateInstructionsTarget(null)
+            onRefresh?.()
+          }}
         />
       )}
 

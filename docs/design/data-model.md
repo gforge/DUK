@@ -56,8 +56,34 @@ JourneyTemplateEntry
 - scoreAliases: Record<string, string> (raw score key → semantic alias)
 - scoreAliasLabels: Record<string, string> (alias → human label)
 - dashboardCategory: enum (ACUTE, SUBACUTE, CONTROL)
-- instructionText: string | undefined (inline instruction content)
-- instructionTemplateId: string | undefined (FK → InstructionTemplate.id; overrides instructionText)
+
+JourneyTemplateInstruction
+
+- id: string
+- journeyTemplateId: string (FK → JourneyTemplate.id)
+- instructionTemplateId: string (FK → InstructionTemplate.id)
+- label: string | undefined
+- startDayOffset: number
+- endDayOffset: number | undefined
+- order: number
+- tags: string[]
+
+Instruction
+
+- id: string
+- patientJourneyId: string (FK → PatientJourney.id)
+- journeyTemplateInstructionId: string | undefined
+- instructionTemplateId: string (FK → InstructionTemplate.id)
+- label: string | undefined
+- startDayOffset: number
+- endDayOffset: number | undefined
+- startAt: string (ISO)
+- endAt: string | null (ISO)
+- status: enum (ACTIVE, ACKNOWLEDGED, COMPLETED, CANCELLED)
+- acknowledgedAt, completedAt: string | null (ISO)
+- acknowledgedByUserId, completedByUserId: string | null
+- tags: string[]
+- createdAt, updatedAt: string (ISO)
 
 JourneyTemplate
 
@@ -101,7 +127,7 @@ FormResponse (src/api/schemas/forms.ts)
 - scores: Record<string, number> (computed using scoringRules)
 - submittedAt: string (ISO)
 - patientJourneyId: string | undefined (FK → PatientJourney.id; present when submitted via a journey step)
-- journeyStepId: string | undefined (FK → JourneyTemplateEntry.id or recurring `__rN` id; present when submitted via a journey step)
+- journeyTemplateEntryId: string | undefined (FK → JourneyTemplateEntry.id; present when submitted via a journey step)
 - occurrenceIndex: number | undefined (which recurrence instance; present for recurring steps)
 
 QuestionnaireTemplate (src/api/schemas/questionnaire.ts)
@@ -151,8 +177,8 @@ Notes
 
 - The codebase stores journeys by `patientId` and the UI renders all journeys in tabbed views sorted ACTIVE → SUSPENDED → COMPLETED. There is no explicit Case→PatientJourney foreign key.
 - `getMergedDueStepsForPatient(patientId, date)` deduplicates due steps across parallel journeys by `templateEntryId` for dashboard display.
-- `InstructionTemplate` entities are stored in `AppState.instructionTemplates` and referenced from `JourneyTemplateEntry.instructionTemplateId`.
+- `InstructionTemplate` entities are stored in `AppState.instructionTemplates` and referenced from `JourneyTemplateInstruction` and `Instruction`.
 - `JourneyTemplate.parentTemplateId` tracks derivation lineage; `derivedAt` marks the last sync point for `computeParentDiff`.
-- The `EffectiveStep` type (returned by `getEffectiveSteps`) includes a `resolvedInstruction?: string` field hydrated from `instructionTemplateId` (preferred) or `instructionText`.
+- `getEffectiveSteps` only resolves follow-up steps. Instruction rendering uses the dedicated instruction APIs and persisted `Instruction` records.
 - Effective step dates are shifted by `totalPausedDays + currentPauseDays` dynamically in `getEffectiveSteps`; no dates are rewritten to the store during display.
 - `cancelJourney` uses `FormResponse.patientJourneyId` and `PatientJourney.recurringCompletions` to determine whether a journey has recorded data and should be archived (→ `COMPLETED` + `CANCEL` modification) vs. deleted entirely.

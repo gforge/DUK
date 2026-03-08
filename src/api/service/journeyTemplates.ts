@@ -1,18 +1,26 @@
 import type { JourneyTemplate, JourneyTemplateEntry } from '../schemas'
 import { getStore, setStore } from '../storage'
-import { now,uuid } from './utils'
+import { now, uuid } from './utils'
 
 export function getJourneyTemplates(): JourneyTemplate[] {
   return getStore().journeyTemplates
 }
 
 export function saveJourneyTemplate(
-  template: Omit<JourneyTemplate, 'id' | 'createdAt'> & { id?: string },
+  template: Omit<JourneyTemplate, 'id' | 'createdAt' | 'instructions'> & {
+    id?: string
+    instructions?: JourneyTemplate['instructions']
+  },
 ): JourneyTemplate {
   const state = getStore()
   const existing = template.id ? state.journeyTemplates.find((t) => t.id === template.id) : null
   if (existing) {
-    const updated: JourneyTemplate = { ...existing, ...template, id: existing.id }
+    const updated: JourneyTemplate = {
+      ...existing,
+      ...template,
+      instructions: template.instructions ?? existing.instructions ?? [],
+      id: existing.id,
+    }
     setStore({
       ...state,
       journeyTemplates: state.journeyTemplates.map((t) => (t.id === existing.id ? updated : t)),
@@ -21,6 +29,7 @@ export function saveJourneyTemplate(
   }
   const newTemplate: JourneyTemplate = {
     ...template,
+    instructions: template.instructions ?? [],
     id: uuid(),
     createdAt: now(),
   } as JourneyTemplate
@@ -50,6 +59,7 @@ export function deriveJourneyTemplate(parentId: string, newName: string): Journe
     name: newName,
     description: parent.description,
     entries: parent.entries.map((e) => ({ ...e, id: uuid() })),
+    instructions: parent.instructions.map((i) => ({ ...i, id: uuid() })),
     createdAt: now(),
     parentTemplateId: parentId,
     derivedAt: now(),
@@ -93,9 +103,7 @@ export function computeParentDiff(childId: string): EntryDiff[] {
         ce.label !== pe.label ||
         ce.windowDays !== pe.windowDays ||
         ce.templateId !== pe.templateId ||
-        ce.dashboardCategory !== pe.dashboardCategory ||
-        ce.instructionText !== pe.instructionText ||
-        ce.instructionTemplateId !== pe.instructionTemplateId
+        ce.dashboardCategory !== pe.dashboardCategory
       if (changed) {
         diffs.push({ type: 'CHANGED', entryId: ce.id, label: ce.label, parentEntry: pe })
       }

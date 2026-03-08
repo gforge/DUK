@@ -1,5 +1,5 @@
 import type { JourneyTemplate } from '../../schemas'
-import { daysAgo,iso } from '../shared'
+import { daysAgo, iso } from '../shared'
 
 export const jtComplex: JourneyTemplate = {
   id: 'jt-complex',
@@ -17,7 +17,6 @@ export const jtComplex: JourneyTemplate = {
       dashboardCategory: 'ACUTE',
       scoreAliases: { PNRS_1: 'PNRS_baseline' },
       scoreAliasLabels: { PNRS_baseline: 'VAS (PNRS) vid dag 1–2' },
-      instructionTemplateId: 'it-wound-care',
     },
     {
       id: 'jte-cx-2',
@@ -29,7 +28,6 @@ export const jtComplex: JourneyTemplate = {
       dashboardCategory: 'ACUTE',
       scoreAliases: { PNRS_2: 'PNRS_day4' },
       scoreAliasLabels: { PNRS_day4: 'VAS (PNRS) vid dag 3–5' },
-      instructionTemplateId: 'it-wound-care',
     },
     {
       id: 'jte-cx-3',
@@ -45,7 +43,6 @@ export const jtComplex: JourneyTemplate = {
         PNRS_NIGHT_day14: 'Nattsmärta (PNRS) vid dag 10–14',
       },
       reviewTypes: ['XRAY'],
-      instructionTemplateId: 'it-post-op-general',
     },
     {
       id: 'jte-cx-4',
@@ -60,8 +57,6 @@ export const jtComplex: JourneyTemplate = {
         PNRS_week4: 'VAS (PNRS) vid vecka 4',
         OSS_week4: 'OSS-poäng vid vecka 4',
       },
-      instructionText:
-        'Rörelseträning: aktiv assisterad flexion och abduktion upp till 90°. Motverka svullnad med höjning och fingerrörelser.',
     },
     {
       id: 'jte-cx-5',
@@ -106,6 +101,48 @@ export const jtComplex: JourneyTemplate = {
         EQ5D_1yr: 'EQ-5D index vid 1 år',
         EQ_VAS_1yr: 'EQ VAS vid 1 år',
       },
+    },
+  ],
+  instructions: [
+    {
+      id: 'jti-cx-1',
+      journeyTemplateId: 'jt-complex',
+      instructionTemplateId: 'it-wound-care',
+      label: 'Dag 1–2: Sårvård',
+      startDayOffset: 1,
+      endDayOffset: 14,
+      order: 1,
+      tags: ['wound', 'acute'],
+    },
+    {
+      id: 'jti-cx-2',
+      journeyTemplateId: 'jt-complex',
+      instructionTemplateId: 'it-wound-care',
+      label: 'Dag 3–5: Tidig sårkontroll',
+      startDayOffset: 4,
+      endDayOffset: 14,
+      order: 2,
+      tags: ['wound', 'acute'],
+    },
+    {
+      id: 'jti-cx-3',
+      journeyTemplateId: 'jt-complex',
+      instructionTemplateId: 'it-post-op-general',
+      label: 'Dag 10–14: Postoperativa råd',
+      startDayOffset: 10,
+      endDayOffset: 21,
+      order: 3,
+      tags: ['post-op'],
+    },
+    {
+      id: 'jti-cx-4',
+      journeyTemplateId: 'jt-complex',
+      instructionTemplateId: 'it-physio-week4-general',
+      label: 'Vecka 4: Rörelseträning',
+      startDayOffset: 28,
+      endDayOffset: 56,
+      order: 4,
+      tags: ['physio', 'subacute'],
     },
   ],
   createdAt: iso(daysAgo(100)),

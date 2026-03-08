@@ -28,6 +28,44 @@ export const InstructionTemplateSchema = z.object({
 })
 export type InstructionTemplate = z.infer<typeof InstructionTemplateSchema>
 
+export const JourneyTemplateInstructionSchema = z.object({
+  id: z.string(),
+  journeyTemplateId: z.string(),
+  instructionTemplateId: z.string(),
+  label: z.string().optional(),
+  startDayOffset: z.number().int(),
+  endDayOffset: z.number().int().optional(),
+  order: z.number(),
+  tags: z.array(z.string()).default([]),
+})
+export type JourneyTemplateInstruction = z.infer<typeof JourneyTemplateInstructionSchema>
+
+export const InstructionStatusSchema = z.enum(['ACTIVE', 'ACKNOWLEDGED', 'COMPLETED', 'CANCELLED'])
+export type InstructionStatus = z.infer<typeof InstructionStatusSchema>
+
+export const InstructionSchema = z.object({
+  id: z.string(),
+  patientJourneyId: z.string(),
+  journeyTemplateInstructionId: z.string().optional(),
+  instructionTemplateId: z.string(),
+  label: z.string().optional(),
+  startDayOffset: z.number().int(),
+  endDayOffset: z.number().int().optional(),
+  /** Resolved ISO datetime start, persisted for stable timeline rendering. */
+  startAt: z.string().datetime(),
+  /** Resolved ISO datetime end, persisted for stable timeline rendering. */
+  endAt: z.string().datetime().nullable().default(null),
+  status: InstructionStatusSchema.default('ACTIVE'),
+  tags: z.array(z.string()).default([]),
+  acknowledgedAt: z.string().datetime().nullable().default(null),
+  acknowledgedByUserId: z.string().nullable().default(null),
+  completedAt: z.string().datetime().nullable().default(null),
+  completedByUserId: z.string().nullable().default(null),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
+})
+export type Instruction = z.infer<typeof InstructionSchema>
+
 /**
  * One step inside a reusable journey template.
  * scoreAliases maps raw score keys to semantic journey-relative names,
@@ -54,10 +92,6 @@ export const JourneyTemplateEntrySchema = z.object({
   stepKey: z.string().optional(),
   /** Which dashboard column is active while this step's window is open. */
   dashboardCategory: CaseCategorySchema.default('CONTROL'),
-  /** Quick freeform instruction text (markdown). Shown to clinician and patient. */
-  instructionText: z.string().optional(),
-  /** Reference to a reusable InstructionTemplate. Overrides instructionText if both present. */
-  instructionTemplateId: z.string().optional(),
   /**
    * If set, this step recurs every N days after the previous occurrence is completed.
    * Completion is triggered when the patient submits the linked form.
@@ -76,6 +110,7 @@ export const JourneyTemplateSchema = z.object({
   name: z.string(),
   description: z.string().optional(),
   entries: z.array(JourneyTemplateEntrySchema),
+  instructions: z.array(JourneyTemplateInstructionSchema).default([]),
   createdAt: z.string().datetime(),
   /** If derived from another template, the parent's ID is recorded here. */
   parentTemplateId: z.string().optional(),

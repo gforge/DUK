@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 
 import * as client from '@/api/client'
 import type { JourneyTemplate, PatientJourney } from '@/api/schemas'
+import { InstructionTimeline } from '@/components/journey'
 import { JourneyTimeline } from '@/components/journey/JourneyTimeline'
 import { getStatusChipColor } from '@/components/patientView/PatientCareplan/getStatusChipColor'
 import { PatientClinicalReviews } from '@/components/patientView/PatientCareplan/PatientClinicalReviews'
@@ -35,6 +36,13 @@ export function PatientCareplan({ journeys, journeyTemplates, patientId }: Reado
 
   const { data: effectiveSteps } = useApi(
     () => (selectedJourney ? client.getEffectiveSteps(selectedJourney.id) : Promise.resolve([])),
+    [selectedJourney?.id],
+  )
+  const { data: resolvedInstructions } = useApi(
+    () =>
+      selectedJourney
+        ? client.getResolvedInstructionsForJourney(selectedJourney.id)
+        : Promise.resolve([]),
     [selectedJourney?.id],
   )
 
@@ -105,6 +113,14 @@ export function PatientCareplan({ journeys, journeyTemplates, patientId }: Reado
             </Tabs>
           )}
           <Box>
+            <Typography variant="subtitle2" sx={{ mb: 1 }}>
+              {t('journey.instructionsSection')}
+            </Typography>
+            <InstructionTimeline instructions={resolvedInstructions ?? []} />
+
+            <Typography variant="subtitle2" sx={{ mt: 2, mb: 1 }}>
+              {t('journey.followUpSection')}
+            </Typography>
             <JourneyTimeline
               steps={effectiveSteps ?? []}
               formResponses={[]}

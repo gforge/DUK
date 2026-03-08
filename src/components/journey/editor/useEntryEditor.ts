@@ -1,10 +1,6 @@
 import { useState } from 'react'
 
-import type {
-  InstructionTemplate,
-  JourneyTemplateEntry,
-  QuestionnaireTemplate,
-} from '@/api/schemas'
+import type { JourneyTemplateEntry, QuestionnaireTemplate } from '@/api/schemas'
 import type { AliasRow } from '@/components/journey/editor/entry-editor'
 import { mkId } from '@/components/journey/editor/questionnaireUtils'
 import { suggestWindowDays } from '@/utils/journeyUtils'
@@ -22,17 +18,10 @@ function entryToAliasRows(entry?: JourneyTemplateEntry): AliasRow[] {
   }))
 }
 
-function deriveInstructionMode(entry?: JourneyTemplateEntry): InstructionMode {
-  if (!entry) return 'NONE'
-  if (entry.instructionTemplateId) return 'TEMPLATE'
-  if (entry.instructionText) return 'FREETEXT'
-  return 'NONE'
-}
-
 export function useEntryEditor(
   entry: JourneyTemplateEntry | undefined,
   questionnaires: QuestionnaireTemplate[],
-  instructionTemplates: InstructionTemplate[],
+  _instructionTemplates: unknown[],
 ) {
   const [label, setLabel] = useState(entry?.label ?? '')
   const [stepKey, setStepKey] = useState(entry?.stepKey ?? '')
@@ -45,13 +34,6 @@ export function useEntryEditor(
   )
   const [templateId, setTemplateId] = useState<string>(entry?.templateId ?? '')
   const [aliasRows, setAliasRows] = useState<AliasRow[]>(entryToAliasRows(entry))
-  const [instructionMode, setInstructionMode] = useState<InstructionMode>(
-    deriveInstructionMode(entry),
-  )
-  const [instructionTemplateId, setInstructionTemplateId] = useState<string>(
-    entry?.instructionTemplateId ?? '',
-  )
-  const [instructionText, setInstructionText] = useState<string>(entry?.instructionText ?? '')
   const [recurringEnabled, setRecurringEnabled] = useState(
     entry?.recurrenceIntervalDays !== undefined,
   )
@@ -61,8 +43,6 @@ export function useEntryEditor(
 
   const selectedQT = questionnaires.find((q) => q.id === templateId) ?? null
   const qtOptions = questionnaires.map((q) => ({ id: q.id, name: q.name }))
-  const itOptions = instructionTemplates.map((it) => ({ id: it.id, name: it.name }))
-  const selectedIT = instructionTemplates.find((it) => it.id === instructionTemplateId) ?? null
 
   const isValid = label.trim() !== '' && offsetDays !== ''
 
@@ -106,12 +86,6 @@ export function useEntryEditor(
       templateId: templateId || undefined,
       scoreAliases,
       scoreAliasLabels,
-      instructionTemplateId:
-        instructionMode === 'TEMPLATE' && instructionTemplateId ? instructionTemplateId : undefined,
-      instructionText:
-        instructionMode === 'FREETEXT' && instructionText.trim()
-          ? instructionText.trim()
-          : undefined,
       recurrenceIntervalDays:
         recurringEnabled && recurrenceIntervalDays !== ''
           ? Number(recurrenceIntervalDays)
@@ -140,20 +114,12 @@ export function useEntryEditor(
     handleAddAlias,
     handleUpdateAlias,
     handleDeleteAlias,
-    instructionMode,
-    setInstructionMode,
-    instructionTemplateId,
-    setInstructionTemplateId,
-    instructionText,
-    setInstructionText,
     recurringEnabled,
     setRecurringEnabled,
     recurrenceIntervalDays,
     setRecurrenceIntervalDays,
     selectedQT,
     qtOptions,
-    itOptions,
-    selectedIT,
     isValid,
     handleSave,
     slugify,

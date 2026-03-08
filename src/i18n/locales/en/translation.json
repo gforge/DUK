@@ -173,6 +173,7 @@
     "selectTemplate": "Select template"
   },
   "journey": {
+    "activeNow": "Active now",
     "added": "Added",
     "addedStep": "Manually added step",
     "cancel": "Cancel journey",
@@ -255,6 +256,10 @@
       "stepKeyPlaceholder": "e.g. week_4",
       "windowDays": "Time window (±days)"
     },
+    "followUpSection": "Follow-up steps",
+    "instructionFallback": "Instruction",
+    "instructionRange": "{{start}} - {{end}}",
+    "instructionsSection": "Active instructions",
     "journeyStatus": {
       "ACTIVE": "Active",
       "COMPLETED": "Completed",
@@ -296,6 +301,7 @@
       "SWITCH_TEMPLATE": "Template switched"
     },
     "noActiveJourney": "No active journey assigned to this patient.",
+    "noInstructions": "No instructions in this journey.",
     "noSteps": "No steps defined.",
     "offsetDays": "Offset (days)",
     "offsetFormat": {
@@ -310,6 +316,7 @@
       "years_one": "{{count}} year",
       "years_other": "{{count}} years"
     },
+    "ongoing": "Ongoing",
     "patient": "Patient",
     "pause": "Pause journey",
     "pauseConfirmBody": "The timeline will be frozen while the journey is paused. All upcoming steps will shift forward until the journey is resumed.",
@@ -409,7 +416,6 @@
       "referenceDateLabel": "Reference date label",
       "referenceDateLabelHint": "Shown in the registration dialog instead of the generic “Reference date”. E.g. Surgery date, Injury date."
     },
-    "toggleInstruction": "Show/hide instructions",
     "type": "Type",
     "window": "Window"
   },

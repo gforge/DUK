@@ -1,5 +1,5 @@
 import type { JourneyTemplate } from '../../schemas'
-import { daysAgo,iso } from '../shared'
+import { daysAgo, iso } from '../shared'
 
 export const jtDistalRadius: JourneyTemplate = {
   id: 'jt-distal-radius',
@@ -19,7 +19,6 @@ export const jtDistalRadius: JourneyTemplate = {
       dashboardCategory: 'ACUTE',
       scoreAliases: { PNRS_1: 'PNRS_baseline' },
       scoreAliasLabels: { PNRS_baseline: 'VAS (PNRS) vid dag 1–2' },
-      instructionTemplateId: 'it-wound-care',
     },
     {
       id: 'jte-dr-2',
@@ -31,7 +30,6 @@ export const jtDistalRadius: JourneyTemplate = {
       dashboardCategory: 'ACUTE',
       scoreAliases: { PNRS_2: 'PNRS_day14' },
       scoreAliasLabels: { PNRS_day14: 'VAS (PNRS) vid dag 10–14' },
-      instructionTemplateId: 'it-distal-radius',
     },
     {
       id: 'jte-dr-3',
@@ -46,7 +44,6 @@ export const jtDistalRadius: JourneyTemplate = {
         PNRS_week4: 'VAS (PNRS) vid vecka 4',
         OSS_week4: 'OSS-poäng vid vecka 4',
       },
-      instructionTemplateId: 'it-distal-radius',
     },
     {
       id: 'jte-dr-4',
@@ -61,7 +58,6 @@ export const jtDistalRadius: JourneyTemplate = {
         PNRS_week8: 'VAS (PNRS) vid vecka 6–8',
         OSS_week8: 'OSS-poäng vid vecka 6–8',
       },
-      instructionTemplateId: 'it-distal-radius',
     },
     {
       id: 'jte-dr-5',
@@ -92,6 +88,48 @@ export const jtDistalRadius: JourneyTemplate = {
         EQ5D_1yr: 'EQ-5D index vid 1 år',
         EQ_VAS_1yr: 'EQ VAS vid 1 år',
       },
+    },
+  ],
+  instructions: [
+    {
+      id: 'jti-dr-1',
+      journeyTemplateId: 'jt-distal-radius',
+      instructionTemplateId: 'it-wound-care',
+      label: 'Dag 1–2: Sårvård',
+      startDayOffset: 1,
+      endDayOffset: 14,
+      order: 1,
+      tags: ['wound', 'acute'],
+    },
+    {
+      id: 'jti-dr-2',
+      journeyTemplateId: 'jt-distal-radius',
+      instructionTemplateId: 'it-distal-radius',
+      label: 'Dag 10–14: Handledsfysioterapi',
+      startDayOffset: 10,
+      endDayOffset: 28,
+      order: 2,
+      tags: ['wrist', 'physio'],
+    },
+    {
+      id: 'jti-dr-3',
+      journeyTemplateId: 'jt-distal-radius',
+      instructionTemplateId: 'it-distal-radius',
+      label: 'Vecka 4: Gipsborttagning och mobilisering',
+      startDayOffset: 28,
+      endDayOffset: 49,
+      order: 3,
+      tags: ['wrist', 'physio'],
+    },
+    {
+      id: 'jti-dr-4',
+      journeyTemplateId: 'jt-distal-radius',
+      instructionTemplateId: 'it-distal-radius',
+      label: 'Vecka 6–8: Styrketräning',
+      startDayOffset: 49,
+      endDayOffset: 84,
+      order: 4,
+      tags: ['wrist', 'physio'],
     },
   ],
   createdAt: iso(daysAgo(60)),
