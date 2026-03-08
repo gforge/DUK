@@ -1,5 +1,5 @@
 @startuml
-title Multiple Parallel Journeys — Rendering & Deduplication
+title Multiple Journeys — Combined Rendering And Deduplication (Legacy)
 
 actor Clinician
 participant "JourneyTab\n(CaseDetail UI)" as JT

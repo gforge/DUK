@@ -1,0 +1,46 @@
+@startuml
+title Form Submission to Case Update — Sequence Diagram
+
+actor "Patient/Clinician" as User
+participant "UI\n(PatientQuestionnaireForm / Case forms)" as UI
+participant "client/forms" as Client
+participant "service/forms" as Forms
+participant "service/journeyResolver" as Resolver
+participant "service/policy" as Policy
+participant "service/cases" as Cases
+participant "service/audit" as Audit
+participant "patchStore" as Store
+
+User -> UI : Submit questionnaire answers
+UI -> Client : submitFormResponse(patientId, caseId, templateId, answers, journeyContext?)
+Client -> Forms : submitFormResponse(...)
+Forms -> Forms : Validate template/questions
+Forms -> Forms : Compute scores from scoringRules
+Forms -> Store : Save FormResponse
+Store --> Forms : persisted FormResponse
+
+Forms -> Cases : touch case lastActivityAt
+Cases -> Store : patch case fields/triggers when needed
+Store --> Cases : updated case
+
+Forms -> Resolver : buildPolicyScopeWithAliases(caseId)
+Resolver --> Forms : numeric scope
+Forms -> Policy : evaluatePolicyRules(caseId, scope)
+Policy -> Store : update Case.policyWarnings
+Store --> Policy : updated case warnings
+
+Forms -> Audit : addAuditEvent(FORM_SUBMITTED, context)
+Audit -> Store : append audit event
+Store --> Audit : persisted event
+
+Forms --> Client : FormResponse + updated case context
+Client --> UI : success
+UI -> UI : Show success snack\nrefetch due steps / case view
+
+note right of Forms
+  Journey context may include:
+  patientJourneyId, journeyStepId,
+  occurrenceIndex
+end note
+
+@enduml

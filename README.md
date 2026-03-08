@@ -137,6 +137,15 @@ src/
 - The English design document and PlantUML sources are in `docs/design.md` and `docs/diagrams/`.
 - Diagrams include component, state, class (ERD) and sequence diagrams that map to implementation files.
 
+### Documentation map
+
+Use this reading order for architecture and flow understanding:
+
+1. `docs/design.md` — integrated narrative with inline diagrams.
+2. `docs/design/patient-journey.md` — journey lifecycle, pause/resume, parallel deduplication.
+3. `docs/design/policy.md` — policy grammar, scope aliasing, evaluation flow.
+4. `docs/diagrams/*.puml` — source diagrams (render with `npm run diagrams:render`).
+
 ---
 
 ## Available Scripts

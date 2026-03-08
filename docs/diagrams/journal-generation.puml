@@ -1,5 +1,5 @@
 @startuml
-title Journal Draft Generation — Sequence
+title Journal Draft Generation — Sequence Diagram
 
 actor Clinician
 participant "UI" as UI

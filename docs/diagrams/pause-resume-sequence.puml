@@ -15,11 +15,16 @@ UI -> UI : Show confirmation dialog
 Clinician -> UI : Confirm pause
 UI -> Client : pauseJourney(journeyId)
 Client -> Service : pauseJourney(journeyId)
-Service -> Service : Guard: status must be ACTIVE\n(throws if not)
-Service -> Store : patchStore:\n  status = SUSPENDED\n  pausedAt = now()
-Store --> Service : updated PatientJourney
-Service --> Client : PatientJourney
-Client --> UI : PatientJourney
+Service -> Service : Guard: status must be ACTIVE
+alt status is ACTIVE
+  Service -> Store : patchStore:\n  status = SUSPENDED\n  pausedAt = now()
+  Store --> Service : updated PatientJourney
+  Service --> Client : PatientJourney
+  Client --> UI : PatientJourney
+else status is not ACTIVE
+  Service --> Client : Error("Journey must be ACTIVE to pause")
+  Client --> UI : show error snackbar
+end
 UI -> UI : Show paused-days banner\n+ Resume button
 UI -> Resolver : getEffectiveSteps(journeyId)
 Resolver -> Resolver : currentPauseDays = floor(\n  (Date.now() - pausedAt) / 86400000\n)
@@ -38,12 +43,17 @@ end note
 Clinician -> UI : Click "Resume journey"
 UI -> Client : resumeJourney(journeyId)
 Client -> Service : resumeJourney(journeyId)
-Service -> Service : Guard: status must be SUSPENDED\n(throws if not)
-Service -> Service : elapsedDays = floor(\n  (Date.now() - pausedAt) / 86400000\n)
-Service -> Store : patchStore:\n  totalPausedDays += elapsedDays\n  pausedAt = null\n  status = ACTIVE
-Store --> Service : updated PatientJourney
-Service --> Client : PatientJourney
-Client --> UI : PatientJourney
+Service -> Service : Guard: status must be SUSPENDED
+alt status is SUSPENDED
+  Service -> Service : elapsedDays = floor(\n  (Date.now() - pausedAt) / 86400000\n)
+  Service -> Store : patchStore:\n  totalPausedDays += elapsedDays\n  pausedAt = null\n  status = ACTIVE
+  Store --> Service : updated PatientJourney
+  Service --> Client : PatientJourney
+  Client --> UI : PatientJourney
+else status is not SUSPENDED
+  Service --> Client : Error("Journey must be SUSPENDED to resume")
+  Client --> UI : show error snackbar
+end
 UI -> UI : Hide banner, show\nnormal timeline
 
 @enduml

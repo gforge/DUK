@@ -1,5 +1,5 @@
 @startuml
-title Dashboard / Journey Computation — Activity
+title Dashboard Due-Step Computation — Activity Diagram
 
 start
 :Load patients & journeys;

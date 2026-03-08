@@ -1,31 +1,52 @@
 @startuml
-title Policy Expression Grammar (overview)
+title Policy Expression Language — Grammar Diagram
 
-class Expression
-class Term
-class Factor
-class Identifier
-class Number
-class Comparison
-class LogicalOp
+class "Expression" as Expression
+class "LogicalOr" as LogicalOr
+class "LogicalAnd" as LogicalAnd
+class "Comparison" as Comparison
+class "Arithmetic" as Arithmetic
+class "Term" as Term
+class "Factor" as Factor
+class "Primary" as Primary
 
-Expression --> Term
+Expression --> LogicalOr
+LogicalOr --> LogicalAnd
+LogicalAnd --> Comparison
+Comparison --> Arithmetic
+Arithmetic --> Term
 Term --> Factor
-Factor --> Identifier
-Factor --> Number
-Expression --> Comparison
-Expression --> LogicalOp
+Factor --> Primary
 
-note left
-  Supported operators:
-  + - * /
-  == != < <= > >=
-  && ||
+note right of LogicalOr
+  Logical operators (lowest precedence):
+  ||, &&
 end note
 
-note bottom
-  See src/api/policyParser
-  for tokenizer and parser
+note right of Comparison
+  Comparison operators:
+  == != < <= > >=
+end note
+
+note right of Arithmetic
+  Additive:
+  + -
+end note
+
+note right of Term
+  Multiplicative (highest among operators):
+  * /
+end note
+
+note bottom of Primary
+  Primary tokens:
+  - Number literals
+  - Identifiers (e.g. score.PNRS, OSS.total)
+  - Parenthesized expressions
+
+  Implemented in:
+  src/api/policyParser/tokens.ts
+  src/api/policyParser/parser.ts
 end note
 
 @enduml

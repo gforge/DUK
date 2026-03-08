@@ -1,5 +1,5 @@
 @startuml
-title Consent — Lifecycle State Diagram
+title Research Consent Lifecycle — State Diagram
 
 state "GRANTED\n(active)" as GRANTED
 state "REVOKED\n(terminal)" as REVOKED

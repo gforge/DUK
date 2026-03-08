@@ -1,5 +1,5 @@
 @startuml
-title Core Data Model — ERD (simplified)
+title Core Data Model — Entity Relationship Diagram
 
 class Patient {
   id

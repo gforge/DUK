@@ -1,20 +1,27 @@
 @startuml
-title Score Aliasing — Sequence
+title Score Aliasing — Scope Mapping Sequence Diagram
 
 actor System
 participant "JourneyTemplateEntry" as Entry
 participant "Service" as Service
 participant "PolicyScope" as Scope
 
-System -> Entry : read scoreAliases\n{ alias: "OSS.total"\n-> path: "scores.OSS.total" }
-Service -> Scope : inject alias values\ninto numeric scope
-Scope --> Service : scope {OSS.total: 22}
-Service -> PolicyParser : evaluateExpression(rule, scope)
+System -> Entry : Read scoreAliases\n{ "OSS.total": "scores.ossTotal",\n  "pain.avg": "scores.painAverage" }
+Service -> Service : Read latest FormResponse.scores
+Service -> Scope : Build base scope\nfrom raw score keys
+Service -> Scope : Inject aliases from JourneyTemplateEntry\n(scoreAliases + scoreAliasLabels)
+Scope --> Service : Final numeric scope\n{ scores.ossTotal: 22,\n  OSS.total: 22,\n  pain.avg: 7.5 }
+Service -> PolicyParser : evaluateExpression(rule, finalScope)
 
 note right
-  Aliasing implemented in
-  journeyResolver
-  .buildPolicyScopeWithAliases
+  Aliasing is computed in:
+  src/api/service/journeyResolver.ts
+  buildPolicyScopeWithAliases(...)
+
+  Benefit:
+  Policy authors can write stable,
+  clinically meaningful identifiers
+  independent of raw scoring key names.
 end note
 
 @enduml
