@@ -1,5 +1,5 @@
-import * as service from '../service'
 import type { JournalDraft, JournalTemplate, Role } from '../schemas'
+import * as service from '../service'
 import { withDelay } from './delay'
 
 export const getJournalDrafts = (caseId: string): Promise<JournalDraft[]> =>

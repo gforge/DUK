@@ -1,13 +1,12 @@
-import { getStore } from '../storage'
 import { evaluateExpression } from '../policyParser'
 import type {
   AppState,
   AuditEvent,
-  Role,
-  QuestionnaireTemplate,
+  FormResponse,
   PolicyRule,
   PolicyWarning,
-  FormResponse,
+  QuestionnaireTemplate,
+  Role,
 } from '../schemas'
 
 export function uuid(): string {

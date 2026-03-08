@@ -1,25 +1,27 @@
-import React, { useState } from 'react'
+import WarningAmberIcon from '@mui/icons-material/WarningAmber'
 import {
-  Chip,
-  Tooltip,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
+  Box,
   Button,
+  Chip,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Divider,
   List,
   ListItem,
   ListItemIcon,
   ListItemText,
-  Typography,
-  Box,
   Stack,
-  Divider,
+  Tooltip,
+  Typography,
 } from '@mui/material'
-import WarningAmberIcon from '@mui/icons-material/WarningAmber'
-import { useTranslation } from 'react-i18next'
-import type { PolicyWarning } from '../../api/schemas'
 import { format, parseISO } from 'date-fns'
+import React, { useState } from 'react'
+import { useTranslation } from 'react-i18next'
+
+import type { PolicyWarning } from '@/api/schemas'
+import { useSeverityLabel } from '@/hooks/labels'
 
 interface AutoWarningsBadgeProps {
   warnings: PolicyWarning[]
@@ -34,6 +36,7 @@ const SEVERITY_COLOR: Record<PolicyWarning['severity'], 'error' | 'warning' | 'i
 
 export default function AutoWarningsBadge({ warnings, lastActivityAt }: AutoWarningsBadgeProps) {
   const { t } = useTranslation()
+  const getSeverityLabel = useSeverityLabel()
   const [open, setOpen] = useState(false)
 
   if (warnings.length === 0) return null
@@ -129,7 +132,7 @@ export default function AutoWarningsBadge({ warnings, lastActivityAt }: AutoWarn
                             fontSize: '0.65rem',
                           }}
                         >
-                          {t(`severity.${w.severity}`)}
+                          {getSeverityLabel(w.severity)}
                         </Typography>
                       </Box>
                     }

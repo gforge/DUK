@@ -1,0 +1,46 @@
+@startuml
+title Journey Modifications — Sequence Diagram
+
+actor Clinician
+participant "ModifyJourneyDialog\n(UI)" as UI
+participant "client/patientJourneys" as Client
+participant "service/patientJourneys" as Service
+participant "patchStore" as Store
+
+Clinician -> UI : Open modification dialog
+
+alt ADD_STEP
+  Clinician -> UI : Submit ADD_STEP(reason, entry)
+  UI -> Client : modifyPatientJourney(journeyId, ADD_STEP, payload)
+  Client -> Service : modifyPatientJourney(...)
+  Service -> Store : Append JourneyModification(type=ADD_STEP)\nand add entry to journey modifications/effective plan
+  Store --> Service : updated journey
+  Service --> Client : updated journey
+  Client --> UI : success
+else REMOVE_STEP
+  Clinician -> UI : Submit REMOVE_STEP(reason, stepId)
+  UI -> Client : modifyPatientJourney(journeyId, REMOVE_STEP, payload)
+  Client -> Service : modifyPatientJourney(...)
+  Service -> Store : Append JourneyModification(type=REMOVE_STEP)
+  Store --> Service : updated journey
+  Service --> Client : updated journey
+  Client --> UI : success
+else SWITCH_TEMPLATE
+  Clinician -> UI : Submit SWITCH_TEMPLATE(reason, newTemplateId, newStartDate?)
+  UI -> Client : modifyPatientJourney(journeyId, SWITCH_TEMPLATE, payload)
+  Client -> Service : modifyPatientJourney(...)
+  Service -> Service : Validate newTemplateId exists
+  Service -> Store : Update journeyTemplateId\nOptionally reset startDate\nAppend JourneyModification(type=SWITCH_TEMPLATE, previous/new template and dates)
+  Store --> Service : updated journey
+  Service --> Client : updated journey
+  Client --> UI : success
+end
+
+note right of Service
+  All modification types require
+  a clinician reason and are kept
+  as audit-friendly history in
+  PatientJourney.modifications[].
+end note
+
+@enduml

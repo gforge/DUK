@@ -1,7 +1,8 @@
-import { describe, it, expect, beforeEach } from 'vitest'
-import { initStore } from '../api/storage'
-import { SEED_STATE } from '../api/seed'
-import * as service from '../api/service'
+import { beforeEach,describe, expect, it } from 'vitest'
+
+import { SEED_STATE } from '@/api/seed'
+import * as service from '@/api/service'
+import { initStore } from '@/api/storage'
 
 beforeEach(() => {
   initStore(structuredClone(SEED_STATE))

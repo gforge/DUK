@@ -1,11 +1,11 @@
-import * as service from '../service'
-import type { PatientJourney, JourneyModification, PatientJourneyStatus } from '../schemas'
+import type { JourneyModification, PatientJourney, PatientJourneyStatus } from '../schemas'
 import type {
-  EffectiveStep,
-  MergedDueStep,
-  JourneyStepConflict,
   CancelJourneyResult,
+  EffectiveStep,
+  JourneyStepConflict,
+  MergedDueStep,
 } from '../service'
+import * as service from '../service'
 import { withDelay } from './delay'
 
 export const getPatientJourneys = (patientId?: string): Promise<PatientJourney[]> =>
@@ -18,16 +18,20 @@ export const assignPatientJourney = (
   patientId: string,
   journeyTemplateId: string,
   startDate: string,
+  episodeId?: string,
   researchModuleIds?: string[],
   mergedStepIds?: { stepId: string; fromJourneyId: string }[],
+  joinedAt?: string,
 ): Promise<PatientJourney> =>
   withDelay(() =>
     service.assignPatientJourney(
       patientId,
       journeyTemplateId,
       startDate,
+      episodeId,
       researchModuleIds,
       mergedStepIds,
+      joinedAt,
     ),
   )
 
@@ -98,3 +102,7 @@ export const cancelJourney = (
   reason: string,
   userId: string,
 ): Promise<CancelJourneyResult> => withDelay(() => service.cancelJourney(journeyId, reason, userId))
+
+export const startNextPhase = (
+  params: Parameters<typeof service.startNextPhase>[0],
+): Promise<import('../schemas').PatientJourney> => withDelay(() => service.startNextPhase(params))

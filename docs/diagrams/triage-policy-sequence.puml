@@ -1,5 +1,5 @@
 @startuml
-title Triage → Policy Evaluation — Sequence
+title Case Triage — Policy Evaluation Sequence Diagram
 
 actor Clinician
 participant "UI" as UI

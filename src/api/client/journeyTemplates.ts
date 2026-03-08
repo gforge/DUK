@@ -1,13 +1,16 @@
-import * as service from '../service'
 import type { JourneyTemplate } from '../schemas'
 import type { EntryDiff, PolicyVariable } from '../service'
+import * as service from '../service'
 import { withDelay } from './delay'
 
 export const getJourneyTemplates = (): Promise<JourneyTemplate[]> =>
   withDelay(() => service.getJourneyTemplates())
 
 export const saveJourneyTemplate = (
-  template: Omit<JourneyTemplate, 'id' | 'createdAt'> & { id?: string },
+  template: Omit<JourneyTemplate, 'id' | 'createdAt' | 'instructions'> & {
+    id?: string
+    instructions?: JourneyTemplate['instructions']
+  },
 ): Promise<JourneyTemplate> => withDelay(() => service.saveJourneyTemplate(template))
 
 export const deleteJourneyTemplate = (templateId: string): Promise<void> =>

@@ -1,5 +1,5 @@
-import { getStore, setStore } from '../storage'
 import type { AppState } from '../schemas'
+import { getStore, setStore } from '../storage'
 
 export type SeedVariant = 'minimal' | 'realistic' | 'faker'
 
@@ -19,7 +19,7 @@ export async function resetAndReseed(variant: SeedVariant = 'minimal'): Promise<
     const { buildFakerSeed } = await import('../seedFaker')
     setStore(await buildFakerSeed())
   } else {
-    const { SEED_STATE } = await import('../seed')
-    setStore(SEED_STATE)
+    const { buildMinimalSeed } = await import('../seed')
+    setStore(buildMinimalSeed())
   }
 }

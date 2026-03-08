@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useRef } from 'react'
-import { useNavigate, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { useRole } from '../store/roleContext'
-import type { Role } from '../api/schemas'
+import { useLocation,useNavigate } from 'react-router-dom'
+
+import type { Role } from '@/api/schemas'
+import { useRole } from '@/store/roleContext'
 
 interface NavItem {
   label: string

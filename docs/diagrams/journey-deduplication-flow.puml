@@ -1,0 +1,27 @@
+@startuml
+title Parallel Journeys — Due-Step Deduplication Activity Diagram
+
+start
+:Load ACTIVE journeys for patient;
+:For each journey -> getEffectiveSteps(journeyId);
+:Filter steps due for selected date;
+:Collect all due steps across journeys;
+
+if (same templateEntryId appears more than once?) then (yes)
+  :Keep first occurrence;
+  :Drop duplicate occurrences;
+else (no)
+  :Keep all due steps;
+endif
+
+:Return MergedDueStep[];
+:Render questionnaire list once per templateEntryId;
+stop
+
+note right
+  Implemented by:
+  getMergedDueStepsForPatient(patientId, date)
+  in src/api/service/journeyResolver.ts
+end note
+
+@enduml

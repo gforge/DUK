@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react'
-import type { Role, User } from '../api/schemas'
+
+import type { Role, User } from '@/api/schemas'
 
 const DEMO_USERS: User[] = [
   { id: 'user-pal-1', name: 'Dr. Sara Lindqvist (PAL)', role: 'PAL' },
@@ -59,4 +60,18 @@ export function useRole(): RoleContextValue {
   const ctx = useContext(RoleContext)
   if (!ctx) throw new Error('useRole must be used within RoleProvider')
   return ctx
+}
+
+/**
+ * Same as `useRole` but returns `null` when called outside a provider instead of
+ * throwing. Useful for utility components that may be rendered in isolation by
+ * tests.
+ */
+// eslint-disable-next-line react-refresh/only-export-components
+export function useOptionalRole(): RoleContextValue | null {
+  try {
+    return useRole()
+  } catch {
+    return null
+  }
 }

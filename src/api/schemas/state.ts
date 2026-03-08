@@ -1,19 +1,22 @@
 import { z } from 'zod'
-import { UserSchema } from './users'
-import { PatientSchema } from './patient'
+
+import { AuditEventSchema } from './audit'
 import { CaseSchema } from './case'
 import { FormResponseSchema } from './forms'
-import { AuditEventSchema } from './audit'
 import { JournalDraftSchema, JournalTemplateSchema } from './journal'
-import { PolicyRuleSchema } from './policy'
-import { QuestionnaireTemplateSchema, FormSeriesSchema } from './questionnaire'
 import {
-  JourneyTemplateSchema,
-  ResearchModuleSchema,
-  PatientJourneySchema,
-  InstructionTemplateSchema,
   ConsentSchema,
+  EpisodeOfCareSchema,
+  InstructionSchema,
+  InstructionTemplateSchema,
+  JourneyTemplateSchema,
+  PatientJourneySchema,
+  ResearchModuleSchema,
 } from './journey'
+import { PatientSchema } from './patient'
+import { PolicyRuleSchema } from './policy'
+import { FormSeriesSchema, QuestionnaireTemplateSchema } from './questionnaire'
+import { UserSchema } from './users'
 
 export const AppStateSchema = z.object({
   schemaVersion: z.number().int().default(0),
@@ -30,6 +33,8 @@ export const AppStateSchema = z.object({
   journeyTemplates: z.array(JourneyTemplateSchema),
   researchModules: z.array(ResearchModuleSchema),
   patientJourneys: z.array(PatientJourneySchema),
+  episodesOfCare: z.array(EpisodeOfCareSchema).default([]),
+  instructions: z.array(InstructionSchema).default([]),
   instructionTemplates: z.array(InstructionTemplateSchema),
   researchConsents: z.array(ConsentSchema).default([]),
 })

@@ -1,8 +1,9 @@
-import React from 'react'
-import { Box, Chip, Stack, Typography, useMediaQuery, useTheme } from '@mui/material'
 import RouteIcon from '@mui/icons-material/Route'
+import { Box, Chip, Stack, Typography, useMediaQuery, useTheme } from '@mui/material'
+import React from 'react'
 import { useTranslation } from 'react-i18next'
-import type { PatientJourney, JourneyTemplate } from '../../api/schemas'
+
+import type { JourneyTemplate,PatientJourney } from '@/api/schemas'
 
 interface Props {
   readonly journeys: PatientJourney[]

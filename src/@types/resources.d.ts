@@ -65,6 +65,7 @@ interface Resources {
       "edit": "Redigera",
       "error": "Fel uppstod",
       "errorGeneric": "Ett fel uppstod",
+      "errorUnknown": "An error occurred",
       "language": "Språk",
       "mainNavigation": "Huvudnavigering",
       "next": "Nästa",
@@ -156,6 +157,14 @@ interface Resources {
       "title": "Demo-verktyg",
       "warning": "Obs! Dessa verktyg ändrar appens interna tillstånd och är avsedda för demonstration."
     },
+    "episode": {
+      "openedAt": "Öppnad",
+      "status": {
+        "COMPLETED": "Avslutad",
+        "DISCHARGED": "Utskriven",
+        "OPEN": "Öppen"
+      }
+    },
     "eq": {
       "level_1": "Inga problem",
       "level_2": "Vissa problem",
@@ -175,6 +184,7 @@ interface Resources {
       "selectTemplate": "Välj mall"
     },
     "journey": {
+      "activeNow": "Aktiv nu",
       "added": "Tillagd",
       "addedStep": "Manuellt tillagt steg",
       "cancel": "Avbryt resa",
@@ -188,7 +198,6 @@ interface Resources {
       "editor": {
         "addEntry": "Lägg till steg",
         "addInstruction": "Lägg till instruktion",
-        "confirmDeleteEntry": "Ta bort detta steg från mallen?",
         "confirmDeleteInstruction": "Ta bort instruktionsmall \"{{name}}\"?",
         "confirmDeleteModule": "Ta bort forskningsmodul \"{{name}}\"?",
         "confirmDeleteTemplate": "Ta bort resemall \"{{name}}\"?",
@@ -207,10 +216,8 @@ interface Resources {
         "editTemplate": "Redigera mall",
         "entryDeleted": "Steg borttaget",
         "entrySaved": "Steg sparat",
-        "instruction": "Instruktion",
         "instructionDeleted": "Instruktionsmall borttagen",
         "instructionSaved": "Instruktionsmall sparad",
-        "instructionTemplate": "Instruktionsmall",
         "moduleDeleted": "Forskningsmodul borttagen",
         "newQuestionnaire": "Nytt formulär",
         "newTemplate": "Ny mall",
@@ -242,42 +249,55 @@ interface Resources {
         "addAlias": "Lägg till alias",
         "aliasHelp": "Poängalias kopplar ett beräknat formulärvärde till ett unikt namn för just den här tidpunkten. Exempelvis mappas \"PNRS_2\" (den andra smärtfrågan i formuläret) → \"PNRS_vecka4\", så att en policyregel kan jämföra smärta vid vecka 4 med baseline-värdet — oavsett vilket formulär som användes.",
         "dashboardCategory": "Instrumentpanelskategori",
-        "instruction": "Instruktion",
-        "instructionFreetext": "Fritext",
-        "instructionFreetextHint": "Fritext visad för patient vid detta steg.",
         "instructionFromTemplate": "Från mall",
-        "instructionNone": "Ingen",
-        "instructionPreview": "Förhandsgranska instruktionstext",
         "label": "Stegetikett",
         "noAliases": "Inga poängalias definierade.",
         "noForm": "— Inget formulär (instruktionssteg) —",
-        "noFormHint": "Lämna tomt för ett rent instruktionssteg.",
-        "noScoringRules": "Det här formuläret har inga beräkningsregler. Individuella frågenycklar visas ovan.",
         "offsetDays": "Dagar efter start",
-        "offsetDaysHint": "Antal dagar efter startdatum (t.ex. operationsdatum) då steget planeras",
-        "recurrenceEnabled": "Återkommande steg",
-        "recurrenceInterval": "Upprepningsintervall (dagar)",
         "scoreAliasAlias": "Alias (unikt namn)",
         "scoreAliasLabel": "Visningsnamn",
-        "scoreAliasLabelHint": "Läsbart namn som visas för kliniker, t.ex. \"VAS smärta vid vecka 4\"",
         "scoreAliasRaw": "Beräknat mätvärde",
-        "scoringOutputKeys": "Beräknade mätvärden — välj ett av dessa",
         "showFormDetails_one": "Visa formulärinnehåll ({{count}} fråga)",
         "showFormDetails_other": "Visa formulärinnehåll ({{count}} frågor)",
         "stepKey": "Steg-ID",
         "stepKeyHint": "Används i policyuttryck för att referera detta steg, t.ex. PNRS_vecka4. Genereras automatiskt från etiketten.",
         "stepKeyPlaceholder": "t.ex. vecka_4",
-        "windowDays": "Tidsfönster (±dagar)",
-        "windowDaysHint": "Patienten kan svara upp till ±N dagar från planerat datum och ändå räknas som \"i tid\"",
-        "windowDaysSuggest": "Förslag: {{n}} dagar"
+        "windowDays": "Tidsfönster (±dagar)"
       },
+      "followUpSection": "Uppföljningssteg",
+      "hideUnrealizedSteps": "Dölj ej genomförda steg",
+      "icon": "Ikon",
+      "instructionFallback": "Instruktion",
+      "instructionModify": {
+        "addAction": "Lägg till instruktion",
+        "addConfirm": "Lägg till",
+        "addTab": "Lägg till",
+        "addTitle": "Lägg till instruktion",
+        "cancelConfirm": "Avboka instruktion",
+        "cancelTab": "Avboka",
+        "cancelWarning": "Instruktionen \"{{name}}\" avbokas permanent. Åtgärden kan inte ångras.",
+        "endOffset": "Slutförskjutning (dagar, valfri)",
+        "endOffsetHelp": "Lämna tomt om instruktionen är löpande.",
+        "invalidOffset": "Ogiltigt antal dagar.",
+        "modifyTitle": "Ändra instruktion — {{name}}",
+        "offsetHelp": "Dagar från resans referensdatum.",
+        "rescheduleConfirm": "Boka om",
+        "rescheduleHint": "Ange nya dagförskjutningar från resans startdatum.",
+        "rescheduleTab": "Boka om",
+        "startOffset": "Startförskjutning (dagar)",
+        "templateLabel": "Instruktionsmall",
+        "templateRequired": "Välj en instruktionsmall."
+      },
+      "instructionRange": "{{start}} - {{end}}",
+      "instructionsSection": "Aktiva instruktioner",
+      "joinedAt": "Inskrivningsdatum",
+      "joinedAtHelp": "Lämna tomt om patienten inskrivs idag. Fyll i om patienten faktiskt har haft sin startdag tidigare — t.ex. fraktur för 4 veckor sedan.",
       "journeyStatus": {
         "ACTIVE": "Aktiv",
         "COMPLETED": "Avslutad",
         "SUSPENDED": "Pausad",
         "label": "Status"
       },
-      "label": "Etikett",
       "modType": {
         "ADD_STEP": "Steg tillagt",
         "CANCEL": "Avbruten",
@@ -291,7 +311,6 @@ interface Resources {
         "addStep": "Lägg till steg",
         "confirm": "Tillämpa",
         "currentTemplate": "Aktuell mall",
-        "dateReset": "Startdatum ändrat: {{from}} → {{to}}",
         "newStartDate": "Nytt startdatum",
         "newStartDateHint": "T.ex. operationsdatum — alla steg beräknas om relativt detta datum.",
         "newTemplate": "Ny mall",
@@ -308,11 +327,21 @@ interface Resources {
         "select": "Välj",
         "stepLabel": "Stegetikett",
         "stepLabelPlaceholder": "T.ex. Dag 20 extra kontroll",
-        "switchTemplate": "Byt mall",
         "title": "Justera patientresa",
         "windowDays": "Fönster (±dagar)"
       },
+      "nextPhase": {
+        "confirm": "Starta fas",
+        "note": "Klinisk anteckning (valfri)",
+        "phaseType": "Typ av fas",
+        "startDate": "Startdatum (kliniskt ankardatum)",
+        "success": "Ny fas startad",
+        "template": "Mall för ny fas",
+        "title": "Starta nästa fas",
+        "triggerType": "Vad utlöste övergången?"
+      },
       "noActiveJourney": "Ingen aktiv patientresa tilldelad.",
+      "noInstructions": "Inga instruktioner i den här resan.",
       "noSteps": "Inga steg definierade.",
       "offsetDays": "Offset (dagar)",
       "offsetFormat": {
@@ -327,6 +356,7 @@ interface Resources {
         "years_one": "{{count}} år",
         "years_other": "{{count}} år"
       },
+      "ongoing": "Löpande",
       "patient": "Patient",
       "pause": "Pausa resa",
       "pauseConfirmBody": "Tidslinjen fryses medan resan är pausad. Alla kommande steg skjuts fram tills du återupptar resan.",
@@ -336,6 +366,15 @@ interface Resources {
       "pausedBanner_one": "Resa pausad sedan {{days}} dag",
       "pausedBanner_other": "Resa pausad sedan {{days}} dagar",
       "pausedDaysShort": "+{{days}}d pausad",
+      "phaseType": {
+        "DISCHARGE": "__NOT_TRANSLATED__",
+        "FOLLOWUP": "__NOT_TRANSLATED__",
+        "INTAKE": "__NOT_TRANSLATED__",
+        "MONITORING": "__NOT_TRANSLATED__",
+        "POST_OP": "__NOT_TRANSLATED__",
+        "REFERRAL": "__NOT_TRANSLATED__",
+        "WAITING_LIST": "__NOT_TRANSLATED__"
+      },
       "qTemplate": {
         "addQuestion": "Lägg till fråga",
         "addScoringRule": "Lägg till poängregel",
@@ -408,7 +447,10 @@ interface Resources {
       "scheduledDate": "Schemalagd",
       "scoreAliases": "Poängalias",
       "scoreAliasesHint": "Mappar råa poängnycklar till semantiska namn för policyuttryck",
+      "showUnrealizedSteps_one": "Visa {{count}} ej genomfört steg",
+      "showUnrealizedSteps_other": "Visa {{count}} ej genomförda steg",
       "startDate": "Startdatum",
+      "startNextPhase": "Starta nästa fas",
       "status": {
         "OVERDUE": "Försenad",
         "SUBMITTED": "Skickat",
@@ -426,7 +468,16 @@ interface Resources {
         "referenceDateLabel": "Referensdatumets namn",
         "referenceDateLabelHint": "Visas i registreringsdialogen istället för „Referensdatum“. T.ex. Operationsdatum, Skadedatum."
       },
-      "toggleInstruction": "Visa/dölj instruktioner",
+      "transitionTrigger": {
+        "MANUAL": "__NOT_TRANSLATED__",
+        "MILESTONE": "__NOT_TRANSLATED__",
+        "PHYSIO_COMPLETED": "__NOT_TRANSLATED__",
+        "REFERRAL_RECEIVED": "__NOT_TRANSLATED__",
+        "SURGERY_COMPLETED": "__NOT_TRANSLATED__",
+        "SURGERY_SCHEDULED": "__NOT_TRANSLATED__",
+        "TRIAGE_DECISION": "__NOT_TRANSLATED__",
+        "VISIT_DECISION": "__NOT_TRANSLATED__"
+      },
       "type": "Typ",
       "window": "Fönster"
     },
@@ -476,6 +527,10 @@ interface Resources {
     "patient": {
       "appOpenedSuccess": "App markerad som öppnad",
       "carePlan": "Min vårdplan",
+      "clinicalReviews": "Granskningar av prov och röntgen",
+      "completedReviews": "Granskade prov och röntgen",
+      "completedReviewsCount_one": "{{count}} granskning genomförd",
+      "completedReviewsCount_other": "{{count}} granskningar genomförda",
       "confirm": "Bekräfta",
       "consentGranted": "Samtycke givet {{date}}",
       "consentPending": "Samtycke saknas",
@@ -515,14 +570,15 @@ interface Resources {
     "patientDetail": {
       "cases": "Ärenden",
       "created": "Skapad",
-      "journeyTemplate": "Resemall",
+      "episode": "Episod",
       "journeys": "Patientresor",
       "lastActivity": "Senaste aktivitet",
       "noCases": "Inga ärenden för denna patient.",
       "noJourneys": "Inga patientresor tilldelade.",
       "notFound": "Patienten hittades inte.",
+      "phases_one": "{{count}} fas",
+      "phases_other": "{{count}} faser",
       "registered": "Registrerad",
-      "startDate": "Startdatum",
       "triggers": "Triggers"
     },
     "patients": {
@@ -660,6 +716,7 @@ interface Resources {
       "descriptionPlaceholderLAB": "t.ex. Blodstatus, CRP, HbA1c, koagulation",
       "descriptionPlaceholderXRAY": "t.ex. DT fotled, handled, axel",
       "expectedAtThisStep": "Förväntad granskning vid detta steg — klicka för att lägga till",
+      "journeyStep": "Vårdplan steg: {{label}}",
       "markReviewed": "Markera granskat",
       "notAvailableHere": "Ej tillgänglig i denna vy",
       "note": "Notering",
@@ -678,11 +735,11 @@ interface Resources {
     },
     "reviewType": {
       "LAB": "Provsvar",
-      "LAB_one": "__NOT_TRANSLATED__",
-      "LAB_other": "__NOT_TRANSLATED__",
+      "LAB_one": "{{count}} labbsvar",
+      "LAB_other": "{{count}} labbsvar",
       "XRAY": "Röntgen",
-      "XRAY_one": "__NOT_TRANSLATED__",
-      "XRAY_other": "__NOT_TRANSLATED__"
+      "XRAY_one": "{{count}} röntgen",
+      "XRAY_other": "{{count}} röntgen"
     },
     "role": {
       "DOCTOR": "Läkare",
@@ -700,7 +757,7 @@ interface Resources {
     "status": {
       "CLOSED": "Stängd",
       "FOLLOWING_UP": "Uppföljning",
-      "NEEDS_REVIEW": "Kräver bedömning",
+      "NEEDS_REVIEW": "Nästa uppföljning",
       "NEW": "Ny kontrollpunkt",
       "TRIAGED": "Triagerad"
     },

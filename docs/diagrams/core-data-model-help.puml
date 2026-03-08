@@ -1,0 +1,42 @@
+@startuml
+title Core Data Model — Field Guide And Examples
+
+skinparam shadowing false
+skinparam linetype ortho
+
+legend top
+  | Notation | Meaning |
+  | field? | Optional/nullable field |
+  | field[] | Array/list field |
+  | *Id | Reference/identifier field |
+  | 2026-03-08T14:30:45.123Z | ISO datetime example |
+  | ACUTE / SUBACUTE / CONTROL | Category enum examples |
+endlegend
+
+note as JT
+JourneyTemplate
+- name: "Proximala humerusfraktur"
+- parentTemplateId?: link to parent template when derived
+- derivedAt?: last sync timestamp from parent
+end note
+
+note as JTE
+JourneyTemplateEntry
+- label: "Vecka 4 - fysiokontroll"
+- offsetDays/windowDays: 28 / 7
+- scoreAliases: {"PNRS_2":"PNRS_week4", "OSS.total":"OSS_week4"}
+- dashboardCategory: SUBACUTE
+end note
+
+note as C
+Consent
+- grantedAt: "2026-03-08T14:30:45.123Z"
+- revokedAt: null (active) or ISO timestamp (revoked)
+- One active consent per patient+module+journey
+- Revoked records are retained for audit trail
+end note
+
+JT .. JTE
+JTE .. C
+
+@enduml

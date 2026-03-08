@@ -1,17 +1,19 @@
-import React from 'react'
-import { Chip, Tooltip, Stack } from '@mui/material'
+import BiotechIcon from '@mui/icons-material/Biotech'
+import BugReportIcon from '@mui/icons-material/BugReport'
+import ImageIcon from '@mui/icons-material/Image'
 import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment'
-import TrendingDownIcon from '@mui/icons-material/TrendingDown'
+import PhoneMissedIcon from '@mui/icons-material/PhoneMissed'
+import ReportProblemIcon from '@mui/icons-material/ReportProblem'
 import SentimentDissatisfiedIcon from '@mui/icons-material/SentimentDissatisfied'
 import SmartphoneIcon from '@mui/icons-material/Smartphone'
-import PhoneMissedIcon from '@mui/icons-material/PhoneMissed'
 import SupportAgentIcon from '@mui/icons-material/SupportAgent'
-import BugReportIcon from '@mui/icons-material/BugReport'
-import ReportProblemIcon from '@mui/icons-material/ReportProblem'
-import BiotechIcon from '@mui/icons-material/Biotech'
-import ImageIcon from '@mui/icons-material/Image'
+import TrendingDownIcon from '@mui/icons-material/TrendingDown'
+import { Chip, Stack,Tooltip } from '@mui/material'
+import React from 'react'
 import { useTranslation } from 'react-i18next'
-import type { TriggerType } from '../../api/schemas'
+
+import type { TriggerType } from '@/api/schemas'
+import { useTriggerLabel } from '@/hooks/labels'
 
 interface TriggerChipsProps {
   readonly triggers: TriggerType[]
@@ -38,6 +40,7 @@ const TRIGGER_CONFIG: Record<TriggerType, TriggerConfig> = {
 
 export default function TriggerChips({ triggers, maxVisible = 3 }: TriggerChipsProps) {
   const { t } = useTranslation()
+  const getTriggerLabel = useTriggerLabel()
   if (triggers.length === 0) return null
 
   const visible = triggers.slice(0, maxVisible)
@@ -54,15 +57,15 @@ export default function TriggerChips({ triggers, maxVisible = 3 }: TriggerChipsP
       {visible.map((trigger) => {
         const cfg = TRIGGER_CONFIG[trigger]
         return (
-          <Tooltip key={trigger} title={t(`trigger.${trigger}`)} arrow enterDelay={300}>
+          <Tooltip key={trigger} title={getTriggerLabel(trigger)} arrow enterDelay={300}>
             <Chip
               role="listitem"
               icon={cfg.icon}
-              label={t(`trigger.${trigger}`)}
+              label={getTriggerLabel(trigger)}
               size="small"
               variant="outlined"
               color={cfg.color}
-              aria-label={t(`trigger.${trigger}`)}
+              aria-label={getTriggerLabel(trigger)}
               sx={{ fontSize: 10, height: 22 }}
             />
           </Tooltip>
@@ -72,7 +75,7 @@ export default function TriggerChips({ triggers, maxVisible = 3 }: TriggerChipsP
         <Tooltip
           title={triggers
             .slice(maxVisible)
-            .map((tr) => t(`trigger.${tr}`))
+            .map((tr) => getTriggerLabel(tr))
             .join(', ')}
           arrow
         >

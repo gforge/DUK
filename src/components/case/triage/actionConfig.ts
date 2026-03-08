@@ -1,4 +1,4 @@
-import type { Role, NextStep } from '../../../api/schemas'
+import type { NextStep,Role } from '@/api/schemas'
 
 export type TriageActionKey =
   | 'DIGITAL_CONTROL'

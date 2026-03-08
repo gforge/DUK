@@ -1,5 +1,5 @@
 @startuml
-title Research Consent — Grant & Revoke Sequence
+title Research Consent — Grant And Revoke Sequence Diagram
 
 actor Clinician
 participant "JourneyTab\n(UI)" as UI

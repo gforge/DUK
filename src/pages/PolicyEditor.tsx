@@ -1,4 +1,6 @@
-import React, { useState } from 'react'
+import AddIcon from '@mui/icons-material/Add'
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline'
+import RouteIcon from '@mui/icons-material/Route'
 import {
   Alert,
   Box,
@@ -11,18 +13,21 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material'
-import AddIcon from '@mui/icons-material/Add'
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline'
-import RouteIcon from '@mui/icons-material/Route'
+import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useApi } from '../hooks/useApi'
-import { useSnack } from '../store/snackContext'
-import * as client from '../api/client'
-import type { PolicyRule } from '../api/schemas'
-import PolicyRuleDialog, { ruleSchema, SEVERITIES } from '../components/policy/PolicyRuleDialog'
-import PolicyHelpDialog from '../components/policy/PolicyHelpDialog'
-import type { RuleForm } from '../components/policy/PolicyRuleDialog'
-import PolicyRulesTable from '../components/policy/PolicyRulesTable'
+
+import * as client from '@/api/client'
+import type { PolicyRule } from '@/api/schemas'
+import type { RuleForm } from '@/components/policy'
+import {
+  PolicyHelpDialog,
+  PolicyRuleDialog,
+  PolicyRulesTable,
+  ruleSchema,
+  SEVERITIES,
+} from '@/components/policy'
+import { useApi } from '@/hooks/useApi'
+import { useSnack } from '@/store/snackContext'
 
 const EMPTY_FORM: RuleForm = { severity: 'MEDIUM', name: '', expression: '', description: '' }
 
@@ -30,7 +35,7 @@ const EMPTY_FORM: RuleForm = { severity: 'MEDIUM', name: '', expression: '', des
 void ruleSchema
 void SEVERITIES
 
-export default function PolicyEditor() {
+export function PolicyEditor() {
   const { t } = useTranslation()
   const { showSnack } = useSnack()
 

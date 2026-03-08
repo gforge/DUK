@@ -1,38 +1,25 @@
-import React, { useState, useCallback } from 'react'
-import { Alert, Box, Button, Paper, Stack, Tab, Tabs, Tooltip, Typography } from '@mui/material'
+import AssignmentIcon from '@mui/icons-material/Assignment'
+import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined'
+import PeopleIcon from '@mui/icons-material/People'
 import RouteIcon from '@mui/icons-material/Route'
 import ScienceIcon from '@mui/icons-material/Science'
-import PeopleIcon from '@mui/icons-material/People'
-import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined'
-import AssignmentIcon from '@mui/icons-material/Assignment'
 import UndoIcon from '@mui/icons-material/Undo'
+import { Alert, Box, Button, Paper, Stack, Tab, Tabs, Tooltip, Typography } from '@mui/material'
+import React, { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useApi } from '../hooks/useApi'
-import { useEditorUndo } from '../hooks/useEditorUndo'
-import * as client from '../api/client'
-import { useSnack } from '../store/snackContext'
-import ConfirmDialog from '../components/common/ConfirmDialog'
-import JourneyTemplatesTab from '../components/journey/editor/JourneyTemplatesTab'
-import ResearchModulesTab from '../components/journey/editor/ResearchModulesTab'
-import PatientJourneysTable from '../components/journey/editor/PatientJourneysTable'
-import InstructionTemplatesTab from '../components/journey/editor/InstructionTemplatesTab'
-import QuestionnaireTemplatesTab from '../components/journey/editor/QuestionnaireTemplatesTab'
 
-function TabPanel({
-  children,
-  value,
-  index,
-}: {
-  children: React.ReactNode
-  value: number
-  index: number
-}) {
-  return (
-    <div role="tabpanel" hidden={value !== index} id={`journey-tabpanel-${index}`}>
-      {value === index && <Box sx={{ pt: 2 }}>{children}</Box>}
-    </div>
-  )
-}
+import * as client from '@/api/client'
+import { ConfirmDialog, TabPanel } from '@/components/common'
+import {
+  InstructionTemplatesTab,
+  JourneyTemplatesTab,
+  PatientJourneysTable,
+  QuestionnaireTemplatesTab,
+  ResearchModulesTab,
+} from '@/components/journey/editor'
+import { useApi } from '@/hooks/useApi'
+import { useEditorUndo } from '@/hooks/useEditorUndo'
+import { useSnack } from '@/store/snackContext'
 
 export default function JourneyEditor() {
   const { t } = useTranslation()

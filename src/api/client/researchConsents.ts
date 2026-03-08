@@ -1,5 +1,5 @@
-import * as service from '../service'
 import type { Consent } from '../schemas'
+import * as service from '../service'
 import { withDelay } from './delay'
 
 export const getResearchConsents = (patientId?: string, moduleId?: string): Promise<Consent[]> =>

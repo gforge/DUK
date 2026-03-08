@@ -1,8 +1,9 @@
-import { describe, it, expect } from 'vitest'
-import { AppStateSchema } from '../api/schemas'
-import { SEED_STATE } from '../api/seed'
-import { buildRealisticSeed } from '../api/seedRealistic'
-import { buildFakerSeed } from '../api/seedFaker'
+import { describe, expect,it } from 'vitest'
+
+import { AppStateSchema } from '@/api/schemas'
+import { SEED_STATE } from '@/api/seed'
+import { buildFakerSeed } from '@/api/seedFaker'
+import { buildRealisticSeed } from '@/api/seedRealistic'
 
 describe('Seed data — AppStateSchema validation', () => {
   it('SEED_STATE (minimal) passes schema', () => {

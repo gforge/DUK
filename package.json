@@ -12,12 +12,14 @@
     "test:watch": "vitest",
     "check": "npm run typecheck && npm run lint",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint src --max-warnings 0",
+    "lint": "eslint src --max-warnings 0 --fix",
     "format": "prettier --write src",
     "generate:i18n": "i18next-cli extract --quiet && i18next-cli types",
     "ncu": "ncu",
+    "diagrams": "npm run diagrams:clean && npm run diagrams:render",
     "diagrams:render": "docker run --rm --user \"$(id -u):$(id -g)\" -v \"$PWD\":/workspace plantuml/plantuml -tsvg /workspace/docs/diagrams",
-    "diagrams:clean": "bash -lc \"rm -f docs/diagrams/*.svg || true\""
+    "diagrams:clean": "bash -lc \"rm -f docs/diagrams/*.svg || true\"",
+    "barrel:generate": "vscode-generate-index-standalone \"src/components/**\""
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -43,12 +45,17 @@
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
+    "@types/node": "^25.3.3",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.4",
     "eslint": "^9.39.3",
+    "eslint-import-resolver-typescript": "^4.4.4",
+    "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.5.2",
+    "eslint-plugin-simple-import-sort": "^12.1.1",
+    "eslint-plugin-unused-imports": "^4.4.1",
     "gh-pages": "^6.3.0",
     "globals": "^17.3.0",
     "i18next-cli": "^1.43.0",
@@ -58,6 +65,7 @@
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.56.1",
     "vite": "^7.3.1",
-    "vitest": "^4.0.18"
+    "vitest": "^4.0.18",
+    "vscode-generate-index-standalone": "^1.7.1"
   }
 }

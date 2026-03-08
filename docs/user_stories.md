@@ -75,7 +75,7 @@ This document captures the key user stories for the Duk demo application. The li
 4. Due questionnaire steps are listed with template name, scheduled date, and overdue indicator.
 5. The questionnaire form renders all five question types (SCALE, BOOLEAN, TEXT, SELECT, NUMBER) and validates required fields before submission.
 
-> _Related code_: `src/pages/PatientView.tsx`, `src/components/patientView/PatientDueForms.tsx`, `src/components/patientView/PatientQuestionnaireForm.tsx`, `src/components/patientView/PatientActions.tsx`.
+> _Related code_: `src/pages/PatientView.tsx`, `src/components/patientView/PatientDueForms/index.tsx`, `src/components/patientView/PatientQuestionnaireForm/index.tsx`, `src/components/patientView/PatientActions/index.tsx`.
 
 ## US5 – Configurable triage policy without eval
 
@@ -189,22 +189,23 @@ These stories map directly to the workflows and components described in the desi
 
 ## US11 – Physio & patient instructions on the timeline
 
-**As a** clinician **I want** to attach physio protocols or care instructions to specific journey steps so patients and staff see relevant guidance at each checkpoint:
+**As a** clinician **I want** to schedule patient instructions separately from follow-up steps so guidance can be managed independently:
 
-- journey template entries can have inline `instructionText` or reference a reusable `InstructionTemplate`
-- the timeline renders instructions as collapsible panels with an info icon toggle
+- journey templates include dedicated `instructions[]` schedules referencing reusable `InstructionTemplate`
+- patient journeys instantiate persisted `Instruction` records with status lifecycle (ACTIVE/ACKNOWLEDGED/COMPLETED/CANCELLED)
+- the UI renders follow-up timeline and instruction timeline as separate sections
 - instruction templates are managed in the Journey Editor under an "Instructions" tab with full CRUD
 
 **Acceptance criteria**
 
-1. `JourneyTemplateEntry` supports `instructionText` and `instructionTemplateId` fields.
+1. `JourneyTemplate.instructions` stores `JourneyTemplateInstruction` schedule records.
 2. `InstructionTemplate` entity exists with CRUD operations.
-3. `getEffectiveSteps` returns `resolvedInstruction` hydrated from the template or inline text.
-4. The `JourneyTimeline` component renders collapsible instruction panels.
-5. The Journey Editor has an "Instructions" tab for managing reusable templates.
-6. Unit tests verify instruction hydration from both template references and inline text.
+3. `assignPatientJourney` instantiates patient-level `Instruction` records from template schedules.
+4. The case/patient journey views render instructions in a dedicated instruction timeline.
+5. The Journey Editor supports editing template-level instruction schedules.
+6. Unit tests verify instruction lifecycle and resolved instruction rendering via instruction APIs.
 
-> _Related code_: `src/api/schemas/journey.ts`, `src/api/service/instructionTemplates.ts`, `src/components/journey/JourneyTimeline.tsx`, `src/components/journey/editor/InstructionTemplatesTab.tsx`.
+> _Related code_: `src/api/schemas/journey.ts`, `src/api/service/instructions.ts`, `src/components/journey/InstructionTimeline.tsx`, `src/components/journey/editor/JourneyTemplatesTab/TemplateInstructionsDialog.tsx`.
 
 ---
 
@@ -234,17 +235,17 @@ These stories map directly to the workflows and components described in the desi
 
 **As a** patient **I want** to see my clinical journey timeline with instructions so I know what to expect at each checkpoint:
 
-- the patient view shows a "My Care Plan" section with the journey timeline
-- each step shows its scheduled date, status, and any resolved instructions
-- instructions are displayed as collapsible panels identical to the clinician view
+- the patient view shows a "My Care Plan" section with separate follow-up and instruction sections
+- follow-up steps are rendered in a read-only `JourneyTimeline`
+- instructions are rendered in a dedicated `InstructionTimeline` with status and active-range information
 
 **Acceptance criteria**
 
 1. Patient view (`/patient`) fetches the active journey and effective steps.
-2. A "My Care Plan" `Paper` section renders a read-only `JourneyTimeline`.
-3. Resolved instructions are visible and expandable.
+2. A "My Care Plan" `Paper` section renders a read-only `JourneyTimeline` for follow-up steps.
+3. Patient instructions are fetched via instruction APIs and rendered separately using `InstructionTimeline`.
 
-> _Related code_: `src/pages/PatientView.tsx`, `src/components/journey/JourneyTimeline.tsx`.
+> _Related code_: `src/pages/PatientView.tsx`, `src/components/patientView/PatientCareplan/main.tsx`, `src/components/journey/InstructionTimeline.tsx`, `src/components/journey/JourneyTimeline/main.tsx`.
 
 ---
 
@@ -266,7 +267,7 @@ These stories map directly to the workflows and components described in the desi
 5. Pausing a non-ACTIVE journey and resuming a non-SUSPENDED journey both throw with a descriptive error.
 6. Unit tests verify status transitions, `totalPausedDays` accumulation, and the step-date shift.
 
-> _Related code_: `src/api/service/patientJourneys.ts`, `src/api/service/journeyResolver.ts`, `src/components/case/JourneyTab.tsx`, `src/tests/journey.test.ts`.
+> _Related code_: `src/api/service/patientJourneys.ts`, `src/api/service/journeyResolver.ts`, `src/components/case/JourneyTab/index.tsx`, `src/tests/journey.test.ts`.
 
 ---
 
@@ -286,7 +287,7 @@ These stories map directly to the workflows and components described in the desi
 4. `getMergedDueStepsForPatient(patientId, date)` deduplicates due steps across all ACTIVE journeys by `templateEntryId`.
 5. Unit tests verify that `getMergedDueStepsForPatient` deduplicates correctly when two journeys share the same questionnaire.
 
-> _Related code_: `src/api/service/journeyResolver.ts`, `src/components/case/JourneyTab.tsx`, `src/components/patientView/PatientCareplan.tsx`, `src/tests/journey.test.ts`.
+> _Related code_: `src/api/service/journeyResolver.ts`, `src/components/case/JourneyTab/index.tsx`, `src/components/patientView/PatientCareplan/main.tsx`, `src/tests/journey.test.ts`.
 
 ---
 

@@ -1,5 +1,5 @@
-import type { Patient } from '../../api/schemas'
-import type { CaseWithActiveCategory } from '../../api/service'
+import type { Patient } from '@/api/schemas'
+import type { CaseWithActiveCategory } from '@/api/service'
 
 export type SortMode = 'time' | 'flags' | 'name'
 

@@ -4,13 +4,13 @@
  * (journeyTemplates, instructionTemplates, questionnaireTemplates, researchModules).
  * Never touches the main duk_app_state key directly — uses getStore / patchStore.
  */
-import { getStore, patchStore } from './storage'
 import type {
-  JourneyTemplate,
   InstructionTemplate,
+  JourneyTemplate,
   QuestionnaireTemplate,
   ResearchModule,
 } from './schemas'
+import { getStore, patchStore } from './storage'
 
 const UNDO_KEY = 'duk_undo_history'
 const MAX_STACK = 30

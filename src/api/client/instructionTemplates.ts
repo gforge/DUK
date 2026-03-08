@@ -1,5 +1,5 @@
-import * as service from '../service'
 import type { InstructionTemplate } from '../schemas'
+import * as service from '../service'
 import { withDelay } from './delay'
 
 export const getInstructionTemplates = (): Promise<InstructionTemplate[]> =>

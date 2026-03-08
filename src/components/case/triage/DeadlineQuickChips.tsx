@@ -1,6 +1,7 @@
+import { Chip, Stack, Typography } from '@mui/material'
 import React from 'react'
-import { Stack, Chip, Typography } from '@mui/material'
 import { useTranslation } from 'react-i18next'
+
 import { parseDeadlineInput } from './parseDeadlineInput'
 
 const QUICK_OPTIONS = [

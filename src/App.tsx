@@ -1,10 +1,11 @@
+import { createTheme, CssBaseline,ThemeProvider } from '@mui/material'
 import React from 'react'
-import { ThemeProvider, createTheme, CssBaseline } from '@mui/material'
+
+import type { MigrationResultErr } from './api/migrations'
+import MigrationErrorOverlay from './components/common/MigrationErrorOverlay'
+import { AppRouter } from './router'
 import { RoleProvider } from './store/roleContext'
 import { SnackProvider } from './store/snackContext'
-import AppRouter from './router'
-import MigrationErrorOverlay from './components/common/MigrationErrorOverlay'
-import type { MigrationResultErr } from './api/migrations'
 
 const theme = createTheme({
   palette: {

@@ -1,4 +1,4 @@
-import React from 'react'
+import MergeIcon from '@mui/icons-material/MergeType'
 import {
   Alert,
   Box,
@@ -9,9 +9,10 @@ import {
   Stack,
   Typography,
 } from '@mui/material'
-import MergeIcon from '@mui/icons-material/MergeType'
+import React from 'react'
 import { useTranslation } from 'react-i18next'
-import type { JourneyStepConflict } from '../../../api/service'
+
+import type { JourneyStepConflict } from '@/api/service'
 
 interface MergedStepRef {
   readonly stepId: string

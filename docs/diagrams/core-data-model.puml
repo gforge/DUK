@@ -1,5 +1,18 @@
 @startuml
-title Core Data Model — ERD (simplified)
+title Core Data Model — Entity Relationship Diagram
+
+left to right direction
+skinparam linetype ortho
+skinparam shadowing false
+
+skinparam package {
+  BorderColor #666
+  FontStyle bold
+}
+
+skinparam classBackgroundColor white
+
+package "Patient Core" #E3F2FD {
 
 class Patient {
   id
@@ -21,6 +34,10 @@ class Case {
   deadline
 }
 
+}
+
+package "Journeys" #E8F5E9 {
+
 class PatientJourney {
   id
   patientId
@@ -33,36 +50,19 @@ class PatientJourney {
   modifications[]
 }
 
-class JourneyTemplate {
+class Instruction {
   id
-  name
-  description
-  parentTemplateId
-  derivedAt
-  entries[]
-}
-
-class JourneyTemplateEntry {
-  id
-  label
-  offsetDays
-  windowDays
-  order
-  templateId?
-  scoreAliases
-  scoreAliasLabels
-  dashboardCategory
-  instructionText?
-  instructionTemplateId?
-}
-
-class InstructionTemplate {
-  id
-  name
-  content
-  tags[]
-  createdAt
-  updatedAt
+  patientJourneyId
+  journeyTemplateInstructionId?
+  instructionTemplateId
+  label?
+  startDayOffset
+  endDayOffset?
+  startAt
+  endAt?
+  status
+  acknowledgedAt?
+  completedAt?
 }
 
 class JourneyModification {
@@ -76,6 +76,56 @@ class JourneyModification {
   previousStartDate?
   newStartDate?
 }
+
+}
+
+package "Templates" #FFF8E1 {
+
+class JourneyTemplate {
+  id
+  name
+  description
+  parentTemplateId
+  derivedAt
+  entries[]
+  instructions[]
+}
+
+class JourneyTemplateEntry {
+  id
+  label
+  offsetDays
+  windowDays
+  order
+  templateId?
+  scoreAliases
+  scoreAliasLabels
+  dashboardCategory
+}
+
+class JourneyTemplateInstruction {
+  id
+  journeyTemplateId
+  instructionTemplateId
+  label?
+  startDayOffset
+  endDayOffset?
+  order
+  tags[]
+}
+
+class InstructionTemplate {
+  id
+  name
+  content
+  tags[]
+  createdAt
+  updatedAt
+}
+
+}
+
+package "Research" #F3E5F5 {
 
 class ResearchModule {
   id
@@ -95,6 +145,10 @@ class Consent {
   revokedByUserId
 }
 
+}
+
+package "Forms" #FBE9E7 {
+
 class FormResponse {
   id
   patientId
@@ -102,6 +156,8 @@ class FormResponse {
   templateId
   answers
   scores
+  patientJourneyId?
+  journeyTemplateEntryId?
 }
 
 class JournalDraft {
@@ -112,18 +168,78 @@ class JournalDraft {
   status
 }
 
+}
+
 Patient "1" -- "*" Case : has
 Patient "1" -- "*" PatientJourney : journeys
 Patient "1" -- "*" Consent : consents
+
 Case "1" -- "*" FormResponse : responses
 Case "1" -- "*" JournalDraft : drafts
+
+FormResponse "*" -- "0..1" PatientJourney : patientJourneyId
+FormResponse "*" -- "0..1" JourneyTemplateEntry : journeyTemplateEntryId
+
 JourneyTemplate "1" -- "*" JourneyTemplateEntry : entries
+JourneyTemplate "1" -- "*" JourneyTemplateInstruction : instructions
 JourneyTemplate "0..1" -- "*" JourneyTemplate : parentTemplateId (derives)
+
+JourneyTemplateInstruction "*" -- "1" InstructionTemplate : instructionTemplateId
+
 PatientJourney "*" -- "1" JourneyTemplate : journeyTemplateId
 PatientJourney "1" -- "*" JourneyModification : modifications
-PatientJourney "1" -- "*" Consent : journey consents
-PatientJourney "*" -- "*" ResearchModule : researchModuleIds
-JourneyTemplateEntry "*" -- "0..1" InstructionTemplate : instructionTemplateId
+PatientJourney "1" -- "*" Instruction : instructions
+
+Instruction "*" -- "1" InstructionTemplate : instructionTemplateId
+Instruction "*" -- "0..1" JourneyTemplateInstruction : journeyTemplateInstructionId
+
+PatientJourney "*" -- "*" ResearchModule : researchModules
 Consent "*" -- "1" ResearchModule : researchModuleId
+
+legend right
+  | Notation | Meaning |
+  | field? | Optional/nullable field |
+  | field[] | Array/list field |
+  | *Id | Reference/identifier field |
+  | 2026-03-08T14:30:45.123Z | ISO datetime example |
+  | ACUTE / SUBACUTE / CONTROL | Category enum examples |
+endlegend
+
+note right of JourneyTemplate
+  Example:
+  name = "Proximala humerusfraktur"
+  parentTemplateId links to source template if derived
+  derivedAt stores last sync timestamp from parent
+end note
+
+note right of JourneyTemplateEntry
+  Example:
+  label = "Vecka 4 - fysiokontroll"
+  offsetDays = 28, windowDays = 7
+  scoreAliases = {"PNRS_2":"PNRS_week4", "OSS.total":"OSS_week4"}
+  dashboardCategory = SUBACUTE
+end note
+
+note right of Consent
+  Example:
+  grantedAt = "2026-03-08T14:30:45.123Z"
+  revokedAt = null (active) or timestamp (revoked)
+  One active consent per patient+module+journey
+  Revoked records are kept for audit trail
+end note
+
+note right of FormResponse
+  Follow-up trigger semantics:
+  JourneyTemplateEntry defines a due follow-up point.
+  When a form is submitted, FormResponse may reference
+  patientJourneyId and journeyTemplateEntryId.
+  Submission updates Case.triggers and policyWarnings,
+  which then drive staff triage decisions.
+end note
+
+note bottom
+  Simplified ERD for readability.
+  Some optional UI/audit helper fields are intentionally omitted.
+end note
 
 @enduml

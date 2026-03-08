@@ -1,5 +1,5 @@
-import { iso, daysAgo, daysFromNow } from './shared'
 import type { Case } from '../schemas'
+import { daysAgo, daysFromNow, iso } from './shared'
 
 export const cases: Case[] = [
   // ── ACUTE ──────────────────────────────────────────────────────────────────
@@ -8,16 +8,8 @@ export const cases: Case[] = [
     patientId: 'p-1',
     category: 'ACUTE',
     status: 'NEEDS_REVIEW',
-    triggers: ['HIGH_PAIN', 'INFECTION_SUSPECTED'],
-    policyWarnings: [
-      {
-        ruleId: 'rule-1',
-        ruleName: 'Smärta minskar inte',
-        severity: 'HIGH',
-        triggeredValues: { PNRS_1: 8, PNRS_2: 8 },
-        expression: 'PNRS_1 - PNRS_2 <= 0',
-      },
-    ],
+    triggers: [], // cleared so the patient isn't alarmed
+    policyWarnings: [],
     assignedRole: 'DOCTOR',
     assignedUserId: 'user-doc-1',
     createdByUserId: 'user-nurse-1',
@@ -25,7 +17,32 @@ export const cases: Case[] = [
     lastActivityAt: iso(daysAgo(1)),
     createdAt: iso(daysAgo(2)),
     formSeriesId: 'fs-1',
-    reviews: [],
+    reviews: [
+      {
+        id: 'case-1-review-1',
+        type: 'LAB',
+        source: 'JOURNEY',
+        journeyStepLabel: 'Dag 10–14',
+        createdByUserId: 'user-doc-1',
+        createdByRole: 'DOCTOR',
+        createdAt: iso(daysAgo(14)),
+        reviewedAt: iso(daysAgo(7)),
+        outcome: 'OK',
+        note: 'Rutinmässiga blodprover: CRP och Hb normala.',
+      },
+      {
+        id: 'case-1-review-2',
+        type: 'XRAY',
+        source: 'JOURNEY',
+        journeyStepLabel: 'Dag 10–14',
+        createdByUserId: 'user-doc-1',
+        createdByRole: 'DOCTOR',
+        createdAt: iso(daysAgo(14)),
+        reviewedAt: iso(daysAgo(7)),
+        outcome: 'OK',
+        note: '2‑veckors postoperativ röntgen: inga komplikationer.',
+      },
+    ],
   },
   {
     id: 'case-2',
@@ -343,5 +360,38 @@ export const cases: Case[] = [
         source: 'MANUAL',
       },
     ],
+  },
+  // ── Knee OA case (p-15) ────────────────────────────────────────────────
+  {
+    id: 'case-15',
+    patientId: 'p-15',
+    category: 'CONTROL',
+    status: 'TRIAGED',
+    triggers: [],
+    policyWarnings: [],
+    nextStep: 'DIGITAL_CONTROL',
+    deadline: iso(daysFromNow(14)),
+    internalNote: 'Postoperativ kontroll — 14 dagar efter protesoperation.',
+    assignedRole: 'NURSE',
+    createdByUserId: 'user-pal-1',
+    triagedByUserId: 'user-pal-1',
+    scheduledAt: iso(daysAgo(14)),
+    lastActivityAt: iso(daysAgo(1)),
+    createdAt: iso(daysAgo(14)),
+    reviews: [],
+  },
+  // ── Late-join demo case (p-16) ─────────────────────────────────────────
+  {
+    id: 'case-16',
+    patientId: 'p-16',
+    category: 'SUBACUTE',
+    status: 'NEW',
+    triggers: [],
+    policyWarnings: [],
+    createdByUserId: 'user-doc-1',
+    scheduledAt: iso(daysAgo(0)),
+    lastActivityAt: iso(daysAgo(0)),
+    createdAt: iso(daysAgo(0)),
+    reviews: [],
   },
 ]

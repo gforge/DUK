@@ -1,14 +1,13 @@
+import { Box, Divider, Stack, Typography } from '@mui/material'
+import { differenceInDays, format, parseISO } from 'date-fns'
 import React from 'react'
-import { Box, Typography, Stack, Divider } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
-import { format, differenceInDays, parseISO } from 'date-fns'
-import { useFocusRestore } from '../../hooks/useFocusRestore'
-import StatusChip from '../common/StatusChip'
-import TriggerChips from '../common/TriggerChips'
-import AutoWarningsBadge from '../common/AutoWarningsBadge'
-import DeadlineLabel from '../common/DeadlineLabel'
-import type { Case, Patient, CaseStatus } from '../../api/schemas'
+
+import type { Case, CaseStatus, Patient } from '@/api/schemas'
+import { AutoWarningsBadge, DeadlineLabel, StatusChip, TriggerChips } from '@/components/common'
+import { useStatusLabel } from '@/hooks/labels'
+import { useFocusRestore } from '@/hooks/useFocusRestore'
 
 interface CaseListItemProps extends React.HTMLAttributes<HTMLDivElement> {
   caseData: Case
@@ -61,6 +60,7 @@ export default function CaseListItem({
   ...props
 }: CaseListItemProps) {
   const { t } = useTranslation()
+  const getStatusLabel = useStatusLabel()
   const navigate = useNavigate()
   const { save } = useFocusRestore()
 
@@ -105,7 +105,7 @@ export default function CaseListItem({
             outlineOffset: -2,
           },
         }}
-        aria-label={`${patient?.displayName ?? caseData.patientId} – ${t(`status.${caseData.status}`)}`}
+        aria-label={`${patient?.displayName ?? caseData.patientId} – ${getStatusLabel(caseData.status)}`}
         {...props}
         onClick={(e) => {
           props.onClick?.(e)

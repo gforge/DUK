@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import AddIcon from '@mui/icons-material/Add'
+import ScienceIcon from '@mui/icons-material/Science'
 import {
   Box,
   Button,
@@ -11,13 +12,13 @@ import {
   Stack,
   Typography,
 } from '@mui/material'
-import ScienceIcon from '@mui/icons-material/Science'
-import AddIcon from '@mui/icons-material/Add'
+import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useSnack } from '../../store/snackContext'
-import * as client from '../../api/client'
-import { ConsentDialog, RevokeConsentDialog } from '../journey/ConsentDialog'
-import type { PatientJourney, ResearchModule, Consent } from '../../api/schemas'
+
+import * as client from '@/api/client'
+import type { Consent, PatientJourney, ResearchModule } from '@/api/schemas'
+import { GrantConsentDialog, RevokeConsentDialog } from '@/components/journey'
+import { useSnack } from '@/store/snackContext'
 
 interface Props {
   readonly journey: PatientJourney
@@ -149,8 +150,8 @@ export default function PatientJourneyResearchCard({
         </Stack>
       )}
 
-      {/* Enroll a new module */}
-      {availableModules.length > 0 && (
+      {/* Enroll a new module — only for active journeys */}
+      {availableModules.length > 0 && journey.status === 'ACTIVE' && (
         <>
           {enrolledModules.length > 0 && <Divider sx={{ my: 1 }} />}
           {enrolling ? (
@@ -190,11 +191,7 @@ export default function PatientJourneyResearchCard({
               </Button>
             </Stack>
           ) : (
-            <Button
-              size="small"
-              startIcon={<AddIcon />}
-              onClick={() => setEnrolling(true)}
-            >
+            <Button size="small" startIcon={<AddIcon />} onClick={() => setEnrolling(true)}>
               {t('patients.research.addStudy')}
             </Button>
           )}
@@ -203,7 +200,7 @@ export default function PatientJourneyResearchCard({
 
       {/* Consent dialogs */}
       {consentTarget && (
-        <ConsentDialog
+        <GrantConsentDialog
           open
           onClose={() => setConsentTarget(null)}
           module={consentTarget}
@@ -220,7 +217,9 @@ export default function PatientJourneyResearchCard({
           open
           onClose={() => setRevokeTarget(null)}
           consent={revokeTarget}
-          studyName={allModules.find((rm) => rm.id === revokeTarget.researchModuleId)?.studyName ?? ''}
+          studyName={
+            allModules.find((rm) => rm.id === revokeTarget.researchModuleId)?.studyName ?? ''
+          }
           onRevoked={() => {
             onChanged()
             setRevokeTarget(null)

@@ -1,13 +1,15 @@
-import React from 'react'
-import { Chip } from '@mui/material'
-import type { ChipProps } from '@mui/material'
-import FiberNewIcon from '@mui/icons-material/FiberNew'
-import ErrorIcon from '@mui/icons-material/Error'
-import TaskAltIcon from '@mui/icons-material/TaskAlt'
-import ScheduleIcon from '@mui/icons-material/Schedule'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
-import { useTranslation } from 'react-i18next'
-import type { CaseStatus } from '../../api/schemas'
+import ErrorIcon from '@mui/icons-material/Error'
+import FiberNewIcon from '@mui/icons-material/FiberNew'
+import ScheduleIcon from '@mui/icons-material/Schedule'
+import TaskAltIcon from '@mui/icons-material/TaskAlt'
+import type { ChipProps } from '@mui/material'
+import { Chip } from '@mui/material'
+import React from 'react'
+
+import type { CaseStatus } from '@/api/schemas'
+import { useStatusLabel } from '@/hooks/labels'
+import { useOptionalRole } from '@/store/roleContext'
 
 const STATUS_COLORS: Record<CaseStatus, ChipProps['color']> = {
   NEW: 'default',
@@ -31,15 +33,23 @@ interface StatusChipProps {
 }
 
 export default function StatusChip({ status, size = 'small' }: StatusChipProps) {
-  const { t } = useTranslation()
+  const getStatusLabel = useStatusLabel()
+  // role context may not exist in isolated tests
+  let isPatientView = false
+  const roleCtx = useOptionalRole()
+  if (roleCtx && roleCtx.currentUser.role === 'PATIENT') {
+    isPatientView = true
+  }
+  const label = getStatusLabel(status, isPatientView)
+
   return (
     <Chip
       icon={STATUS_ICONS[status]}
-      label={t(`status.${status}`)}
+      label={label}
       color={STATUS_COLORS[status]}
       size={size}
       variant="filled"
-      aria-label={t(`status.${status}`)}
+      aria-label={label}
     />
   )
 }

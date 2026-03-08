@@ -1,4 +1,5 @@
-import React, { useRef } from 'react'
+/* eslint-disable react-refresh/only-export-components */
+import { zodResolver } from '@hookform/resolvers/zod'
 import {
   Box,
   Button,
@@ -15,12 +16,14 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material'
-import { useForm, Controller } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
+import React, { useRef } from 'react'
+import { Controller,useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
-import { validateExpression } from '../../api/policyParser'
-import type { PolicyVariable } from '../../api/service'
+import { z } from 'zod'
+
+import { validateExpression } from '@/api/policyParser'
+import type { PolicyVariable } from '@/api/service'
+import { useSeverityLabel } from '@/hooks/labels'
 
 const SEVERITIES = ['LOW', 'MEDIUM', 'HIGH'] as const
 export { SEVERITIES }
@@ -69,6 +72,7 @@ export default function PolicyRuleDialog({
   variables = [],
 }: Props) {
   const { t } = useTranslation()
+  const getSeverityLabel = useSeverityLabel()
   const exprRef = useRef<HTMLInputElement>(null)
 
   const { control, handleSubmit, watch, formState, setValue, getValues } = useForm<RuleForm>({
@@ -76,6 +80,7 @@ export default function PolicyRuleDialog({
     values: formValues,
   })
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const watchedExpr = watch('expression')
   const exprError = watchedExpr ? validateExpression(watchedExpr) : null
 
@@ -226,7 +231,7 @@ export default function PolicyRuleDialog({
                 >
                   {SEVERITIES.map((s) => (
                     <MenuItem key={s} value={s}>
-                      {t(`severity.${s}`)}
+                      {getSeverityLabel(s)}
                     </MenuItem>
                   ))}
                 </TextField>

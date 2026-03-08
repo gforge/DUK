@@ -1,7 +1,7 @@
-import { getStore, setStore } from '../storage'
-import { uuid, now, evaluatePolicyRules } from './utils'
-import { buildPolicyScopeWithAliases } from './journeyResolver'
 import type { Case, PolicyRule, PolicyWarning } from '../schemas'
+import { getStore, setStore } from '../storage'
+import { buildPolicyScopeWithAliases } from './journeyResolver'
+import { evaluatePolicyRules,now, uuid } from './utils'
 
 /** Returns all rules for a specific journey template. */
 export function getPolicyRules(journeyTemplateId: string): PolicyRule[] {

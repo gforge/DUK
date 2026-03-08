@@ -1,4 +1,4 @@
-import type { AppState, User, Role } from '../schemas'
+import type { AppState, Role,User } from '../schemas'
 
 /**
  * Swedish first names for nurses (Sjuksköterskor)

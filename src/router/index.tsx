@@ -1,17 +1,20 @@
-import React, { Suspense, lazy } from 'react'
-import { HashRouter, Routes, Route, Navigate } from 'react-router-dom'
-import { CircularProgress, Box } from '@mui/material'
-import AppShell from '../components/layout/AppShell'
+import { Box,CircularProgress } from '@mui/material'
+import React, { lazy,Suspense } from 'react'
+import { HashRouter, Navigate,Route, Routes } from 'react-router-dom'
+
+import AppShell from '@/components/layout/AppShell'
 
 const Dashboard = lazy(() => import('../pages/Dashboard'))
 const CaseDetail = lazy(() => import('../pages/CaseDetail'))
 const PatientView = lazy(() => import('../pages/PatientView'))
 const Patients = lazy(() => import('../pages/Patients'))
 const PatientDetail = lazy(() => import('../pages/PatientDetail'))
-const PolicyEditor = lazy(() => import('../pages/PolicyEditor'))
+const PolicyEditor = lazy(() =>
+  import('../pages/PolicyEditor').then((m) => ({ default: m.PolicyEditor })),
+)
 const DemoTools = lazy(() => import('../pages/DemoTools'))
 const JourneyEditor = lazy(() => import('../pages/JourneyEditor'))
-const Worklist = lazy(() => import('../pages/Worklist'))
+const Worklist = lazy(() => import('../pages/Worklist').then((m) => ({ default: m.Worklist })))
 const NotFound = lazy(() => import('../pages/NotFound'))
 
 function Loader() {
@@ -22,7 +25,7 @@ function Loader() {
   )
 }
 
-export default function AppRouter() {
+export function AppRouter() {
   return (
     <HashRouter>
       <AppShell>

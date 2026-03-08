@@ -1,5 +1,5 @@
 @startuml
-title High-level Architecture — Duk Demo
+title System Architecture — Component Diagram
 
 left to right direction
 
@@ -43,8 +43,8 @@ package "Persistence" {
 note bottom of [Journey Resolver]
   Computes effective steps,
   hydrates instructions,
-  handles template derivation,
-  SWITCH_TEMPLATE,
+  handles template derivation
+  and SWITCH_TEMPLATE,
   pause-shift calculation,
   getMergedDueStepsForPatient
 end note
@@ -58,6 +58,8 @@ end note
 note bottom of [Patient Journeys]
   assignPatientJourney,
   pauseJourney, resumeJourney,
+  modifyPatientJourney,
+  cancelJourney,
   totalPausedDays accumulation
 end note
 

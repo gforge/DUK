@@ -1,0 +1,28 @@
+@startuml
+title Multiple Journeys — Tab Rendering Sequence Diagram
+
+actor Clinician
+participant "JourneyTab\n(CaseDetail UI)" as JT
+participant "PatientCareplan\n(PatientView UI)" as PC
+participant "client/patientJourneys" as Client
+participant "service/journeyResolver" as Resolver
+
+== Clinician view (CaseDetail) ==
+Clinician -> JT : Open journey tab
+JT -> Client : getPatientJourneys(patientId)
+Client --> JT : PatientJourney[]
+JT -> JT : Sort tabs by\nACTIVE -> SUSPENDED -> COMPLETED\nnewest first within group
+Clinician -> JT : Select a journey tab
+JT -> Client : getEffectiveSteps(journeyId)
+Client -> Resolver : getEffectiveSteps(journeyId)
+Resolver --> Client : EffectiveStep[]
+Client --> JT : EffectiveStep[]
+JT -> JT : Render timeline + controls
+
+== Patient self-view (PatientCareplan) ==
+Clinician -> PC : Switch role to PATIENT
+PC -> Client : getPatientJourneys(patientId)
+Client --> PC : PatientJourney[]
+PC -> PC : Same tab ordering\nread-only timeline per tab
+
+@enduml

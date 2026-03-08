@@ -1,10 +1,11 @@
+import type { FormResponse, JourneyTemplateEntry } from '../schemas'
 import { getStore } from '../storage'
+import { computeTotalPauseShift, toScheduledDate } from './journeyDates'
+import { applyResearchModules } from './journeyResearch'
 import { buildPolicyScope } from './utils'
-import type { JourneyTemplateEntry, CaseCategory, FormResponse } from '../schemas'
 
 /**
  * A resolved, ordered step for a specific patient — after modifications and research overlays.
- * resolvedInstruction is hydrated from instructionTemplateId (preferred) or instructionText.
  * Recurring entries (recurrenceIntervalDays set) are expanded into multiple EffectiveSteps,
  * each with a unique id (`${baseId}__r${occurrenceIndex}`) and an occurrenceIndex.
  */
@@ -18,7 +19,6 @@ export type EffectiveStep = JourneyTemplateEntry & {
   researchModuleId?: string
   replacesStepId?: string
   scheduledDate: string // YYYY-MM-DD relative to journey.startDate
-  resolvedInstruction?: string // hydrated instruction content (markdown)
 }
 
 /** Recurring step occurrences are expanded up to this many days from startDate. */
@@ -29,7 +29,6 @@ const RECURRENCE_HORIZON_DAYS = 5 * 365 // 5 years
  * Applies ADD_STEP / REMOVE_STEP modifications in chronological order.
  * SWITCH_TEMPLATE is already reflected in journey.journeyTemplateId and startDate.
  * Research module entries are then merged/inserted.
- * Instruction content is hydrated from instructionTemplateId or instructionText.
  */
 export function getEffectiveSteps(journeyId: string): EffectiveStep[] {
   const state = getStore()
@@ -41,27 +40,10 @@ export function getEffectiveSteps(journeyId: string): EffectiveStep[] {
 
   const startMs = new Date(journey.startDate).getTime()
 
-  // Whilst the journey is suspended, add the current ongoing pause days on top of
-  // the already-accumulated total.  This keeps all future step dates shifting
-  // forward in real time without writing to the store on every render.
-  const currentPauseDays =
-    journey.status === 'SUSPENDED' && journey.pausedAt
-      ? Math.floor((Date.now() - new Date(journey.pausedAt).getTime()) / 86_400_000)
-      : 0
-  const totalPauseShift = (journey.totalPausedDays ?? 0) + currentPauseDays
+  // compute the combined pause shift including any current suspension
+  const totalPauseShift = computeTotalPauseShift(journey)
 
-  const toDate = (offsetDays: number) =>
-    new Date(startMs + (offsetDays + totalPauseShift) * 86_400_000).toISOString().slice(0, 10)
-
-  const resolveInstruction = (entry: JourneyTemplateEntry): string | undefined => {
-    if (entry.instructionTemplateId) {
-      const it = (state.instructionTemplates ?? []).find(
-        (t) => t.id === entry.instructionTemplateId,
-      )
-      return it?.content ?? entry.instructionText
-    }
-    return entry.instructionText
-  }
+  const toDate = (offsetDays: number) => toScheduledDate(startMs, offsetDays, totalPauseShift)
 
   let steps: EffectiveStep[] = []
 
@@ -85,7 +67,6 @@ export function getEffectiveSteps(journeyId: string): EffectiveStep[] {
           isRecurring: true,
           occurrenceIndex: occIdx,
           scheduledDate,
-          resolvedInstruction: resolveInstruction(e),
         })
         // Next occurrence: advance by interval from this occurrence's scheduled date;
         // if this occurrence was already completed, advance from the actual completion date.
@@ -105,7 +86,6 @@ export function getEffectiveSteps(journeyId: string): EffectiveStep[] {
         isResearch: false,
         isRecurring: false,
         scheduledDate: toDate(e.offsetDays),
-        resolvedInstruction: resolveInstruction(e),
       })
     }
   }
@@ -121,58 +101,13 @@ export function getEffectiveSteps(journeyId: string): EffectiveStep[] {
         isResearch: false,
         isRecurring: false,
         scheduledDate: toDate(mod.entry.offsetDays),
-        resolvedInstruction: resolveInstruction(mod.entry),
       })
     }
   }
   steps = steps.filter((s) => !removedIds.has(s.id))
 
-  for (const moduleId of journey.researchModuleIds) {
-    const module = state.researchModules.find((m) => m.id === moduleId)
-    if (!module) continue
-    for (const entry of module.entries) {
-      if (entry.replaceStepId) {
-        const original = steps.find((s) => s.id === entry.replaceStepId)
-        const researchStep: EffectiveStep = {
-          id: entry.id,
-          label: entry.label,
-          offsetDays: original?.offsetDays ?? 0,
-          windowDays: original?.windowDays ?? 2,
-          order: original?.order ?? 999,
-          templateId: entry.templateId,
-          scoreAliases: original?.scoreAliases ?? {},
-          scoreAliasLabels: original?.scoreAliasLabels ?? {},
-          dashboardCategory: (original?.dashboardCategory ?? 'CONTROL') as CaseCategory,
-          isAdded: false,
-          isResearch: true,
-          isRecurring: false,
-          researchModuleId: moduleId,
-          replacesStepId: entry.replaceStepId,
-          scheduledDate: original?.scheduledDate ?? toDate(0),
-          resolvedInstruction: original?.resolvedInstruction,
-        }
-        steps = steps.filter((s) => s.id !== entry.replaceStepId)
-        steps.push(researchStep)
-      } else if (entry.offsetDays !== undefined) {
-        steps.push({
-          id: entry.id,
-          label: entry.label,
-          offsetDays: entry.offsetDays,
-          windowDays: 3,
-          order: entry.offsetDays,
-          templateId: entry.templateId,
-          scoreAliases: {},
-          scoreAliasLabels: {},
-          dashboardCategory: 'CONTROL',
-          isAdded: false,
-          isResearch: true,
-          isRecurring: false,
-          researchModuleId: moduleId,
-          scheduledDate: toDate(entry.offsetDays),
-        })
-      }
-    }
-  }
+  // apply any research‑module overlays / additions
+  steps = applyResearchModules(steps, journey, startMs, totalPauseShift)
 
   return steps.sort((a, b) => a.offsetDays - b.offsetDays || a.order - b.order)
 }
@@ -240,11 +175,10 @@ export function buildPolicyScopeWithAliases(
   for (const step of getEffectiveSteps(journey.id)) {
     if (Object.keys(step.scoreAliases).length === 0) continue
     const stepResponses = responses
-      .filter((r) =>
-        // Prefer exact step match via journeyStepId (set for responses submitted
-        // after step keys were introduced). Fall back to templateId for legacy
-        // responses that predate the journeyStepId field.
-        r.journeyStepId ? r.journeyStepId === step.id : r.templateId === step.templateId,
+      .filter(
+        (r) =>
+          // Responses submitted through a journey step are linked by template entry id.
+          r.journeyTemplateEntryId === step.id,
       )
       .sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime())
     const latest = stepResponses[0]
@@ -296,16 +230,14 @@ export function getMergedDueStepsForPatient(patientId: string, date: string): Me
       if (date < windowStart || date > windowEnd) continue
 
       // Skip steps that the patient already submitted a response for.
-      // journeyStepId in stored responses is always the base id (without __r<N>).
+      // Stored journeyTemplateEntryId is always the base id (without __r<N>).
       const baseStepId = step.id.replace(/__r\d+$/, '')
       const alreadySubmitted = state.formResponses.some(
         (r) =>
           r.patientId === patientId &&
           r.patientJourneyId === journey.id &&
-          (r.journeyStepId
-            ? r.journeyStepId === baseStepId &&
-              (step.occurrenceIndex === undefined || r.occurrenceIndex === step.occurrenceIndex)
-            : r.templateId === step.templateId),
+          r.journeyTemplateEntryId === baseStepId &&
+          (step.occurrenceIndex === undefined || r.occurrenceIndex === step.occurrenceIndex),
       )
       if (alreadySubmitted) continue
 

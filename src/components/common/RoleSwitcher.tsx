@@ -1,22 +1,25 @@
-import React, { useState } from 'react'
+import CheckIcon from '@mui/icons-material/Check'
+import SwitchAccountIcon from '@mui/icons-material/SwitchAccount'
 import {
+  Divider,
   IconButton,
+  ListItemIcon,
+  ListItemText,
   Menu,
   MenuItem,
-  ListItemText,
-  ListItemIcon,
   Tooltip,
-  Divider,
   Typography,
 } from '@mui/material'
-import SwitchAccountIcon from '@mui/icons-material/SwitchAccount'
-import CheckIcon from '@mui/icons-material/Check'
+import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useRole } from '../../store/roleContext'
-import type { User } from '../../api/schemas'
+
+import type { User } from '@/api/schemas'
+import { useRoleLabel } from '@/hooks/labels'
+import { useRole } from '@/store/roleContext'
 
 export default function RoleSwitcher() {
   const { t } = useTranslation()
+  const getRoleLabel = useRoleLabel()
   const { currentUser, setCurrentUser, availableUsers } = useRole()
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
 
@@ -59,7 +62,7 @@ export default function RoleSwitcher() {
             </ListItemIcon>
             <ListItemText
               primary={user.name}
-              secondary={t(`role.${user.role}`)}
+              secondary={getRoleLabel(user.role)}
               secondaryTypographyProps={{ fontSize: 11 }}
             />
           </MenuItem>

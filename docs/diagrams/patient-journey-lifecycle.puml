@@ -1,5 +1,5 @@
 @startuml
-title PatientJourney Lifecycle
+title Patient Journey Lifecycle — State Diagram
 
 state ACTIVE
 state SUSPENDED

@@ -1,7 +1,8 @@
-import React from 'react'
 import { Chip, Stack, Tab, Tabs } from '@mui/material'
-import { useTranslation } from 'react-i18next'
-import type { JourneyTemplate, PatientJourney } from '../../../api/schemas'
+import React from 'react'
+
+import type { JourneyTemplate, PatientJourney } from '@/api/schemas'
+import { useJourneyStatusLabel } from '@/hooks/labels'
 
 function journeyStatusColor(status: string): 'primary' | 'warning' | 'default' {
   if (status === 'ACTIVE') return 'primary'
@@ -22,7 +23,7 @@ export default function JourneySelectorTabs({
   journeyTemplates,
   onChange,
 }: JourneySelectorTabsProps) {
-  const { t } = useTranslation()
+  const getJourneyStatusLabel = useJourneyStatusLabel()
 
   if (journeys.length <= 1) return null
 
@@ -44,7 +45,7 @@ export default function JourneySelectorTabs({
               <Stack direction="row" alignItems="center" gap={0.5}>
                 <span>{tmpl?.name ?? j.journeyTemplateId}</span>
                 <Chip
-                  label={t(`journey.journeyStatus.${j.status}`)}
+                  label={getJourneyStatusLabel(j.status)}
                   size="small"
                   color={journeyStatusColor(j.status)}
                   variant="outlined"

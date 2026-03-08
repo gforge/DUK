@@ -1,23 +1,24 @@
-import React from 'react'
+import type { SvgIconComponent } from '@mui/icons-material'
+import AccessibilityNewIcon from '@mui/icons-material/AccessibilityNew'
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
+import LocalHospitalIcon from '@mui/icons-material/LocalHospital'
+import MedicalServicesIcon from '@mui/icons-material/MedicalServices'
+import MonitorHeartIcon from '@mui/icons-material/MonitorHeart'
+import PhoneIcon from '@mui/icons-material/Phone'
 import {
   Box,
-  Grid,
   Card,
   CardActionArea,
   CardContent,
-  Typography,
+  Chip,
+  Grid,
   Stack,
   Tooltip,
-  Chip,
+  Typography,
 } from '@mui/material'
-import PhoneIcon from '@mui/icons-material/Phone'
-import LocalHospitalIcon from '@mui/icons-material/LocalHospital'
-import MedicalServicesIcon from '@mui/icons-material/MedicalServices'
-import AccessibilityNewIcon from '@mui/icons-material/AccessibilityNew'
-import MonitorHeartIcon from '@mui/icons-material/MonitorHeart'
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
+import React from 'react'
 import { useTranslation } from 'react-i18next'
-import type { SvgIconComponent } from '@mui/icons-material'
+
 import { ACTION_ORDER, type TriageActionKey } from './actionConfig'
 
 const ACTION_ICONS: Record<TriageActionKey, SvgIconComponent> = {

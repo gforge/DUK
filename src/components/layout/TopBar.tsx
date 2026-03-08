@@ -1,19 +1,18 @@
-import React from 'react'
-import { AppBar, Toolbar, Typography, IconButton, Box, Chip, Tooltip } from '@mui/material'
 import MenuIcon from '@mui/icons-material/Menu'
 import WarningAmberIcon from '@mui/icons-material/WarningAmber'
+import { AppBar, Box, Chip, IconButton, Toolbar, Tooltip, Typography } from '@mui/material'
+import React from 'react'
 import { useTranslation } from 'react-i18next'
-import RoleSwitcher from '../common/RoleSwitcher'
-import LanguageSwitcher from '../common/LanguageSwitcher'
-import GlobalSearch from './GlobalSearch'
-import { useRole } from '../../store/roleContext'
+
+import { LanguageSwitcher, RoleSwitcher } from '@/components/common'
+import GlobalSearch from '@/components/layout/GlobalSearch'
+import { useRole } from '@/store/roleContext'
 
 interface TopBarProps {
-  drawerWidth: number
   onMenuClick: () => void
 }
 
-export default function TopBar({ drawerWidth, onMenuClick }: TopBarProps) {
+export default function TopBar({ onMenuClick }: TopBarProps) {
   const { t } = useTranslation()
   const { currentUser } = useRole()
 

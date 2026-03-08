@@ -4,15 +4,15 @@
  * unaffected; only downloaded when the user requests the large seed.
  */
 
-import type { AppState, Case, Patient, PatientJourney, AuditEvent } from './schemas'
+import type { AppState, AuditEvent, Case, EpisodeOfCare, Patient, PatientJourney } from './schemas'
 import { SEED_STATE } from './seed'
+import type { Cohort } from './seed/seedHelpers'
 import {
-  TRIGGERS,
-  PAL_IDS,
   isoDateOffset as isoDate,
   isoTsOffset as isoTs,
+  PAL_IDS,
+  TRIGGERS,
 } from './seed/seedHelpers'
-import type { Cohort } from './seed/seedHelpers'
 import { ensureAllUsers } from './utils/userGenerator'
 
 // Placement cohorts — same shape as seedRealistic, scaled up
@@ -52,6 +52,7 @@ export async function buildFakerSeed(): Promise<AppState> {
   const patients: Patient[] = []
   const cases: Case[] = []
   const journeys: PatientJourney[] = []
+  const episodes: EpisodeOfCare[] = []
   const auditEvents: AuditEvent[] = []
 
   let idx = 0
@@ -114,10 +115,29 @@ export async function buildFakerSeed(): Promise<AppState> {
         reviews: [],
       })
 
+      const epId = `fe-${idx}`
+
+      episodes.push({
+        id: epId,
+        patientId: pid,
+        label: isComplex ? 'Complex fracture follow-up' : 'Standard fracture follow-up',
+        clinicalArea: 'Ortopedi',
+        status: 'OPEN',
+        openedAt: createdAt,
+        closedAt: null,
+        responsibleUserId: palId,
+        primaryCaseId: caseId,
+        createdAt,
+        updatedAt: createdAt,
+      })
+
       journeys.push({
         id: jid,
+        episodeId: epId,
         patientId: pid,
         journeyTemplateId,
+        phaseType: 'FOLLOWUP',
+        joinedAt: '',
         startDate,
         status: 'ACTIVE',
         researchModuleIds: [],
@@ -147,6 +167,7 @@ export async function buildFakerSeed(): Promise<AppState> {
     cases,
     formResponses: [],
     journalDrafts: [],
+    episodesOfCare: episodes,
     patientJourneys: journeys,
     auditEvents,
   }

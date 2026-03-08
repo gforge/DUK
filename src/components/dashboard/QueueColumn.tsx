@@ -1,25 +1,28 @@
-import React from 'react'
-import {
-  Box,
-  Typography,
-  Chip,
-  Stack,
-  Divider,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-} from '@mui/material'
+import BiotechIcon from '@mui/icons-material/Biotech'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import HourglassEmptyIcon from '@mui/icons-material/HourglassEmpty'
-import WarningAmberIcon from '@mui/icons-material/WarningAmber'
-import PhoneMissedIcon from '@mui/icons-material/PhoneMissed'
-import BiotechIcon from '@mui/icons-material/Biotech'
 import ImageIcon from '@mui/icons-material/Image'
+import PhoneMissedIcon from '@mui/icons-material/PhoneMissed'
+import WarningAmberIcon from '@mui/icons-material/WarningAmber'
+import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Box,
+  Chip,
+  Divider,
+  Stack,
+  Typography,
+} from '@mui/material'
+import React from 'react'
 import { useTranslation } from 'react-i18next'
-import type { Case, CaseCategory, Patient } from '../../api/schemas'
-import type { SortMode } from './sortCases'
+
+import type { Case, CaseCategory, Patient } from '@/api/schemas'
+import { useCategoryDescLabel,useCategoryLabel } from '@/hooks/labels'
+import { useRovingTabIndex } from '@/hooks/useRovingTabIndex'
+
 import CaseListItem from './CaseListItem'
-import { useRovingTabIndex } from '../../hooks/useRovingTabIndex'
+import type { SortMode } from './sortCases'
 
 interface QueueColumnProps {
   readonly category: CaseCategory
@@ -48,7 +51,9 @@ export default function QueueColumn({
   onToggle,
 }: QueueColumnProps) {
   const { t } = useTranslation()
-  const categoryLabel = t(`category.${category}`)
+  const getCategoryLabel = useCategoryLabel()
+  const getCategoryDescLabel = useCategoryDescLabel()
+  const categoryLabel = getCategoryLabel(category)
   const { getItemProps } = useRovingTabIndex(expanded ? cases.length + waitingCases.length : 0)
 
   const warningCount = cases.filter((c) => c.policyWarnings.length > 0).length
@@ -85,10 +90,10 @@ export default function QueueColumn({
         {/* Category title + desc */}
         <Box sx={{ flex: 1 }}>
           <Typography variant="subtitle1" fontWeight={700} component="span">
-            {t(`category.${category}`)}
+            {getCategoryLabel(category)}
           </Typography>
           <Typography variant="caption" color="text.secondary" sx={{ ml: 1 }}>
-            {t(`category.${category}_desc`)}
+            {getCategoryDescLabel(category)}
           </Typography>
         </Box>
 

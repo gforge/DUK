@@ -1,5 +1,12 @@
-import React from 'react'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import NavigateNextIcon from '@mui/icons-material/NavigateNext'
+import PersonIcon from '@mui/icons-material/Person'
+import RouteIcon from '@mui/icons-material/Route'
+import ScienceIcon from '@mui/icons-material/Science'
 import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
   Alert,
   Box,
   Breadcrumbs,
@@ -9,30 +16,22 @@ import {
   Link as MuiLink,
   Paper,
   Stack,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
   Typography,
 } from '@mui/material'
-import PersonIcon from '@mui/icons-material/Person'
-import RouteIcon from '@mui/icons-material/Route'
-import AssignmentIcon from '@mui/icons-material/Assignment'
-import ScienceIcon from '@mui/icons-material/Science'
-import NavigateNextIcon from '@mui/icons-material/NavigateNext'
-import { Link, useParams, useNavigate } from 'react-router-dom'
+import React, { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { format } from 'date-fns'
-import { useApi } from '../hooks/useApi'
-import * as client from '../api/client'
-import StatusChip from '../components/common/StatusChip'
-import PatientJourneyResearchCard from '../components/patients/PatientJourneyResearchCard'
-import { formatPersonnummer } from '../api/utils/personnummer'
+import { Link, useNavigate, useParams } from 'react-router-dom'
+
+import * as client from '@/api/client'
+import { CasesSection, PatientJourneyResearchCard, PatientSummary } from '@/components/patients'
+import { JourneyPanelContent } from '@/components/patients/JourneyPanel'
+import { useJourneyStatusLabel } from '@/hooks/labels'
+import { useApi } from '@/hooks/useApi'
 
 export default function PatientDetail() {
   const { id } = useParams<{ id: string }>()
   const { t } = useTranslation()
+  const getJourneyStatusLabel = useJourneyStatusLabel()
   const navigate = useNavigate()
 
   const { data: patient, loading, error } = useApi(() => client.getPatient(id!), [id])
@@ -42,16 +41,48 @@ export default function PatientDetail() {
     [id],
   )
   const { data: journeyTemplates } = useApi(() => client.getJourneyTemplates(), [])
+  const { data: questionnaireTemplates } = useApi(() => client.getQuestionnaireTemplates(), [])
   const { data: researchModules } = useApi(() => client.getResearchModules(), [])
   const { data: consents, refetch: refetchConsents } = useApi(
     () => client.getResearchConsents(id!),
     [id],
   )
+  const { data: episodes } = useApi(() => client.getEpisodesOfCare(id!), [id])
 
   const handleResearchChanged = () => {
     refetchJourneys()
     refetchConsents()
   }
+
+  const episodeGroups = useMemo(() => {
+    const eps = episodes ?? []
+    const jrns = [...(journeys ?? [])].sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    )
+    const journeysByEpisode: Record<string, typeof jrns> = {}
+    const episodeOrder: string[] = []
+    for (const j of jrns) {
+      if (!journeysByEpisode[j.episodeId]) {
+        journeysByEpisode[j.episodeId] = []
+        episodeOrder.push(j.episodeId)
+      }
+      journeysByEpisode[j.episodeId].push(j)
+    }
+    const groups = episodeOrder.map((epId) => {
+      const phases = [...journeysByEpisode[epId]].sort((a, b) =>
+        a.startDate.localeCompare(b.startDate),
+      )
+      return { episode: eps.find((e) => e.id === epId), phases }
+    })
+    return groups.sort((a, b) => {
+      const aHasActive = a.phases.some((j) => j.status === 'ACTIVE' || j.status === 'SUSPENDED')
+      const bHasActive = b.phases.some((j) => j.status === 'ACTIVE' || j.status === 'SUSPENDED')
+      if (aHasActive !== bHasActive) return aHasActive ? -1 : 1
+      const aLatest = a.phases[a.phases.length - 1]?.startDate ?? ''
+      const bLatest = b.phases[b.phases.length - 1]?.startDate ?? ''
+      return bLatest.localeCompare(aLatest)
+    })
+  }, [journeys, episodes])
 
   if (loading) {
     return (
@@ -112,128 +143,12 @@ export default function PatientDetail() {
       </Breadcrumbs>
 
       {/* Patient summary */}
-      <Paper variant="outlined" sx={{ p: 2.5, borderRadius: 2, mb: 3 }}>
-        <Stack direction="row" alignItems="center" gap={1.5} mb={1}>
-          <PersonIcon color="primary" />
-          <Typography variant="h5" fontWeight={700}>
-            {patient.displayName}
-          </Typography>
-        </Stack>
-        <Stack direction="row" gap={4} flexWrap="wrap">
-          <Box>
-            <Typography variant="caption" color="text.secondary">
-              {t('patients.personalNumber')}
-            </Typography>
-            <Typography variant="body2" fontWeight={500}>
-              {formatPersonnummer(patient.personalNumber)}
-            </Typography>
-          </Box>
-          <Box>
-            <Typography variant="caption" color="text.secondary">
-              {t('patients.dateOfBirth')}
-            </Typography>
-            <Typography variant="body2" fontWeight={500}>
-              {patient.dateOfBirth}
-            </Typography>
-          </Box>
-          {patient.lastOpenedAt && (
-            <Box>
-              <Typography variant="caption" color="text.secondary">
-                {t('patient.lastOpened')}
-              </Typography>
-              <Typography variant="body2" fontWeight={500}>
-                {format(new Date(patient.lastOpenedAt), 'dd MMM yyyy HH:mm')}
-              </Typography>
-            </Box>
-          )}
-          <Box>
-            <Typography variant="caption" color="text.secondary">
-              {t('patientDetail.registered')}
-            </Typography>
-            <Typography variant="body2" fontWeight={500}>
-              {format(new Date(patient.createdAt), 'dd MMM yyyy')}
-            </Typography>
-          </Box>
-        </Stack>
-      </Paper>
+      <PatientSummary patient={patient} />
 
       {/* Cases */}
-      <Paper variant="outlined" sx={{ p: 2.5, borderRadius: 2, mb: 3 }}>
-        <Stack direction="row" alignItems="center" gap={1} mb={1.5}>
-          <AssignmentIcon color="primary" fontSize="small" />
-          <Typography variant="subtitle1" fontWeight={600}>
-            {t('patientDetail.cases')}
-          </Typography>
-          <Chip label={sortedCases.length} size="small" variant="outlined" />
-        </Stack>
+      <CasesSection cases={sortedCases} onRowClick={(caseId) => navigate(`/cases/${caseId}`)} />
 
-        {sortedCases.length === 0 ? (
-          <Typography variant="body2" color="text.secondary">
-            {t('patientDetail.noCases')}
-          </Typography>
-        ) : (
-          <Table size="small">
-            <TableHead>
-              <TableRow>
-                <TableCell>{t('case.status')}</TableCell>
-                <TableCell>{t('case.category')}</TableCell>
-                <TableCell>{t('patientDetail.triggers')}</TableCell>
-                <TableCell>{t('patientDetail.created')}</TableCell>
-                <TableCell>{t('patientDetail.lastActivity')}</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {sortedCases.map((c) => (
-                <TableRow
-                  key={c.id}
-                  hover
-                  sx={{ cursor: 'pointer' }}
-                  onClick={() => navigate(`/cases/${c.id}`)}
-                >
-                  <TableCell>
-                    <StatusChip status={c.status} />
-                  </TableCell>
-                  <TableCell>
-                    <Chip label={t(`category.${c.category}`)} size="small" variant="outlined" />
-                  </TableCell>
-                  <TableCell>
-                    {c.triggers.length > 0 ? (
-                      <Stack direction="row" gap={0.5} flexWrap="wrap">
-                        {c.triggers.map((tr) => (
-                          <Chip
-                            key={tr}
-                            label={t(`trigger.${tr}`)}
-                            size="small"
-                            color="error"
-                            variant="outlined"
-                            sx={{ height: 20, fontSize: 10 }}
-                          />
-                        ))}
-                      </Stack>
-                    ) : (
-                      <Typography variant="caption" color="text.secondary">
-                        —
-                      </Typography>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="caption">
-                      {format(new Date(c.createdAt), 'dd MMM yyyy')}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="caption">
-                      {format(new Date(c.lastActivityAt), 'dd MMM yyyy HH:mm')}
-                    </Typography>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        )}
-      </Paper>
-
-      {/* Journeys */}
+      {/* Journeys — grouped by episode */}
       <Paper variant="outlined" sx={{ p: 2.5, borderRadius: 2, mb: 3 }}>
         <Stack direction="row" alignItems="center" gap={1} mb={1.5}>
           <RouteIcon color="primary" fontSize="small" />
@@ -248,41 +163,114 @@ export default function PatientDetail() {
             {t('patientDetail.noJourneys')}
           </Typography>
         ) : (
-          <Table size="small">
-            <TableHead>
-              <TableRow>
-                <TableCell>{t('patientDetail.journeyTemplate')}</TableCell>
-                <TableCell>{t('case.status')}</TableCell>
-                <TableCell>{t('patientDetail.startDate')}</TableCell>
-                <TableCell>{t('patientDetail.created')}</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {sortedJourneys.map((j) => (
-                <TableRow key={j.id}>
-                  <TableCell>
-                    <Typography variant="body2" fontWeight={500}>
-                      {templateName(j.journeyTemplateId)}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Chip
-                      label={t(`journey.journeyStatus.${j.status}`)}
-                      size="small"
-                      color={journeyStatusColor(j.status)}
-                      variant="outlined"
-                    />
-                  </TableCell>
-                  <TableCell>{j.startDate}</TableCell>
-                  <TableCell>
-                    <Typography variant="caption">
-                      {format(new Date(j.createdAt), 'dd MMM yyyy')}
-                    </Typography>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+          <Stack gap={1}>
+            {episodeGroups.map(({ episode, phases }) => {
+              const hasActivePhase = phases.some(
+                (j) => j.status === 'ACTIVE' || j.status === 'SUSPENDED',
+              )
+              const episodeLabel = episode?.label || t('patientDetail.episode')
+              return (
+                <Accordion
+                  key={episode?.id ?? phases[0]?.episodeId}
+                  variant="outlined"
+                  defaultExpanded={hasActivePhase}
+                  sx={{ borderRadius: '8px !important' }}
+                >
+                  <AccordionSummary expandIcon={<ExpandMoreIcon fontSize="small" />}>
+                    <Stack direction="row" alignItems="center" gap={1} sx={{ flex: 1, pr: 1 }}>
+                      <Typography variant="body2" fontWeight={600}>
+                        {episodeLabel}
+                      </Typography>
+                      <Chip
+                        label={t('patientDetail.phases', { count: phases.length })}
+                        size="small"
+                        variant="outlined"
+                      />
+                    </Stack>
+                  </AccordionSummary>
+                  <AccordionDetails sx={{ p: 1, pt: 0 }}>
+                    <Stack gap={1.5}>
+                      {phases.map((j) => {
+                        const isActive = j.status === 'ACTIVE' || j.status === 'SUSPENDED'
+                        // Active phases and single-phase episodes: render directly
+                        if (isActive || phases.length === 1) {
+                          return (
+                            <Box key={j.id} sx={{ pt: 1 }}>
+                              {phases.length > 1 && (
+                                <Stack direction="row" alignItems="center" gap={1} mb={1}>
+                                  <Typography variant="body2" fontWeight={600}>
+                                    {templateName(j.journeyTemplateId)}
+                                  </Typography>
+                                  <Chip
+                                    label={getJourneyStatusLabel(j.status)}
+                                    size="small"
+                                    color={journeyStatusColor(j.status)}
+                                    variant="outlined"
+                                    sx={{ height: 20, fontSize: 11 }}
+                                  />
+                                  <Typography variant="caption" color="text.secondary">
+                                    {j.startDate}
+                                  </Typography>
+                                </Stack>
+                              )}
+                              <JourneyPanelContent
+                                journey={j}
+                                journeyTemplates={journeyTemplates ?? []}
+                                questionnaireTemplates={questionnaireTemplates ?? []}
+                                onJourneyChanged={refetchJourneys}
+                              />
+                            </Box>
+                          )
+                        }
+                        // Completed phase in multi-phase episode: inner collapsed accordion
+                        return (
+                          <Accordion
+                            key={j.id}
+                            variant="outlined"
+                            defaultExpanded={false}
+                            sx={{ borderRadius: '6px !important', '&:before': { display: 'none' } }}
+                          >
+                            <AccordionSummary expandIcon={<ExpandMoreIcon fontSize="small" />}>
+                              <Stack
+                                direction="row"
+                                alignItems="center"
+                                gap={1}
+                                sx={{ flex: 1, pr: 1 }}
+                              >
+                                <Typography variant="body2">
+                                  {templateName(j.journeyTemplateId)}
+                                </Typography>
+                                <Chip
+                                  label={getJourneyStatusLabel(j.status)}
+                                  size="small"
+                                  variant="outlined"
+                                />
+                                <Typography
+                                  variant="caption"
+                                  color="text.secondary"
+                                  sx={{ ml: 'auto' }}
+                                >
+                                  {j.startDate}
+                                </Typography>
+                              </Stack>
+                            </AccordionSummary>
+                            <AccordionDetails>
+                              <JourneyPanelContent
+                                journey={j}
+                                journeyTemplates={journeyTemplates ?? []}
+                                questionnaireTemplates={questionnaireTemplates ?? []}
+                                onJourneyChanged={refetchJourneys}
+                              />
+                            </AccordionDetails>
+                          </Accordion>
+                        )
+                      })}
+                    </Stack>
+                  </AccordionDetails>
+                </Accordion>
+              )
+            })}
+          </Stack>
         )}
       </Paper>
 
@@ -303,7 +291,7 @@ export default function PatientDetail() {
                     {templateName(j.journeyTemplateId)}
                   </Typography>
                   <Chip
-                    label={t(`journey.journeyStatus.${j.status}`)}
+                    label={getJourneyStatusLabel(j.status)}
                     size="small"
                     color={journeyStatusColor(j.status)}
                     variant="outlined"

@@ -1,108 +1,100 @@
-**Patient Journey — Concurrency, Entries and Effective Steps**
+**Patient Journey — Lifecycle, Scheduling, And Parallelism**
+
+This document explains how journey logic drives due steps, scheduling behavior, and clinician/patient views.
+
+Start with `../design.md` for architecture context, then use this deep dive for implementation details.
+
+## Concept
+
+A `PatientJourney` is a follow-up programme anchored to `startDate`.
+
+- A patient may have multiple journeys in parallel.
+- Each journey references a `JourneyTemplate` with ordered entries.
+- Effective timeline output is computed (not stored) by resolver logic.
+
+## Lifecycle And State
 
 ![Patient Journey Lifecycle](../diagrams/patient-journey-lifecycle.svg)
 
-![Dashboard Journey Computation](../diagrams/dashboard-journey-computation.svg)
+What this diagram shows:
 
-Concept
+- Assignment starts at `ACTIVE` with `pausedAt = null` and `totalPausedDays = 0`.
+- Pause/resume transitions are explicit and guarded.
+- Template switching can reset `startDate` with audit context.
 
-- A `PatientJourney` represents a configured series of follow-ups for a patient anchored at `startDate`.
-- A patient can have many `PatientJourney` records simultaneously (e.g., overlapping studies, long-term vs short-term care plans).
-- The `startDate` can be any clinically relevant anchor: registration date, surgery date, injury date, etc. It is set at journey assignment and can be reset via `SWITCH_TEMPLATE` with `newStartDate`.
+## Effective Step Computation
 
-Journey entries
+![Dashboard Due-Step Computation](../diagrams/dashboard-journey-computation.svg)
 
-- Each `JourneyTemplateEntry` defines:
-  - `offsetDays`: days from journey `startDate` when the entry becomes active
-  - `windowDays`: the allowed window for the follow-up
-  - `scoreAliases`: a map of alias names to score paths used by policies and templates
+What this diagram shows:
 
-![Score Aliasing](../diagrams/score-aliasing.svg)
+- Resolver pipeline: apply modifications, pause shift, research overlays, instruction hydration, due-step filtering.
 
-- `scoreAliasLabels`: human-readable labels for aliased scores
-- `dashboardCategory`: which queue the step maps to (Acute/Subacute/Control)
-- `templateId`: optional questionnaire template; omitted for instruction-only steps
-- `instructionText`: optional inline instruction content
-- `instructionTemplateId`: optional FK to `InstructionTemplate`; if present, overrides `instructionText`
+Key methods:
 
-Instruction hydration
+- `getEffectiveSteps(journeyId)`
+- `getMergedDueStepsForPatient(patientId, date)`
 
-- `getEffectiveSteps` hydrates a `resolvedInstruction` string for each step:
-  1. If `instructionTemplateId` is set and a matching `InstructionTemplate` exists, use its `content`.
-  2. Else if `instructionText` is set, use it directly.
-  3. Otherwise, `resolvedInstruction` is `undefined`.
-- The `JourneyTimeline` component renders resolved instructions as collapsible panels per step.
+## Parallel Journeys In Views
 
-Template inheritance (copy-on-derive)
+![Multiple Journeys Tab Rendering](../diagrams/journey-tabs-rendering.svg)
 
-- `deriveJourneyTemplate(parentId, newName)` creates a full deep copy of the parent with:
-  - `parentTemplateId` set to the parent's id
-  - `derivedAt` set to the current timestamp
-  - All entries get new UUIDs (no shared references)
-- `computeParentDiff(childId)` compares the child's entries against its parent using `offsetDays + order` as the stable matching key, returning `EntryDiff[]` with types: `ADDED`, `REMOVED`, `CHANGED`.
-- `applyParentDiff(childId, entryIds[])` selectively applies diffs to the child and updates `derivedAt`.
-- The Journey Editor UI exposes a "Derive" button (creates child) and a "Sync from Parent" button (shows diff checklist and applies selected changes).
+What this diagram shows:
 
-Journey switching (SWITCH_TEMPLATE)
+- `JourneyTab` (clinician) and `PatientCareplan` (patient) both render all journeys as tabs.
+- Sorting order is deterministic (`ACTIVE`, `SUSPENDED`, `COMPLETED`; newest-first inside groups).
 
-- `modifyPatientJourney` with `type: SWITCH_TEMPLATE` changes `journeyTemplateId` to `newTemplateId` and records the `previousTemplateId` in the modification.
-- When `newStartDate` is provided, the journey's `startDate` is also updated. The modification records both `previousStartDate` and `newStartDate` so the change is auditable.
-- All effective steps recalculate relative to the new start date after switching.
+## Deduplication Across Journeys
 
-Effective step computation
+![Parallel Journey Deduplication](../diagrams/journey-deduplication-flow.svg)
 
-- `getEffectiveSteps` (see `src/api/service/journeyResolver.ts`) applies modifications, overlays research modules, hydrates instructions, and returns a list of effective follow-ups for display.
-- The dashboard uses `getEffectiveSteps` and maps follow-ups to Case rows; Cases are then assigned categories and suggested `nextStep`.
+What this diagram shows:
 
-Selection rule (current behavior)
+- Due steps are deduplicated by `templateEntryId` when journeys overlap.
 
-- The UI renders **all journeys** for a patient in MUI `Tabs` sorted ACTIVE → SUSPENDED → COMPLETED (newest first within each group). The old "latest ACTIVE" single-journey selection is retained only for legacy compatibility.
-- For the dashboard worklist, `getMergedDueStepsForPatient(patientId, date)` is used instead of per-journey selection — see “Parallel journeys & form deduplication” below.
+Clinical effect:
 
-Journey pause & resume
+- A questionnaire appears once, even if scheduled by more than one active programme.
 
-- `pauseJourney(journeyId)` (service layer) guards `status === 'ACTIVE'`, sets `status: 'SUSPENDED'` and `pausedAt: now()`. **No step dates are written to the store.**
-- `resumeJourney(journeyId)` guards `status === 'SUSPENDED'`, computes `elapsedDays = Math.floor((Date.now() − new Date(pausedAt).getTime()) / 86_400_000)`, adds to `totalPausedDays`, clears `pausedAt: null`, sets `status: 'ACTIVE'`.
-- `getEffectiveSteps` computes a dynamic shift: `currentPauseDays = status === 'SUSPENDED' && pausedAt ? Math.floor((Date.now() − new Date(pausedAt).getTime()) / 86_400_000) : 0`. The total shift `totalPauseShift = totalPausedDays + currentPauseDays` is added to every step’s scheduled date and recurring step offsets.
-- While a journey is suspended the `JourneyTab` shows a paused-days banner and a resume button. All dates in the timeline appear shifted forward, giving clinicians an accurate preview of resumed dates.
+## Pause And Resume Semantics
 
-![Pause Resume Sequence](../diagrams/pause-resume-sequence.svg)
+![Journey Pause Resume Sequence](../diagrams/pause-resume-sequence.svg)
 
-Parallel journeys & form deduplication
+What this diagram shows:
 
-- `getMergedDueStepsForPatient(patientId, date)` in `src/api/service/journeyResolver.ts` collects all due steps from every ACTIVE journey for the patient, then deduplicates by `templateEntryId`.
-- Deduplication is by `templateEntryId` (not by step date): if two parallel journeys both schedule the same questionnaire in an overlapping window only one step is included in the merged result — the questionnaire is never shown twice on the dashboard.
-- `JourneyTab` (CaseDetail view) and `PatientCareplan` (patient self-view) render all journeys as MUI `Tabs`. Within each tab, `getEffectiveSteps` is called for that specific journey.
+- `pauseJourney`: store `pausedAt`, move to `SUSPENDED`.
+- `resumeJourney`: add elapsed days to `totalPausedDays`, clear `pausedAt`, return to `ACTIVE`.
+- Dynamic date shift while suspended happens in resolver, without rewriting all step dates.
 
-![Multi Journey Tabs](../diagrams/multi-journey-tabs.svg)
+## Journey Modifications
 
-Patient journey status transitions
+![Journey Modifications](../diagrams/journey-modifications-sequence.svg)
 
-- `pauseJourney(journeyId)` and `resumeJourney(journeyId)` replace the former `updatePatientJourneyStatus` freeze/unfreeze approach with explicit, pause-aware service functions.
-- `assignPatientJourney` always initialises `pausedAt: null, totalPausedDays: 0`.
+Supported operations:
 
-Scheduling & cases
+- `ADD_STEP`
+- `REMOVE_STEP`
+- `SWITCH_TEMPLATE` (optionally with date reset)
 
-- Cases may be created from a scheduled follow-up (entry) or from patient-initiated contacts; the mapping is performed when the FormResponse is saved and service logic assigns/creates a `Case` where appropriate.
-- There is no automatic background job advancing entries; scheduled follow-ups become visible in the dashboard based on computed dates.
+All operations append to `PatientJourney.modifications[]` with reason text for auditability.
 
-Journey cancellation
+## Form Submission Coupling
 
-- `cancelJourney(journeyId, reason, userId)` is the single entry point for removing a journey. Behaviour depends on whether the journey has recorded data:
-  - **No data** (no `FormResponse.patientJourneyId === journeyId` and `recurringCompletions.length === 0`): the journey record is deleted entirely from `AppState.patientJourneys`. The operation is permanent.
-  - **Has data**: status is set to `COMPLETED`, `pausedAt` is cleared, and a `CANCEL` modification is appended with the clinician-supplied reason. The record is preserved as an audit trail and remains visible in history tabs under the `COMPLETED` group.
-- `CANCEL` is a `JourneyModificationType` (alongside `ADD_STEP`, `REMOVE_STEP`, `SWITCH_TEMPLATE`). It carries no step-specific payload — only `reason` and `addedByUserId`.
-- Form responses and recurring completions are **never deleted** regardless of outcome.
-- The `JourneyHeader` shows an "Avbryt resa" button for `ACTIVE` and `SUSPENDED` journeys. `CancelJourneyDialog` enforces a minimum-length reason and shows a severity-appropriate alert (`error` for delete, `warning` for archive).
-- `JourneyModHistory` renders `CANCEL` entries with a red `CancelIcon`.
+![Form Submission Flow](../diagrams/form-submission-flow.svg)
 
-Patient registration flow
+What this diagram shows:
 
-- The `/patients` page lists all patients in a searchable, paginated table. A **"Visa patient"** button per row navigates to `/patients/:id`. The quick-assign journey button has been removed; journey management is done from the patient detail page instead.
-- A registration wizard (3-step: patient details → journey assignment → confirm) is available for creating new patients.
-- `createPatient` creates the patient record; `assignPatientJourney` links them to a journey template with the selected start date.
+- Form submission updates journey context and may update case/policy/audit outputs.
 
-Patient care plan view
+## Cancellation Rules
 
-- The patient view (`/patient` role=PATIENT) shows a "My Care Plan" section with MUI `Tabs` for all journeys (ACTIVE → SUSPENDED → COMPLETED), each rendering a read-only `JourneyTimeline` for that journey.
-- Resolved instructions are visible and expandable within each journey tab.
+- Delete journey only when no recorded journey data exists.
+- Otherwise archive as `COMPLETED` and append a `CANCEL` modification.
+- Never delete form responses as part of cancellation.
+
+## Key Code References
+
+- `../../src/api/service/patientJourneys.ts`
+- `../../src/api/service/journeyResolver.ts`
+- `../../src/components/case/JourneyTab/index.tsx`
+- `../../src/components/patientView/PatientCareplan/main.tsx`
