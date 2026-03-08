@@ -1,5 +1,5 @@
-import type { Patient,User } from '../schemas'
-import { daysAgo,iso } from './shared'
+import type { Patient, User } from '../schemas'
+import { daysAgo, iso } from './shared'
 
 export const users: User[] = [
   { id: 'user-pal-1', name: 'Dr. Sara Lindqvist (PAL)', role: 'PAL' },
@@ -135,5 +135,25 @@ export const patients: Patient[] = [
     palId: 'user-doc-1',
     lastOpenedAt: iso(daysAgo(3)),
     createdAt: iso(daysAgo(52)),
+  },
+  // ── Knee OA patient (3-phase journey) ────────────────────────────────────
+  {
+    id: 'p-15',
+    displayName: 'Karin Karlberg',
+    personalNumber: '195904241234',
+    dateOfBirth: '1959-04-24',
+    palId: 'user-pal-1',
+    lastOpenedAt: iso(daysAgo(2)),
+    createdAt: iso(daysAgo(120)),
+  },
+  // ── Late-join demo patient (fracture 4 weeks ago, registered today) ───────
+  {
+    id: 'p-16',
+    displayName: 'Lars Larsson',
+    personalNumber: '197003151234',
+    dateOfBirth: '1970-03-15',
+    palId: 'user-doc-1',
+    lastOpenedAt: iso(daysAgo(0)),
+    createdAt: iso(daysAgo(0)),
   },
 ]

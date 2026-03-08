@@ -1,10 +1,13 @@
-import type { Case,FormResponse } from '../schemas'
+import type { Case, FormResponse } from '../schemas'
 import * as service from '../service'
 import type { JourneyStepContext } from '../service/forms'
 import { withDelay } from './delay'
 
 export const getFormResponses = (caseId: string): Promise<FormResponse[]> =>
   withDelay(() => service.getFormResponses(caseId))
+
+export const getFormResponsesByJourney = (journeyId: string): Promise<FormResponse[]> =>
+  withDelay(() => service.getFormResponsesByJourney(journeyId))
 
 export const submitFormResponse = (
   patientId: string,

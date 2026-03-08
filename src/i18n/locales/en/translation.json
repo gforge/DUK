@@ -63,6 +63,7 @@
     "edit": "Edit",
     "error": "An error occurred",
     "errorGeneric": "An error occurred. Please try again.",
+    "errorUnknown": "__NOT_TRANSLATED__",
     "language": "Language",
     "mainNavigation": "Main navigation",
     "next": "Next",
@@ -154,6 +155,14 @@
     "title": "Demo Tools",
     "warning": "Note! These tools modify the app's internal state and are intended for demonstration purposes."
   },
+  "episode": {
+    "openedAt": "Opened",
+    "status": {
+      "COMPLETED": "Completed",
+      "DISCHARGED": "Discharged",
+      "OPEN": "Open"
+    }
+  },
   "eq": {
     "level_1": "No problems",
     "level_2": "Some problems",
@@ -238,10 +247,7 @@
       "addAlias": "Add alias",
       "aliasHelp": "A score alias links a calculated form value to a unique name for this time point. For example \"PNRS_2\" (the second pain question) → \"PNRS_week4\", so that a policy rule can compare pain at week 4 with the baseline — regardless of which form was used.",
       "dashboardCategory": "Dashboard category",
-      "instruction": "Instruction",
-      "instructionFreetext": "Free text",
       "instructionFromTemplate": "From template",
-      "instructionNone": "None",
       "label": "Step label",
       "noAliases": "No score aliases defined.",
       "noForm": "— No form (instruction-only step) —",
@@ -257,9 +263,33 @@
       "windowDays": "Time window (±days)"
     },
     "followUpSection": "Follow-up steps",
+    "hideUnrealizedSteps": "Hide unrealized steps",
+    "icon": "Icon",
     "instructionFallback": "Instruction",
+    "instructionModify": {
+      "addAction": "Add instruction",
+      "addConfirm": "Add",
+      "addTab": "Add",
+      "addTitle": "Add instruction",
+      "cancelConfirm": "Cancel instruction",
+      "cancelTab": "Cancel",
+      "cancelWarning": "The instruction \"{{name}}\" will be permanently cancelled. This action cannot be undone.",
+      "endOffset": "End offset (days, optional)",
+      "endOffsetHelp": "Leave blank if the instruction is ongoing.",
+      "invalidOffset": "Invalid number of days.",
+      "modifyTitle": "Modify instruction — {{name}}",
+      "offsetHelp": "Days from the journey reference date.",
+      "rescheduleConfirm": "Reschedule",
+      "rescheduleHint": "Enter new day offsets from the journey start date.",
+      "rescheduleTab": "Reschedule",
+      "startOffset": "Start offset (days)",
+      "templateLabel": "Instruction template",
+      "templateRequired": "Please select an instruction template."
+    },
     "instructionRange": "{{start}} - {{end}}",
     "instructionsSection": "Active instructions",
+    "joinedAt": "Enrollment date",
+    "joinedAtHelp": "Leave blank if the patient is enrolled today. Fill in if the patient's actual start date was earlier — e.g. fracture 4 weeks ago.",
     "journeyStatus": {
       "ACTIVE": "Active",
       "COMPLETED": "Completed",
@@ -273,7 +303,6 @@
       "addStep": "Add Step",
       "confirm": "Apply",
       "currentTemplate": "Current template",
-      "dateReset": "Start date changed: {{from}} → {{to}}",
       "newStartDate": "New start date",
       "newStartDateHint": "e.g. surgery date — all steps will be recalculated relative to this date.",
       "newTemplate": "New template",
@@ -290,7 +319,6 @@
       "select": "Select",
       "stepLabel": "Step label",
       "stepLabelPlaceholder": "e.g. Day 20 extra check",
-      "switchTemplate": "Switch Template",
       "title": "Modify Journey",
       "windowDays": "Window (±days)"
     },
@@ -299,6 +327,16 @@
       "CANCEL": "Cancelled",
       "REMOVE_STEP": "Step removed",
       "SWITCH_TEMPLATE": "Template switched"
+    },
+    "nextPhase": {
+      "confirm": "Start phase",
+      "note": "Clinical note (optional)",
+      "phaseType": "Phase type",
+      "startDate": "Start date (clinical anchor date)",
+      "success": "New phase started",
+      "template": "Template for new phase",
+      "title": "Start Next Phase",
+      "triggerType": "What triggered this transition?"
     },
     "noActiveJourney": "No active journey assigned to this patient.",
     "noInstructions": "No instructions in this journey.",
@@ -326,6 +364,15 @@
     "pausedBannerToday": "Journey paused today",
     "pausedDaysShort": "+{{days}}d paused",
     "pauseSuccess": "Journey paused",
+    "phaseType": {
+      "DISCHARGE": "__NOT_TRANSLATED__",
+      "FOLLOWUP": "__NOT_TRANSLATED__",
+      "INTAKE": "__NOT_TRANSLATED__",
+      "MONITORING": "__NOT_TRANSLATED__",
+      "POST_OP": "__NOT_TRANSLATED__",
+      "REFERRAL": "__NOT_TRANSLATED__",
+      "WAITING_LIST": "__NOT_TRANSLATED__"
+    },
     "qTemplate": {
       "addQuestion": "Add question",
       "addScoringRule": "Add scoring rule",
@@ -398,7 +445,10 @@
     "scheduledDate": "Scheduled",
     "scoreAliases": "Score aliases",
     "scoreAliasesHint": "Maps raw score keys to semantic names used in policy expressions across journeys",
+    "showUnrealizedSteps_one": "Show {{count}} unrealized step",
+    "showUnrealizedSteps_other": "Show {{count}} unrealized steps",
     "startDate": "Start date",
+    "startNextPhase": "Start Next Phase",
     "status": {
       "OVERDUE": "Overdue",
       "SUBMITTED": "Submitted",
@@ -415,6 +465,16 @@
       "recurrenceUnit_other": "days",
       "referenceDateLabel": "Reference date label",
       "referenceDateLabelHint": "Shown in the registration dialog instead of the generic “Reference date”. E.g. Surgery date, Injury date."
+    },
+    "transitionTrigger": {
+      "MANUAL": "__NOT_TRANSLATED__",
+      "MILESTONE": "__NOT_TRANSLATED__",
+      "PHYSIO_COMPLETED": "__NOT_TRANSLATED__",
+      "REFERRAL_RECEIVED": "__NOT_TRANSLATED__",
+      "SURGERY_COMPLETED": "__NOT_TRANSLATED__",
+      "SURGERY_SCHEDULED": "__NOT_TRANSLATED__",
+      "TRIAGE_DECISION": "__NOT_TRANSLATED__",
+      "VISIT_DECISION": "__NOT_TRANSLATED__"
     },
     "type": "Type",
     "window": "Window"
@@ -508,14 +568,15 @@
   "patientDetail": {
     "cases": "Cases",
     "created": "Created",
+    "episode": "Episode",
     "journeys": "Journeys",
-    "journeyTemplate": "Journey Template",
     "lastActivity": "Last Activity",
     "noCases": "No cases for this patient.",
     "noJourneys": "No journeys assigned.",
     "notFound": "Patient not found.",
+    "phases_one": "{{count}} phase",
+    "phases_other": "{{count}} phases",
     "registered": "Registered",
-    "startDate": "Start Date",
     "triggers": "Triggers"
   },
   "patients": {

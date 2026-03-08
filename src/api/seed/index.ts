@@ -3,6 +3,7 @@ import { CURRENT_SCHEMA_VERSION } from '../schemaVersion'
 import { ensureAllUsers } from '../utils/userGenerator'
 import { auditEvents } from './auditEvents'
 import { cases } from './cases'
+import { episodesOfCare } from './episodesOfCare'
 import { formResponses } from './formResponses'
 import { formSeries } from './formSeries'
 import { instructionTemplates } from './instructionTemplates'
@@ -33,6 +34,7 @@ const baseSeedState: AppState = {
   journalTemplates,
   journeyTemplates,
   researchModules,
+  episodesOfCare,
   patientJourneys,
   instructions: [],
   instructionTemplates,

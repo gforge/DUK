@@ -65,6 +65,7 @@ interface Resources {
       "edit": "Redigera",
       "error": "Fel uppstod",
       "errorGeneric": "Ett fel uppstod",
+      "errorUnknown": "An error occurred",
       "language": "Språk",
       "mainNavigation": "Huvudnavigering",
       "next": "Nästa",
@@ -156,6 +157,14 @@ interface Resources {
       "title": "Demo-verktyg",
       "warning": "Obs! Dessa verktyg ändrar appens interna tillstånd och är avsedda för demonstration."
     },
+    "episode": {
+      "openedAt": "Öppnad",
+      "status": {
+        "COMPLETED": "Avslutad",
+        "DISCHARGED": "Utskriven",
+        "OPEN": "Öppen"
+      }
+    },
     "eq": {
       "level_1": "Inga problem",
       "level_2": "Vissa problem",
@@ -240,10 +249,7 @@ interface Resources {
         "addAlias": "Lägg till alias",
         "aliasHelp": "Poängalias kopplar ett beräknat formulärvärde till ett unikt namn för just den här tidpunkten. Exempelvis mappas \"PNRS_2\" (den andra smärtfrågan i formuläret) → \"PNRS_vecka4\", så att en policyregel kan jämföra smärta vid vecka 4 med baseline-värdet — oavsett vilket formulär som användes.",
         "dashboardCategory": "Instrumentpanelskategori",
-        "instruction": "Instruktion",
-        "instructionFreetext": "Fritext",
         "instructionFromTemplate": "Från mall",
-        "instructionNone": "Ingen",
         "label": "Stegetikett",
         "noAliases": "Inga poängalias definierade.",
         "noForm": "— Inget formulär (instruktionssteg) —",
@@ -259,9 +265,33 @@ interface Resources {
         "windowDays": "Tidsfönster (±dagar)"
       },
       "followUpSection": "Uppföljningssteg",
+      "hideUnrealizedSteps": "Dölj ej genomförda steg",
+      "icon": "Ikon",
       "instructionFallback": "Instruktion",
+      "instructionModify": {
+        "addAction": "Lägg till instruktion",
+        "addConfirm": "Lägg till",
+        "addTab": "Lägg till",
+        "addTitle": "Lägg till instruktion",
+        "cancelConfirm": "Avboka instruktion",
+        "cancelTab": "Avboka",
+        "cancelWarning": "Instruktionen \"{{name}}\" avbokas permanent. Åtgärden kan inte ångras.",
+        "endOffset": "Slutförskjutning (dagar, valfri)",
+        "endOffsetHelp": "Lämna tomt om instruktionen är löpande.",
+        "invalidOffset": "Ogiltigt antal dagar.",
+        "modifyTitle": "Ändra instruktion — {{name}}",
+        "offsetHelp": "Dagar från resans referensdatum.",
+        "rescheduleConfirm": "Boka om",
+        "rescheduleHint": "Ange nya dagförskjutningar från resans startdatum.",
+        "rescheduleTab": "Boka om",
+        "startOffset": "Startförskjutning (dagar)",
+        "templateLabel": "Instruktionsmall",
+        "templateRequired": "Välj en instruktionsmall."
+      },
       "instructionRange": "{{start}} - {{end}}",
       "instructionsSection": "Aktiva instruktioner",
+      "joinedAt": "Inskrivningsdatum",
+      "joinedAtHelp": "Lämna tomt om patienten inskrivs idag. Fyll i om patienten faktiskt har haft sin startdag tidigare — t.ex. fraktur för 4 veckor sedan.",
       "journeyStatus": {
         "ACTIVE": "Aktiv",
         "COMPLETED": "Avslutad",
@@ -281,7 +311,6 @@ interface Resources {
         "addStep": "Lägg till steg",
         "confirm": "Tillämpa",
         "currentTemplate": "Aktuell mall",
-        "dateReset": "Startdatum ändrat: {{from}} → {{to}}",
         "newStartDate": "Nytt startdatum",
         "newStartDateHint": "T.ex. operationsdatum — alla steg beräknas om relativt detta datum.",
         "newTemplate": "Ny mall",
@@ -298,9 +327,18 @@ interface Resources {
         "select": "Välj",
         "stepLabel": "Stegetikett",
         "stepLabelPlaceholder": "T.ex. Dag 20 extra kontroll",
-        "switchTemplate": "Byt mall",
         "title": "Justera patientresa",
         "windowDays": "Fönster (±dagar)"
+      },
+      "nextPhase": {
+        "confirm": "Starta fas",
+        "note": "Klinisk anteckning (valfri)",
+        "phaseType": "Typ av fas",
+        "startDate": "Startdatum (kliniskt ankardatum)",
+        "success": "Ny fas startad",
+        "template": "Mall för ny fas",
+        "title": "Starta nästa fas",
+        "triggerType": "Vad utlöste övergången?"
       },
       "noActiveJourney": "Ingen aktiv patientresa tilldelad.",
       "noInstructions": "Inga instruktioner i den här resan.",
@@ -328,6 +366,15 @@ interface Resources {
       "pausedBanner_one": "Resa pausad sedan {{days}} dag",
       "pausedBanner_other": "Resa pausad sedan {{days}} dagar",
       "pausedDaysShort": "+{{days}}d pausad",
+      "phaseType": {
+        "DISCHARGE": "__NOT_TRANSLATED__",
+        "FOLLOWUP": "__NOT_TRANSLATED__",
+        "INTAKE": "__NOT_TRANSLATED__",
+        "MONITORING": "__NOT_TRANSLATED__",
+        "POST_OP": "__NOT_TRANSLATED__",
+        "REFERRAL": "__NOT_TRANSLATED__",
+        "WAITING_LIST": "__NOT_TRANSLATED__"
+      },
       "qTemplate": {
         "addQuestion": "Lägg till fråga",
         "addScoringRule": "Lägg till poängregel",
@@ -400,7 +447,10 @@ interface Resources {
       "scheduledDate": "Schemalagd",
       "scoreAliases": "Poängalias",
       "scoreAliasesHint": "Mappar råa poängnycklar till semantiska namn för policyuttryck",
+      "showUnrealizedSteps_one": "Visa {{count}} ej genomfört steg",
+      "showUnrealizedSteps_other": "Visa {{count}} ej genomförda steg",
       "startDate": "Startdatum",
+      "startNextPhase": "Starta nästa fas",
       "status": {
         "OVERDUE": "Försenad",
         "SUBMITTED": "Skickat",
@@ -417,6 +467,16 @@ interface Resources {
         "recurrenceUnit_other": "dagar",
         "referenceDateLabel": "Referensdatumets namn",
         "referenceDateLabelHint": "Visas i registreringsdialogen istället för „Referensdatum“. T.ex. Operationsdatum, Skadedatum."
+      },
+      "transitionTrigger": {
+        "MANUAL": "__NOT_TRANSLATED__",
+        "MILESTONE": "__NOT_TRANSLATED__",
+        "PHYSIO_COMPLETED": "__NOT_TRANSLATED__",
+        "REFERRAL_RECEIVED": "__NOT_TRANSLATED__",
+        "SURGERY_COMPLETED": "__NOT_TRANSLATED__",
+        "SURGERY_SCHEDULED": "__NOT_TRANSLATED__",
+        "TRIAGE_DECISION": "__NOT_TRANSLATED__",
+        "VISIT_DECISION": "__NOT_TRANSLATED__"
       },
       "type": "Typ",
       "window": "Fönster"
@@ -510,14 +570,15 @@ interface Resources {
     "patientDetail": {
       "cases": "Ärenden",
       "created": "Skapad",
-      "journeyTemplate": "Resemall",
+      "episode": "Episod",
       "journeys": "Patientresor",
       "lastActivity": "Senaste aktivitet",
       "noCases": "Inga ärenden för denna patient.",
       "noJourneys": "Inga patientresor tilldelade.",
       "notFound": "Patienten hittades inte.",
+      "phases_one": "{{count}} fas",
+      "phases_other": "{{count}} faser",
       "registered": "Registrerad",
-      "startDate": "Startdatum",
       "triggers": "Triggers"
     },
     "patients": {

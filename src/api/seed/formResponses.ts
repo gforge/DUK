@@ -1,5 +1,5 @@
 import type { FormResponse } from '../schemas'
-import { daysAgo,iso } from './shared'
+import { daysAgo, iso } from './shared'
 
 export const formResponses: FormResponse[] = [
   // Anders — case-1 — acute, high pain + infection
@@ -228,5 +228,62 @@ export const formResponses: FormResponse[] = [
     answers: { OSS_1: 2, OSS_2: 2, OSS_3: 2, OSS_4: 2, OSS_5: 2, PNRS_2: 6 },
     scores: { 'OSS.total': 20 },
     submittedAt: iso(daysAgo(3)),
+  },
+
+  // ── Karin Karlberg — Knee OA 3-phase journey (p-15) ──────────────────────
+  // Phase 1: Remissfas (pj-knee-1, started daysAgo(120))
+  {
+    id: 'fr-knee-ref-1',
+    patientId: 'p-15',
+    templateId: 'qt-numbness-infection',
+    caseId: 'case-15',
+    patientJourneyId: 'pj-knee-1',
+    journeyTemplateEntryId: 'jte-knee-ref-1',
+    // Day 1 baseline: no red flags, moderate OA pain
+    answers: { NUMB_1: false, NUMB_2: false, INF_WOUND: false, INF_FEVER: false, PNRS_1: 6 },
+    scores: {},
+    submittedAt: iso(daysAgo(119)),
+  },
+  {
+    id: 'fr-knee-ref-2',
+    patientId: 'p-15',
+    templateId: 'qt-wound-pain',
+    caseId: 'case-15',
+    patientJourneyId: 'pj-knee-1',
+    journeyTemplateEntryId: 'jte-knee-ref-2',
+    // Day 7 symptom check before orthopaedic visit: significant knee pain, no wound issues
+    answers: { WOUND_HEALED: true, WOUND_DISCHARGE: false, PNRS_2: 7, PNRS_NIGHT: 5 },
+    scores: {},
+    submittedAt: iso(daysAgo(113)),
+  },
+
+  // Phase 2: Väntelista operation (pj-knee-2, started daysAgo(90))
+  // Health declaration at queue entry. Quarterly controls were never reached — surgery
+  // happened at day 76 (daysAgo(14)), before the first 90-day recurrence fell due.
+  {
+    id: 'fr-knee-sq-1',
+    patientId: 'p-15',
+    templateId: 'qt-numbness-infection',
+    caseId: 'case-15',
+    patientJourneyId: 'pj-knee-2',
+    journeyTemplateEntryId: 'jte-knee-sq-1',
+    // Health declaration on joining the waiting list: pain worsening after conservative treatment
+    answers: { NUMB_1: false, NUMB_2: false, INF_WOUND: false, INF_FEVER: false, PNRS_1: 7 },
+    scores: {},
+    submittedAt: iso(daysAgo(89)),
+  },
+
+  // Phase 3: Postoperativ uppföljning (pj-knee-3, started daysAgo(14) — surgery date)
+  // Week 1 wound control: healing on track, still early post-op pain
+  {
+    id: 'fr-knee-po-1',
+    patientId: 'p-15',
+    templateId: 'qt-wound-pain',
+    caseId: 'case-15',
+    patientJourneyId: 'pj-knee-3',
+    journeyTemplateEntryId: 'jte-knee-po-1',
+    answers: { WOUND_HEALED: false, WOUND_DISCHARGE: false, PNRS_2: 5, PNRS_NIGHT: 6 },
+    scores: {},
+    submittedAt: iso(daysAgo(7)),
   },
 ]

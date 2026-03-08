@@ -1,4 +1,4 @@
-import type { AppState, AuditEvent,Case, Patient, PatientJourney } from '../schemas'
+import type { AppState, AuditEvent, Case, EpisodeOfCare, Patient, PatientJourney } from '../schemas'
 import { SEED_STATE } from '../seed'
 import {
   isoDateOffset as isoDate,
@@ -40,6 +40,7 @@ export function buildRealisticSeed(): AppState {
   const patients: Patient[] = []
   const cases: Case[] = []
   const journeys: PatientJourney[] = []
+  const episodes: EpisodeOfCare[] = []
   const auditEvents: AuditEvent[] = []
 
   let idx = 0
@@ -111,10 +112,29 @@ export function buildRealisticSeed(): AppState {
         reviews,
       })
 
+      const epId = `re-${idx}`
+
+      episodes.push({
+        id: epId,
+        patientId: pid,
+        label: isComplex ? 'Complex fracture follow-up' : 'Standard fracture follow-up',
+        clinicalArea: 'Ortopedi',
+        status: 'OPEN',
+        openedAt: createdAt,
+        closedAt: null,
+        responsibleUserId: palId,
+        primaryCaseId: caseId,
+        createdAt,
+        updatedAt: createdAt,
+      })
+
       journeys.push({
         id: jid,
+        episodeId: epId,
         patientId: pid,
         journeyTemplateId,
+        phaseType: 'FOLLOWUP',
+        joinedAt: '',
         startDate,
         status: 'ACTIVE',
         researchModuleIds: [],
@@ -144,6 +164,7 @@ export function buildRealisticSeed(): AppState {
     cases,
     formResponses: [],
     journalDrafts: [],
+    episodesOfCare: episodes,
     patientJourneys: journeys,
     auditEvents,
   }

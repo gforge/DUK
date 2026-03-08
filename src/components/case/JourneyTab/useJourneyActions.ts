@@ -1,8 +1,8 @@
-import { useCallback,useState } from 'react'
+import { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import * as client from '@/api/client'
-import type { JourneyModification,PatientJourney } from '@/api/schemas'
+import type { JourneyModification, PatientJourney } from '@/api/schemas'
 import { useRole } from '@/store/roleContext'
 import { useSnack } from '@/store/snackContext'
 
@@ -17,10 +17,6 @@ export type ModifyPayload = {
   reason: string
   entry?: { label: string; offsetDays: number; windowDays: number; templateId: string }
   stepId?: string
-  newTemplateId?: string
-  previousTemplateId?: string
-  previousStartDate?: string
-  newStartDate?: string
 }
 
 export function useJourneyActions({
@@ -75,17 +71,13 @@ export function useJourneyActions({
   }, [selectedJourney, showSnack, t, refetchJourneys, refetchSteps])
 
   const handleModify = useCallback(
-    async (type: 'ADD_STEP' | 'REMOVE_STEP' | 'SWITCH_TEMPLATE', payload: ModifyPayload) => {
+    async (type: 'ADD_STEP' | 'REMOVE_STEP' | 'CANCEL', payload: ModifyPayload) => {
       if (!selectedJourney || !currentUser) return
       const modification: Omit<JourneyModification, 'id' | 'addedAt'> = {
         type,
         addedByUserId: currentUser.id,
         reason: payload.reason,
         ...(payload.stepId ? { stepId: payload.stepId } : {}),
-        ...(payload.newTemplateId ? { newTemplateId: payload.newTemplateId } : {}),
-        ...(payload.previousTemplateId ? { previousTemplateId: payload.previousTemplateId } : {}),
-        ...(payload.previousStartDate ? { previousStartDate: payload.previousStartDate } : {}),
-        ...(payload.newStartDate ? { newStartDate: payload.newStartDate } : {}),
         ...(payload.entry
           ? {
               entry: {

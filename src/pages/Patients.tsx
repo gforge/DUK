@@ -3,6 +3,7 @@ import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt'
 import { Alert, Box, Button, CircularProgress, Stack, TextField, Typography } from '@mui/material'
 import React, { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
 
 import * as client from '@/api/client'
 import { PatientTable, RegisterPatientDialog } from '@/components/patients'
@@ -15,6 +16,7 @@ export default function Patients() {
   const [registerOpen, setRegisterOpen] = useState(false)
   const [search, setSearch] = useState('')
 
+  const navigate = useNavigate()
   const { data: patients, loading, error, refetch } = useApi(() => client.getPatients(), [])
   const { data: allJourneys } = useApi(() => client.getPatientJourneys(), [])
   const { data: journeyTemplates } = useApi(() => client.getJourneyTemplates(), [])
@@ -76,7 +78,7 @@ export default function Patients() {
       <RegisterPatientDialog
         open={registerOpen}
         onClose={() => setRegisterOpen(false)}
-        onCreated={refetch}
+        onCreated={(patientId) => navigate(`/patients/${patientId}`)}
       />
     </Box>
   )

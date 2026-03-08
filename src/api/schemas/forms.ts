@@ -4,7 +4,8 @@ export const FormResponseSchema = z.object({
   id: z.string(),
   patientId: z.string(),
   templateId: z.string(),
-  caseId: z.string(),
+  /** Case this response belongs to. Optional for journey-driven PRO forms that have no associated case. */
+  caseId: z.string().optional(),
   answers: z.record(z.string(), z.union([z.string(), z.number(), z.boolean()])),
   scores: z.record(z.string(), z.number()),
   submittedAt: z.string().datetime(),

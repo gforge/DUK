@@ -40,6 +40,7 @@ export function useEntryEditor(
   const [recurrenceIntervalDays, setRecurrenceIntervalDays] = useState<number | ''>(
     entry?.recurrenceIntervalDays ?? '',
   )
+  const [icon, setIcon] = useState<string | undefined>(entry?.icon)
 
   const selectedQT = questionnaires.find((q) => q.id === templateId) ?? null
   const qtOptions = questionnaires.map((q) => ({ id: q.id, name: q.name }))
@@ -86,6 +87,7 @@ export function useEntryEditor(
       templateId: templateId || undefined,
       scoreAliases,
       scoreAliasLabels,
+      icon,
       recurrenceIntervalDays:
         recurringEnabled && recurrenceIntervalDays !== ''
           ? Number(recurrenceIntervalDays)
@@ -118,6 +120,8 @@ export function useEntryEditor(
     setRecurringEnabled,
     recurrenceIntervalDays,
     setRecurrenceIntervalDays,
+    icon,
+    setIcon,
     selectedQT,
     qtOptions,
     isValid,

@@ -1,7 +1,6 @@
 import AddIcon from '@mui/icons-material/Add'
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline'
 import ScienceIcon from '@mui/icons-material/Science'
-import SwapHorizIcon from '@mui/icons-material/SwapHoriz'
 import {
   Chip,
   Divider,
@@ -29,7 +28,6 @@ import { useJourneyStatusLabel } from '@/hooks/labels'
 const MOD_ICON: Record<string, React.ReactNode> = {
   ADD_STEP: <AddIcon fontSize="inherit" />,
   REMOVE_STEP: <RemoveCircleOutlineIcon fontSize="inherit" />,
-  SWITCH_TEMPLATE: <SwapHorizIcon fontSize="inherit" />,
 }
 
 interface Props {
@@ -40,10 +38,9 @@ interface Props {
   researchModules: ResearchModule[] | null
 }
 
-function modSummary(mod: JourneyModification, templateName: (id: string) => string) {
+function modSummary(mod: JourneyModification, _templateName: (id: string) => string) {
   if (mod.type === 'ADD_STEP') return `+${mod.entry?.label ?? ''}`
   if (mod.type === 'REMOVE_STEP') return `-${mod.stepId ?? ''}`
-  if (mod.type === 'SWITCH_TEMPLATE') return `→ ${templateName(mod.newTemplateId ?? '')}`
   return mod.type
 }
 

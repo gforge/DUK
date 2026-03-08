@@ -4,14 +4,18 @@ import { useTranslation } from 'react-i18next'
 
 import * as client from '@/api/client'
 import type { Case } from '@/api/schemas'
+import type { ResolvedInstruction } from '@/api/service'
 import JourneyModHistory from '@/components/case/JourneyTab/JourneyModHistory'
 import { InstructionTimeline, JourneyTimeline } from '@/components/journey'
 import { ModifyJourneyDialog } from '@/components/journey'
+import { StartNextPhaseDialog } from '@/components/journey'
+import { InstructionModifyDialog } from '@/components/journey/InstructionModifyDialog'
 import { PatientJourneyResearchCard } from '@/components/patients'
 import { useApi } from '@/hooks/useApi'
 import { useRole } from '@/store/roleContext'
 
 import CancelJourneyDialog from './CancelJourneyDialog'
+import EpisodeHeader from './EpisodeHeader'
 import JourneyHeader from './JourneyHeader'
 import JourneySelectorTabs from './JourneySelectorTabs'
 import PauseConfirmDialog from './PauseConfirmDialog'
@@ -29,6 +33,10 @@ export default function JourneyTab({ caseData }: JourneyTabProps) {
 
   const [modifyOpen, setModifyOpen] = useState(false)
   const [selectedJourneyId, setSelectedJourneyId] = useState<string | null>(null)
+  const [startNextPhaseOpen, setStartNextPhaseOpen] = useState(false)
+  const [instructionTarget, setInstructionTarget] = useState<ResolvedInstruction | null>(null)
+  const [instructionDialogOpen, setInstructionDialogOpen] = useState(false)
+  const [instructionInitialTab, setInstructionInitialTab] = useState(0)
 
   const {
     data: journeys,
@@ -57,7 +65,15 @@ export default function JourneyTab({ caseData }: JourneyTabProps) {
   const selectedJourney =
     sortedJourneys.find((j) => j.id === selectedJourneyId) ?? sortedJourneys[0] ?? null
 
-  const { data: resolvedInstructions } = useApi(
+  const { data: episode, loading: episodeLoading } = useApi(
+    () =>
+      selectedJourney?.episodeId
+        ? client.getEpisodeById(selectedJourney.episodeId)
+        : Promise.resolve(undefined),
+    [selectedJourney?.episodeId],
+  )
+
+  const { data: resolvedInstructions, refetch: refetchInstructions } = useApi(
     () =>
       selectedJourney
         ? client.getResolvedInstructionsForJourney(selectedJourney.id)
@@ -138,6 +154,8 @@ export default function JourneyTab({ caseData }: JourneyTabProps) {
 
   return (
     <Box>
+      <EpisodeHeader episode={episode} loading={episodeLoading && !!selectedJourney?.episodeId} />
+
       <JourneySelectorTabs
         journeys={sortedJourneys}
         selectedId={selectedJourney?.id ?? null}
@@ -156,6 +174,12 @@ export default function JourneyTab({ caseData }: JourneyTabProps) {
             onModifyClick={() => setModifyOpen(true)}
             onResume={handleResume}
             onCancelClick={() => setCancelConfirmOpen(true)}
+            onStartNextPhase={
+              selectedJourney.status === 'ACTIVE' &&
+              (currentUser.role === 'DOCTOR' || currentUser.role === 'PAL')
+                ? () => setStartNextPhaseOpen(true)
+                : undefined
+            }
           />
 
           {selectedJourney.status === 'SUSPENDED' && (
@@ -182,7 +206,18 @@ export default function JourneyTab({ caseData }: JourneyTabProps) {
               <Alert severity="info" sx={{ mb: 1 }}>
                 {t('journey.instructionsSection')}
               </Alert>
-              <InstructionTimeline instructions={resolvedInstructions ?? []} />
+              <InstructionTimeline
+                instructions={resolvedInstructions ?? []}
+                onModify={(instr, tab) => {
+                  setInstructionTarget(instr)
+                  setInstructionInitialTab(tab)
+                  setInstructionDialogOpen(true)
+                }}
+                onAdd={() => {
+                  setInstructionTarget(null)
+                  setInstructionDialogOpen(true)
+                }}
+              />
             </Box>
 
             <JourneyTimeline
@@ -194,10 +229,21 @@ export default function JourneyTab({ caseData }: JourneyTabProps) {
             />
           </Paper>
 
-          <JourneyModHistory
-            modifications={selectedJourney.modifications}
-            journeyTemplates={journeyTemplates}
-          />
+          <JourneyModHistory modifications={selectedJourney.modifications} />
+
+          {instructionDialogOpen && selectedJourney && (
+            <InstructionModifyDialog
+              open={instructionDialogOpen}
+              onClose={() => setInstructionDialogOpen(false)}
+              journeyId={selectedJourney.id}
+              instruction={instructionTarget}
+              initialTab={instructionInitialTab}
+              onChanged={() => {
+                setInstructionDialogOpen(false)
+                refetchInstructions()
+              }}
+            />
+          )}
 
           {modifyOpen && journeyTemplates && questionnaireTemplates && effectiveSteps && (
             <ModifyJourneyDialog
@@ -228,6 +274,19 @@ export default function JourneyTab({ caseData }: JourneyTabProps) {
             onClose={() => setCancelConfirmOpen(false)}
             onConfirm={handleCancel}
           />
+
+          {startNextPhaseOpen && journeyTemplates && (
+            <StartNextPhaseDialog
+              open={startNextPhaseOpen}
+              onClose={() => setStartNextPhaseOpen(false)}
+              journey={selectedJourney}
+              journeyTemplates={journeyTemplates}
+              onCompleted={() => {
+                setStartNextPhaseOpen(false)
+                refetchJourneys()
+              }}
+            />
+          )}
         </>
       )}
     </Box>

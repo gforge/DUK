@@ -120,21 +120,39 @@ export default function JournalTab({ caseData, patient: _patient, onCaseChange }
           {t('journal.generate')}
         </Typography>
         <Stack direction="row" gap={2} flexWrap="wrap" alignItems="flex-end">
-          <FormControl size="small" sx={{ minWidth: 260 }}>
-            <InputLabel id="journal-template-label">{t('journal.selectTemplate')}</InputLabel>
-            <Select
-              labelId="journal-template-label"
-              value={selectedTemplate}
-              onChange={(e) => setSelectedTemplate(e.target.value)}
-              label={t('journal.selectTemplate')}
-            >
+          {currentLangTemplates.length < 4 ? (
+            // small set, render one button per template
+            <Stack direction="row" gap={1} aria-label={t('journal.selectTemplate')}>
               {currentLangTemplates.map((tmpl) => (
-                <MenuItem key={tmpl.id} value={tmpl.id}>
+                <Button
+                  key={tmpl.id}
+                  variant={selectedTemplate === tmpl.id ? 'contained' : 'outlined'}
+                  onClick={() => setSelectedTemplate(tmpl.id)}
+                  disabled={generating}
+                >
                   {tmpl.name}
-                </MenuItem>
+                </Button>
               ))}
-            </Select>
-          </FormControl>
+            </Stack>
+          ) : (
+            // four or more templates, fall back to a select dropdown
+            <FormControl size="small" sx={{ minWidth: 260 }}>
+              <InputLabel id="journal-template-label">{t('journal.selectTemplate')}</InputLabel>
+              <Select
+                labelId="journal-template-label"
+                value={selectedTemplate}
+                onChange={(e) => setSelectedTemplate(e.target.value)}
+                label={t('journal.selectTemplate')}
+              >
+                {currentLangTemplates.map((tmpl) => (
+                  <MenuItem key={tmpl.id} value={tmpl.id}>
+                    {tmpl.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          )}
+
           <Button
             variant="contained"
             onClick={handleGenerate}

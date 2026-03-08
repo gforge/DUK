@@ -1,4 +1,4 @@
-import { beforeEach,describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 
 import { SEED_STATE } from '@/api/seed'
 import * as service from '@/api/service'
@@ -78,25 +78,11 @@ describe('getEffectiveSteps', () => {
     expect(steps.length).toBe(5)
   })
 
-  it('reflects SWITCH_TEMPLATE by using new template steps', () => {
-    // pj-1 is Standard Fracture (6 steps), switch to Complex (7 steps)
-    service.modifyPatientJourney('pj-1', {
-      type: 'SWITCH_TEMPLATE',
-      addedByUserId: 'user-pal-1',
-      reason: 'Complication — switching to complex pathway',
-      previousTemplateId: 'jt-standard',
-      newTemplateId: 'jt-complex',
-    })
-    const steps = service.getEffectiveSteps('pj-1')
-    expect(steps.length).toBe(7) // Complex has 7 steps
-    expect(steps.some((s) => s.id === 'jte-cx-2')).toBe(true) // early wound check
-  })
-
-  it('pj-8 already shows Complex template steps after seeded SWITCH_TEMPLATE', () => {
-    // pj-8 was switched to 'jt-complex' in seed
+  it('pj-8 uses Complex template steps directly', () => {
+    // pj-8 was assigned to jt-complex from the start
     const steps = service.getEffectiveSteps('pj-8')
     expect(steps.length).toBe(7)
-    expect(steps.some((s) => s.id === 'jte-cx-2')).toBe(true)
+    expect(steps.some((s) => s.id === 'jte-cx-2')).toBe(true) // early wound check
   })
 
   it('research module replaceStepId replaces matching template step', () => {

@@ -8,5 +8,12 @@ export {
   useStatusLabel,
   useTriggerLabel,
 } from './useCaseLabels'
-export { type StepStatus,useJourneyStatusLabel, useStepStatusLabel } from './useJourneyLabels'
+export {
+  type StepStatus,
+  useEpisodeStatusLabel,
+  useJourneyStatusLabel,
+  usePhaseTypeLabel,
+  useStepStatusLabel,
+  useTransitionTriggerLabel,
+} from './useJourneyLabels'
 export { useRoleLabel } from './useRoleLabel'

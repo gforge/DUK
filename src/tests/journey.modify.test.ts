@@ -1,4 +1,4 @@
-import { beforeEach,describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 
 import { SEED_STATE } from '@/api/seed'
 import * as service from '@/api/service'
@@ -31,38 +31,6 @@ describe('modifyPatientJourney', () => {
     const mod = journeys[0].modifications.find((m) => m.stepId === 'jte-std-1')
     expect(mod).toBeDefined()
     expect(mod!.reason).toBe('clinical reason')
-  })
-
-  it('SWITCH_TEMPLATE updates journeyTemplateId', () => {
-    service.modifyPatientJourney('pj-1', {
-      type: 'SWITCH_TEMPLATE',
-      addedByUserId: 'user-pal-1',
-      reason: 'complication',
-      previousTemplateId: 'jt-standard',
-      newTemplateId: 'jt-complex',
-    })
-    const journeys = service.getPatientJourneys('p-1')
-    expect(journeys[0].journeyTemplateId).toBe('jt-complex')
-    // old template preserved in modification record
-    expect(journeys[0].modifications[0].previousTemplateId).toBe('jt-standard')
-  })
-
-  it('SWITCH_TEMPLATE with newStartDate resets the journey start date', () => {
-    service.modifyPatientJourney('pj-1', {
-      type: 'SWITCH_TEMPLATE',
-      addedByUserId: 'user-pal-1',
-      reason: 'Surgery occurred — resetting timeline',
-      previousTemplateId: 'jt-standard',
-      newTemplateId: 'jt-complex',
-      previousStartDate: '2026-01-15',
-      newStartDate: '2026-02-10',
-    })
-    const journeys = service.getPatientJourneys('p-1')
-    expect(journeys[0].journeyTemplateId).toBe('jt-complex')
-    expect(journeys[0].startDate).toBe('2026-02-10')
-    const mod = journeys[0].modifications[0]
-    expect(mod.previousStartDate).toBe('2026-01-15')
-    expect(mod.newStartDate).toBe('2026-02-10')
   })
 })
 

@@ -39,6 +39,8 @@ export type ClinicalReview = z.infer<typeof ClinicalReviewSchema>
 export const CaseSchema = z.object({
   id: z.string(),
   patientId: z.string(),
+  /** The EpisodeOfCare this case is associated with. */
+  episodeId: z.string().optional(),
   category: CaseCategorySchema,
   status: CaseStatusSchema,
   triggers: z.array(TriggerTypeSchema),

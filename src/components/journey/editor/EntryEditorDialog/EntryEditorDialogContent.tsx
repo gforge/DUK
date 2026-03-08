@@ -15,6 +15,9 @@ import {
   Stack,
   Switch,
   TextField,
+  ToggleButton,
+  ToggleButtonGroup,
+  Tooltip,
 } from '@mui/material'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
@@ -26,6 +29,7 @@ import type {
 } from '@/api/schemas'
 import { ScoreAliasEditor } from '@/components/journey/editor/entry-editor'
 import { useEntryEditor } from '@/components/journey/editor/useEntryEditor'
+import { JOURNEY_ICON_OPTIONS, JourneyIcon } from '@/utils/journeyIcons'
 
 interface Props {
   entry?: JourneyTemplateEntry
@@ -70,6 +74,8 @@ export function EntryEditorDialog({
     setRecurringEnabled,
     recurrenceIntervalDays,
     setRecurrenceIntervalDays,
+    icon,
+    setIcon,
     selectedQT,
     qtOptions,
     isValid,
@@ -219,6 +225,27 @@ export function EntryEditorDialog({
                 sx={{ width: 120 }}
               />
             )}
+          </Box>
+
+          {/* ── Icon ── */}
+          <Box>
+            <Box sx={{ mb: 0.5, typography: 'caption', color: 'text.secondary' }}>
+              {t('journey.icon')}
+            </Box>
+            <ToggleButtonGroup
+              value={icon ?? ''}
+              exclusive
+              onChange={(_, v) => setIcon(v || undefined)}
+              size="small"
+            >
+              {JOURNEY_ICON_OPTIONS.map((opt) => (
+                <ToggleButton key={opt.key} value={opt.key} aria-label={opt.label}>
+                  <Tooltip title={opt.label}>
+                    <JourneyIcon icon={opt.key} fontSize="small" />
+                  </Tooltip>
+                </ToggleButton>
+              ))}
+            </ToggleButtonGroup>
           </Box>
         </Stack>
       </DialogContent>

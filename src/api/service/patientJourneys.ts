@@ -1,6 +1,7 @@
 import type {
   Instruction,
   JourneyModification,
+  JourneyTemplateEntry,
   JourneyTemplateInstruction,
   PatientJourney,
 } from '../schemas'
@@ -16,6 +17,31 @@ function wholeElapsedDays(isoStart: string, isoEnd?: string): number {
   return Math.floor((endMs - new Date(isoStart).getTime()) / 86_400_000)
 }
 
+/**
+ * Builds REMOVE_STEP modifications for template entries whose window closed before
+ * the patient's joinedAt date. Allows late-registered patients to skip steps
+ * that were already past their due window at the time of registration.
+ */
+function buildLateJoinModifications(
+  entries: JourneyTemplateEntry[],
+  startDate: string,
+  joinedAt: string,
+): JourneyModification[] {
+  const elapsedDays = Math.floor(
+    (new Date(joinedAt).getTime() - new Date(startDate).getTime()) / 86_400_000,
+  )
+  return entries
+    .filter((e) => e.offsetDays + (e.windowDays ?? 2) < elapsedDays)
+    .map((e) => ({
+      id: uuid(),
+      type: 'REMOVE_STEP' as const,
+      addedByUserId: 'system',
+      addedAt: now(),
+      reason: 'Inskrivning efter stegets fönster — patienten registrerades sent.',
+      stepId: e.id,
+    }))
+}
+
 export function getPatientJourneys(patientId?: string): PatientJourney[] {
   const journeys = getStore().patientJourneys
   return patientId ? journeys.filter((j) => j.patientId === patientId) : journeys
@@ -25,10 +51,13 @@ export function assignPatientJourney(
   patientId: string,
   journeyTemplateId: string,
   startDate: string,
+  episodeId: string = '',
   researchModuleIds: string[] = [],
   mergedStepIds: { stepId: string; fromJourneyId: string }[] = [],
+  joinedAt: string = '',
 ): PatientJourney {
   const state = getStore()
+  const template = state.journeyTemplates.find((t) => t.id === journeyTemplateId)
 
   // Convert merged step IDs into REMOVE_STEP modifications so the new
   // journey never shows forms that will be filled through a parallel journey.
@@ -45,14 +74,23 @@ export function assignPatientJourney(
     }),
   )
 
+  // Auto-remove steps whose window closed before the patient enrolled (late join).
+  const lateJoinModifications: JourneyModification[] =
+    joinedAt && joinedAt > startDate
+      ? buildLateJoinModifications(template?.entries ?? [], startDate, joinedAt)
+      : []
+
   const journey: PatientJourney = {
     id: uuid(),
+    episodeId,
     patientId,
     journeyTemplateId,
+    phaseType: 'FOLLOWUP',
+    joinedAt,
     startDate,
     status: 'ACTIVE',
     researchModuleIds,
-    modifications: mergeModifications,
+    modifications: [...mergeModifications, ...lateJoinModifications],
     recurringCompletions: [],
     pausedAt: null,
     totalPausedDays: 0,
@@ -60,7 +98,6 @@ export function assignPatientJourney(
     updatedAt: now(),
   }
 
-  const template = state.journeyTemplates.find((t) => t.id === journeyTemplateId)
   const instantiatedInstructions = instantiateInstructionsForJourney(
     journey,
     template?.instructions ?? [],
@@ -162,17 +199,11 @@ export function modifyPatientJourney(
   if (!journey) throw new Error(`Journey ${journeyId} not found`)
 
   const mod: JourneyModification = { ...modification, id: uuid(), addedAt: now() }
-  let updated: PatientJourney = {
+  const updated: PatientJourney = {
     ...journey,
     modifications: [...journey.modifications, mod],
     updatedAt: now(),
   }
-  if (modification.type === 'SWITCH_TEMPLATE' && modification.newTemplateId)
-    updated = { ...updated, journeyTemplateId: modification.newTemplateId }
-
-  // Allow re-anchoring the start date when switching templates (e.g. surgery happened)
-  if (modification.type === 'SWITCH_TEMPLATE' && modification.newStartDate)
-    updated = { ...updated, startDate: modification.newStartDate }
 
   setStore({
     ...state,
@@ -301,11 +332,19 @@ function instantiateInstructionsForJourney(
 ): Instruction[] {
   const shift = computeTotalPauseShift(journey)
   const startMs = new Date(journey.startDate).getTime()
+  // Days elapsed between startDate and joinedAt — used to auto-cancel past instructions.
+  const elapsedDays =
+    journey.joinedAt && journey.joinedAt > journey.startDate
+      ? Math.floor((new Date(journey.joinedAt).getTime() - startMs) / 86_400_000)
+      : 0
 
   return templateInstructions
     .slice()
     .sort((a, b) => a.order - b.order)
     .map((ti) => {
+      // A late-joined instruction has a defined end that already passed before enrollment.
+      const isLateJoin =
+        elapsedDays > 0 && ti.endDayOffset !== undefined && ti.endDayOffset < elapsedDays
       const startAt = toScheduledDate(startMs, ti.startDayOffset, shift)
       const endAt =
         ti.endDayOffset === undefined ? null : toScheduledDate(startMs, ti.endDayOffset, shift)
@@ -319,7 +358,8 @@ function instantiateInstructionsForJourney(
         endDayOffset: ti.endDayOffset,
         startAt: `${startAt}T00:00:00.000Z`,
         endAt: endAt ? `${endAt}T00:00:00.000Z` : null,
-        status: 'ACTIVE',
+        status: isLateJoin ? ('CANCELLED' as const) : ('ACTIVE' as const),
+        cancelReason: isLateJoin ? ('LATE_JOIN' as const) : undefined,
         tags: ti.tags,
         acknowledgedAt: null,
         acknowledgedByUserId: null,
@@ -329,4 +369,84 @@ function instantiateInstructionsForJourney(
         updatedAt: now(),
       }
     })
+}
+
+/**
+ * Starts the next phase of an episode by completing the current journey and
+ * creating a new PatientJourney linked to the same episode.
+ *
+ * - `fromJourneyId`: the currently-active journey being superseded.
+ * - `journeyTemplateId`: template for the new phase.
+ * - `startDate`: clinical anchor date for the new phase (YYYY-MM-DD).
+ * - `phaseType`: semantic role of the new phase.
+ * - `trigger.type`: what clinical event triggered the transition.
+ * - `trigger.triggeredByUserId`: who initiated the transition.
+ * - `trigger.note`: optional free-text note.
+ */
+export function startNextPhase(params: {
+  fromJourneyId: string
+  journeyTemplateId: string
+  startDate: string
+  phaseType: import('../schemas').PhaseType
+  trigger: {
+    type: import('../schemas').TransitionTriggerType
+    triggeredByUserId?: string
+    note?: string
+  }
+  researchModuleIds?: string[]
+}): PatientJourney {
+  const state = getStore()
+  const fromJourney = state.patientJourneys.find((j) => j.id === params.fromJourneyId)
+  if (!fromJourney) throw new Error(`Journey ${params.fromJourneyId} not found`)
+  if (!fromJourney.episodeId) throw new Error(`Journey ${params.fromJourneyId} has no episodeId`)
+
+  // Mark the previous phase as COMPLETED
+  const completedPrev: PatientJourney = {
+    ...fromJourney,
+    status: 'COMPLETED',
+    updatedAt: now(),
+  }
+
+  const template = state.journeyTemplates.find((t) => t.id === params.journeyTemplateId)
+
+  const newJourney: PatientJourney = {
+    id: uuid(),
+    episodeId: fromJourney.episodeId,
+    patientId: fromJourney.patientId,
+    journeyTemplateId: params.journeyTemplateId,
+    phaseType: params.phaseType,
+    joinedAt: '',
+    startDate: params.startDate,
+    status: 'ACTIVE',
+    researchModuleIds: params.researchModuleIds ?? [],
+    modifications: [],
+    recurringCompletions: [],
+    pausedAt: null,
+    totalPausedDays: 0,
+    transition: {
+      fromJourneyId: params.fromJourneyId,
+      type: params.trigger.type,
+      triggeredAt: now(),
+      triggeredByUserId: params.trigger.triggeredByUserId,
+      note: params.trigger.note,
+    },
+    createdAt: now(),
+    updatedAt: now(),
+  }
+
+  const newInstructions = instantiateInstructionsForJourney(
+    newJourney,
+    template?.instructions ?? [],
+  )
+
+  setStore({
+    ...state,
+    patientJourneys: [
+      ...state.patientJourneys.map((j) => (j.id === params.fromJourneyId ? completedPrev : j)),
+      newJourney,
+    ],
+    instructions: [...(state.instructions ?? []), ...newInstructions],
+  })
+
+  return newJourney
 }

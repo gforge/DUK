@@ -1,4 +1,4 @@
-import { beforeEach,describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 
 import { SEED_STATE } from '@/api/seed'
 import * as service from '@/api/service'
@@ -18,7 +18,7 @@ describe('assignPatientJourney', () => {
   })
 
   it('allows parallel journeys for the same patient', () => {
-    service.assignPatientJourney('p-1', 'jt-complex', '2026-01-01', ['rm-move-2026'])
+    service.assignPatientJourney('p-1', 'jt-complex', '2026-01-01', undefined, ['rm-move-2026'])
     const journeys = service.getPatientJourneys('p-1')
     expect(journeys.length).toBeGreaterThanOrEqual(2)
     const research = journeys.find((j) => j.journeyTemplateId === 'jt-complex')

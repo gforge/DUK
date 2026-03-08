@@ -10,6 +10,7 @@ import { useTranslation } from 'react-i18next'
 import type { ClinicalReview } from '@/api/schemas'
 import type { EffectiveStep } from '@/api/service'
 import { type StepStatus, useStepStatusLabel } from '@/hooks/labels'
+import { JourneyIcon } from '@/utils/journeyIcons'
 
 import { StatusIcon } from './JourneyTimeline/StatusIcon'
 import { ReviewTypeKey } from './JourneyTimeline/types'
@@ -151,6 +152,7 @@ export default function JourneyTimelineItem({
       {/* right column */}
       <Box sx={{ pb: isLast ? 0 : 2, flex: 1 }}>
         <Stack direction="row" alignItems="center" flexWrap="wrap" gap={0.5} mb={0.25}>
+          <JourneyIcon icon={step.icon} fontSize="small" color="action" sx={{ flexShrink: 0 }} />
           <Typography variant="body2" fontWeight={600}>
             {step.label}
           </Typography>

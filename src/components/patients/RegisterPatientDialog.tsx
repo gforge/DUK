@@ -28,7 +28,7 @@ import { Step3Review } from './register-dialog/Step3Review'
 interface Props {
   open: boolean
   onClose: () => void
-  onCreated: () => void
+  onCreated: (patientId: string) => void
 }
 
 export default function RegisterPatientDialog({ open, onClose, onCreated }: Props) {
@@ -52,6 +52,7 @@ export default function RegisterPatientDialog({ open, onClose, onCreated }: Prop
   // Step 1 — journey assignment
   const [journeyTemplateId, setJourneyTemplateId] = useState('')
   const [startDate, setStartDate] = useState(new Date().toISOString().slice(0, 10))
+  const [joinedAt, setJoinedAt] = useState('')
 
   // Step 2 — research module enrollment
   const [selectedModuleIds, setSelectedModuleIds] = useState<string[]>([])
@@ -79,6 +80,7 @@ export default function RegisterPatientDialog({ open, onClose, onCreated }: Prop
     setDateOfBirth('')
     setJourneyTemplateId('')
     setStartDate(new Date().toISOString().slice(0, 10))
+    setJoinedAt('')
     setSelectedModuleIds([])
     setError(null)
     setHintOpen(false)
@@ -145,9 +147,17 @@ export default function RegisterPatientDialog({ open, onClose, onCreated }: Prop
         personalNumber,
         dateOfBirth: effectiveDob,
       })
-      await client.assignPatientJourney(patient.id, journeyTemplateId, startDate, selectedModuleIds)
+      await client.assignPatientJourney(
+        patient.id,
+        journeyTemplateId,
+        startDate,
+        undefined,
+        selectedModuleIds,
+        [],
+        joinedAt || undefined,
+      )
       showSnack(t('patients.register.success'), 'success')
-      onCreated()
+      onCreated(patient.id)
       handleClose()
     } catch (e) {
       setError(e instanceof Error ? e.message : t('common.error'))
@@ -223,6 +233,8 @@ export default function RegisterPatientDialog({ open, onClose, onCreated }: Prop
             setJourneyTemplateId={setJourneyTemplateId}
             startDate={startDate}
             setStartDate={setStartDate}
+            joinedAt={joinedAt}
+            setJoinedAt={setJoinedAt}
             journeyTemplates={journeyTemplates}
           />
         )}

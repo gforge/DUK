@@ -107,4 +107,130 @@ export const instructionTemplates: InstructionTemplate[] = [
     createdAt: iso(daysAgo(30)),
     updatedAt: iso(daysAgo(30)),
   },
+  // ── Knee OA templates ─────────────────────────────────────────────────────
+  {
+    id: 'it-knee-previsit',
+    name: 'Förberedelse inför ortopedbesök',
+    tags: ['knee', 'pre-visit', 'patient-info'],
+    content: `## Förberedelse inför ditt ortopedbesök
+
+**Ta med till besöket:**
+- Lista med aktuella läkemedel och doser
+- Röntgenbilder om du har egna kopior
+- Antecknade frågor till läkaren
+
+**Beskriv dina besvär:**
+- Smärta: Hur ont gör det på en skala 0–10?
+- Var sitter smärtan? Strålning till lår eller vader?
+- Vilka aktiviteter begränsas av besvären?
+- Hur länge har du haft besvären?
+
+**Förväntan på besöket:**
+Du träffar en ortoped som granskar din remiss och undersöker knäleden. Efter bedömningen informeras du om alternativa behandlingsmöjligheter och eventuellt fortsatt utredning eller operation diskuteras.
+
+> **Tips:** Skriv ned dina besvär och frågor i förväg — besöket går snabbare och du glömmer inget viktigt.`,
+    createdAt: iso(daysAgo(90)),
+    updatedAt: iso(daysAgo(90)),
+  },
+  {
+    id: 'it-knee-waitinglist',
+    name: 'Information under väntetid på operation',
+    tags: ['knee', 'waiting-list', 'pre-op'],
+    content: `## Under väntetiden på knäoperation
+
+**Håll dig aktiv:**
+- Fortsätt med lättare promenader och simning om du klarar det
+- Undvik tunga lyft och aktiviteter som ger kraftig smärta
+- Vattengymnastik är skonsamt och rekommenderas
+
+**Rapportera förändring omedelbart till oss om:**
+- Smärtan ökar kraftigt och inte svarar på smärtstillande
+- Du får feber, rodnad eller svullnad i knäleden
+- Du inte längre önskar operation
+
+**Smärtlindring:**
+- Paracetamol vid behov (upp till 4 g/dag)
+- Ibuprofen kan kombineras vid behov — undvik på fastande mage
+- Kontakta oss om du behöver starkare smärtstillande
+
+**Livsstil:**
+- Viktminskning minskar belastning på knäleden och förbättrar operationsresultat
+- Rökstopp är viktigt — rökning fördröjer sårläkning och ökar komplikationsrisk
+
+**Din plats i kön:**
+Du kontaktas när din operationstid är klar. Vi hör av oss var tredje månad för att stämma av hur du mår.`,
+    createdAt: iso(daysAgo(90)),
+    updatedAt: iso(daysAgo(90)),
+  },
+  {
+    id: 'it-knee-physio-week1',
+    name: 'Träningsprogram vecka 1–2 (postoperativt)',
+    tags: ['knee', 'physio', 'post-op', 'week1'],
+    content: `## Träningsprogram — Vecka 1–2 efter knäoperation
+
+**Mål:** Minska svullnad, återfå grundläggande rörlighet, komma igång med belastning.
+
+### Övningar 3–4 gånger per dag:
+
+**Ankelrörelser** (dag 1 och framåt)
+- Böj och sträck foten upprepade gånger, 20 repetitioner
+- Cirkla med foten åt båda håll, 10 repetitioner per riktning
+
+**Quadriceps-spänning** (dag 2 och framåt)
+- Ligg på rygg med rakt ben
+- Spänn lårmuskeln och tryck knävecket mot underlaget, håll 5 sekunder
+- 10 repetitioner per ben
+
+**Häl-sliding** (dag 2 och framåt)
+- Ligg på rygg, dra långsamt hälen mot dig längs sängen
+- Böj knäet så mycket det går utan kraftig smärta
+- 10 repetitioner
+
+**Stod och gång**
+- Res dig med hjälp av rollator/kryckor
+- Gå korta sträckor (10–15 min), öka gradvis
+
+### Kylning och höjning:
+- Kyla på opererat knä 15–20 min, 3–4 gånger per dag
+- Höj benet när du vilar för att minska svullnad
+
+> **Kontakta oss vid:** ökad värme, rodnad, feber >38.5°C, eller kraftig ökad smärta.`,
+    createdAt: iso(daysAgo(90)),
+    updatedAt: iso(daysAgo(90)),
+  },
+  {
+    id: 'it-knee-physio-week4',
+    name: 'Träningsprogram vecka 4–6 (progressiv träning)',
+    tags: ['knee', 'physio', 'post-op', 'week4'],
+    content: `## Träningsprogram — Vecka 4–6 efter knäoperation
+
+**Mål:** Progressiv styrketräning, återgå till vardagsaktiviteter, förbättra balans och koordination.
+
+### Dagliga övningar:
+
+**Minisquat** (knäböj med kontroll)
+- Stå med fötterna axelbrett isär
+- Böj knäna till ca 30–45°, håll 3 sekunder, sträck upp
+- 3 × 10 repetitioner — öka djupet gradvis
+
+**Utfall framåt**
+- Ta ett steg framåt, sänk dig kontrollerat
+- 3 × 8 repetitioner per ben
+
+**Balansövning**
+- Stå på ett ben, 3 × 30 sekunder
+- Utmaning: gör det med ögonen stängda
+
+**Cykling på konditionscykel**
+- Börja med 10–15 min på lågt motstånd
+- Öka successivt till 20–30 min
+
+### Återgång till vardag:
+- Bilkörning efter godkännande av läkare (vanligen vecka 4–6)
+- Simning (ej bröstsim) kan påbörjas när såret är läkt
+
+> **Individanpassa**: Om smärtan ökar markant — reducera belastning och kontakta din fysioterapeut.`,
+    createdAt: iso(daysAgo(90)),
+    updatedAt: iso(daysAgo(90)),
+  },
 ]

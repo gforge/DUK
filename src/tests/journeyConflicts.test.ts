@@ -1,4 +1,4 @@
-import { afterEach,beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 
 import { SEED_STATE } from '@/api/seed'
 import * as service from '@/api/service'
@@ -40,7 +40,11 @@ describe('detectJourneyConflicts', () => {
 
   /** Helper: create a fresh patient with no journeys */
   function freshPatient(displayName = 'Test Person') {
-    return service.createPatient({ displayName, personalNumber: Math.random().toString(), dateOfBirth: '1980-01-01' })
+    return service.createPatient({
+      displayName,
+      personalNumber: Math.random().toString(),
+      dateOfBirth: '1980-01-01',
+    })
   }
 
   it('returns empty when patient has no active journeys', () => {
@@ -71,9 +75,7 @@ describe('detectJourneyConflicts', () => {
     expect(conflicts[0].newStep.templateId).toBe(conflicts[0].existingStep.templateId)
     expect(conflicts[0].overlapDays).toBeGreaterThanOrEqual(1)
     // First conflict must be for the first questionnaire entry
-    expect(
-      conflicts.some((c) => c.newStep.templateId === firstEntry.templateId),
-    ).toBe(true)
+    expect(conflicts.some((c) => c.newStep.templateId === firstEntry.templateId)).toBe(true)
   })
 
   it('returns no conflicts for same template with large start-date offset exceeding all windows', () => {
@@ -129,7 +131,11 @@ describe('assignPatientJourney mergedStepIds', () => {
   afterEach(() => resetStore())
 
   function freshPatient() {
-    return service.createPatient({ displayName: 'Test', personalNumber: Math.random().toString(), dateOfBirth: '1980-01-01' })
+    return service.createPatient({
+      displayName: 'Test',
+      personalNumber: Math.random().toString(),
+      dateOfBirth: '1980-01-01',
+    })
   }
 
   it('creates REMOVE_STEP modifications with mergedFromJourneyId for each merged step', () => {
@@ -143,6 +149,7 @@ describe('assignPatientJourney mergedStepIds', () => {
       patient.id,
       template.id,
       '2026-03-04',
+      undefined,
       [],
       [{ stepId: stepToMerge.id, fromJourneyId: j1.id }],
     )
@@ -164,6 +171,7 @@ describe('assignPatientJourney mergedStepIds', () => {
       patient.id,
       template.id,
       '2026-03-04',
+      undefined,
       [],
       [{ stepId: stepToMerge.id, fromJourneyId: j1.id }],
     )

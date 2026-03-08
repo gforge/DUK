@@ -1,6 +1,6 @@
 import type { Instruction } from '../schemas'
-import type { ResolvedInstruction } from '../service/instructions'
 import * as service from '../service'
+import type { ResolvedInstruction } from '../service/instructions'
 import { withDelay } from './delay'
 
 export const getInstructions = (patientJourneyId?: string): Promise<Instruction[]> =>
@@ -37,5 +37,7 @@ export const acknowledgeInstruction = (
 export const completeInstruction = (instructionId: string, userId: string): Promise<Instruction> =>
   withDelay(() => service.completeInstruction(instructionId, userId))
 
-export const cancelInstruction = (instructionId: string): Promise<Instruction> =>
-  withDelay(() => service.cancelInstruction(instructionId))
+export const cancelInstruction = (
+  instructionId: string,
+  cancelReason: 'MANUAL' | 'LATE_JOIN' = 'MANUAL',
+): Promise<Instruction> => withDelay(() => service.cancelInstruction(instructionId, cancelReason))

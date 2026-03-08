@@ -17,6 +17,8 @@ interface Props {
   setJourneyTemplateId: (v: string) => void
   startDate: string
   setStartDate: (v: string) => void
+  joinedAt: string
+  setJoinedAt: (v: string) => void
   journeyTemplates: JourneyTemplate[] | null
 }
 
@@ -25,6 +27,8 @@ export function Step1JourneyAssignment({
   setJourneyTemplateId,
   startDate,
   setStartDate,
+  joinedAt,
+  setJoinedAt,
   journeyTemplates,
 }: Props) {
   const { t } = useTranslation()
@@ -65,6 +69,17 @@ export function Step1JourneyAssignment({
         fullWidth
         required
         InputLabelProps={{ shrink: true }}
+      />
+      <TextField
+        label={t('journey.joinedAt')}
+        helperText={t('journey.joinedAtHelp')}
+        value={joinedAt}
+        onChange={(e) => setJoinedAt(e.target.value)}
+        size="small"
+        type="date"
+        fullWidth
+        InputLabelProps={{ shrink: true }}
+        inputProps={{ max: new Date().toISOString().slice(0, 10) }}
       />
     </Stack>
   )

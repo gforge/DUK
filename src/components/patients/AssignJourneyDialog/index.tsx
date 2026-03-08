@@ -115,6 +115,7 @@ export default function AssignJourneyDialog({
         patientId,
         journeyTemplateId,
         startDate,
+        undefined,
         selectedModuleIds,
         mergedStepIds,
       )

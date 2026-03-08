@@ -6,6 +6,7 @@ import { now, uuid } from './utils'
 export interface ResolvedInstruction extends Instruction {
   content: string
   templateName?: string
+  icon?: string
   isActiveNow: boolean
 }
 
@@ -36,10 +37,20 @@ export function getInstructions(patientJourneyId?: string): Instruction[] {
 export function getResolvedInstructionsForJourney(journeyId: string): ResolvedInstruction[] {
   const state = getStore()
   const templates = state.instructionTemplates ?? []
+  const journeyTemplates = state.journeyTemplates ?? []
+  const journey = (state.patientJourneys ?? []).find((j) => j.id === journeyId)
+  const journeyTemplate = journey
+    ? journeyTemplates.find((jt) => jt.id === journey.journeyTemplateId)
+    : undefined
   const currentIso = now()
 
   return getInstructions(journeyId).map((instruction) => {
     const tpl = templates.find((t) => t.id === instruction.instructionTemplateId)
+    const jtInstruction = instruction.journeyTemplateInstructionId
+      ? journeyTemplate?.instructions.find(
+          (jti) => jti.id === instruction.journeyTemplateInstructionId,
+        )
+      : undefined
     const afterStart = currentIso >= instruction.startAt
     const beforeEnd = !instruction.endAt || currentIso <= instruction.endAt
     const isActiveNow =
@@ -52,6 +63,7 @@ export function getResolvedInstructionsForJourney(journeyId: string): ResolvedIn
       ...instruction,
       content: tpl?.content ?? '',
       templateName: tpl?.name,
+      icon: jtInstruction?.icon,
       isActiveNow,
     }
   })
@@ -160,10 +172,14 @@ export function completeInstruction(instructionId: string, userId: string): Inst
   }))
 }
 
-export function cancelInstruction(instructionId: string): Instruction {
+export function cancelInstruction(
+  instructionId: string,
+  cancelReason: 'MANUAL' | 'LATE_JOIN' = 'MANUAL',
+): Instruction {
   return patchInstruction(instructionId, (instruction) => ({
     ...instruction,
     status: 'CANCELLED',
+    cancelReason,
     updatedAt: now(),
   }))
 }

@@ -150,8 +150,8 @@ export default function PatientJourneyResearchCard({
         </Stack>
       )}
 
-      {/* Enroll a new module */}
-      {availableModules.length > 0 && (
+      {/* Enroll a new module — only for active journeys */}
+      {availableModules.length > 0 && journey.status === 'ACTIVE' && (
         <>
           {enrolledModules.length > 0 && <Divider sx={{ my: 1 }} />}
           {enrolling ? (

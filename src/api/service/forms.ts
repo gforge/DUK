@@ -8,6 +8,10 @@ export function getFormResponses(caseId: string): FormResponse[] {
   return getStore().formResponses.filter((r) => r.caseId === caseId)
 }
 
+export function getFormResponsesByJourney(journeyId: string): FormResponse[] {
+  return getStore().formResponses.filter((r) => r.patientJourneyId === journeyId)
+}
+
 export interface JourneyStepContext {
   patientJourneyId: string
   /** Base entry id (not the __r0 expanded variant). */

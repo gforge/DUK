@@ -3,6 +3,7 @@ import EditIcon from '@mui/icons-material/Edit'
 import PauseIcon from '@mui/icons-material/Pause'
 import PlayArrowIcon from '@mui/icons-material/PlayArrow'
 import RouteIcon from '@mui/icons-material/Route'
+import SkipNextIcon from '@mui/icons-material/SkipNext'
 import { Button, Chip, CircularProgress, Stack, Tooltip, Typography } from '@mui/material'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
@@ -25,6 +26,7 @@ interface JourneyHeaderProps {
   readonly onModifyClick: () => void
   readonly onResume: () => void
   readonly onCancelClick: () => void
+  readonly onStartNextPhase?: () => void
 }
 
 export default function JourneyHeader({
@@ -36,6 +38,7 @@ export default function JourneyHeader({
   onModifyClick,
   onResume,
   onCancelClick,
+  onStartNextPhase,
 }: JourneyHeaderProps) {
   const { t } = useTranslation()
   const getJourneyStatusLabel = useJourneyStatusLabel()
@@ -87,6 +90,17 @@ export default function JourneyHeader({
             >
               {t('journey.modify.action')}
             </Button>
+            {onStartNextPhase && (
+              <Button
+                startIcon={<SkipNextIcon />}
+                size="small"
+                variant="outlined"
+                color="secondary"
+                onClick={onStartNextPhase}
+              >
+                {t('journey.startNextPhase')}
+              </Button>
+            )}
           </>
         )}
         {journey.status === 'SUSPENDED' && (

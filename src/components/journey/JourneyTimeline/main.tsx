@@ -1,4 +1,4 @@
-import { Box, Typography, useTheme } from '@mui/material'
+import { Box, Button, Typography, useTheme } from '@mui/material'
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -16,6 +16,7 @@ interface JourneyTimelineProps {
   readonly formResponses: FormResponse[]
   readonly reviews?: ClinicalReview[]
   readonly journeyName?: string
+  readonly hideUnrealized?: boolean
   readonly onAddReview?: (
     stepId: string,
     reviewType: string,
@@ -30,6 +31,7 @@ export function JourneyTimeline({
   formResponses,
   reviews = [],
   journeyName,
+  hideUnrealized = false,
   onAddReview,
   onRemoveReview,
 }: Readonly<JourneyTimelineProps>) {
@@ -47,6 +49,7 @@ export function JourneyTimeline({
   const [addedReviews, setAddedReviews] = useState<
     Map<string, { reviewId: string; description?: string }>
   >(new Map())
+  const [showUnrealized, setShowUnrealized] = useState(false)
 
   const openDialog = (stepId: string, reviewType: ReviewTypeKey, stepLabel: string) => {
     setDescription('')
@@ -104,6 +107,14 @@ export function JourneyTimeline({
     )
   }
 
+  const realizedSteps = hideUnrealized
+    ? steps.filter((s) => getStepStatus(s, formResponses) === 'SUBMITTED')
+    : steps
+  const unrealizedSteps = hideUnrealized
+    ? steps.filter((s) => getStepStatus(s, formResponses) !== 'SUBMITTED')
+    : []
+  const visibleSteps = hideUnrealized && !showUnrealized ? realizedSteps : steps
+
   const _statusColor: Record<StepStatus, string> = {
     SUBMITTED: theme.palette.success.main,
     UPCOMING: theme.palette.primary.main,
@@ -117,10 +128,11 @@ export function JourneyTimeline({
           {journeyName}
         </Typography>
       )}
+
       <Box sx={{ position: 'relative' }}>
-        {steps.map((step, idx) => {
+        {visibleSteps.map((step, idx) => {
           const status = getStepStatus(step, formResponses)
-          const isLast = idx === steps.length - 1
+          const isLast = idx === visibleSteps.length - 1
           return (
             <JourneyTimelineItem
               key={step.id}
@@ -137,7 +149,18 @@ export function JourneyTimeline({
           )
         })}
       </Box>
-
+      {hideUnrealized && unrealizedSteps.length > 0 && (
+        <Button
+          size="small"
+          variant="text"
+          onClick={() => setShowUnrealized((v) => !v)}
+          sx={{ mt: 1, pl: 0 }}
+        >
+          {showUnrealized
+            ? t('journey.hideUnrealizedSteps')
+            : t('journey.showUnrealizedSteps', { count: unrealizedSteps.length })}
+        </Button>
+      )}
       <AddReviewDialog
         open={!!reviewDialog}
         reviewDialog={reviewDialog}
@@ -147,7 +170,6 @@ export function JourneyTimeline({
         onConfirm={handleConfirmAdd}
         onClose={closeDialog}
       />
-
       <ReviewDetailsDialog reviewDetails={reviewDetails} onClose={() => setReviewDetails(null)} />
     </Box>
   )

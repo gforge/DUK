@@ -324,6 +324,74 @@ const MIGRATIONS: Migration[] = [
       }
     },
   },
+  {
+    from: 10,
+    to: 11,
+    up: (s) => {
+      const nowIso = new Date().toISOString()
+
+      // Group existing patient journeys by patientId so we can create one
+      // synthetic EpisodeOfCare per patient (all phases lumped into a single episode).
+      const journeys = Array.isArray(s['patientJourneys'])
+        ? (s['patientJourneys'] as Record<string, unknown>[])
+        : []
+
+      // Build a map: patientId → first journey for that patient (chronological)
+      const patientFirstJourney = new Map<string, Record<string, unknown>>()
+      for (const j of journeys) {
+        const pid = String(j['patientId'] ?? '')
+        if (!patientFirstJourney.has(pid)) patientFirstJourney.set(pid, j)
+      }
+
+      // Create one episode per patient
+      const episodesOfCare: Record<string, unknown>[] = []
+      const episodeByPatient = new Map<string, string>() // patientId → episodeId
+      let epIdx = 0
+      for (const [pid, firstJourney] of patientFirstJourney) {
+        const epId = `ep-migrated-${epIdx++}`
+        const openedAt =
+          typeof firstJourney['createdAt'] === 'string' ? firstJourney['createdAt'] : nowIso
+        episodesOfCare.push({
+          id: epId,
+          patientId: pid,
+          label: 'Uppföljning',
+          status: 'OPEN',
+          openedAt,
+          closedAt: null,
+          createdAt: openedAt,
+          updatedAt: nowIso,
+        })
+        episodeByPatient.set(pid, epId)
+      }
+
+      // Backfill episodeId, phaseType, joinedAt on all existing patient journeys.
+      // Strip any SWITCH_TEMPLATE modifications (replaced by new-journey-per-phase model).
+      const updatedJourneys = journeys.map((j) => {
+        const pid = String(j['patientId'] ?? '')
+        const epId = episodeByPatient.get(pid) ?? ''
+        const mods = Array.isArray(j['modifications'])
+          ? (j['modifications'] as Record<string, unknown>[]).filter(
+              (m) => m['type'] !== 'SWITCH_TEMPLATE',
+            )
+          : []
+        return {
+          ...j,
+          episodeId: j['episodeId'] ?? epId,
+          phaseType: j['phaseType'] ?? 'FOLLOWUP',
+          joinedAt: j['joinedAt'] ?? '',
+          modifications: mods,
+        }
+      })
+
+      return {
+        ...s,
+        schemaVersion: 11,
+        episodesOfCare:
+          (s['episodesOfCare'] as Record<string, unknown>[] | undefined) ?? episodesOfCare,
+        patientJourneys: updatedJourneys,
+      }
+    },
+  },
 ]
 
 // ---------------------------------------------------------------------------

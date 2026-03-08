@@ -85,10 +85,22 @@ export function JourneyTemplatesTab({ journeyTemplates, loading, onDelete, onRef
     setEntryDeleteConfirm({ template, entryId })
   }
 
+  const handleDeleteInstruction = async (template: JourneyTemplate, instrId: string) => {
+    const instructions = template.instructions.filter((i) => i.id !== instrId)
+    try {
+      await client.saveJourneyTemplate({ ...template, instructions })
+      showSnack(t('journey.editor.entryDeleted'), 'success')
+      onRefresh?.()
+    } catch {
+      showSnack(t('common.error'), 'error')
+    }
+  }
+
   // Close entry editor and optionally focus
   const handleCloseEntryEditor = () => setEntryEditState(null)
 
-  if (loading) return <Skeleton variant="rectangular" height={200} sx={{ borderRadius: 1 }} />
+  if (loading && !journeyTemplates)
+    return <Skeleton variant="rectangular" height={200} sx={{ borderRadius: 1 }} />
 
   const parentName = (id: string | undefined) =>
     id ? journeyTemplates?.find((jt) => jt.id === id)?.name : undefined
@@ -109,6 +121,7 @@ export function JourneyTemplatesTab({ journeyTemplates, loading, onDelete, onRef
       {journeyTemplates && journeyTemplates.length > 0 ? (
         <JourneyTemplatesTabList
           journeyTemplates={journeyTemplates}
+          instructionTemplates={instructionTemplates ?? []}
           parentName={parentName}
           onDelete={onDelete}
           setSyncTarget={setSyncTarget}
@@ -118,6 +131,7 @@ export function JourneyTemplatesTab({ journeyTemplates, loading, onDelete, onRef
           setEntryEditState={setEntryEditState}
           handleSaveEntry={handleSaveEntry}
           handleDeleteEntry={handleDeleteEntry}
+          handleDeleteInstruction={handleDeleteInstruction}
         />
       ) : (
         <Typography color="text.secondary">{t('journey.editor.noTemplates')}</Typography>
