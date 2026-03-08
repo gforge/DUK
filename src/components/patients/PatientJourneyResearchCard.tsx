@@ -17,9 +17,8 @@ import { useTranslation } from 'react-i18next'
 
 import * as client from '@/api/client'
 import type { Consent, PatientJourney, ResearchModule } from '@/api/schemas'
+import { GrantConsentDialog, RevokeConsentDialog } from '@/components/journey'
 import { useSnack } from '@/store/snackContext'
-
-import { GrantConsentDialog, RevokeConsentDialog } from '../journey'
 
 interface Props {
   readonly journey: PatientJourney

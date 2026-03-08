@@ -114,7 +114,7 @@ function EditInstructionDialog({
   )
 }
 
-export default function InstructionTemplatesTab({
+export function InstructionTemplatesTab({
   instructionTemplates,
   loading,
   onDelete,

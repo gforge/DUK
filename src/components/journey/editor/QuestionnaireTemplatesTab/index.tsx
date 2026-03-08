@@ -25,8 +25,7 @@ import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import type { QuestionnaireTemplate } from '@/api/schemas'
-
-import { QuestionnaireEditorDialog } from './'
+import { QuestionnaireEditorDialog } from '@/components/journey/editor'
 
 interface Props {
   questionnaires: QuestionnaireTemplate[] | null
@@ -35,12 +34,7 @@ interface Props {
   onSave: (t: Omit<QuestionnaireTemplate, 'id' | 'createdAt'> & { id?: string }) => void
 }
 
-export default function QuestionnaireTemplatesTab({
-  questionnaires,
-  loading,
-  onDelete,
-  onSave,
-}: Props) {
+export function QuestionnaireTemplatesTab({ questionnaires, loading, onDelete, onSave }: Props) {
   const { t } = useTranslation()
   // null = closed, undefined = create new, QuestionnaireTemplate = edit existing
   const [editTarget, setEditTarget] = useState<QuestionnaireTemplate | null | undefined>(null)

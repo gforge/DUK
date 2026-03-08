@@ -4,10 +4,10 @@ import { useTranslation } from 'react-i18next'
 
 import type { ClinicalReview, FormResponse } from '@/api/schemas'
 import type { EffectiveStep } from '@/api/service'
+import AddReviewDialog from '@/components/journey/AddReviewDialog'
+import { ReviewDetailsDialog } from '@/components/journey/ConsentDialog/ReviewDetails'
+import JourneyTimelineItem from '@/components/journey/JourneyTimelineItem'
 
-import AddReviewDialog from '../AddReviewDialog'
-import { ReviewDetailsDialog } from '../ConsentDialog/ReviewDetails'
-import JourneyTimelineItem from '../JourneyTimelineItem'
 import { getStepStatus } from './getStepStatus'
 import { ReviewTypeKey, StepStatus } from './types'
 

@@ -6,12 +6,14 @@ import { useNavigate } from 'react-router-dom'
 import * as client from '@/api/client'
 import type { QuestionnaireTemplate } from '@/api/schemas'
 import type { MergedDueStep } from '@/api/service'
-import { PatientCareplan } from '@/components/patientView'
-import PatientActions from '@/components/patientView/PatientActions'
-import PatientCaseList from '@/components/patientView/PatientCaseList'
-import PatientDueForms from '@/components/patientView/PatientDueForms'
-import PatientQuestionnaireForm from '@/components/patientView/PatientQuestionnaireForm'
-import PatientSummaryCard from '@/components/patientView/PatientSummaryCard'
+import {
+  PatientActions,
+  PatientCareplan,
+  PatientCaseList,
+  PatientDueForms,
+  PatientQuestionnaireForm,
+  PatientSummaryCard,
+} from '@/components/patientView'
 import { useApi } from '@/hooks/useApi'
 import { useRole } from '@/store/roleContext'
 

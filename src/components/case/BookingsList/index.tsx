@@ -24,11 +24,10 @@ import { useTranslation } from 'react-i18next'
 
 import * as client from '@/api/client'
 import type { Case } from '@/api/schemas'
+import { ConfirmDialog } from '@/components/common'
 import { useNextStepLabel, useRoleLabel } from '@/hooks/labels'
 import { useRole } from '@/store/roleContext'
 import { useSnack } from '@/store/snackContext'
-
-import ConfirmDialog from '../common/ConfirmDialog'
 
 interface Props {
   caseData: Case

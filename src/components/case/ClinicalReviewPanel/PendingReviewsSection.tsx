@@ -14,9 +14,8 @@ import React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import type { ClinicalReview, User } from '@/api/schemas'
+import { RoleIcon } from '@/components/common'
 import { useReviewTypeLabel } from '@/hooks/labels'
-
-import { RoleIcon } from '../../common/RoleIcon'
 
 interface Props {
   reviews: ClinicalReview[]
@@ -28,7 +27,7 @@ interface Props {
   onDelete: (id: string) => void
 }
 
-export default function PendingReviewsSection({
+export function PendingReviewsSection({
   reviews,
   userMap,
   isClinician,

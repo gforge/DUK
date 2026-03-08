@@ -1,17 +1,13 @@
-import { Box, Divider,Stack, Typography } from '@mui/material'
+import { Box, Divider, Stack, Typography } from '@mui/material'
 import { differenceInDays, format, parseISO } from 'date-fns'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 
-import type { Case, CaseStatus,Patient } from '@/api/schemas'
+import type { Case, CaseStatus, Patient } from '@/api/schemas'
+import { AutoWarningsBadge, DeadlineLabel, StatusChip, TriggerChips } from '@/components/common'
 import { useStatusLabel } from '@/hooks/labels'
 import { useFocusRestore } from '@/hooks/useFocusRestore'
-
-import AutoWarningsBadge from '../common/AutoWarningsBadge'
-import DeadlineLabel from '../common/DeadlineLabel'
-import StatusChip from '../common/StatusChip'
-import TriggerChips from '../common/TriggerChips'
 
 interface CaseListItemProps extends React.HTMLAttributes<HTMLDivElement> {
   caseData: Case

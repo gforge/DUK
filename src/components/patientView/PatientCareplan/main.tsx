@@ -4,14 +4,13 @@ import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import * as client from '@/api/client'
-import type { JourneyTemplate,PatientJourney } from '@/api/schemas'
+import type { JourneyTemplate, PatientJourney } from '@/api/schemas'
+import { JourneyTimeline } from '@/components/journey/JourneyTimeline'
+import { getStatusChipColor } from '@/components/patientView/PatientCareplan/getStatusChipColor'
+import { PatientClinicalReviews } from '@/components/patientView/PatientCareplan/PatientClinicalReviews'
+import { ResearchStudiesSection } from '@/components/patientView/PatientCareplan/ResearchStudiesSection'
 import { useApi } from '@/hooks/useApi'
 import { useRole } from '@/store/roleContext'
-
-import { JourneyTimeline } from '../../journey/JourneyTimeline'
-import { getStatusChipColor } from './getStatusChipColor'
-import { PatientClinicalReviews } from './PatientClinicalReviews'
-import { ResearchStudiesSection } from './ResearchStudiesSection'
 
 const STATUS_ORDER: Record<string, number> = { ACTIVE: 0, SUSPENDED: 1, COMPLETED: 2 }
 

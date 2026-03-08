@@ -15,7 +15,7 @@ import React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import type { Case } from '@/api/schemas'
-import StatusChip from '@/components/common/StatusChip'
+import { StatusChip } from '@/components/common'
 import { useCategoryLabel, useTriggerLabel } from '@/hooks/labels'
 
 interface CasesSectionProps {

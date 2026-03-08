@@ -5,11 +5,10 @@ import type {
   JourneyTemplateEntry,
   QuestionnaireTemplate,
 } from '@/api/schemas'
-
-import { suggestWindowDays } from '../../../utils/journeyUtils'
-import { slugify } from '../../../utils/slugify'
-import type { AliasRow } from './entry-editor'
-import { mkId } from './questionnaireUtils'
+import type { AliasRow } from '@/components/journey/editor/entry-editor'
+import { mkId } from '@/components/journey/editor/questionnaireUtils'
+import { suggestWindowDays } from '@/utils/journeyUtils'
+import { slugify } from '@/utils/slugify'
 
 export type InstructionMode = 'NONE' | 'TEMPLATE' | 'FREETEXT'
 

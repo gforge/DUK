@@ -17,7 +17,8 @@
     "generate:i18n": "i18next-cli extract --quiet && i18next-cli types",
     "ncu": "ncu",
     "diagrams:render": "docker run --rm --user \"$(id -u):$(id -g)\" -v \"$PWD\":/workspace plantuml/plantuml -tsvg /workspace/docs/diagrams",
-    "diagrams:clean": "bash -lc \"rm -f docs/diagrams/*.svg || true\""
+    "diagrams:clean": "bash -lc \"rm -f docs/diagrams/*.svg || true\"",
+    "barrel:generate": "vscode-generate-index-standalone \"src/components/**\""
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -63,6 +64,7 @@
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.56.1",
     "vite": "^7.3.1",
-    "vitest": "^4.0.18"
+    "vitest": "^4.0.18",
+    "vscode-generate-index-standalone": "^1.7.1"
   }
 }

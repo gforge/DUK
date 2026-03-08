@@ -14,10 +14,10 @@ import { useTranslation } from 'react-i18next'
 
 import * as client from '@/api/client'
 import type { JourneyTemplate, JourneyTemplateEntry } from '@/api/schemas'
+import { EntryEditorDialog } from '@/components/journey/editor'
 import { useApi } from '@/hooks/useApi'
 import { useSnack } from '@/store/snackContext'
 
-import { EntryEditorDialog } from './EntryEditorDialog'
 import { JourneyTemplatesTabDialogs } from './JourneyTemplatesTabDialogs'
 import { JourneyTemplatesTabList } from './JourneyTemplatesTabList'
 

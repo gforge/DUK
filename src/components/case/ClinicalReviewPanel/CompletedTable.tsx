@@ -15,9 +15,8 @@ import React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import type { ClinicalReview, User } from '@/api/schemas'
-import { useReviewOutcomeLabel,useReviewTypeLabel } from '@/hooks/labels'
-
-import { RoleIcon } from '../../common/RoleIcon'
+import { RoleIcon } from '@/components/common'
+import { useReviewOutcomeLabel, useReviewTypeLabel } from '@/hooks/labels'
 
 function outcomeColor(
   outcome: ClinicalReview['outcome'] | undefined,
@@ -33,7 +32,7 @@ interface Props {
   userMap: Map<string, User>
 }
 
-export default function CompletedReviewsTable({ reviews, userMap }: Props) {
+export function CompletedReviewsTable({ reviews, userMap }: Props) {
   const { t } = useTranslation()
   const getReviewTypeLabel = useReviewTypeLabel()
   const getReviewOutcomeLabel = useReviewOutcomeLabel()

@@ -4,15 +4,15 @@ import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import * as client from '@/api/client'
-import type { Case, ReviewOutcome,ReviewType } from '@/api/schemas'
+import type { Case, ReviewOutcome, ReviewType } from '@/api/schemas'
 import { useApi } from '@/hooks/useApi'
 import { useRole } from '@/store/roleContext'
 import { useSnack } from '@/store/snackContext'
 
-import AddReviewDialog from './AddReviewDialog'
-import CompletedReviewsTable from './CompletedReviewsTable'
-import CompleteReviewDialog from './CompleteReviewDialog'
-import PendingReviewsSection from './PendingReviewsSection'
+import { AddReviewDialog } from './AddDialog'
+import { CompleteReviewDialog } from './CompleteDialog'
+import { CompletedReviewsTable } from './CompletedTable'
+import { PendingReviewsSection } from './PendingReviewsSection'
 
 interface Props {
   readonly caseData: Case

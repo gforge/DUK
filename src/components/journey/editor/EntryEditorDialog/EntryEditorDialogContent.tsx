@@ -28,9 +28,8 @@ import type {
   JourneyTemplateEntry,
   QuestionnaireTemplate,
 } from '@/api/schemas'
-
-import { ScoreAliasEditor } from '../entry-editor'
-import { InstructionMode, useEntryEditor } from '../useEntryEditor'
+import { ScoreAliasEditor } from '@/components/journey/editor/entry-editor'
+import { InstructionMode, useEntryEditor } from '@/components/journey/editor/useEntryEditor'
 
 interface Props {
   entry?: JourneyTemplateEntry

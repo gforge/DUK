@@ -1,4 +1,4 @@
-import type { Question,QuestionnaireTemplate } from '@/api/schemas'
+import type { Question, QuestionnaireTemplate } from '@/api/schemas'
 
 export const mkId = () => Date.now().toString(36) + '-' + Math.random().toString(36).slice(2)
 

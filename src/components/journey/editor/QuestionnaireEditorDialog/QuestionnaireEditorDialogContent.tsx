@@ -26,11 +26,10 @@ import React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import type { QuestionnaireTemplate } from '@/api/schemas'
-
-import QuestionnaireEditorQuestionsTab from '../QuestionnaireEditorQuestionsTab'
-import QuestionnaireEditorScoringTab from '../QuestionnaireEditorScoringTab'
-import { ScoringRowDraft } from '../questionnaireUtils'
-import { useQuestionnaireEditor } from '../useQuestionnaireEditor'
+import QuestionnaireEditorQuestionsTab from '@/components/journey/editor/QuestionnaireEditorQuestionsTab'
+import QuestionnaireEditorScoringTab from '@/components/journey/editor/QuestionnaireEditorScoringTab'
+import { ScoringRowDraft } from '@/components/journey/editor/questionnaireUtils'
+import { useQuestionnaireEditor } from '@/components/journey/editor/useQuestionnaireEditor'
 
 interface Props {
   template?: QuestionnaireTemplate
@@ -38,7 +37,7 @@ interface Props {
   onClose: () => void
 }
 
-export default function QuestionnaireEditorDialog({ template, onSave, onClose }: Props) {
+export function QuestionnaireEditorDialog({ template, onSave, onClose }: Props) {
   const { t } = useTranslation()
   const isCreate = !template
   const {

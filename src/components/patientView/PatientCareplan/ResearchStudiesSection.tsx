@@ -3,9 +3,8 @@ import { Button, Chip, Divider, Stack, Typography } from '@mui/material'
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import type { Consent,ResearchModule } from '@/api/schemas'
-
-import { DeclineConsentDialog, GrantConsentDialog,RevokeConsentDialog } from '../../journey'
+import type { Consent, ResearchModule } from '@/api/schemas'
+import { DeclineConsentDialog, GrantConsentDialog, RevokeConsentDialog } from '@/components/journey'
 
 interface Props {
   patientId: string

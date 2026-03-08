@@ -21,20 +21,20 @@ Core roles
 Workflows (high-level)
 
 - Dashboard: three queues (Acute 0–2w, Subacute 3–8w, Follow-up 9w+) with filters and search.
-- Case detail: patient summary, triggers, latest forms, policy warnings, tabs (Forms, Triage, Journal, Audit).
+- Case detail: patient summary, triggers, latest forms, policy warnings, tabs (Forms, Journey, Triage, Journal, Audit).
 - Triage form: nextStep, deadline, internal note, patient message, assignToRole, submit -> update backend + audit event.
 
 State machine (case lifecycle)
 
 - States: NEW → NEEDS_REVIEW → TRIAGED → FOLLOWING_UP → CLOSED
-- Valid transitions enforced in code (see mapping in [src/api/service/cases.ts](src/api/service/cases.ts)).
+- Valid transitions enforced in code (see mapping in [src/api/service/cases.ts](../src/api/service/cases.ts)).
 - Audit events emitted on state change.
 
 Patient journeys
 
 - A patient may have multiple concurrent `PatientJourney` instances. A journey defines a series of follow-ups (entries) with an offset and window relative to `startDate`.
-- The UI resolves effective steps via `getEffectiveSteps` ([src/api/service/journeyResolver.ts](src/api/service/journeyResolver.ts)).
-- Selection rule: by default the latest ACTIVE journey for a patient is used for dashboard/step computation.
+- The UI resolves effective steps via `getEffectiveSteps` ([src/api/service/journeyResolver.ts](../src/api/service/journeyResolver.ts)).
+- Dashboard due-step computation merges due steps across all ACTIVE journeys via `getMergedDueStepsForPatient` and deduplicates by `templateEntryId`.
 - **Journey switching with date reset**: clinicians can switch between templates (e.g., non-op → surgery → post-op) using `SWITCH_TEMPLATE`. When switching, a new start date can be set (e.g. surgery date) so all subsequent steps recalculate relative to the new anchor.
 - **Instruction steps**: each `JourneyTemplateEntry` can carry physio/patient instructions — either inline text (`instructionText`) or a reference to a reusable `InstructionTemplate` (`instructionTemplateId`). Instructions are hydrated at resolution time and rendered as collapsible panels in the timeline.
 - **Template inheritance**: templates can be derived from a parent via `deriveJourneyTemplate` (copy-on-derive). The `computeParentDiff` / `applyParentDiff` functions let clinicians selectively sync changes from the parent after it evolves.
@@ -49,18 +49,18 @@ InstructionTemplates
 
 - `InstructionTemplate` is a reusable entity (id, name, content, tags) for physio protocols, wound care instructions, post-op guidance, etc.
 - Managed in the Journey Editor under the "Instructions" tab.
-- CRUD: `saveInstructionTemplate`, `deleteInstructionTemplate` in [src/api/service/instructionTemplates.ts](src/api/service/instructionTemplates.ts).
+- CRUD: `saveInstructionTemplate`, `deleteInstructionTemplate` in [src/api/service/instructionTemplates.ts](../src/api/service/instructionTemplates.ts).
 - Seed provides 4 templates: proximal humerus, distal radius, wound care, post-op general.
 
 Patient care plan
 
-- The Patient view (`/patient`) displays a "My Care Plan" section showing the read-only journey timeline with resolved instructions for the patient's active journey.
+- The Patient view (`/patient`) displays a "My Care Plan" section showing tabbed read-only timelines with resolved instructions for all journeys.
 
 Policy & templating
 
-- Policy: user-editable rules with a safe expression language (identifiers, + - _ /, comparisons, parentheses). Evaluator is implemented without `eval` ([src/api/policyParser/_](src/api/policyParser)).
-- Policy evaluation runs against an assembled numeric scope (answers + aliased scores) and produces `policyWarnings` on cases ([src/api/service/policy.ts](src/api/service/policy.ts)).
-- Journal templates: secure Mustache-like renderer with a whitelist of tokens and limited `{{#if FLAG}}` conditionals ([src/api/journalRenderer.ts](src/api/journalRenderer.ts)).
+- Policy: user-editable rules with a safe expression language (identifiers, + - \_ /, comparisons, parentheses). Evaluator is implemented without `eval` ([src/api/policyParser/](../src/api/policyParser/)).
+- Policy evaluation runs against an assembled numeric scope (answers + aliased scores) and produces `policyWarnings` on cases ([src/api/service/policy.ts](../src/api/service/policy.ts)).
+- Journal templates: secure Mustache-like renderer with a whitelist of tokens and limited `{{#if FLAG}}` conditionals ([src/api/journalRenderer.ts](../src/api/journalRenderer.ts)).
 
 Journey pause & resume
 
@@ -148,30 +148,30 @@ Data model (core entities)
 
 Mapping to implementation
 
-- Enums & statuses: [src/api/schemas/enums.ts](src/api/schemas/enums.ts)
-- Case schema & triage: [src/api/schemas/case.ts](src/api/schemas/case.ts)
-- Patient & journeys: [src/api/schemas/patient.ts](src/api/schemas/patient.ts), [src/api/schemas/journey.ts](src/api/schemas/journey.ts)
-- Instruction templates: [src/api/service/instructionTemplates.ts](src/api/service/instructionTemplates.ts)
-- Journey template derivation & sync: [src/api/service/journeyTemplates.ts](src/api/service/journeyTemplates.ts) (`deriveJourneyTemplate`, `computeParentDiff`, `applyParentDiff`)
-- Patient CRUD: [src/api/service/patients.ts](src/api/service/patients.ts) (`createPatient`)
-- Case services & transitions: [src/api/service/cases.ts](src/api/service/cases.ts)
-- Journey resolution: [src/api/service/journeyResolver.ts](src/api/service/journeyResolver.ts) (`getEffectiveSteps`, `getMergedDueStepsForPatient`)
-- Journey pause & resume: [src/api/service/patientJourneys.ts](src/api/service/patientJourneys.ts) (`pauseJourney`, `resumeJourney`, `cancelJourney`)
-- Journey cancellation UI: [src/components/case/JourneyTab/CancelJourneyDialog.tsx](src/components/case/JourneyTab/CancelJourneyDialog.tsx)
-- JourneyTab sub-components: [src/components/case/JourneyTab/](src/components/case/JourneyTab/) (`useJourneyActions`, `JourneyHeader`, `JourneySelectorTabs`, `PauseConfirmDialog`, `CancelJourneyDialog`)
-- Research consent: [src/api/service/researchConsents.ts](src/api/service/researchConsents.ts) (`grantConsent`, `revokeConsent`, `hasActiveConsent`)
-- Consent UI: [src/components/journey/ConsentDialog.tsx](src/components/journey/ConsentDialog.tsx)
-- Policy parser: [src/api/policyParser/parser.ts](src/api/policyParser/parser.ts)
-- Journal renderer: [src/api/journalRenderer.ts](src/api/journalRenderer.ts)
-- Seeds show examples: [src/api/seed](src/api/seed)
-- Patient registration UI: [src/pages/Patients.tsx](src/pages/Patients.tsx)
-- Patient detail page: [src/pages/PatientDetail.tsx](src/pages/PatientDetail.tsx)
-- Patient questionnaire form: [src/components/patientView/PatientQuestionnaireForm.tsx](src/components/patientView/PatientQuestionnaireForm.tsx), [src/components/patientView/PatientDueForms.tsx](src/components/patientView/PatientDueForms.tsx)
-- Nurse contact actions: [src/components/case/NurseContactActions.tsx](src/components/case/NurseContactActions.tsx), `logContactEvent` in [src/api/service/audit.ts](src/api/service/audit.ts)
-- Global patient search: [src/components/layout/GlobalSearch.tsx](src/components/layout/GlobalSearch.tsx)
-- Patient table pagination: [src/components/patients/PatientTable.tsx](src/components/patients/PatientTable.tsx)
-- Confirm dialog: [src/components/common/ConfirmDialog.tsx](src/components/common/ConfirmDialog.tsx)
-- 404 page: [src/pages/NotFound.tsx](src/pages/NotFound.tsx)
+- Enums & statuses: [src/api/schemas/enums.ts](../src/api/schemas/enums.ts)
+- Case schema & triage: [src/api/schemas/case.ts](../src/api/schemas/case.ts)
+- Patient & journeys: [src/api/schemas/patient.ts](../src/api/schemas/patient.ts), [src/api/schemas/journey.ts](../src/api/schemas/journey.ts)
+- Instruction templates: [src/api/service/instructionTemplates.ts](../src/api/service/instructionTemplates.ts)
+- Journey template derivation & sync: [src/api/service/journeyTemplates.ts](../src/api/service/journeyTemplates.ts) (`deriveJourneyTemplate`, `computeParentDiff`, `applyParentDiff`)
+- Patient CRUD: [src/api/service/patients.ts](../src/api/service/patients.ts) (`createPatient`)
+- Case services & transitions: [src/api/service/cases.ts](../src/api/service/cases.ts)
+- Journey resolution: [src/api/service/journeyResolver.ts](../src/api/service/journeyResolver.ts) (`getEffectiveSteps`, `getMergedDueStepsForPatient`)
+- Journey pause & resume: [src/api/service/patientJourneys.ts](../src/api/service/patientJourneys.ts) (`pauseJourney`, `resumeJourney`, `cancelJourney`)
+- Journey cancellation UI: [src/components/case/JourneyTab/CancelJourneyDialog.tsx](../src/components/case/JourneyTab/CancelJourneyDialog.tsx)
+- JourneyTab sub-components: [src/components/case/JourneyTab/](../src/components/case/JourneyTab/) (`useJourneyActions`, `JourneyHeader`, `JourneySelectorTabs`, `PauseConfirmDialog`, `CancelJourneyDialog`)
+- Research consent: [src/api/service/researchConsents.ts](../src/api/service/researchConsents.ts) (`grantConsent`, `revokeConsent`, `hasActiveConsent`)
+- Consent UI: [src/components/journey/ConsentDialog.tsx](../src/components/journey/ConsentDialog.tsx)
+- Policy parser: [src/api/policyParser/parser.ts](../src/api/policyParser/parser.ts)
+- Journal renderer: [src/api/journalRenderer.ts](../src/api/journalRenderer.ts)
+- Seeds show examples: [src/api/seed](../src/api/seed)
+- Patient registration UI: [src/pages/Patients.tsx](../src/pages/Patients.tsx)
+- Patient detail page: [src/pages/PatientDetail.tsx](../src/pages/PatientDetail.tsx)
+- Patient questionnaire form: [src/components/patientView/PatientQuestionnaireForm/index.tsx](../src/components/patientView/PatientQuestionnaireForm/index.tsx), [src/components/patientView/PatientDueForms/index.tsx](../src/components/patientView/PatientDueForms/index.tsx)
+- Nurse contact actions: [src/components/case/NurseContactActions.tsx](../src/components/case/NurseContactActions.tsx), `logContactEvent` in [src/api/service/audit.ts](../src/api/service/audit.ts)
+- Global patient search: [src/components/layout/GlobalSearch.tsx](../src/components/layout/GlobalSearch.tsx)
+- Patient table pagination: [src/components/patients/PatientTable.tsx](../src/components/patients/PatientTable.tsx)
+- Confirm dialog: [src/components/common/ConfirmDialog.tsx](../src/components/common/ConfirmDialog.tsx)
+- 404 page: [src/pages/NotFound.tsx](../src/pages/NotFound.tsx)
 
 Gaps & recommendations
 

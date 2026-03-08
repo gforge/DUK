@@ -18,12 +18,11 @@ import { useTranslation } from 'react-i18next'
 
 import * as client from '@/api/client'
 import type { Case, Patient } from '@/api/schemas'
+import BookingsList from '@/components/case/BookingsList'
+import JournalDraftCard from '@/components/case/JournalDraftCard'
 import { useApi } from '@/hooks/useApi'
 import { useRole } from '@/store/roleContext'
 import { useSnack } from '@/store/snackContext'
-
-import BookingsList from './BookingsList'
-import JournalDraftCard from './journal/JournalDraftCard'
 
 interface JournalTabProps {
   readonly caseData: Case

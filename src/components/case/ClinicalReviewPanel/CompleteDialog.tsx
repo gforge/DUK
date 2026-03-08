@@ -13,7 +13,6 @@ import {
   ToggleButton,
   ToggleButtonGroup,
 } from '@mui/material'
-import React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import type { ReviewOutcome } from '@/api/schemas'
@@ -29,7 +28,7 @@ interface Props {
   onConfirm: () => void
 }
 
-export default function CompleteReviewDialog({
+export function CompleteReviewDialog({
   open,
   outcome,
   note,

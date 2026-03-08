@@ -47,7 +47,7 @@ function modSummary(mod: JourneyModification, templateName: (id: string) => stri
   return mod.type
 }
 
-export default function PatientJourneysTable({
+export function PatientJourneysTable({
   patientJourneys,
   loading,
   patients,

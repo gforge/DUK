@@ -14,20 +14,21 @@ import {
   Tabs,
   Typography,
 } from '@mui/material'
-import React, { useCallback, useEffect, useMemo, useRef,useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useNavigate,useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 
 import * as client from '@/api/client'
-import AuditLogTab from '@/components/case/AuditLogTab'
-import FormResponsesTab from '@/components/case/FormResponsesTab'
-import JournalTab from '@/components/case/JournalTab'
-import JourneyTab from '@/components/case/JourneyTab'
-import NurseContactActions from '@/components/case/NurseContactActions'
-import PatientCard from '@/components/case/PatientCard'
-import TriageTab from '@/components/case/TriageTab'
-import AutoWarningsBadge from '@/components/common/AutoWarningsBadge'
-import StatusChip from '@/components/common/StatusChip'
+import {
+  AuditLogTab,
+  FormResponsesTab,
+  JournalTab,
+  JourneyTab,
+  NurseContactActions,
+  PatientCard,
+  TriageTab,
+} from '@/components/case'
+import { AutoWarningsBadge, StatusChip } from '@/components/common'
 import { useApi } from '@/hooks/useApi'
 import { useHotkeys } from '@/hooks/useHotkeys'
 

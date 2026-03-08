@@ -22,12 +22,10 @@ import {
 import { format } from 'date-fns'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link, useNavigate,useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 
 import * as client from '@/api/client'
-import CasesSection from '@/components/patients/CasesSection'
-import PatientJourneyResearchCard from '@/components/patients/PatientJourneyResearchCard'
-import PatientSummary from '@/components/patients/PatientSummary'
+import { CasesSection, PatientJourneyResearchCard, PatientSummary } from '@/components/patients'
 import { useJourneyStatusLabel } from '@/hooks/labels'
 import { useApi } from '@/hooks/useApi'
 

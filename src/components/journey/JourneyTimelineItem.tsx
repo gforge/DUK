@@ -16,10 +16,11 @@ import {
 } from '@mui/material'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
+import ReactMarkdown from 'react-markdown'
 
 import type { ClinicalReview } from '@/api/schemas'
 import type { EffectiveStep } from '@/api/service'
-import { type StepStatus,useStepStatusLabel } from '@/hooks/labels'
+import { type StepStatus, useStepStatusLabel } from '@/hooks/labels'
 
 import { StatusIcon } from './JourneyTimeline/StatusIcon'
 import { ReviewTypeKey } from './JourneyTimeline/types'
@@ -259,19 +260,12 @@ export default function JourneyTimelineItem({
                   borderRadius: 1,
                   borderLeft: 3,
                   borderColor: 'primary.light',
+                  '& p': { my: 0.5, typography: 'caption', color: 'text.secondary' },
+                  '& ul, & ol': { my: 0.5, pl: 2.5 },
+                  '& li': { my: 0 },
                 }}
               >
-                <Typography
-                  variant="caption"
-                  component="pre"
-                  sx={{
-                    whiteSpace: 'pre-wrap',
-                    fontFamily: 'inherit',
-                    color: 'text.secondary',
-                  }}
-                >
-                  {step.resolvedInstruction}
-                </Typography>
+                <ReactMarkdown>{step.resolvedInstruction}</ReactMarkdown>
               </Box>
             </Collapse>
           </Box>

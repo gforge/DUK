@@ -10,7 +10,6 @@ import {
   MenuItem,
   Select,
 } from '@mui/material'
-import React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import type { ReviewType } from '@/api/schemas'
@@ -24,7 +23,7 @@ interface Props {
   onConfirm: () => void
 }
 
-export default function AddReviewDialog({
+export function AddReviewDialog({
   open,
   onClose,
   reviewType,

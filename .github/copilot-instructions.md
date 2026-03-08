@@ -148,7 +148,7 @@ All UI code calls functions from `src/api/client/` which wrap service functions 
 
 - `withDelay(fn)` — adds 100–400 ms simulated latency.
 - All client functions are `async` and return `Promise<T>`.
-- Import with `import * as client from '../api/client'` in page and component files.
+- Import with `import * as client from '@/api/client'` in page and component files.
 
 ---
 
@@ -203,7 +203,7 @@ A patient can have any number of concurrent `PatientJourney` records (e.g., wris
 
 ### Conventions
 
-- All components are named exports except page-level components (default exports).
+- Prefer named exports for shared utilities and helpers. UI components may use default exports where established in the codebase.
 - Props interfaces are defined inline above the component: `interface Props { ... }`.
 - Use MUI components exclusively — do not introduce CSS files, Tailwind, or other styling libraries.
 - Use `sx` prop for one-off styles; avoid `styled()` unless the component is reused and the style is complex.
@@ -226,10 +226,10 @@ const { data, loading, error, refetch } = useApi(() => client.getSomething(id), 
 ### Role-based UI
 
 ```tsx
-const { user } = useRole()
+const { currentUser } = useRole()
 ```
 
-`user.role` is `'PATIENT' | 'NURSE' | 'DOCTOR' | 'PAL'`. PAL is a Doctor with restricted patient filter. Guard admin-only UI with `user.role !== 'PATIENT'`.
+`currentUser.role` is `'PATIENT' | 'NURSE' | 'DOCTOR' | 'PAL'`. PAL is a Doctor with restricted patient filter. Guard admin-only UI with `currentUser.role !== 'PATIENT'`.
 
 ### Notifications
 
@@ -293,7 +293,6 @@ Do not add `eval` or dynamic code execution under any circumstances.
 | `npm run typecheck`       | `tsc --noEmit`                                                                                                                   |
 | `npm run lint`            | ESLint with zero warnings allowed                                                                                                |
 | `npm run format`          | Prettier on `src/`                                                                                                               |
-| `npm run generate:i18n`   | Extract i18n keys                                                                                                                |
 | `npm run generate:i18n`   | Extract i18n keys into `src/i18n/locales/*/translation.json` — run after adding or changing UI text; updates both `sv` and `en`. |
 | `npm run diagrams:render` | Render PlantUML diagrams to SVG via Docker                                                                                       |
 
@@ -333,7 +332,7 @@ Keyboard shortcuts are registered with `useHotkeys` from `src/hooks/useHotkeys.t
 ## Hard constraints (never violate)
 
 1. **No `eval()` or `new Function()`** anywhere in the codebase.
-2. **No direct `localStorage` access** outside `src/api/storage.ts`.
+2. **No direct `localStorage` access** outside `src/api/storage.ts` for application/domain state. Exception: lightweight UI/session preferences in store/context modules are allowed.
 3. **No real patient data** — all names, personal numbers and clinical values are fictional.
 4. **No network calls** — there is no backend; all async operations resolve against the in-memory store.
 5. **No authentication logic** — role switching is purely for demo purposes.

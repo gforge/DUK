@@ -15,10 +15,8 @@ import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import * as client from '@/api/client'
-import ExportPanel from '@/components/demo/ExportPanel'
-import ImportPanel from '@/components/demo/ImportPanel'
-import type { ConfirmAction } from '@/components/demo/SeedPanel'
-import SeedPanel from '@/components/demo/SeedPanel'
+import type { ConfirmAction } from '@/components/demo'
+import { ExportPanel, ImportPanel, SeedPanel } from '@/components/demo'
 import { useSnack } from '@/store/snackContext'
 
 export default function DemoTools() {

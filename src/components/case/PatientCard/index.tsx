@@ -1,5 +1,5 @@
 import PersonIcon from '@mui/icons-material/Person'
-import { Box, Chip, Divider, Paper, Stack, Tooltip,Typography } from '@mui/material'
+import { Box, Chip, Divider, Paper, Stack, Tooltip, Typography } from '@mui/material'
 import { format } from 'date-fns'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
@@ -7,11 +7,8 @@ import { useNavigate } from 'react-router-dom'
 
 import type { Case, Patient } from '@/api/schemas'
 import { formatPersonnummer } from '@/api/utils/personnummer'
-import { useCategoryLabel, useNextStepLabel,useRoleLabel } from '@/hooks/labels'
-
-import AutoWarningsBadge from '../common/AutoWarningsBadge'
-import DeadlineLabel from '../common/DeadlineLabel'
-import TriggerChips from '../common/TriggerChips'
+import { AutoWarningsBadge, DeadlineLabel, TriggerChips } from '@/components/common'
+import { useCategoryLabel, useNextStepLabel, useRoleLabel } from '@/hooks/labels'
 
 interface PatientCardProps {
   readonly patient: Patient

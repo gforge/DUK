@@ -19,7 +19,7 @@ import {
 } from '@mui/material'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useLocation,useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 import { useNavItems } from '@/hooks/useNavItems'
 import { useRole } from '@/store/roleContext'

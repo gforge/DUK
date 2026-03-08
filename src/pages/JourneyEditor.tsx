@@ -5,12 +5,11 @@ import RouteIcon from '@mui/icons-material/Route'
 import ScienceIcon from '@mui/icons-material/Science'
 import UndoIcon from '@mui/icons-material/Undo'
 import { Alert, Box, Button, Paper, Stack, Tab, Tabs, Tooltip, Typography } from '@mui/material'
-import React, { useCallback,useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import * as client from '@/api/client'
-import ConfirmDialog from '@/components/common/ConfirmDialog'
-import TabPanel from '@/components/common/TabPanel'
+import { ConfirmDialog, TabPanel } from '@/components/common'
 import {
   InstructionTemplatesTab,
   JourneyTemplatesTab,

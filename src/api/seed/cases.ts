@@ -1,5 +1,5 @@
 import type { Case } from '../schemas'
-import { daysAgo, daysFromNow,iso } from './shared'
+import { daysAgo, daysFromNow, iso } from './shared'
 
 export const cases: Case[] = [
   // ── ACUTE ──────────────────────────────────────────────────────────────────
@@ -28,7 +28,7 @@ export const cases: Case[] = [
         createdAt: iso(daysAgo(14)),
         reviewedAt: iso(daysAgo(7)),
         outcome: 'OK',
-        note: 'Routine lab values within normal range.',
+        note: 'Rutinmässiga blodprover: CRP och Hb normala.',
       },
       {
         id: 'case-1-review-2',
@@ -40,7 +40,7 @@ export const cases: Case[] = [
         createdAt: iso(daysAgo(14)),
         reviewedAt: iso(daysAgo(7)),
         outcome: 'OK',
-        note: '2‑week postoperative radiograph: no complications.',
+        note: '2‑veckors postoperativ röntgen: inga komplikationer.',
       },
     ],
   },

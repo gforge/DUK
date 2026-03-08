@@ -75,7 +75,7 @@ This document captures the key user stories for the Duk demo application. The li
 4. Due questionnaire steps are listed with template name, scheduled date, and overdue indicator.
 5. The questionnaire form renders all five question types (SCALE, BOOLEAN, TEXT, SELECT, NUMBER) and validates required fields before submission.
 
-> _Related code_: `src/pages/PatientView.tsx`, `src/components/patientView/PatientDueForms.tsx`, `src/components/patientView/PatientQuestionnaireForm.tsx`, `src/components/patientView/PatientActions.tsx`.
+> _Related code_: `src/pages/PatientView.tsx`, `src/components/patientView/PatientDueForms/index.tsx`, `src/components/patientView/PatientQuestionnaireForm/index.tsx`, `src/components/patientView/PatientActions/index.tsx`.
 
 ## US5 – Configurable triage policy without eval
 
@@ -266,7 +266,7 @@ These stories map directly to the workflows and components described in the desi
 5. Pausing a non-ACTIVE journey and resuming a non-SUSPENDED journey both throw with a descriptive error.
 6. Unit tests verify status transitions, `totalPausedDays` accumulation, and the step-date shift.
 
-> _Related code_: `src/api/service/patientJourneys.ts`, `src/api/service/journeyResolver.ts`, `src/components/case/JourneyTab.tsx`, `src/tests/journey.test.ts`.
+> _Related code_: `src/api/service/patientJourneys.ts`, `src/api/service/journeyResolver.ts`, `src/components/case/JourneyTab/index.tsx`, `src/tests/journey.test.ts`.
 
 ---
 
@@ -286,7 +286,7 @@ These stories map directly to the workflows and components described in the desi
 4. `getMergedDueStepsForPatient(patientId, date)` deduplicates due steps across all ACTIVE journeys by `templateEntryId`.
 5. Unit tests verify that `getMergedDueStepsForPatient` deduplicates correctly when two journeys share the same questionnaire.
 
-> _Related code_: `src/api/service/journeyResolver.ts`, `src/components/case/JourneyTab.tsx`, `src/components/patientView/PatientCareplan.tsx`, `src/tests/journey.test.ts`.
+> _Related code_: `src/api/service/journeyResolver.ts`, `src/components/case/JourneyTab/index.tsx`, `src/components/patientView/PatientCareplan/main.tsx`, `src/tests/journey.test.ts`.
 
 ---
 

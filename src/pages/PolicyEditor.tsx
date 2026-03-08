@@ -18,10 +18,14 @@ import { useTranslation } from 'react-i18next'
 
 import * as client from '@/api/client'
 import type { PolicyRule } from '@/api/schemas'
-import PolicyHelpDialog from '@/components/policy/PolicyHelpDialog'
-import type { RuleForm } from '@/components/policy/PolicyRuleDialog'
-import PolicyRuleDialog, { ruleSchema, SEVERITIES } from '@/components/policy/PolicyRuleDialog'
-import PolicyRulesTable from '@/components/policy/PolicyRulesTable'
+import type { RuleForm } from '@/components/policy'
+import {
+  PolicyHelpDialog,
+  PolicyRuleDialog,
+  PolicyRulesTable,
+  ruleSchema,
+  SEVERITIES,
+} from '@/components/policy'
 import { useApi } from '@/hooks/useApi'
 import { useSnack } from '@/store/snackContext'
 

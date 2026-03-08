@@ -24,9 +24,8 @@ import {
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import type { QuestionnaireTemplate,ResearchModule } from '@/api/schemas'
-
-import ModuleEditorDialog from '../ModuleEditorDialog'
+import type { QuestionnaireTemplate, ResearchModule } from '@/api/schemas'
+import ModuleEditorDialog from '@/components/journey/editor/ModuleEditorDialog'
 
 // dialog implementation moved to ModuleEditorDialog.tsx
 
@@ -40,7 +39,7 @@ interface Props {
   onSave: (m: Omit<ResearchModule, 'id' | 'createdAt'> & { id?: string }) => void
 }
 
-export default function ResearchModulesTab({
+export function ResearchModulesTab({
   researchModules,
   loading,
   questionnaires,
