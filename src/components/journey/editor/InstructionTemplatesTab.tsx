@@ -23,6 +23,7 @@ import {
 } from '@mui/material'
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import ReactMarkdown from 'react-markdown'
 
 import type { InstructionTemplate } from '@/api/schemas'
 
@@ -203,19 +204,10 @@ export default function InstructionTemplatesTab({
                     borderRadius: 1,
                     borderLeft: 3,
                     borderColor: 'primary.light',
+                    '& p': { mt: 0.5, mb: 0.5, typography: 'body2' },
                   }}
                 >
-                  <Typography
-                    variant="body2"
-                    component="pre"
-                    sx={{
-                      whiteSpace: 'pre-wrap',
-                      fontFamily: 'inherit',
-                      color: 'text.secondary',
-                    }}
-                  >
-                    {it.content}
-                  </Typography>
+                  <ReactMarkdown>{it.content}</ReactMarkdown>
                 </Box>
               </AccordionDetails>
             </Accordion>
