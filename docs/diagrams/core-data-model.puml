@@ -131,6 +131,8 @@ class FormResponse {
   templateId
   answers
   scores
+  patientJourneyId?
+  journeyStepId?
 }
 
 class JournalDraft {
@@ -149,6 +151,9 @@ Patient "1" -- "*" Consent : consents
 
 Case "1" -- "*" FormResponse : responses
 Case "1" -- "*" JournalDraft : drafts
+
+FormResponse "*" -- "0..1" PatientJourney : patientJourneyId
+FormResponse "*" -- "0..1" JourneyTemplateEntry : journeyStepId
 
 JourneyTemplate "1" -- "*" JourneyTemplateEntry : entries
 JourneyTemplate "0..1" -- "*" JourneyTemplate : parentTemplateId (derives)
@@ -191,6 +196,15 @@ note right of Consent
   revokedAt = null (active) or timestamp (revoked)
   One active consent per patient+module+journey
   Revoked records are kept for audit trail
+end note
+
+note right of FormResponse
+  Follow-up trigger semantics:
+  JourneyTemplateEntry defines a due follow-up point.
+  When a form is submitted, FormResponse may reference
+  patientJourneyId and journeyStepId.
+  Submission updates Case.triggers and policyWarnings,
+  which then drive staff triage decisions.
 end note
 
 note bottom
