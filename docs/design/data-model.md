@@ -4,6 +4,10 @@ This document expands the core entities with field-level detail and references t
 
 ![Core Data Model](../diagrams/core-data-model.svg)
 
+The ERD above is intentionally compact. For examples and clarifications of non-intuitive field names, see:
+
+![Core Data Model Field Guide](../diagrams/core-data-model-help.svg)
+
 Patient (src/api/schemas/patient.ts)
 
 - id: string (uuid)
