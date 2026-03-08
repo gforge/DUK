@@ -15,6 +15,10 @@ import { questionnaireTemplates } from './questionnaireTemplates'
 import { researchModules } from './researchModules'
 import { patients, users } from './users'
 
+const MS_PER_DAY = 86_400_000
+const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}$/
+const ISO_DATETIME_RE = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/
+
 const baseSeedState: AppState = {
   schemaVersion: CURRENT_SCHEMA_VERSION,
   users,
@@ -35,7 +39,74 @@ const baseSeedState: AppState = {
   researchConsents: [],
 }
 
-export const SEED_STATE: AppState = {
-  ...baseSeedState,
-  users: ensureAllUsers(baseSeedState),
+function dayStart(date: Date): Date {
+  const d = new Date(date)
+  d.setHours(0, 0, 0, 0)
+  return d
 }
+
+function shiftIso(value: string, shiftDays: number): string {
+  if (shiftDays === 0) return value
+  const parsed = new Date(value)
+  if (Number.isNaN(parsed.getTime())) return value
+  return new Date(parsed.getTime() + shiftDays * MS_PER_DAY).toISOString()
+}
+
+function shiftDate(value: string, shiftDays: number): string {
+  if (shiftDays === 0) return value
+  const parsed = new Date(`${value}T00:00:00.000Z`)
+  if (Number.isNaN(parsed.getTime())) return value
+  return new Date(parsed.getTime() + shiftDays * MS_PER_DAY).toISOString().slice(0, 10)
+}
+
+function shiftDatesDeep<T>(value: T, shiftDays: number): T {
+  if (shiftDays === 0) return structuredClone(value)
+
+  if (Array.isArray(value)) {
+    return value.map((item) => shiftDatesDeep(item, shiftDays)) as T
+  }
+
+  if (value && typeof value === 'object') {
+    const entries = Object.entries(value as Record<string, unknown>).map(([k, v]) => [
+      k,
+      shiftDatesDeep(v, shiftDays),
+    ])
+    return Object.fromEntries(entries) as T
+  }
+
+  if (typeof value === 'string') {
+    if (ISO_DATETIME_RE.test(value)) return shiftIso(value, shiftDays) as T
+    if (ISO_DATE_RE.test(value)) return shiftDate(value, shiftDays) as T
+  }
+
+  return value
+}
+
+function inferSeedAnchorDate(state: AppState): Date {
+  const pj1 = state.patientJourneys.find((j) => j.id === 'pj-1')
+  const baseline = pj1?.startDate ?? state.patientJourneys[0]?.startDate
+  if (!baseline) return dayStart(new Date())
+
+  const baselineDate = new Date(`${baseline}T00:00:00.000Z`)
+  if (Number.isNaN(baselineDate.getTime())) return dayStart(new Date())
+
+  // In minimal seed, pj-1 starts 14 days before "today".
+  return dayStart(new Date(baselineDate.getTime() + 14 * MS_PER_DAY))
+}
+
+function buildBaseMinimalSeed(): AppState {
+  return {
+    ...baseSeedState,
+    users: ensureAllUsers(baseSeedState),
+  }
+}
+
+export function buildMinimalSeed(today: Date = new Date()): AppState {
+  const seed = buildBaseMinimalSeed()
+  const target = dayStart(today)
+  const anchor = inferSeedAnchorDate(seed)
+  const shiftDays = Math.round((target.getTime() - anchor.getTime()) / MS_PER_DAY)
+  return shiftDatesDeep(seed, shiftDays)
+}
+
+export const SEED_STATE: AppState = buildMinimalSeed()

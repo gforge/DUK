@@ -19,7 +19,7 @@ export async function resetAndReseed(variant: SeedVariant = 'minimal'): Promise<
     const { buildFakerSeed } = await import('../seedFaker')
     setStore(await buildFakerSeed())
   } else {
-    const { SEED_STATE } = await import('../seed')
-    setStore(SEED_STATE)
+    const { buildMinimalSeed } = await import('../seed')
+    setStore(buildMinimalSeed())
   }
 }
