@@ -1,6 +1,6 @@
-import * as service from '../service'
 import type { JourneyTemplate } from '../schemas'
 import type { EntryDiff, PolicyVariable } from '../service'
+import * as service from '../service'
 import { withDelay } from './delay'
 
 export const getJourneyTemplates = (): Promise<JourneyTemplate[]> =>

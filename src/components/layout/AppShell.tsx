@@ -1,7 +1,8 @@
-import React, { useState } from 'react'
 import { Box, Toolbar, useMediaQuery, useTheme } from '@mui/material'
-import TopBar from './TopBar'
+import React, { useState } from 'react'
+
 import SideNav from './SideNav'
+import TopBar from './TopBar'
 
 const DRAWER_WIDTH = 220
 

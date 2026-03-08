@@ -1,5 +1,5 @@
-import * as service from '../service'
 import type { ResearchModule } from '../schemas'
+import * as service from '../service'
 import { withDelay } from './delay'
 
 export const getResearchModules = (): Promise<ResearchModule[]> =>

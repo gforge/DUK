@@ -1,6 +1,8 @@
 import { useState } from 'react'
-import type { QuestionnaireTemplate, Question } from '@/api/schemas'
-import { mkId, initQuestions, initScoringRows, ScoringRowDraft } from './questionnaireUtils'
+
+import type { Question,QuestionnaireTemplate } from '@/api/schemas'
+
+import { initQuestions, initScoringRows, mkId, ScoringRowDraft } from './questionnaireUtils'
 
 export function useQuestionnaireEditor(template?: QuestionnaireTemplate) {
   const [tab, setTab] = useState(0)

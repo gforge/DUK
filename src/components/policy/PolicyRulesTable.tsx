@@ -1,4 +1,5 @@
-import React from 'react'
+import DeleteIcon from '@mui/icons-material/Delete'
+import EditIcon from '@mui/icons-material/Edit'
 import {
   Box,
   Chip,
@@ -14,11 +15,11 @@ import {
   TableRow,
   Typography,
 } from '@mui/material'
-import EditIcon from '@mui/icons-material/Edit'
-import DeleteIcon from '@mui/icons-material/Delete'
+import React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useSeverityLabel } from '@/hooks/labels'
+
 import type { PolicyRule } from '@/api/schemas'
+import { useSeverityLabel } from '@/hooks/labels'
 
 interface Props {
   rules: PolicyRule[]

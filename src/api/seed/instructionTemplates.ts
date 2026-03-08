@@ -1,5 +1,5 @@
-import { iso, daysAgo } from './shared'
 import type { InstructionTemplate } from '../schemas'
+import { daysAgo,iso } from './shared'
 
 export const instructionTemplates: InstructionTemplate[] = [
   {

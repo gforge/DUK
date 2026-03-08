@@ -1,4 +1,5 @@
-import React from 'react'
+import BiotechIcon from '@mui/icons-material/Biotech'
+import ImageIcon from '@mui/icons-material/Image'
 import {
   Button,
   Chip,
@@ -10,10 +11,10 @@ import {
   Stack,
   TextField,
 } from '@mui/material'
-import BiotechIcon from '@mui/icons-material/Biotech'
-import ImageIcon from '@mui/icons-material/Image'
+import React from 'react'
 import { useTranslation } from 'react-i18next'
-import type { ReviewTypeKey } from './JourneyTimelineContent'
+
+import type { ReviewTypeKey } from './JourneyTimeline/types'
 
 export interface AddReviewDialogProps {
   open: boolean
@@ -44,7 +45,7 @@ export default function AddReviewDialog({
           {reviewDialog && (
             <Chip
               icon={reviewDialog.reviewType === 'LAB' ? <BiotechIcon /> : <ImageIcon />}
-              label={t(`reviewType.${reviewDialog.reviewType}`)}
+              label={t(`reviewType.${reviewDialog.reviewType}` as any) as string}
               color="info"
               sx={{ alignSelf: 'flex-start' }}
             />

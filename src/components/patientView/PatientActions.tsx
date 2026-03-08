@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import ContactPhoneIcon from '@mui/icons-material/ContactPhone'
+import SmartphoneIcon from '@mui/icons-material/Smartphone'
 import {
   Button,
   CircularProgress,
@@ -9,12 +10,12 @@ import {
   DialogTitle,
   Stack,
 } from '@mui/material'
-import SmartphoneIcon from '@mui/icons-material/Smartphone'
-import ContactPhoneIcon from '@mui/icons-material/ContactPhone'
+import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useSnack } from '@/store/snackContext'
+
 import * as client from '@/api/client'
 import type { Case } from '@/api/schemas'
+import { useSnack } from '@/store/snackContext'
 
 interface Props {
   patientId: string

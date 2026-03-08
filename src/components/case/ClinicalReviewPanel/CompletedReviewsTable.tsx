@@ -1,21 +1,23 @@
-import React from 'react'
+import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import {
   Box,
-  Typography,
+  Chip,
+  Stack,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  Stack,
-  Chip,
+  Typography,
 } from '@mui/material'
-import CheckCircleIcon from '@mui/icons-material/CheckCircle'
+import React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useReviewTypeLabel, useReviewOutcomeLabel } from '@/hooks/labels'
-import { RoleIcon } from '../../common/RoleIcon'
+
 import type { ClinicalReview, User } from '@/api/schemas'
+import { useReviewOutcomeLabel,useReviewTypeLabel } from '@/hooks/labels'
+
+import { RoleIcon } from '../../common/RoleIcon'
 
 function outcomeColor(
   outcome: ClinicalReview['outcome'] | undefined,

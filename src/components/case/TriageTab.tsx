@@ -1,14 +1,16 @@
+import { Alert,Box, Button, Stack } from '@mui/material'
 import React from 'react'
-import { Box, Button, Stack, Alert } from '@mui/material'
 import { useTranslation } from 'react-i18next'
-import { useRoleLabel } from '@/hooks/labels'
+
+import * as client from '@/api/client'
 import type { Case } from '@/api/schemas'
+import { useRoleLabel } from '@/hooks/labels'
 import { useRole } from '@/store/roleContext'
 import { useSnack } from '@/store/snackContext'
-import * as client from '@/api/client'
-import TriageForm from './triage/TriageForm'
+
 import ClinicalReviewPanel from './ClinicalReviewPanel'
 import type { TriageForm as TriageFormData } from './triage/TriageForm'
+import TriageForm from './triage/TriageForm'
 
 interface TriageTabProps {
   readonly caseData: Case

@@ -1,4 +1,3 @@
-import React from 'react'
 import {
   Button,
   CircularProgress,
@@ -11,7 +10,9 @@ import {
   MenuItem,
   Select,
 } from '@mui/material'
+import React from 'react'
 import { useTranslation } from 'react-i18next'
+
 import type { ReviewType } from '@/api/schemas'
 
 interface Props {

@@ -1,10 +1,11 @@
-import React from 'react'
-import { Box, Divider, Paper, Stack, Typography } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
 import CancelIcon from '@mui/icons-material/Cancel'
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline'
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz'
+import { Box, Divider, Paper, Stack, Typography } from '@mui/material'
+import React from 'react'
 import { useTranslation } from 'react-i18next'
+
 import type { JourneyModification, JourneyTemplate } from '@/api/schemas'
 
 const MOD_ICON: Record<string, React.ReactNode> = {

@@ -1,30 +1,31 @@
-import React from 'react'
-import {
-  Box,
-  Stack,
-  Typography,
-  Chip,
-  Button,
-  Tooltip,
-  IconButton,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-} from '@mui/material'
-import OpenInNewIcon from '@mui/icons-material/OpenInNew'
-import PlayArrowIcon from '@mui/icons-material/PlayArrow'
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth'
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
+import OpenInNewIcon from '@mui/icons-material/OpenInNew'
+import PlayArrowIcon from '@mui/icons-material/PlayArrow'
+import {
+  Box,
+  Button,
+  Chip,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  IconButton,
+  Stack,
+  TextField,
+  Tooltip,
+  Typography,
+} from '@mui/material'
+import React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useRoleLabel } from '@/hooks/labels'
 import { useNavigate } from 'react-router-dom'
+
+import type { Case, NextStep,Patient } from '@/api/schemas'
+import { formatPersonnummer } from '@/api/utils/personnummer'
 import DeadlineLabel from '@/components/common/DeadlineLabel'
 import StatusChip from '@/components/common/StatusChip'
-import type { Case, Patient, NextStep } from '@/api/schemas'
-import { formatPersonnummer } from '@/api/utils/personnummer'
+import { useRoleLabel } from '@/hooks/labels'
 
 /** Steps that require scheduling an appointment */
 const BOOKABLE_STEPS: NextStep[] = ['DOCTOR_VISIT', 'NURSE_VISIT', 'PHYSIO_VISIT', 'PHONE_CALL']

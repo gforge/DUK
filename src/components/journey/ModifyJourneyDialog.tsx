@@ -1,4 +1,3 @@
-import React, { useState } from 'react'
 import {
   Alert,
   Box,
@@ -10,9 +9,12 @@ import {
   Tab,
   Tabs,
 } from '@mui/material'
+import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import type { EffectiveStep } from '@/api/service'
+
 import type { JourneyTemplate, QuestionnaireTemplate } from '@/api/schemas'
+import type { EffectiveStep } from '@/api/service'
+
 import { AddStepForm, RemoveStepForm, SwitchTemplateForm } from './modify/ModifyForms'
 
 interface ModifyJourneyDialogProps {

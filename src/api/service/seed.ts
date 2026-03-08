@@ -1,5 +1,5 @@
-import { getStore, setStore } from '../storage'
 import type { AppState } from '../schemas'
+import { getStore, setStore } from '../storage'
 
 export type SeedVariant = 'minimal' | 'realistic' | 'faker'
 

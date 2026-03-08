@@ -1,4 +1,5 @@
-import React from 'react'
+import AddIcon from '@mui/icons-material/Add'
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 import {
   Box,
   Button,
@@ -12,9 +13,9 @@ import {
   TextField,
   Typography,
 } from '@mui/material'
-import AddIcon from '@mui/icons-material/Add'
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
+import React from 'react'
 import { useTranslation } from 'react-i18next'
+
 import { ScoringRowDraft } from './questionnaireUtils'
 
 interface Props {

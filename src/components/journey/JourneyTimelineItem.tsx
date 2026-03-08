@@ -1,4 +1,9 @@
-import React from 'react'
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
+import BiotechIcon from '@mui/icons-material/Biotech'
+import ImageIcon from '@mui/icons-material/Image'
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
+import RepeatIcon from '@mui/icons-material/Repeat'
+import ScienceIcon from '@mui/icons-material/Science'
 import {
   Box,
   Chip,
@@ -9,17 +14,15 @@ import {
   Typography,
   useTheme,
 } from '@mui/material'
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
-import ScienceIcon from '@mui/icons-material/Science'
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
-import RepeatIcon from '@mui/icons-material/Repeat'
-import BiotechIcon from '@mui/icons-material/Biotech'
-import ImageIcon from '@mui/icons-material/Image'
+import React from 'react'
 import { useTranslation } from 'react-i18next'
-import type { EffectiveStep } from '@/api/service'
+
 import type { ClinicalReview } from '@/api/schemas'
-import { StatusIcon, ReviewTypeKey } from './JourneyTimelineContent'
-import { useStepStatusLabel, type StepStatus } from '@/hooks/labels'
+import type { EffectiveStep } from '@/api/service'
+import { type StepStatus,useStepStatusLabel } from '@/hooks/labels'
+
+import { StatusIcon } from './JourneyTimeline/StatusIcon'
+import { ReviewTypeKey } from './JourneyTimeline/types'
 
 interface Props {
   step: EffectiveStep

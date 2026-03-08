@@ -1,11 +1,12 @@
 import { useTranslation } from 'react-i18next'
+
 import type {
-  CaseStatus,
   CaseCategory,
-  TriggerType,
-  ReviewType,
-  ReviewOutcome,
+  CaseStatus,
   NextStep,
+  ReviewOutcome,
+  ReviewType,
+  TriggerType,
 } from '@/api/schemas'
 
 // ── helpers ──────────────────────────────────────────────────────────────────

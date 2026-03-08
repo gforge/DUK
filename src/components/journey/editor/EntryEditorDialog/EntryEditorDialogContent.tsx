@@ -1,8 +1,8 @@
-import React from 'react'
 import {
   Autocomplete,
   Box,
   Button,
+  Checkbox,
   Dialog,
   DialogActions,
   DialogContent,
@@ -18,16 +18,19 @@ import {
   ToggleButton,
   ToggleButtonGroup,
   Typography,
-  Checkbox,
 } from '@mui/material'
+import React from 'react'
 import { useTranslation } from 'react-i18next'
+import ReactMarkdown from 'react-markdown'
+
 import type {
+  InstructionTemplate,
   JourneyTemplateEntry,
   QuestionnaireTemplate,
-  InstructionTemplate,
 } from '@/api/schemas'
-import { ScoreAliasEditor } from './entry-editor'
-import { useEntryEditor, InstructionMode } from './useEntryEditor'
+
+import { ScoreAliasEditor } from '../entry-editor'
+import { InstructionMode, useEntryEditor } from '../useEntryEditor'
 
 interface Props {
   entry?: JourneyTemplateEntry
@@ -37,7 +40,7 @@ interface Props {
   onClose: () => void
 }
 
-export default function EntryEditorDialogContent({
+export function EntryEditorDialog({
   entry,
   questionnaires,
   instructionTemplates,
@@ -237,6 +240,24 @@ export default function EntryEditorDialogContent({
                   ))}
                 </Select>
               </FormControl>
+            )}
+            {instructionMode === 'TEMPLATE' && selectedIT && (
+              <Box
+                sx={{
+                  mt: 1,
+                  p: 1,
+                  bgcolor: 'action.hover',
+                  borderRadius: 1,
+                  borderLeft: 3,
+                  borderColor: 'primary.light',
+                  '& p': { mt: 0.5, mb: 0.5, typography: 'body2' },
+                }}
+              >
+                <Typography variant="overline" color="text.secondary" display="block" mb={0.5}>
+                  {t('journey.entry.instruction')}
+                </Typography>
+                <ReactMarkdown>{selectedIT.content}</ReactMarkdown>
+              </Box>
             )}
             {instructionMode === 'FREETEXT' && (
               <TextField

@@ -1,8 +1,8 @@
-import React from 'react'
-import { Button, Divider, Paper, Stack, Typography } from '@mui/material'
-import RestoreIcon from '@mui/icons-material/Restore'
-import PeopleIcon from '@mui/icons-material/People'
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome'
+import PeopleIcon from '@mui/icons-material/People'
+import RestoreIcon from '@mui/icons-material/Restore'
+import { Button, Divider, Paper, Stack, Typography } from '@mui/material'
+import React from 'react'
 import { useTranslation } from 'react-i18next'
 
 export type ConfirmAction =

@@ -1,4 +1,7 @@
-import React from 'react'
+import AddIcon from '@mui/icons-material/Add'
+import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline'
+import ScienceIcon from '@mui/icons-material/Science'
+import SwapHorizIcon from '@mui/icons-material/SwapHoriz'
 import {
   Chip,
   Divider,
@@ -11,19 +14,17 @@ import {
   TableRow,
   Typography,
 } from '@mui/material'
-import ScienceIcon from '@mui/icons-material/Science'
-import AddIcon from '@mui/icons-material/Add'
-import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline'
-import SwapHorizIcon from '@mui/icons-material/SwapHoriz'
+import React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useJourneyStatusLabel } from '@/hooks/labels'
+
 import type {
   JourneyModification,
-  PatientJourney,
-  ResearchModule,
   JourneyTemplate,
   Patient,
+  PatientJourney,
+  ResearchModule,
 } from '@/api/schemas'
+import { useJourneyStatusLabel } from '@/hooks/labels'
 
 const MOD_ICON: Record<string, React.ReactNode> = {
   ADD_STEP: <AddIcon fontSize="inherit" />,

@@ -1,7 +1,8 @@
-import React from 'react'
 import { Card, CardContent, CircularProgress, Stack, Typography } from '@mui/material'
-import { useTranslation } from 'react-i18next'
 import { format } from 'date-fns'
+import React from 'react'
+import { useTranslation } from 'react-i18next'
+
 import type { Patient } from '@/api/schemas'
 import { formatPersonnummer } from '@/api/utils/personnummer'
 

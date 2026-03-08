@@ -1,4 +1,3 @@
-import React, { useState } from 'react'
 import {
   Box,
   Button,
@@ -12,13 +11,16 @@ import {
   FormControlLabel,
   Typography,
 } from '@mui/material'
-import ReactMarkdown from 'react-markdown'
-import DeclineConsentDialog from './DeclineConsentDialog'
+import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import ReactMarkdown from 'react-markdown'
+
 import * as client from '@/api/client'
-import { useSnack } from '@/store/snackContext'
-import { useRole } from '@/store/roleContext'
 import type { ResearchModule } from '@/api/schemas'
+import { useRole } from '@/store/roleContext'
+import { useSnack } from '@/store/snackContext'
+
+import { DeclineConsentDialog } from './Decline'
 
 interface ConsentDialogProps {
   readonly open: boolean
@@ -29,7 +31,7 @@ interface ConsentDialogProps {
   readonly onGranted: () => void
 }
 
-export default function GrantConsentDialog({
+export function GrantConsentDialog({
   open,
   onClose,
   module,

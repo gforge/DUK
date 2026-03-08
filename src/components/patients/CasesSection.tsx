@@ -1,21 +1,22 @@
-import React from 'react'
+import AssignmentIcon from '@mui/icons-material/Assignment'
 import {
+  Chip,
   Paper,
   Stack,
-  Typography,
-  Chip,
   Table,
+  TableBody,
+  TableCell,
   TableHead,
   TableRow,
-  TableCell,
-  TableBody,
+  Typography,
 } from '@mui/material'
-import AssignmentIcon from '@mui/icons-material/Assignment'
-import { useTranslation } from 'react-i18next'
-import { useCategoryLabel, useTriggerLabel } from '@/hooks/labels'
 import { format } from 'date-fns'
-import StatusChip from '@/components/common/StatusChip'
+import React from 'react'
+import { useTranslation } from 'react-i18next'
+
 import type { Case } from '@/api/schemas'
+import StatusChip from '@/components/common/StatusChip'
+import { useCategoryLabel, useTriggerLabel } from '@/hooks/labels'
 
 interface CasesSectionProps {
   cases: Case[]

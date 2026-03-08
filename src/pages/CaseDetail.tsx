@@ -1,34 +1,35 @@
-import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react'
+import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import {
+  Alert,
   Badge,
   Box,
-  Typography,
-  Tabs,
-  Tab,
-  Button,
-  Stack,
-  Paper,
-  Alert,
-  Skeleton,
-  Chip,
   Breadcrumbs,
+  Button,
+  Chip,
   Link,
+  Paper,
+  Skeleton,
+  Stack,
+  Tab,
+  Tabs,
+  Typography,
 } from '@mui/material'
-import ArrowBackIcon from '@mui/icons-material/ArrowBack'
-import { useParams, useNavigate } from 'react-router-dom'
+import React, { useCallback, useEffect, useMemo, useRef,useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useNavigate,useParams } from 'react-router-dom'
+
+import * as client from '@/api/client'
+import AuditLogTab from '@/components/case/AuditLogTab'
+import FormResponsesTab from '@/components/case/FormResponsesTab'
+import JournalTab from '@/components/case/JournalTab'
+import JourneyTab from '@/components/case/JourneyTab'
+import NurseContactActions from '@/components/case/NurseContactActions'
+import PatientCard from '@/components/case/PatientCard'
+import TriageTab from '@/components/case/TriageTab'
+import AutoWarningsBadge from '@/components/common/AutoWarningsBadge'
+import StatusChip from '@/components/common/StatusChip'
 import { useApi } from '@/hooks/useApi'
 import { useHotkeys } from '@/hooks/useHotkeys'
-import * as client from '@/api/client'
-import PatientCard from '@/components/case/PatientCard'
-import FormResponsesTab from '@/components/case/FormResponsesTab'
-import TriageTab from '@/components/case/TriageTab'
-import JournalTab from '@/components/case/JournalTab'
-import AuditLogTab from '@/components/case/AuditLogTab'
-import JourneyTab from '@/components/case/JourneyTab'
-import StatusChip from '@/components/common/StatusChip'
-import AutoWarningsBadge from '@/components/common/AutoWarningsBadge'
-import NurseContactActions from '@/components/case/NurseContactActions'
 
 interface TabPanelProps {
   readonly children: React.ReactNode

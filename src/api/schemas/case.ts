@@ -1,12 +1,13 @@
 import { z } from 'zod'
+
 import {
-  RoleSchema,
-  CaseStatusSchema,
   CaseCategorySchema,
-  TriggerTypeSchema,
+  CaseStatusSchema,
   NextStepSchema,
-  ReviewTypeSchema,
   ReviewOutcomeSchema,
+  ReviewTypeSchema,
+  RoleSchema,
+  TriggerTypeSchema,
 } from './enums'
 
 export const PolicyWarningSchema = z.object({

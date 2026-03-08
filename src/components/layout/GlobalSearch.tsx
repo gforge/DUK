@@ -1,26 +1,27 @@
-import React, { useState, useRef, useMemo } from 'react'
+import PersonIcon from '@mui/icons-material/Person'
+import SearchIcon from '@mui/icons-material/Search'
 import {
+  Box,
   Dialog,
   DialogContent,
-  TextField,
+  Divider,
+  IconButton,
+  InputAdornment,
   List,
   ListItemButton,
   ListItemText,
-  Typography,
-  IconButton,
+  TextField,
   Tooltip,
-  InputAdornment,
-  Divider,
-  Box,
+  Typography,
 } from '@mui/material'
-import SearchIcon from '@mui/icons-material/Search'
-import PersonIcon from '@mui/icons-material/Person'
+import React, { useMemo,useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
-import { useRole } from '@/store/roleContext'
+
 import * as client from '@/api/client'
 import type { Patient } from '@/api/schemas'
 import { formatPersonnummer } from '@/api/utils/personnummer'
+import { useRole } from '@/store/roleContext'
 
 const MAX_RESULTS = 10
 

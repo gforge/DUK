@@ -1,8 +1,10 @@
+import { Box, Chip, Divider,Paper, Stack, Typography } from '@mui/material'
 import React from 'react'
-import { Paper, Stack, Typography, Chip, Box, Divider } from '@mui/material'
 import { useTranslation } from 'react-i18next'
+
+import type { Case, NextStep,Patient } from '@/api/schemas'
 import { useNextStepLabel } from '@/hooks/labels'
-import type { Case, Patient, NextStep } from '@/api/schemas'
+
 import WorklistRow from './WorklistRow'
 
 interface GroupSectionProps {

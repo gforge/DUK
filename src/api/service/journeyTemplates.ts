@@ -1,6 +1,6 @@
-import { getStore, setStore } from '../storage'
-import { uuid, now } from './utils'
 import type { JourneyTemplate, JourneyTemplateEntry } from '../schemas'
+import { getStore, setStore } from '../storage'
+import { now,uuid } from './utils'
 
 export function getJourneyTemplates(): JourneyTemplate[] {
   return getStore().journeyTemplates

@@ -1,13 +1,14 @@
-import React, { useState, useMemo } from 'react'
-import { Alert, Box, Button, CircularProgress, Stack, TextField, Typography } from '@mui/material'
-import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt'
 import PersonIcon from '@mui/icons-material/Person'
+import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt'
+import { Alert, Box, Button, CircularProgress, Stack, TextField, Typography } from '@mui/material'
+import React, { useMemo,useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useApi } from '@/hooks/useApi'
+
 import * as client from '@/api/client'
-import { useRole } from '@/store/roleContext'
 import PatientTable from '@/components/patients/PatientTable'
 import RegisterPatientDialog from '@/components/patients/RegisterPatientDialog'
+import { useApi } from '@/hooks/useApi'
+import { useRole } from '@/store/roleContext'
 
 export default function Patients() {
   const { t } = useTranslation()

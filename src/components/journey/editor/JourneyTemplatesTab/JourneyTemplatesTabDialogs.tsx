@@ -1,10 +1,12 @@
 import React from 'react'
-import type { JourneyTemplate } from '@/api/schemas'
-import DeriveDialog from './DeriveDialog'
-import SyncFromParentDialog from './SyncFromParentDialog'
-import EditTemplateDialog from './EditTemplateDialog'
 
-export default function JourneyTemplatesTabDialogs({
+import type { JourneyTemplate } from '@/api/schemas'
+
+import DeriveDialog from '../DeriveDialog'
+import EditTemplateDialog from '../EditTemplateDialog'
+import SyncFromParentDialog from '../SyncFromParentDialog'
+
+export function JourneyTemplatesTabDialogs({
   deriveTarget,
   syncTarget,
   editTarget,

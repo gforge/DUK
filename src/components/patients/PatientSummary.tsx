@@ -1,10 +1,11 @@
-import React from 'react'
-import { Box, Paper, Stack, Typography } from '@mui/material'
 import PersonIcon from '@mui/icons-material/Person'
+import { Box, Paper, Stack, Typography } from '@mui/material'
 import { format } from 'date-fns'
+import React from 'react'
 import { useTranslation } from 'react-i18next'
-import { formatPersonnummer } from '@/api/utils/personnummer'
+
 import type { Patient } from '@/api/schemas'
+import { formatPersonnummer } from '@/api/utils/personnummer'
 
 interface PatientSummaryProps {
   patient: Patient

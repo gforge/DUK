@@ -1,12 +1,14 @@
-import React from 'react'
-import { AppBar, Toolbar, Typography, IconButton, Box, Chip, Tooltip } from '@mui/material'
 import MenuIcon from '@mui/icons-material/Menu'
 import WarningAmberIcon from '@mui/icons-material/WarningAmber'
+import { AppBar, Box, Chip, IconButton, Toolbar, Tooltip,Typography } from '@mui/material'
+import React from 'react'
 import { useTranslation } from 'react-i18next'
-import RoleSwitcher from '../common/RoleSwitcher'
-import LanguageSwitcher from '../common/LanguageSwitcher'
-import GlobalSearch from './GlobalSearch'
+
 import { useRole } from '@/store/roleContext'
+
+import LanguageSwitcher from '../common/LanguageSwitcher'
+import RoleSwitcher from '../common/RoleSwitcher'
+import GlobalSearch from './GlobalSearch'
 
 interface TopBarProps {
   onMenuClick: () => void

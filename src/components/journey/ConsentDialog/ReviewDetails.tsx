@@ -1,4 +1,5 @@
-import React from 'react'
+import BiotechIcon from '@mui/icons-material/Biotech'
+import ImageIcon from '@mui/icons-material/Image'
 import {
   Button,
   Chip,
@@ -9,9 +10,9 @@ import {
   Stack,
   Typography,
 } from '@mui/material'
-import BiotechIcon from '@mui/icons-material/Biotech'
-import ImageIcon from '@mui/icons-material/Image'
+import React from 'react'
 import { useTranslation } from 'react-i18next'
+
 import type { ClinicalReview } from '@/api/schemas'
 
 export interface ReviewDetailsDialogProps {
@@ -19,7 +20,7 @@ export interface ReviewDetailsDialogProps {
   onClose: () => void
 }
 
-export default function ReviewDetailsDialog({ reviewDetails, onClose }: ReviewDetailsDialogProps) {
+export function ReviewDetailsDialog({ reviewDetails, onClose }: ReviewDetailsDialogProps) {
   const { t } = useTranslation()
 
   return (

@@ -1,23 +1,24 @@
-import React from 'react'
 import {
+  Alert,
   Box,
-  Typography,
+  Chip,
+  CircularProgress,
+  Paper,
+  Stack,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableRow,
-  Chip,
-  Alert,
-  CircularProgress,
-  Paper,
-  Stack,
+  Typography,
 } from '@mui/material'
+import { format } from 'date-fns'
+import React from 'react'
 import { useTranslation } from 'react-i18next'
+
+import * as client from '@/api/client'
 import { useRoleLabel } from '@/hooks/labels'
 import { useApi } from '@/hooks/useApi'
-import * as client from '@/api/client'
-import { format } from 'date-fns'
 
 interface AuditLogTabProps {
   caseId: string

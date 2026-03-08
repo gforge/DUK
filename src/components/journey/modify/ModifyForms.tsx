@@ -1,4 +1,4 @@
-import React from 'react'
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 import {
   Button,
   FormControl,
@@ -9,10 +9,11 @@ import {
   TextField,
   Typography,
 } from '@mui/material'
+import React from 'react'
 import { useTranslation } from 'react-i18next'
-import type { EffectiveStep } from '@/api/service'
+
 import type { QuestionnaireTemplate } from '@/api/schemas'
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
+import type { EffectiveStep } from '@/api/service'
 
 // ─── Add Step ─────────────────────────────────────────────────────────────────
 

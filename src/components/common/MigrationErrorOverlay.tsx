@@ -1,12 +1,13 @@
-import React from 'react'
-import { Box, Button, Chip, Divider, Paper, Stack, Typography } from '@mui/material'
-import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline'
-import DownloadIcon from '@mui/icons-material/Download'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
+import DownloadIcon from '@mui/icons-material/Download'
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline'
+import { Box, Button, Chip, Divider, Paper, Stack, Typography } from '@mui/material'
+import React from 'react'
 import { useTranslation } from 'react-i18next'
-import { clearState } from '@/api/storage'
-import { CURRENT_SCHEMA_VERSION } from '@/api/schemaVersion'
+
 import type { MigrationResultErr } from '@/api/migrations'
+import { CURRENT_SCHEMA_VERSION } from '@/api/schemaVersion'
+import { clearState } from '@/api/storage'
 
 interface Props {
   error: MigrationResultErr

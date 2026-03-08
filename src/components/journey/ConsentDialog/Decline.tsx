@@ -1,18 +1,19 @@
-import React, { useState } from 'react'
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
   Alert,
-  DialogActions,
   Button,
-  TextField,
   CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  TextField,
 } from '@mui/material'
+import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+
 import * as client from '@/api/client'
-import { useSnack } from '@/store/snackContext'
 import { useRole } from '@/store/roleContext'
+import { useSnack } from '@/store/snackContext'
 
 interface DeclineConsentDialogProps {
   open: boolean
@@ -28,7 +29,7 @@ interface DeclineConsentDialogProps {
   onDone: () => void
 }
 
-export default function DeclineConsentDialog({
+export function DeclineConsentDialog({
   open,
   onClose,
   studyName,

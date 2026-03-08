@@ -1,5 +1,5 @@
-import { iso, daysAgo } from '../shared'
 import type { JourneyTemplate } from '../../schemas'
+import { daysAgo,iso } from '../shared'
 
 export const jtProximalHumerus: JourneyTemplate = {
   id: 'jt-proximal-humerus',

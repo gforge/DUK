@@ -1,13 +1,14 @@
-import React, { useState } from 'react'
-import { Alert, Button, Stack } from '@mui/material'
-import PhoneIcon from '@mui/icons-material/Phone'
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive'
+import PhoneIcon from '@mui/icons-material/Phone'
+import { Alert, Button, Stack } from '@mui/material'
+import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+
+import * as client from '@/api/client'
+import type { ContactAction } from '@/api/client/audit'
+import type { Case } from '@/api/schemas'
 import { useRole } from '@/store/roleContext'
 import { useSnack } from '@/store/snackContext'
-import * as client from '@/api/client'
-import type { Case } from '@/api/schemas'
-import type { ContactAction } from '@/api/client/audit'
 
 /** Triggers that surface the nurse contact action panel */
 const CONTACT_TRIGGERS = new Set(['SEEK_CONTACT', 'NOT_OPENED'])

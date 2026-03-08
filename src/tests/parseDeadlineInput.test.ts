@@ -1,7 +1,8 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import {
-  parseDeadlineInput,
   isDeadlineShorthand,
+  parseDeadlineInput,
 } from '@/components/case/triage/parseDeadlineInput'
 
 // Fix "today" to 2026-02-25 (Wednesday) for deterministic output

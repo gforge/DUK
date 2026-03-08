@@ -1,13 +1,14 @@
-import React from 'react'
-import { Button, Chip, CircularProgress, Stack, Tooltip, Typography } from '@mui/material'
 import CancelIcon from '@mui/icons-material/Cancel'
 import EditIcon from '@mui/icons-material/Edit'
 import PauseIcon from '@mui/icons-material/Pause'
 import PlayArrowIcon from '@mui/icons-material/PlayArrow'
 import RouteIcon from '@mui/icons-material/Route'
+import { Button, Chip, CircularProgress, Stack, Tooltip, Typography } from '@mui/material'
+import React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useJourneyStatusLabel } from '@/hooks/labels'
+
 import type { JourneyTemplate, PatientJourney } from '@/api/schemas'
+import { useJourneyStatusLabel } from '@/hooks/labels'
 
 function journeyStatusColor(status: string): 'primary' | 'warning' | 'default' {
   if (status === 'ACTIVE') return 'primary'

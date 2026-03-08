@@ -1,5 +1,5 @@
-import { getStore, patchStore } from '../storage'
 import type { AuditEvent, Role } from '../schemas'
+import { getStore, patchStore } from '../storage'
 import { addAuditEvent } from './utils'
 
 export type ContactAction = 'CONTACTED' | 'REMINDER_SENT'

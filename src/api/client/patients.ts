@@ -1,7 +1,7 @@
-import * as service from '../service'
 import type { Patient } from '../schemas'
-import { withDelay } from './delay'
+import * as service from '../service'
 import { formatPersonnummer } from '../utils/personnummer'
+import { withDelay } from './delay'
 
 export const getPatients = (): Promise<Patient[]> => withDelay(() => service.getPatients())
 

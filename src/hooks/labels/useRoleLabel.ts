@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+
 import type { Role } from '@/api/schemas'
 
 function assertNever(x: never): never {

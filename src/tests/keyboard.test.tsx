@@ -1,7 +1,8 @@
-import React from 'react'
-import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import React from 'react'
+import { describe, expect,it } from 'vitest'
+
 import { useRovingTabIndex } from '@/hooks/useRovingTabIndex'
 
 // Simple test component that uses the hook

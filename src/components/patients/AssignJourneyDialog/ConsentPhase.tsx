@@ -1,4 +1,4 @@
-import React from 'react'
+import ScienceIcon from '@mui/icons-material/Science'
 import {
   Box,
   Button,
@@ -11,9 +11,10 @@ import {
   Stack,
   Typography,
 } from '@mui/material'
-import ScienceIcon from '@mui/icons-material/Science'
-import ReactMarkdown from 'react-markdown'
+import React from 'react'
 import { useTranslation } from 'react-i18next'
+import ReactMarkdown from 'react-markdown'
+
 import type { ResearchModule } from '@/api/schemas'
 
 interface Props {

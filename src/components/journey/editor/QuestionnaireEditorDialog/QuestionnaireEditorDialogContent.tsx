@@ -1,9 +1,8 @@
-import React, { useState } from 'react'
+import AddIcon from '@mui/icons-material/Add'
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 import {
   Box,
   Button,
-  Checkbox,
-  Chip,
   Dialog,
   DialogActions,
   DialogContent,
@@ -21,17 +20,17 @@ import {
   TableRow,
   Tabs,
   TextField,
-  Tooltip,
   Typography,
 } from '@mui/material'
-import AddIcon from '@mui/icons-material/Add'
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
+import React from 'react'
 import { useTranslation } from 'react-i18next'
-import type { QuestionnaireTemplate, Question } from '@/api/schemas'
-import QuestionnaireEditorQuestionsTab from './QuestionnaireEditorQuestionsTab'
-import QuestionnaireEditorScoringTab from './QuestionnaireEditorScoringTab'
-import { mkId, initQuestions, initScoringRows, ScoringRowDraft } from './questionnaireUtils'
-import { useQuestionnaireEditor } from './useQuestionnaireEditor'
+
+import type { QuestionnaireTemplate } from '@/api/schemas'
+
+import QuestionnaireEditorQuestionsTab from '../QuestionnaireEditorQuestionsTab'
+import QuestionnaireEditorScoringTab from '../QuestionnaireEditorScoringTab'
+import { ScoringRowDraft } from '../questionnaireUtils'
+import { useQuestionnaireEditor } from '../useQuestionnaireEditor'
 
 interface Props {
   template?: QuestionnaireTemplate
@@ -144,7 +143,7 @@ export default function QuestionnaireEditorDialog({ template, onSave, onClose }:
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {scoringRows.map((r) => (
+                    {scoringRows.map((r: any) => (
                       <TableRow key={r._id}>
                         <TableCell>
                           <TextField

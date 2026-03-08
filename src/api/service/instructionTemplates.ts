@@ -1,6 +1,6 @@
-import { getStore, setStore } from '../storage'
-import { uuid, now } from './utils'
 import type { InstructionTemplate } from '../schemas'
+import { getStore, setStore } from '../storage'
+import { now,uuid } from './utils'
 
 export function getInstructionTemplates(): InstructionTemplate[] {
   return getStore().instructionTemplates ?? []

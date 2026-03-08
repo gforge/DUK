@@ -1,7 +1,8 @@
-import { getStore, setStore } from '@/api/storage'
-import { uuid, now, computeScores, evaluatePolicyRules, addAuditEvent } from './utils'
-import { buildPolicyScopeWithAliases } from './journeyResolver'
 import type { Case, FormResponse, TriggerType } from '@/api/schemas'
+import { getStore, setStore } from '@/api/storage'
+
+import { buildPolicyScopeWithAliases } from './journeyResolver'
+import { addAuditEvent,computeScores, evaluatePolicyRules, now, uuid } from './utils'
 
 export function getFormResponses(caseId: string): FormResponse[] {
   return getStore().formResponses.filter((r) => r.caseId === caseId)

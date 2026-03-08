@@ -1,6 +1,6 @@
+import type { JourneyModification,PatientJourney } from '../schemas'
 import { getStore, setStore } from '../storage'
-import { uuid, now } from './utils'
-import type { PatientJourney, JourneyModification } from '../schemas'
+import { now,uuid } from './utils'
 
 export type CancelJourneyResult = { deleted: true } | { deleted: false; journey: PatientJourney }
 

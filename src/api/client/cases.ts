@@ -1,6 +1,6 @@
-import * as service from '../service'
-import type { Case, CaseStatus, TriageInput, Role } from '../schemas'
+import type { Case, CaseStatus, Role,TriageInput } from '../schemas'
 import type { CaseWithActiveCategory } from '../service'
+import * as service from '../service'
 import { withDelay } from './delay'
 
 export const getCases = (): Promise<Case[]> => withDelay(() => service.getCases())

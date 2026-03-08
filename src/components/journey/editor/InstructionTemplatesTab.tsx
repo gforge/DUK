@@ -1,4 +1,8 @@
-import React, { useState } from 'react'
+import AddIcon from '@mui/icons-material/Add'
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
+import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined'
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import {
   Accordion,
   AccordionDetails,
@@ -17,12 +21,9 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material'
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined'
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
-import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
-import AddIcon from '@mui/icons-material/Add'
+import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+
 import type { InstructionTemplate } from '@/api/schemas'
 
 interface Props {

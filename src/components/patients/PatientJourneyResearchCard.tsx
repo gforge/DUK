@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import AddIcon from '@mui/icons-material/Add'
+import ScienceIcon from '@mui/icons-material/Science'
 import {
   Box,
   Button,
@@ -11,13 +12,14 @@ import {
   Stack,
   Typography,
 } from '@mui/material'
-import ScienceIcon from '@mui/icons-material/Science'
-import AddIcon from '@mui/icons-material/Add'
+import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useSnack } from '@/store/snackContext'
+
 import * as client from '@/api/client'
-import { ConsentDialog, RevokeConsentDialog } from '../journey'
-import type { PatientJourney, ResearchModule, Consent } from '@/api/schemas'
+import type { Consent, PatientJourney, ResearchModule } from '@/api/schemas'
+import { useSnack } from '@/store/snackContext'
+
+import { GrantConsentDialog, RevokeConsentDialog } from '../journey'
 
 interface Props {
   readonly journey: PatientJourney
@@ -199,7 +201,7 @@ export default function PatientJourneyResearchCard({
 
       {/* Consent dialogs */}
       {consentTarget && (
-        <ConsentDialog
+        <GrantConsentDialog
           open
           onClose={() => setConsentTarget(null)}
           module={consentTarget}

@@ -1,4 +1,11 @@
-import React from 'react'
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
+import EditIcon from '@mui/icons-material/Edit'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import ForkRightIcon from '@mui/icons-material/ForkRight'
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
+import RepeatIcon from '@mui/icons-material/Repeat'
+import RouteIcon from '@mui/icons-material/Route'
+import SyncIcon from '@mui/icons-material/Sync'
 import {
   Accordion,
   AccordionDetails,
@@ -15,16 +22,11 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material'
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import RouteIcon from '@mui/icons-material/Route'
-import SyncIcon from '@mui/icons-material/Sync'
-import EditIcon from '@mui/icons-material/Edit'
-import ForkRightIcon from '@mui/icons-material/ForkRight'
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
-import RepeatIcon from '@mui/icons-material/Repeat'
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
-import type { JourneyTemplate, JourneyTemplateEntry } from '@/api/schemas'
+import React from 'react'
 import { useTranslation } from 'react-i18next'
+
+import type { JourneyTemplate, JourneyTemplateEntry } from '@/api/schemas'
+import { useOffsetFormat } from '@/hooks/useOffsetFormat'
 
 interface Props {
   journeyTemplates: JourneyTemplate[]
@@ -43,18 +45,19 @@ interface Props {
   handleDeleteEntry: (template: JourneyTemplate, entryId: string) => void
 }
 
-export default function JourneyTemplatesTabList({
+export function JourneyTemplatesTabList({
   journeyTemplates,
   parentName,
   onDelete,
   setSyncTarget,
   setEditTarget,
   setDeriveTarget,
-  setEntryEditState,
-  handleSaveEntry,
-  handleDeleteEntry,
+  setEntryEditState: _setEntryEditState,
+  handleSaveEntry: _handleSaveEntry,
+  handleDeleteEntry: _handleDeleteEntry,
 }: Props) {
   const { t } = useTranslation()
+  const formatOffset = useOffsetFormat()
 
   return (
     <Stack gap={1.5}>
@@ -193,7 +196,54 @@ export default function JourneyTemplatesTabList({
                           />
                         )}
                       </TableCell>
-                      {/* rest omitted for brevity */}
+                      <TableCell sx={{ whiteSpace: 'nowrap', minWidth: 160 }}>
+                        {(() => {
+                          const f = formatOffset(entry.offsetDays)
+                          return (
+                            <Stack>
+                              <Tooltip title={f.tooltip || ''}>
+                                <Typography variant="body2" fontWeight={600}>
+                                  {f.label}
+                                </Typography>
+                              </Tooltip>
+                              <Typography variant="caption" color="text.secondary">
+                                {entry.windowDays !== undefined ? `±${entry.windowDays}` : ''}
+                              </Typography>
+                            </Stack>
+                          )
+                        })()}
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="caption">{entry.templateId}</Typography>
+                      </TableCell>
+                      <TableCell>{/* score aliases column left intentionally minimal */}</TableCell>
+                      <TableCell sx={{ width: 80 }}>
+                        <Stack direction="row" gap={0.5} justifyContent="flex-end">
+                          <Tooltip title={t('common.edit')}>
+                            <IconButton
+                              size="small"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                _setEntryEditState({ template: jt, entry })
+                              }}
+                            >
+                              <EditIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title={t('common.delete')}>
+                            <IconButton
+                              size="small"
+                              color="error"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                _handleDeleteEntry(jt, entry.id)
+                              }}
+                            >
+                              <DeleteOutlineIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                        </Stack>
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

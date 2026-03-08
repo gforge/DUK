@@ -1,27 +1,29 @@
 /* eslint-disable react-refresh/only-export-components */
-import React, { useEffect, useRef } from 'react'
+import { zodResolver } from '@hookform/resolvers/zod'
+import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import {
   Box,
   Button,
-  Stack,
-  Typography,
-  Paper,
   Chip,
   CircularProgress,
   Divider,
+  Paper,
+  Stack,
+  Typography,
 } from '@mui/material'
-import ArrowBackIcon from '@mui/icons-material/ArrowBack'
+import React, { useEffect, useRef } from 'react'
 import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslation } from 'react-i18next'
-import { TriageInputSchema } from '@/api/schemas'
-import type { Case } from '@/api/schemas'
 import { z } from 'zod'
-import { parseDeadlineInput } from './parseDeadlineInput'
+
+import type { Case } from '@/api/schemas'
+import { TriageInputSchema } from '@/api/schemas'
+
 import { ACTION_CONFIG, type TriageActionKey } from './actionConfig'
-import TriageContextBar from './TriageContextBar'
+import { parseDeadlineInput } from './parseDeadlineInput'
 import TriageActionCards from './TriageActionCards'
 import TriageActionDetails from './TriageActionDetails'
+import TriageContextBar from './TriageContextBar'
 
 export const TriageFormSchema = TriageInputSchema.extend({
   deadline: z.string().optional(),

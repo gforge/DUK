@@ -1,15 +1,17 @@
-import React from 'react'
-import { Paper, Stack, Box, Typography, Chip, Divider, Tooltip } from '@mui/material'
 import PersonIcon from '@mui/icons-material/Person'
-import { useNavigate } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
-import { useCategoryLabel, useRoleLabel, useNextStepLabel } from '@/hooks/labels'
+import { Box, Chip, Divider, Paper, Stack, Tooltip,Typography } from '@mui/material'
 import { format } from 'date-fns'
-import { formatPersonnummer } from '@/api/utils/personnummer'
-import TriggerChips from '../common/TriggerChips'
-import DeadlineLabel from '../common/DeadlineLabel'
-import AutoWarningsBadge from '../common/AutoWarningsBadge'
+import React from 'react'
+import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
+
 import type { Case, Patient } from '@/api/schemas'
+import { formatPersonnummer } from '@/api/utils/personnummer'
+import { useCategoryLabel, useNextStepLabel,useRoleLabel } from '@/hooks/labels'
+
+import AutoWarningsBadge from '../common/AutoWarningsBadge'
+import DeadlineLabel from '../common/DeadlineLabel'
+import TriggerChips from '../common/TriggerChips'
 
 interface PatientCardProps {
   readonly patient: Patient

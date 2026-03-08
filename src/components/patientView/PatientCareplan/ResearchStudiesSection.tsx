@@ -1,9 +1,11 @@
-import React, { useState } from 'react'
-import { Button, Chip, Stack, Divider, Typography } from '@mui/material'
 import ScienceIcon from '@mui/icons-material/Science'
+import { Button, Chip, Divider, Stack, Typography } from '@mui/material'
+import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import type { ResearchModule, Consent } from '@/api/schemas'
-import { ConsentDialog, RevokeConsentDialog, DeclineConsentDialog } from '../journey'
+
+import type { Consent,ResearchModule } from '@/api/schemas'
+
+import { DeclineConsentDialog, GrantConsentDialog,RevokeConsentDialog } from '../../journey'
 
 interface Props {
   patientId: string
@@ -13,7 +15,7 @@ interface Props {
   onConsentsChanged: () => void
 }
 
-export default function ResearchStudiesSection({
+export function ResearchStudiesSection({
   patientId,
   enrolledModules,
   consentsList,
@@ -165,7 +167,7 @@ export default function ResearchStudiesSection({
 
       {/* Consent dialogs managed here */}
       {consentTarget && (
-        <ConsentDialog
+        <GrantConsentDialog
           open
           onClose={handleConsentClose}
           module={consentTarget.module}

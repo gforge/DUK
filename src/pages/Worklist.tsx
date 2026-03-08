@@ -1,39 +1,13 @@
-import React, { useMemo, useCallback } from 'react'
-import {
-  Box,
-  Typography,
-  Stack,
-  Chip,
-  Paper,
-  Divider,
-  Button,
-  Tooltip,
-  IconButton,
-  Alert,
-  Skeleton,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-} from '@mui/material'
-import OpenInNewIcon from '@mui/icons-material/OpenInNew'
-import PlayArrowIcon from '@mui/icons-material/PlayArrow'
-import CalendarMonthIcon from '@mui/icons-material/CalendarMonth'
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
-import ContentCopyIcon from '@mui/icons-material/ContentCopy'
+import { Alert, Box, Chip, Skeleton,Stack, Typography } from '@mui/material'
+import React, { useCallback,useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useNavigate } from 'react-router-dom'
+
+import * as client from '@/api/client'
+import type { NextStep,Patient, Role } from '@/api/schemas'
+import GroupSection from '@/components/worklist/GroupSection'
 import { useApi } from '@/hooks/useApi'
 import { useRole } from '@/store/roleContext'
 import { useSnack } from '@/store/snackContext'
-import * as client from '@/api/client'
-import StatusChip from '@/components/common/StatusChip'
-import DeadlineLabel from '@/components/common/DeadlineLabel'
-import WorklistRow from '@/components/worklist/WorklistRow'
-import GroupSection from '@/components/worklist/GroupSection'
-import type { Case, Patient, Role, NextStep } from '@/api/schemas'
-import { formatPersonnummer } from '@/api/utils/personnummer'
 
 /** Roles that can be used to filter assignments */
 const FILTER_ROLES: Role[] = ['NURSE', 'DOCTOR', 'PAL']
@@ -47,7 +21,7 @@ const NEXT_STEP_ORDER: NextStep[] = [
   'DIGITAL_CONTROL',
 ]
 
-export default function Worklist() {
+export function Worklist() {
   const { t } = useTranslation()
   const { currentUser, isRole } = useRole()
   const { showSnack } = useSnack()

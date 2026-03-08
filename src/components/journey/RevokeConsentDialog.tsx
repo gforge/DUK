@@ -1,18 +1,19 @@
-import React, { useState } from 'react'
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
   Alert,
-  DialogActions,
   Button,
   CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
 } from '@mui/material'
+import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+
 import * as client from '@/api/client'
-import { useSnack } from '@/store/snackContext'
-import { useRole } from '@/store/roleContext'
 import type { Consent } from '@/api/schemas'
+import { useRole } from '@/store/roleContext'
+import { useSnack } from '@/store/snackContext'
 
 interface RevokeConsentDialogProps {
   open: boolean
@@ -22,7 +23,7 @@ interface RevokeConsentDialogProps {
   onRevoked: () => void
 }
 
-export default function RevokeConsentDialog({
+export function RevokeConsentDialog({
   open,
   onClose,
   consent,

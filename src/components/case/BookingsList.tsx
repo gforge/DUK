@@ -1,31 +1,33 @@
-import React, { useState } from 'react'
-import {
-  Box,
-  Stack,
-  Typography,
-  Paper,
-  IconButton,
-  Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  MenuItem,
-  FormControl,
-  Select,
-  InputLabel,
-} from '@mui/material'
-import EditIcon from '@mui/icons-material/Edit'
 import CancelIcon from '@mui/icons-material/Cancel'
+import EditIcon from '@mui/icons-material/Edit'
 import EventAvailableIcon from '@mui/icons-material/EventAvailable'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  FormControl,
+  IconButton,
+  InputLabel,
+  MenuItem,
+  Paper,
+  Select,
+  Stack,
+  TextField,
+  Typography,
+} from '@mui/material'
+import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useNextStepLabel, useRoleLabel } from '@/hooks/labels'
-import type { Case } from '@/api/schemas'
+
 import * as client from '@/api/client'
+import type { Case } from '@/api/schemas'
+import { useNextStepLabel, useRoleLabel } from '@/hooks/labels'
 import { useRole } from '@/store/roleContext'
 import { useSnack } from '@/store/snackContext'
+
 import ConfirmDialog from '../common/ConfirmDialog'
 
 interface Props {

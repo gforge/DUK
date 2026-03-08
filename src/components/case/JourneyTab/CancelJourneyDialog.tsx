@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import CancelIcon from '@mui/icons-material/Cancel'
 import {
   Alert,
   Button,
@@ -10,7 +10,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material'
-import CancelIcon from '@mui/icons-material/Cancel'
+import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 interface CancelJourneyDialogProps {

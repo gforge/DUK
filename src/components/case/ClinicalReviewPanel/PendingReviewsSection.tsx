@@ -1,11 +1,22 @@
-import React from 'react'
-import { Box, Stack, Typography, Chip, Button, Alert, CircularProgress } from '@mui/material'
-import PendingIcon from '@mui/icons-material/Pending'
 import DeleteIcon from '@mui/icons-material/Delete'
+import PendingIcon from '@mui/icons-material/Pending'
+import {
+  Alert,
+  Box,
+  Button,
+  Chip,
+  CircularProgress,
+  Stack,
+  Tooltip,
+  Typography,
+} from '@mui/material'
+import React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useReviewTypeLabel } from '@/hooks/labels'
-import { RoleIcon } from '../../common/RoleIcon'
+
 import type { ClinicalReview, User } from '@/api/schemas'
+import { useReviewTypeLabel } from '@/hooks/labels'
+
+import { RoleIcon } from '../../common/RoleIcon'
 
 interface Props {
   reviews: ClinicalReview[]
@@ -75,25 +86,34 @@ export default function PendingReviewsSection({
                     </Stack>
                   </Box>
                   {isClinician && (
-                    <Stack direction="row" gap={0.5}>
+                    <Stack direction="row" gap={0.5} alignItems="center">
                       <Button
                         size="small"
-                        variant="contained"
+                        variant="outlined"
                         onClick={() => onMarkReviewed(review.id)}
+                        sx={{ height: 30, px: 1.5, textTransform: 'none' }}
                       >
                         {t('review.markReviewed')}
                       </Button>
                       {currentUserRole !== 'PATIENT' && (
-                        <Button
-                          size="small"
-                          variant="text"
-                          color="error"
-                          startIcon={<DeleteIcon />}
-                          onClick={() => onDelete(review.id)}
-                          disabled={loadingReviewId === review.id}
-                        >
-                          {loadingReviewId === review.id ? <CircularProgress size={16} /> : null}
-                        </Button>
+                        <Tooltip title={t('common.delete')}>
+                          <span>
+                            <Button
+                              aria-label={t('common.delete')}
+                              size="small"
+                              variant="text"
+                              color="error"
+                              startIcon={<DeleteIcon />}
+                              onClick={() => onDelete(review.id)}
+                              disabled={loadingReviewId === review.id}
+                              sx={{ height: 30, minWidth: 40, px: 0.5 }}
+                            >
+                              {loadingReviewId === review.id ? (
+                                <CircularProgress size={16} />
+                              ) : null}
+                            </Button>
+                          </span>
+                        </Tooltip>
                       )}
                     </Stack>
                   )}

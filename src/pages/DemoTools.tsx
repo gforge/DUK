@@ -1,24 +1,25 @@
-import React, { useState } from 'react'
 import {
-  Box,
-  Typography,
-  Button,
   Alert,
-  Divider,
+  Box,
+  Button,
   Dialog,
-  DialogTitle,
+  DialogActions,
   DialogContent,
   DialogContentText,
-  DialogActions,
+  DialogTitle,
+  Divider,
   LinearProgress,
+  Typography,
 } from '@mui/material'
+import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useSnack } from '@/store/snackContext'
+
 import * as client from '@/api/client'
-import SeedPanel from '@/components/demo/SeedPanel'
 import ExportPanel from '@/components/demo/ExportPanel'
 import ImportPanel from '@/components/demo/ImportPanel'
 import type { ConfirmAction } from '@/components/demo/SeedPanel'
+import SeedPanel from '@/components/demo/SeedPanel'
+import { useSnack } from '@/store/snackContext'
 
 export default function DemoTools() {
   const { t } = useTranslation()

@@ -1,6 +1,6 @@
-import { CURRENT_SCHEMA_VERSION } from './schemaVersion'
-import { AppStateSchema } from './schemas'
 import type { AppState } from './schemas'
+import { AppStateSchema } from './schemas'
+import { CURRENT_SCHEMA_VERSION } from './schemaVersion'
 
 // ---------------------------------------------------------------------------
 // Types

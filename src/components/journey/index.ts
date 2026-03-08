@@ -1,5 +1,8 @@
-// barrel for journey-level exports
-export { default as JourneyTimeline } from './JourneyTimelineContent'
-export { default as ConsentDialog } from './GrantConsentDialog'
-export { default as RevokeConsentDialog } from './RevokeConsentDialog'
-export { default as DeclineConsentDialog } from './DeclineConsentDialog'
+// @index(['./*/index.ts(|x)', './*.ts(|x)'], f => `export * from '${f.path}'`)
+export * from './AddReviewDialog'
+export * from './ConsentDialog/index'
+export * from './editor/index'
+export * from './JourneyTimeline/index'
+export * from './JourneyTimelineItem'
+export * from './ModifyJourneyDialog'
+export * from './RevokeConsentDialog'

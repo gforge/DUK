@@ -1,14 +1,15 @@
-import React from 'react'
-import { Chip } from '@mui/material'
-import type { ChipProps } from '@mui/material'
-import FiberNewIcon from '@mui/icons-material/FiberNew'
-import ErrorIcon from '@mui/icons-material/Error'
-import TaskAltIcon from '@mui/icons-material/TaskAlt'
-import ScheduleIcon from '@mui/icons-material/Schedule'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
-import { useOptionalRole } from '@/store/roleContext'
-import { useStatusLabel } from '@/hooks/labels'
+import ErrorIcon from '@mui/icons-material/Error'
+import FiberNewIcon from '@mui/icons-material/FiberNew'
+import ScheduleIcon from '@mui/icons-material/Schedule'
+import TaskAltIcon from '@mui/icons-material/TaskAlt'
+import type { ChipProps } from '@mui/material'
+import { Chip } from '@mui/material'
+import React from 'react'
+
 import type { CaseStatus } from '@/api/schemas'
+import { useStatusLabel } from '@/hooks/labels'
+import { useOptionalRole } from '@/store/roleContext'
 
 const STATUS_COLORS: Record<CaseStatus, ChipProps['color']> = {
   NEW: 'default',

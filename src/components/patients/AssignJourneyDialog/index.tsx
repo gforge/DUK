@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import RouteIcon from '@mui/icons-material/Route'
 import {
   Alert,
   Button,
@@ -11,17 +11,19 @@ import {
   StepLabel,
   Stepper,
 } from '@mui/material'
-import RouteIcon from '@mui/icons-material/Route'
+import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useApi } from '@/hooks/useApi'
-import { useSnack } from '@/store/snackContext'
-import { useRole } from '@/store/roleContext'
+
 import * as client from '@/api/client'
-import type { JourneyStepConflict } from '@/api/service'
 import type { ResearchModule } from '@/api/schemas'
+import type { JourneyStepConflict } from '@/api/service'
+import { useApi } from '@/hooks/useApi'
+import { useRole } from '@/store/roleContext'
+import { useSnack } from '@/store/snackContext'
+
+import ConsentPhase from './ConsentPhase'
 import WizardStep0 from './WizardStep0'
 import WizardStep1 from './WizardStep1'
-import ConsentPhase from './ConsentPhase'
 
 interface Props {
   readonly open: boolean

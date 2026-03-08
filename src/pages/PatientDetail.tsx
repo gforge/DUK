@@ -1,4 +1,7 @@
-import React from 'react'
+import NavigateNextIcon from '@mui/icons-material/NavigateNext'
+import PersonIcon from '@mui/icons-material/Person'
+import RouteIcon from '@mui/icons-material/Route'
+import ScienceIcon from '@mui/icons-material/Science'
 import {
   Alert,
   Box,
@@ -16,21 +19,17 @@ import {
   TableRow,
   Typography,
 } from '@mui/material'
-import PersonIcon from '@mui/icons-material/Person'
-import RouteIcon from '@mui/icons-material/Route'
-import AssignmentIcon from '@mui/icons-material/Assignment'
-import ScienceIcon from '@mui/icons-material/Science'
-import NavigateNextIcon from '@mui/icons-material/NavigateNext'
-import { Link, useParams, useNavigate } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
-import { useJourneyStatusLabel } from '@/hooks/labels'
 import { format } from 'date-fns'
-import { useApi } from '@/hooks/useApi'
+import React from 'react'
+import { useTranslation } from 'react-i18next'
+import { Link, useNavigate,useParams } from 'react-router-dom'
+
 import * as client from '@/api/client'
-import StatusChip from '@/components/common/StatusChip'
+import CasesSection from '@/components/patients/CasesSection'
 import PatientJourneyResearchCard from '@/components/patients/PatientJourneyResearchCard'
 import PatientSummary from '@/components/patients/PatientSummary'
-import CasesSection from '@/components/patients/CasesSection'
+import { useJourneyStatusLabel } from '@/hooks/labels'
+import { useApi } from '@/hooks/useApi'
 
 export default function PatientDetail() {
   const { id } = useParams<{ id: string }>()

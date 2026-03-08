@@ -1,15 +1,15 @@
-import type { AppState, Case, Patient, PatientJourney, AuditEvent } from '../schemas'
+import type { AppState, AuditEvent,Case, Patient, PatientJourney } from '../schemas'
 import { SEED_STATE } from '../seed'
 import {
-  TRIGGERS,
-  PAL_IDS,
   isoDateOffset as isoDate,
   isoTsOffset as isoTs,
+  PAL_IDS,
+  TRIGGERS,
 } from '../seed/seedHelpers'
-import { makePrng } from './prng'
-import { FIRST_NAMES, LAST_NAMES, personalNumber } from './namePools'
-import { COHORTS } from './cohorts'
 import { ensureAllUsers } from '../utils/userGenerator'
+import { COHORTS } from './cohorts'
+import { FIRST_NAMES, LAST_NAMES, personalNumber } from './namePools'
+import { makePrng } from './prng'
 
 function generateReviews(rng: ReturnType<typeof makePrng>, caseId: string, createdAt: string) {
   const reviews = []

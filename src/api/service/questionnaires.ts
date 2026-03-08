@@ -1,6 +1,6 @@
+import type { FormSeries,QuestionnaireTemplate } from '../schemas'
 import { getStore, setStore } from '../storage'
-import { uuid, now } from './utils'
-import type { QuestionnaireTemplate, FormSeries } from '../schemas'
+import { now,uuid } from './utils'
 
 export function getQuestionnaireTemplates(): QuestionnaireTemplate[] {
   return getStore().questionnaireTemplates

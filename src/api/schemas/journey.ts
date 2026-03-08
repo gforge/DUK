@@ -1,4 +1,5 @@
 import { z } from 'zod'
+
 import { CaseCategorySchema, ReviewTypeSchema } from './enums'
 
 export const PatientJourneyStatusSchema = z.enum(['ACTIVE', 'COMPLETED', 'SUSPENDED'])

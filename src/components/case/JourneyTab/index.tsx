@@ -1,19 +1,21 @@
-import React, { useState, useMemo } from 'react'
 import { Alert, Box, Paper, Skeleton, Stack } from '@mui/material'
+import React, { useMemo,useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useApi } from '@/hooks/useApi'
+
 import * as client from '@/api/client'
+import type { Case } from '@/api/schemas'
+import { useApi } from '@/hooks/useApi'
 import { useRole } from '@/store/roleContext'
+
 import { JourneyTimeline } from '../../journey'
 import ModifyJourneyDialog from '../../journey/ModifyJourneyDialog'
-import JourneyModHistory from '../journey/JourneyModHistory'
 import PatientJourneyResearchCard from '../../patients/PatientJourneyResearchCard'
-import JourneySelectorTabs from './JourneySelectorTabs'
-import JourneyHeader from './JourneyHeader'
+import JourneyModHistory from '../journey/JourneyModHistory'
 import CancelJourneyDialog from './CancelJourneyDialog'
+import JourneyHeader from './JourneyHeader'
+import JourneySelectorTabs from './JourneySelectorTabs'
 import PauseConfirmDialog from './PauseConfirmDialog'
 import { useJourneyActions } from './useJourneyActions'
-import type { Case } from '@/api/schemas'
 
 const STATUS_ORDER: Record<string, number> = { ACTIVE: 0, SUSPENDED: 1, COMPLETED: 2 }
 

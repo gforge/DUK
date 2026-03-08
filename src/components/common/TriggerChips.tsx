@@ -1,18 +1,19 @@
-import React from 'react'
-import { Chip, Tooltip, Stack } from '@mui/material'
+import BiotechIcon from '@mui/icons-material/Biotech'
+import BugReportIcon from '@mui/icons-material/BugReport'
+import ImageIcon from '@mui/icons-material/Image'
 import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment'
-import TrendingDownIcon from '@mui/icons-material/TrendingDown'
+import PhoneMissedIcon from '@mui/icons-material/PhoneMissed'
+import ReportProblemIcon from '@mui/icons-material/ReportProblem'
 import SentimentDissatisfiedIcon from '@mui/icons-material/SentimentDissatisfied'
 import SmartphoneIcon from '@mui/icons-material/Smartphone'
-import PhoneMissedIcon from '@mui/icons-material/PhoneMissed'
 import SupportAgentIcon from '@mui/icons-material/SupportAgent'
-import BugReportIcon from '@mui/icons-material/BugReport'
-import ReportProblemIcon from '@mui/icons-material/ReportProblem'
-import BiotechIcon from '@mui/icons-material/Biotech'
-import ImageIcon from '@mui/icons-material/Image'
+import TrendingDownIcon from '@mui/icons-material/TrendingDown'
+import { Chip, Stack,Tooltip } from '@mui/material'
+import React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useTriggerLabel } from '@/hooks/labels'
+
 import type { TriggerType } from '@/api/schemas'
+import { useTriggerLabel } from '@/hooks/labels'
 
 interface TriggerChipsProps {
   readonly triggers: TriggerType[]

@@ -1,8 +1,10 @@
-import React from 'react'
-import { Alert, Box, Button, CircularProgress, TextField } from '@mui/material'
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
+import { Alert, Box, Button, CircularProgress, TextField } from '@mui/material'
+import React from 'react'
 import { useTranslation } from 'react-i18next'
+
 import { parsePersonnummer } from '@/api/utils/personnummer'
+
 import { DemoRegisterHint } from './DemoRegisterHint'
 
 interface Props {

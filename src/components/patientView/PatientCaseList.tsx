@@ -1,4 +1,4 @@
-import React from 'react'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import {
   Accordion,
   AccordionDetails,
@@ -11,12 +11,14 @@ import {
   Stack,
   Typography,
 } from '@mui/material'
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import { useTranslation } from 'react-i18next'
-import { useCategoryLabel, useTriggerLabel } from '@/hooks/labels'
 import { format } from 'date-fns'
-import StatusChip from '../common/StatusChip'
+import React from 'react'
+import { useTranslation } from 'react-i18next'
+
 import type { Case } from '@/api/schemas'
+import { useCategoryLabel, useTriggerLabel } from '@/hooks/labels'
+
+import StatusChip from '../common/StatusChip'
 
 interface Props {
   cases: Case[] | null

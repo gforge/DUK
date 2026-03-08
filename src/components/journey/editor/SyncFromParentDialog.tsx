@@ -1,22 +1,23 @@
-import React, { useState, useEffect } from 'react'
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   Button,
   Checkbox,
-  FormControlLabel,
-  Stack,
   Chip,
-  Typography,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  FormControlLabel,
   Skeleton,
+  Stack,
+  Typography,
 } from '@mui/material'
+import React, { useEffect,useState } from 'react'
 import { useTranslation } from 'react-i18next'
+
 import * as client from '@/api/client'
-import { useSnack } from '@/store/snackContext'
 import type { JourneyTemplate } from '@/api/schemas'
 import type { EntryDiff } from '@/api/service/journeyTemplates'
+import { useSnack } from '@/store/snackContext'
 
 interface Props {
   childTemplate: JourneyTemplate

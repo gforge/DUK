@@ -1,4 +1,4 @@
-import React from 'react'
+import PauseIcon from '@mui/icons-material/Pause'
 import {
   Button,
   CircularProgress,
@@ -8,7 +8,7 @@ import {
   DialogTitle,
   Typography,
 } from '@mui/material'
-import PauseIcon from '@mui/icons-material/Pause'
+import React from 'react'
 import { useTranslation } from 'react-i18next'
 
 interface PauseConfirmDialogProps {

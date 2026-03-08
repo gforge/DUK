@@ -1,9 +1,9 @@
-import { jtStandard } from './journeyTemplates/jt-standard'
+import type { JourneyTemplate } from '../schemas'
 import { jtComplex } from './journeyTemplates/jt-complex'
-import { jtProximalHumerus } from './journeyTemplates/jt-proximal-humerus'
 import { jtDistalRadius } from './journeyTemplates/jt-distal-radius'
 import { jtMonitoring } from './journeyTemplates/jt-monitoring'
-import type { JourneyTemplate } from '../schemas'
+import { jtProximalHumerus } from './journeyTemplates/jt-proximal-humerus'
+import { jtStandard } from './journeyTemplates/jt-standard'
 
 export const journeyTemplates: JourneyTemplate[] = [
   jtStandard,

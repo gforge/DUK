@@ -1,22 +1,23 @@
-import React from 'react'
+import CheckCircleIcon from '@mui/icons-material/CheckCircle'
+import ContentCopyIcon from '@mui/icons-material/ContentCopy'
 import {
   Box,
   Button,
-  Stack,
-  Paper,
   Chip,
-  Divider,
-  Tooltip,
-  IconButton,
-  Typography,
   CircularProgress,
+  Divider,
+  IconButton,
+  Paper,
+  Stack,
+  Tooltip,
+  Typography,
 } from '@mui/material'
-import ContentCopyIcon from '@mui/icons-material/ContentCopy'
-import CheckCircleIcon from '@mui/icons-material/CheckCircle'
+import { format } from 'date-fns'
+import React from 'react'
 import { useTranslation } from 'react-i18next'
 import ReactMarkdown from 'react-markdown'
+
 import type { JournalDraft } from '@/api/schemas'
-import { format } from 'date-fns'
 
 interface Props {
   draft: JournalDraft

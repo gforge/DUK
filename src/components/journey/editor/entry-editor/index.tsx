@@ -1,6 +1,8 @@
-import React from 'react'
+import AddIcon from '@mui/icons-material/Add'
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 import {
   Alert,
+  Autocomplete,
   Box,
   Chip,
   IconButton,
@@ -13,11 +15,10 @@ import {
   TextField,
   Tooltip,
   Typography,
-  Autocomplete,
 } from '@mui/material'
-import AddIcon from '@mui/icons-material/Add'
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
+import React from 'react'
 import { useTranslation } from 'react-i18next'
+
 import type { QuestionnaireTemplate } from '@/api/schemas'
 
 export interface AliasRow {

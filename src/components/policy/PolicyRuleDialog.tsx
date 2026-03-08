@@ -1,5 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
-import React, { useRef } from 'react'
+import { zodResolver } from '@hookform/resolvers/zod'
 import {
   Box,
   Button,
@@ -16,13 +16,14 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material'
-import { useForm, Controller } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
+import React, { useRef } from 'react'
+import { Controller,useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
-import { useSeverityLabel } from '@/hooks/labels'
+import { z } from 'zod'
+
 import { validateExpression } from '@/api/policyParser'
 import type { PolicyVariable } from '@/api/service'
+import { useSeverityLabel } from '@/hooks/labels'
 
 const SEVERITIES = ['LOW', 'MEDIUM', 'HIGH'] as const
 export { SEVERITIES }

@@ -1,10 +1,11 @@
-import { Tooltip, SxProps, Theme } from '@mui/material'
-import PersonIcon from '@mui/icons-material/Person'
+import BadgeIcon from '@mui/icons-material/Badge'
 import LocalHospitalIcon from '@mui/icons-material/LocalHospital'
 import MedicalServicesIcon from '@mui/icons-material/MedicalServices'
-import BadgeIcon from '@mui/icons-material/Badge'
-import { useRoleLabel } from '@/hooks/labels'
+import PersonIcon from '@mui/icons-material/Person'
+import { SxProps, Theme,Tooltip } from '@mui/material'
+
 import type { Role } from '@/api/schemas'
+import { useRoleLabel } from '@/hooks/labels'
 
 interface Props {
   readonly role: Role
@@ -36,7 +37,7 @@ export function RoleIcon({ role, showTooltip = true, sx }: Props) {
 
   return (
     <Tooltip title={getRoleLabel(role)}>
-      <span>{icon}</span>
+      <span style={{ display: 'inline-flex', alignItems: 'center' }}>{icon}</span>
     </Tooltip>
   )
 }

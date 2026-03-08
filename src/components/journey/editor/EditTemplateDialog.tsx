@@ -1,17 +1,18 @@
-import React, { useState } from 'react'
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   Button,
-  TextField,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   Stack,
+  TextField,
 } from '@mui/material'
+import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+
 import * as client from '@/api/client'
-import { useSnack } from '@/store/snackContext'
 import type { JourneyTemplate } from '@/api/schemas'
+import { useSnack } from '@/store/snackContext'
 
 interface Props {
   template?: JourneyTemplate

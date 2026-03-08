@@ -1,13 +1,15 @@
 import { useState } from 'react'
+
 import type {
+  InstructionTemplate,
   JourneyTemplateEntry,
   QuestionnaireTemplate,
-  InstructionTemplate,
 } from '@/api/schemas'
-import { mkId } from './questionnaireUtils'
-import { slugify } from '../../../utils/slugify'
+
 import { suggestWindowDays } from '../../../utils/journeyUtils'
+import { slugify } from '../../../utils/slugify'
 import type { AliasRow } from './entry-editor'
+import { mkId } from './questionnaireUtils'
 
 export type InstructionMode = 'NONE' | 'TEMPLATE' | 'FREETEXT'
 

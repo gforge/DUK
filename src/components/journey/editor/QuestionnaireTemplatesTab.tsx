@@ -1,4 +1,8 @@
-import React, { useState } from 'react'
+import AddIcon from '@mui/icons-material/Add'
+import AssignmentIcon from '@mui/icons-material/Assignment'
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
+import EditIcon from '@mui/icons-material/Edit'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import {
   Accordion,
   AccordionDetails,
@@ -17,13 +21,11 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material'
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import AssignmentIcon from '@mui/icons-material/Assignment'
-import AddIcon from '@mui/icons-material/Add'
-import EditIcon from '@mui/icons-material/Edit'
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
+import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+
 import type { QuestionnaireTemplate } from '@/api/schemas'
+
 import { QuestionnaireEditorDialog } from './'
 
 interface Props {

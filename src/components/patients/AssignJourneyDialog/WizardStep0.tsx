@@ -1,4 +1,4 @@
-import React from 'react'
+import ScienceIcon from '@mui/icons-material/Science'
 import {
   Checkbox,
   Divider,
@@ -12,8 +12,9 @@ import {
   TextField,
   Typography,
 } from '@mui/material'
-import ScienceIcon from '@mui/icons-material/Science'
+import React from 'react'
 import { useTranslation } from 'react-i18next'
+
 import type { JourneyTemplate, ResearchModule } from '@/api/schemas'
 
 interface Props {

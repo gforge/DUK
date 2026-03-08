@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react'
+
 import type { Role, User } from '@/api/schemas'
 
 const DEMO_USERS: User[] = [

@@ -1,4 +1,8 @@
-import React, { useState } from 'react'
+import AddIcon from '@mui/icons-material/Add'
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
+import EditIcon from '@mui/icons-material/Edit'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import ScienceIcon from '@mui/icons-material/Science'
 import {
   Accordion,
   AccordionDetails,
@@ -17,14 +21,12 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material'
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import ModuleEditorDialog from './ModuleEditorDialog'
-import ScienceIcon from '@mui/icons-material/Science'
-import AddIcon from '@mui/icons-material/Add'
-import EditIcon from '@mui/icons-material/Edit'
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
+import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import type { ResearchModule, QuestionnaireTemplate } from '@/api/schemas'
+
+import type { QuestionnaireTemplate,ResearchModule } from '@/api/schemas'
+
+import ModuleEditorDialog from '../ModuleEditorDialog'
 
 // dialog implementation moved to ModuleEditorDialog.tsx
 
@@ -164,7 +166,7 @@ export default function ResearchModulesTab({
         <ModuleEditorDialog
           module={editTarget ?? undefined}
           questionnaires={questionnaires ?? []}
-          onSave={(data) => {
+          onSave={(data: any) => {
             onSave(data)
             setEditTarget(null)
           }}

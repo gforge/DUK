@@ -1,5 +1,5 @@
-import { iso, daysAgo } from './shared'
-import type { User, Patient } from '../schemas'
+import type { Patient,User } from '../schemas'
+import { daysAgo,iso } from './shared'
 
 export const users: User[] = [
   { id: 'user-pal-1', name: 'Dr. Sara Lindqvist (PAL)', role: 'PAL' },

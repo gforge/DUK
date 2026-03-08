@@ -1,4 +1,6 @@
-import React from 'react'
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline'
+import ReportProblemIcon from '@mui/icons-material/ReportProblem'
 import {
   Button,
   CircularProgress,
@@ -11,10 +13,9 @@ import {
   ToggleButton,
   ToggleButtonGroup,
 } from '@mui/material'
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline'
-import ReportProblemIcon from '@mui/icons-material/ReportProblem'
+import React from 'react'
 import { useTranslation } from 'react-i18next'
+
 import type { ReviewOutcome } from '@/api/schemas'
 
 interface Props {

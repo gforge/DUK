@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import AddIcon from '@mui/icons-material/Add'
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 import {
   Autocomplete,
   Button,
@@ -18,10 +19,10 @@ import {
   ToggleButtonGroup,
   Typography,
 } from '@mui/material'
-import AddIcon from '@mui/icons-material/Add'
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
+import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import type { ResearchModule, ResearchModuleEntry, QuestionnaireTemplate } from '@/api/schemas'
+
+import type { QuestionnaireTemplate,ResearchModule, ResearchModuleEntry } from '@/api/schemas'
 
 const mkId = () => Date.now().toString(36) + '-' + Math.random().toString(36).slice(2)
 

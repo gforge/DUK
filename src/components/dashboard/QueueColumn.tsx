@@ -1,26 +1,28 @@
-import React from 'react'
-import {
-  Box,
-  Typography,
-  Chip,
-  Stack,
-  Divider,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-} from '@mui/material'
+import BiotechIcon from '@mui/icons-material/Biotech'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import HourglassEmptyIcon from '@mui/icons-material/HourglassEmpty'
-import WarningAmberIcon from '@mui/icons-material/WarningAmber'
-import PhoneMissedIcon from '@mui/icons-material/PhoneMissed'
-import BiotechIcon from '@mui/icons-material/Biotech'
 import ImageIcon from '@mui/icons-material/Image'
+import PhoneMissedIcon from '@mui/icons-material/PhoneMissed'
+import WarningAmberIcon from '@mui/icons-material/WarningAmber'
+import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Box,
+  Chip,
+  Divider,
+  Stack,
+  Typography,
+} from '@mui/material'
+import React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useCategoryLabel, useCategoryDescLabel } from '@/hooks/labels'
+
 import type { Case, CaseCategory, Patient } from '@/api/schemas'
-import type { SortMode } from './sortCases'
-import CaseListItem from './CaseListItem'
+import { useCategoryDescLabel,useCategoryLabel } from '@/hooks/labels'
 import { useRovingTabIndex } from '@/hooks/useRovingTabIndex'
+
+import CaseListItem from './CaseListItem'
+import type { SortMode } from './sortCases'
 
 interface QueueColumnProps {
   readonly category: CaseCategory

@@ -1,31 +1,25 @@
-import React, { useState } from 'react'
-import { Button, Skeleton, Stack, Typography } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Skeleton,
+  Stack,
+  Typography,
+} from '@mui/material'
+import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+
 import * as client from '@/api/client'
+import type { JourneyTemplate, JourneyTemplateEntry } from '@/api/schemas'
 import { useApi } from '@/hooks/useApi'
 import { useSnack } from '@/store/snackContext'
-import type { JourneyTemplate, JourneyTemplateEntry } from '@/api/schemas'
-import JourneyTemplatesTabList from './JourneyTemplatesTabList'
-import JourneyTemplatesTabDialogs from './JourneyTemplatesTabDialogs'
 
-// helper moved from original file
-function formatOffsetDays(
-  days: number,
-  t: (key: string, opts?: Record<string, unknown>) => string,
-): {
-  label: string
-  tooltip: string
-} {
-  const tooltip = t('journey.offsetFormat.exactDays', { count: days })
-  if (days >= 365)
-    return { label: t('journey.offsetFormat.years', { count: Math.round(days / 365) }), tooltip }
-  if (days >= 60)
-    return { label: t('journey.offsetFormat.months', { count: Math.round(days / 30) }), tooltip }
-  if (days >= 14)
-    return { label: t('journey.offsetFormat.weeks', { count: Math.round(days / 7) }), tooltip }
-  return { label: t('journey.offsetFormat.days', { count: days }), tooltip: '' }
-}
+import { EntryEditorDialog } from './EntryEditorDialog'
+import { JourneyTemplatesTabDialogs } from './JourneyTemplatesTabDialogs'
+import { JourneyTemplatesTabList } from './JourneyTemplatesTabList'
 
 interface Props {
   journeyTemplates: JourneyTemplate[] | null
@@ -34,12 +28,7 @@ interface Props {
   onRefresh?: () => void
 }
 
-export default function JourneyTemplatesTabContent({
-  journeyTemplates,
-  loading,
-  onDelete,
-  onRefresh,
-}: Props) {
+export function JourneyTemplatesTab({ journeyTemplates, loading, onDelete, onRefresh }: Props) {
   const { t } = useTranslation()
   const { showSnack } = useSnack()
   const [deriveTarget, setDeriveTarget] = useState<JourneyTemplate | null>(null)
@@ -60,6 +49,19 @@ export default function JourneyTemplatesTabContent({
 
   const { data: questionnaires } = useApi(() => client.getQuestionnaireTemplates(), [])
   const { data: instructionTemplates } = useApi(() => client.getInstructionTemplates(), [])
+  const executeDeleteEntry = async () => {
+    if (!entryDeleteConfirm) return
+    const { template, entryId } = entryDeleteConfirm
+    setEntryDeleteConfirm(null)
+    const entries = template.entries.filter((e) => e.id !== entryId)
+    try {
+      await client.saveJourneyTemplate({ ...template, entries })
+      showSnack(t('journey.editor.entryDeleted'), 'success')
+      onRefresh?.()
+    } catch {
+      showSnack(t('common.error'), 'error')
+    }
+  }
 
   const handleSaveEntry = async (template: JourneyTemplate, saved: JourneyTemplateEntry) => {
     const existing = template.entries.find((e) => e.id === saved.id)
@@ -80,19 +82,8 @@ export default function JourneyTemplatesTabContent({
     setEntryDeleteConfirm({ template, entryId })
   }
 
-  const executeDeleteEntry = async () => {
-    if (!entryDeleteConfirm) return
-    const { template, entryId } = entryDeleteConfirm
-    setEntryDeleteConfirm(null)
-    const entries = template.entries.filter((e) => e.id !== entryId)
-    try {
-      await client.saveJourneyTemplate({ ...template, entries })
-      showSnack(t('journey.editor.entryDeleted'), 'success')
-      onRefresh?.()
-    } catch {
-      showSnack(t('common.error'), 'error')
-    }
-  }
+  // Close entry editor and optionally focus
+  const handleCloseEntryEditor = () => setEntryEditState(null)
 
   if (loading) return <Skeleton variant="rectangular" height={200} sx={{ borderRadius: 1 }} />
 
@@ -137,6 +128,38 @@ export default function JourneyTemplatesTabContent({
         setEditTarget={setEditTarget}
         onRefresh={onRefresh}
       />
+
+      {entryEditState && (
+        <EntryEditorDialog
+          entry={entryEditState.entry}
+          questionnaires={questionnaires ?? []}
+          instructionTemplates={instructionTemplates ?? []}
+          onSave={(saved) => handleSaveEntry(entryEditState.template, saved)}
+          onClose={handleCloseEntryEditor}
+        />
+      )}
+
+      <Dialog open={!!entryDeleteConfirm} onClose={() => setEntryDeleteConfirm(null)}>
+        <DialogTitle>{t('common.confirm')}</DialogTitle>
+        <DialogContent>
+          <Typography>
+            {t('journey.editor.confirmDeleteTemplate', {
+              name: entryDeleteConfirm?.template.name ?? '',
+            })}
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setEntryDeleteConfirm(null)}>{t('common.cancel')}</Button>
+          <Button
+            variant="contained"
+            color="error"
+            onClick={() => executeDeleteEntry()}
+            disableElevation
+          >
+            {t('common.delete')}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   )
 }

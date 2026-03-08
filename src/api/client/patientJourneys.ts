@@ -1,11 +1,11 @@
-import * as service from '../service'
-import type { PatientJourney, JourneyModification, PatientJourneyStatus } from '../schemas'
+import type { JourneyModification, PatientJourney, PatientJourneyStatus } from '../schemas'
 import type {
-  EffectiveStep,
-  MergedDueStep,
-  JourneyStepConflict,
   CancelJourneyResult,
+  EffectiveStep,
+  JourneyStepConflict,
+  MergedDueStep,
 } from '../service'
+import * as service from '../service'
 import { withDelay } from './delay'
 
 export const getPatientJourneys = (patientId?: string): Promise<PatientJourney[]> =>

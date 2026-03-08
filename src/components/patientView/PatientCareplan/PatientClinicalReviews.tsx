@@ -1,28 +1,29 @@
-import React, { useState } from 'react'
+import BiotechIcon from '@mui/icons-material/Biotech'
+import ImageIcon from '@mui/icons-material/Image'
 import {
+  Alert,
   Box,
   Button,
   Chip,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   Stack,
   Typography,
-  Alert,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
 } from '@mui/material'
-import BiotechIcon from '@mui/icons-material/Biotech'
-import ImageIcon from '@mui/icons-material/Image'
+import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+
+import * as client from '@/api/client'
 import { useReviewTypeLabel } from '@/hooks/labels'
 import { useApi } from '@/hooks/useApi'
-import * as client from '@/api/client'
 
 interface Props {
   patientId: string
 }
 
-export default function PatientClinicalReviews({ patientId }: Readonly<Props>) {
+export function PatientClinicalReviews({ patientId }: Readonly<Props>) {
   const { t } = useTranslation()
   const getReviewTypeLabel = useReviewTypeLabel()
   const [openDetails, setOpenDetails] = useState(false)

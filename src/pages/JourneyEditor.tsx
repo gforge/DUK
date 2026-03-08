@@ -1,26 +1,26 @@
-import React, { useState, useCallback } from 'react'
-import { Alert, Box, Button, Paper, Stack, Tab, Tabs, Tooltip, Typography } from '@mui/material'
+import AssignmentIcon from '@mui/icons-material/Assignment'
+import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined'
+import PeopleIcon from '@mui/icons-material/People'
 import RouteIcon from '@mui/icons-material/Route'
 import ScienceIcon from '@mui/icons-material/Science'
-import PeopleIcon from '@mui/icons-material/People'
-import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined'
-import AssignmentIcon from '@mui/icons-material/Assignment'
 import UndoIcon from '@mui/icons-material/Undo'
+import { Alert, Box, Button, Paper, Stack, Tab, Tabs, Tooltip, Typography } from '@mui/material'
+import React, { useCallback,useState } from 'react'
 import { useTranslation } from 'react-i18next'
+
+import * as client from '@/api/client'
+import ConfirmDialog from '@/components/common/ConfirmDialog'
+import TabPanel from '@/components/common/TabPanel'
+import {
+  InstructionTemplatesTab,
+  JourneyTemplatesTab,
+  PatientJourneysTable,
+  QuestionnaireTemplatesTab,
+  ResearchModulesTab,
+} from '@/components/journey/editor'
 import { useApi } from '@/hooks/useApi'
 import { useEditorUndo } from '@/hooks/useEditorUndo'
-import * as client from '@/api/client'
 import { useSnack } from '@/store/snackContext'
-import ConfirmDialog from '@/components/common/ConfirmDialog'
-import {
-  JourneyTemplatesTab,
-  ResearchModulesTab,
-  PatientJourneysTable,
-  InstructionTemplatesTab,
-  QuestionnaireTemplatesTab,
-} from '@/components/journey/editor'
-
-import TabPanel from '@/components/common/TabPanel'
 
 export default function JourneyEditor() {
   const { t } = useTranslation()

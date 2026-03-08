@@ -1,40 +1,15 @@
-import React, { useState } from 'react'
 import { Box, Typography, useTheme } from '@mui/material'
-import CheckCircleIcon from '@mui/icons-material/CheckCircle'
-import ErrorIcon from '@mui/icons-material/Error'
-import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked'
+import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import type { EffectiveStep } from '@/api/service'
+
 import type { ClinicalReview, FormResponse } from '@/api/schemas'
-import { type StepStatus } from '@/hooks/labels'
-import JourneyTimelineItem from './JourneyTimelineItem'
-import AddReviewDialog from './AddReviewDialog'
-import ReviewDetailsDialog from './ReviewDetailsDialog'
+import type { EffectiveStep } from '@/api/service'
 
-export type { StepStatus }
-
-export const REVIEW_TYPES = ['LAB', 'XRAY'] as const
-export type ReviewTypeKey = (typeof REVIEW_TYPES)[number]
-
-export const StatusIcon = ({ status }: { status: StepStatus }) => {
-  const theme = useTheme()
-  const statusColor: Record<StepStatus, string> = {
-    SUBMITTED: theme.palette.success.main,
-    UPCOMING: theme.palette.primary.main,
-    OVERDUE: theme.palette.error.main,
-  }
-  if (status === 'SUBMITTED') return <CheckCircleIcon sx={{ color: statusColor.SUBMITTED }} />
-  if (status === 'OVERDUE') return <ErrorIcon sx={{ color: statusColor.OVERDUE }} />
-  return <RadioButtonUncheckedIcon sx={{ color: statusColor.UPCOMING }} />
-}
-
-function getStepStatus(step: EffectiveStep, responses: FormResponse[]): StepStatus {
-  const submitted = responses.some((r) => r.templateId === step.templateId)
-  if (submitted) return 'SUBMITTED'
-  const today = new Date().toISOString().slice(0, 10)
-  if (step.scheduledDate < today) return 'OVERDUE'
-  return 'UPCOMING'
-}
+import AddReviewDialog from '../AddReviewDialog'
+import { ReviewDetailsDialog } from '../ConsentDialog/ReviewDetails'
+import JourneyTimelineItem from '../JourneyTimelineItem'
+import { getStepStatus } from './getStepStatus'
+import { ReviewTypeKey, StepStatus } from './types'
 
 interface JourneyTimelineProps {
   readonly steps: EffectiveStep[]
@@ -50,7 +25,7 @@ interface JourneyTimelineProps {
   readonly onRemoveReview?: (reviewId: string) => Promise<void>
 }
 
-export default function JourneyTimeline({
+export function JourneyTimeline({
   steps,
   formResponses,
   reviews = [],
@@ -93,14 +68,20 @@ export default function JourneyTimeline({
     setDescription('')
   }
 
-  const getStepReview = (stepLabel: string, reviewType: ReviewTypeKey): ClinicalReview | null => {
-    const candidates = reviews.filter(
-      (review) => review.type === reviewType && review.journeyStepLabel === stepLabel,
-    )
-    if (candidates.length === 0) return null
-    return [...candidates].sort(
-      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-    )[0]
+  // Remove a locally-added review entry when upstream removal succeeds.
+  const handleRemoveChip = async (reviewId: string) => {
+    if (!onRemoveReview) return
+    await onRemoveReview(reviewId)
+    setAddedReviews((prev) => {
+      const next = new Map(prev)
+      for (const [k, v] of next.entries()) {
+        if (v.reviewId === reviewId) {
+          next.delete(k)
+          break
+        }
+      }
+      return next
+    })
   }
 
   const handleConfirmAdd = async () => {
@@ -125,16 +106,6 @@ export default function JourneyTimeline({
     }
   }
 
-  const handleRemoveChip = async (key: string, reviewId: string) => {
-    if (!onRemoveReview) return
-    await onRemoveReview(reviewId)
-    setAddedReviews((prev) => {
-      const next = new Map(prev)
-      next.delete(key)
-      return next
-    })
-  }
-
   if (steps.length === 0) {
     return (
       <Typography variant="body2" color="text.secondary">
@@ -143,7 +114,7 @@ export default function JourneyTimeline({
     )
   }
 
-  const statusColor: Record<StepStatus, string> = {
+  const _statusColor: Record<StepStatus, string> = {
     SUBMITTED: theme.palette.success.main,
     UPCOMING: theme.palette.primary.main,
     OVERDUE: theme.palette.error.main,
@@ -169,7 +140,7 @@ export default function JourneyTimeline({
               reviews={reviews}
               addedReviews={addedReviews}
               onAddReview={onAddReview}
-              onRemoveReview={onRemoveReview}
+              onRemoveReview={handleRemoveChip}
               setReviewDetails={setReviewDetails}
               expandedInstructions={expandedInstructions}
               toggleInstruction={toggleInstruction}

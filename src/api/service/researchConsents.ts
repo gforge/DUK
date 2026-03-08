@@ -1,6 +1,6 @@
-import { getStore, setStore } from '../storage'
-import { uuid, now } from './utils'
 import type { Consent } from '../schemas'
+import { getStore, setStore } from '../storage'
+import { now,uuid } from './utils'
 
 export function getResearchConsents(patientId?: string, moduleId?: string): Consent[] {
   const consents = getStore().researchConsents

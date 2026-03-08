@@ -1,5 +1,13 @@
-import React from 'react'
+import AssignmentIcon from '@mui/icons-material/Assignment'
+import BuildIcon from '@mui/icons-material/Build'
+import DashboardIcon from '@mui/icons-material/Dashboard'
+import PolicyIcon from '@mui/icons-material/GppMaybe'
+import PeopleIcon from '@mui/icons-material/People'
+import PersonIcon from '@mui/icons-material/Person'
+import RouteIcon from '@mui/icons-material/Route'
 import {
+  Box,
+  Divider,
   Drawer,
   List,
   ListItem,
@@ -7,22 +15,16 @@ import {
   ListItemIcon,
   ListItemText,
   Toolbar,
-  Divider,
-  Box,
   Typography,
 } from '@mui/material'
-import { version } from '../../../package.json'
-import DashboardIcon from '@mui/icons-material/Dashboard'
-import PolicyIcon from '@mui/icons-material/GppMaybe'
-import BuildIcon from '@mui/icons-material/Build'
-import PersonIcon from '@mui/icons-material/Person'
-import PeopleIcon from '@mui/icons-material/People'
-import RouteIcon from '@mui/icons-material/Route'
-import AssignmentIcon from '@mui/icons-material/Assignment'
-import { useNavigate, useLocation } from 'react-router-dom'
+import React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useRole } from '@/store/roleContext'
+import { useLocation,useNavigate } from 'react-router-dom'
+
 import { useNavItems } from '@/hooks/useNavItems'
+import { useRole } from '@/store/roleContext'
+
+import { version } from '../../../package.json'
 
 interface SideNavProps {
   drawerWidth: number
