@@ -30,6 +30,7 @@ Switch role from the top bar to experience each perspective:
 | **PAL** (Patientansvarig läkare) | Full access: dashboard, triage, journal approve, policy editor |
 | **Doctor**                       | Dashboard, triage, journal approve                             |
 | **Nurse**                        | Dashboard, triage, journal view                                |
+| **Secretary**                    | Worklist coordination, contact logistics, booking follow-up    |
 | **Patient**                      | Patient portal: view own cases, open app, seek contact         |
 
 ### Dashboard
@@ -84,6 +85,17 @@ Score: {{scores.PNRS_1}}
 - **Export** current app state as JSON
 - **Import** a previously exported JSON state
 - **Reset & Re-seed** back to the original demo data
+
+### Worklist (`/worklist`)
+
+- Structured queue for operational follow-up tasks
+- Filters for category, assigned role, PAL-only and ownership views
+- Completion dialog with scheduling metadata and comments
+
+### Patient Detail (`/patients/:id`)
+
+- Clinician detail page for longitudinal patient context
+- Complements list view (`/patients`) and patient self-view (`/patient`)
 
 ---
 

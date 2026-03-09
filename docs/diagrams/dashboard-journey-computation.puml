@@ -6,12 +6,11 @@ start
 :For each patient: collect
 ALL PatientJourney records
 (may be multiple parallel journeys);
-:For each ACTIVE journey:
+:For each ACTIVE/SUSPENDED journey:
 Apply pause shift
 (totalPausedDays + currentPauseDays);
 :Apply modifications per journey
-(ADD_STEP, REMOVE_STEP,
-SWITCH_TEMPLATE);
+(ADD_STEP, REMOVE_STEP);
 :Overlay research module
 entries if researchModuleIds
 are present;
@@ -22,7 +21,7 @@ from persisted Instruction
 records;
 :Merge & deduplicate due steps
 across parallel journeys by
-templateEntryId
+templateId
 (getMergedDueStepsForPatient);
 :Map merged steps to
 queue/category;

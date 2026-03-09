@@ -26,27 +26,47 @@ class Patient {
 class Case {
   id
   patientId
+  episodeId?
   status
   category
   triggers
   policyWarnings
-  assignedRole
-  deadline
+  triageDecision?
+  bookings[]?
+  reviews[]
+  closedAt?
 }
 
 }
 
 package "Journeys" #E8F5E9 {
 
-class PatientJourney {
+class EpisodeOfCare {
   id
   patientId
+  label
+  status
+  openedAt
+  closedAt?
+  responsibleUserId?
+  primaryCaseId?
+}
+
+class PatientJourney {
+  id
+  episodeId
+  patientId
   journeyTemplateId
+  phaseType
+  phaseLabel?
   startDate
+  joinedAt
+  transition?
   status
   pausedAt
   totalPausedDays
   researchModuleIds
+  recurringCompletions[]
   modifications[]
 }
 
@@ -71,10 +91,9 @@ class JourneyModification {
   addedByUserId
   reason
   addedAt
-  previousTemplateId?
-  newTemplateId?
-  previousStartDate?
-  newStartDate?
+  entry?
+  stepId?
+  mergedFromJourneyId?
 }
 
 }
@@ -171,14 +190,18 @@ class JournalDraft {
 }
 
 Patient "1" -- "*" Case : has
+Patient "1" -- "*" EpisodeOfCare : episodes
 Patient "1" -- "*" PatientJourney : journeys
 Patient "1" -- "*" Consent : consents
 
 Case "1" -- "*" FormResponse : responses
 Case "1" -- "*" JournalDraft : drafts
+Case "0..1" -- "1" EpisodeOfCare : episodeId
 
 FormResponse "*" -- "0..1" PatientJourney : patientJourneyId
 FormResponse "*" -- "0..1" JourneyTemplateEntry : journeyTemplateEntryId
+
+EpisodeOfCare "1" -- "*" PatientJourney : phases
 
 JourneyTemplate "1" -- "*" JourneyTemplateEntry : entries
 JourneyTemplate "1" -- "*" JourneyTemplateInstruction : instructions

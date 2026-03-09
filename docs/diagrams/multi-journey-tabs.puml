@@ -42,14 +42,14 @@ loop per Active Journey
   Resolver -> Resolver : Filter steps where\n  scheduledDate is within\n  today's window
 end
 
-Resolver -> Resolver : Deduplicate by templateEntryId\n(keep first occurrence;\ndiscard duplicates from\nparallel journeys)
+Resolver -> Resolver : Deduplicate by templateId\n(keep first occurrence;\ndiscard duplicates from\nparallel journeys)
 Resolver --> MDS : MergedDueStep[]\n(no duplicate questionnaires)
 MDS --> JT : Merged due steps for\ndashboard/worklist display
 
 note right of Resolver
   Key invariant:
   The same questionnaire
-  (templateEntryId) is shown
+  (templateId) is shown
   at most once per day, even
   when two parallel journeys
   both schedule it.

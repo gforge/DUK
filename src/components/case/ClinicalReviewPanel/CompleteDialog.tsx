@@ -15,7 +15,8 @@ import {
 } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 
-import type { ReviewOutcome } from '@/api/schemas'
+import type { ReviewOutcome, ReviewType } from '@/api/schemas'
+import PersonalNumberCopy from '@/components/common/PersonalNumberCopy'
 
 interface Props {
   open: boolean
@@ -26,6 +27,24 @@ interface Props {
   onChangeOutcome: (o: ReviewOutcome) => void
   onChangeNote: (n: string) => void
   onConfirm: () => void
+  patientLabel?: string | null
+  personalNumber?: string | null
+  reviewType?: ReviewType | null
+}
+
+const useReviewTypeTitle = (reviewType: ReviewType | null | undefined) => {
+  const { t } = useTranslation()
+  if (!reviewType) return t('review.markReviewed')
+
+  if (reviewType === 'LAB') {
+    return t('review.reviewTypeTitle.Lab', 'Review Lab Result')
+  }
+
+  if (reviewType === 'XRAY') {
+    return t('review.reviewTypeTitle.XRAY', 'Review X-Ray Result')
+  }
+
+  return t('review.markReviewed')
 }
 
 export function CompleteReviewDialog({
@@ -37,13 +56,26 @@ export function CompleteReviewDialog({
   onChangeOutcome,
   onChangeNote,
   onConfirm,
+  patientLabel,
+  personalNumber,
+  reviewType,
 }: Props) {
   const { t } = useTranslation()
 
+  const title = useReviewTypeTitle(reviewType)
+
   return (
     <Dialog open={open} onClose={onClose}>
-      <DialogTitle>{t('review.markReviewed')}</DialogTitle>
+      <DialogTitle>{title}</DialogTitle>
       <DialogContent sx={{ minWidth: 420, pt: 2 }}>
+        {patientLabel || personalNumber ? (
+          <Stack spacing={0.5} sx={{ mb: 1 }}>
+            {patientLabel ? <strong>{patientLabel}</strong> : null}
+            {personalNumber ? (
+              <PersonalNumberCopy personalNumber={personalNumber} labelFormat="short" showCopy />
+            ) : null}
+          </Stack>
+        ) : null}
         <Stack gap={2.5}>
           <ToggleButtonGroup
             value={outcome}
@@ -90,7 +122,7 @@ export function CompleteReviewDialog({
           variant="contained"
           disabled={loading || (outcome !== 'OK' && !note.trim())}
         >
-          {loading ? <CircularProgress size={24} /> : t('common.save')}
+          {loading ? <CircularProgress size={24} /> : (t as any)('review.marked')}
         </Button>
       </DialogActions>
     </Dialog>

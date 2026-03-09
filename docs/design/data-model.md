@@ -22,27 +22,48 @@ Case (src/api/schemas/case.ts)
 
 - id: string
 - patientId: string (FK → Patient.id)
+- episodeId: string | undefined (FK → EpisodeOfCare.id)
 - status: enum (NEW, NEEDS_REVIEW, TRIAGED, FOLLOWING_UP, CLOSED)
 - category: enum (ACUTE, SUBACUTE, CONTROL)
 - triggers: string[] (named trigger keys)
-- policyWarnings: {ruleId, message, severity, resolvedVars}[]
-- nextStep: enum (digital, doctorVisit, nurse, physio, phone, none)
-- assignedRole: enum (SSK, DOCTOR, PAL) | null
-- assignedUserId: string | null
-- deadline: string | null (ISO)
+- policyWarnings: {ruleId, ruleName, severity, triggeredValues, expression}[]
+- triageDecision: {contactMode, careRole, assignmentMode, assignedUserId?, dueAt?, note?} | undefined
+- bookings: Booking[] | undefined
+- reviews: ClinicalReview[]
+- internalNote, patientMessage, deadline, formSeriesId: string | undefined
 - createdAt, lastActivityAt: string (ISO)
+- closedAt: string | null | undefined
 
 PatientJourney (src/api/schemas/journey.ts)
 
 - id: string
+- episodeId: string
 - patientId: string
 - journeyTemplateId: string
-- startDate: string (ISO; may be reset via SWITCH_TEMPLATE with newStartDate)
+- phaseType: enum (REFERRAL, INTAKE, FOLLOWUP, WAITING_LIST, POST_OP, MONITORING, DISCHARGE)
+- phaseLabel: string | undefined
+- startDate: string (YYYY-MM-DD)
+- joinedAt: string (YYYY-MM-DD; late enrollment anchor)
+- transition: JourneyPhaseTransition | undefined
 - status: enum (ACTIVE, SUSPENDED, COMPLETED)
 - pausedAt: string | null (ISO; set when SUSPENDED, cleared on resume)
 - totalPausedDays: number (accumulated whole-day pauses from all previous pause/resume cycles)
 - researchModuleIds: string[]
 - modifications: JourneyModification[]
+- recurringCompletions: RecurringCompletion[]
+- createdAt, updatedAt: string (ISO)
+
+EpisodeOfCare (src/api/schemas/journey.ts)
+
+- id: string
+- patientId: string
+- label: string
+- clinicalArea: string | undefined
+- status: enum (OPEN, COMPLETED, DISCHARGED)
+- openedAt: string (ISO)
+- closedAt: string | null (ISO)
+- responsibleUserId: string | undefined
+- primaryCaseId: string | undefined
 - createdAt, updatedAt: string (ISO)
 
 JourneyTemplateEntry
@@ -55,7 +76,11 @@ JourneyTemplateEntry
 - windowDays: number
 - scoreAliases: Record<string, string> (raw score key → semantic alias)
 - scoreAliasLabels: Record<string, string> (alias → human label)
+- stepKey: string | undefined
 - dashboardCategory: enum (ACUTE, SUBACUTE, CONTROL)
+- recurrenceIntervalDays: number | undefined
+- reviewTypes: ReviewType[] | undefined
+- icon: string | undefined
 
 JourneyTemplateInstruction
 
@@ -93,6 +118,7 @@ JourneyTemplate
 - entries: JourneyTemplateEntry[]
 - parentTemplateId: string | undefined (FK → parent JourneyTemplate.id for derived templates)
 - derivedAt: string | undefined (ISO; timestamp of last sync from parent)
+- referenceDateLabel: string
 - createdAt: string (ISO)
 
 InstructionTemplate (src/api/schemas/journey.ts) — NEW
@@ -107,14 +133,12 @@ InstructionTemplate (src/api/schemas/journey.ts) — NEW
 JourneyModification (embedded in PatientJourney.modifications[])
 
 - id: string
-- type: enum (ADD_STEP, REMOVE_STEP, SWITCH_TEMPLATE, CANCEL)
+- type: enum (ADD_STEP, REMOVE_STEP, CANCEL)
 - addedByUserId: string
 - reason: string
 - addedAt: string (ISO)
 - entry: JourneyTemplateEntry | undefined (for ADD_STEP)
 - stepId: string | undefined (for REMOVE_STEP)
-- previousTemplateId, newTemplateId: string | undefined (for SWITCH_TEMPLATE)
-- previousStartDate, newStartDate: string | undefined (for SWITCH_TEMPLATE with date reset)
 - mergedFromJourneyId: string | undefined (audit trail for parallel-journey merge conflicts)
 
 FormResponse (src/api/schemas/forms.ts)
@@ -168,6 +192,7 @@ Consent (src/api/schemas/journey.ts)
 - grantedByUserId: string
 - revokedAt: string | null (ISO; null = still active)
 - revokedByUserId: string | null
+- withdrawalReason: string | null
 
 All `Consent` records are stored in `AppState.researchConsents`. A revoked consent is never deleted — it stays as a permanent audit trail and a new grant creates a fresh record.
 
@@ -176,7 +201,7 @@ All `Consent` records are stored in `AppState.researchConsents`. A revoked conse
 Notes
 
 - The codebase stores journeys by `patientId` and the UI renders all journeys in tabbed views sorted ACTIVE → SUSPENDED → COMPLETED. There is no explicit Case→PatientJourney foreign key.
-- `getMergedDueStepsForPatient(patientId, date)` deduplicates due steps across parallel journeys by `templateEntryId` for dashboard display.
+- `getMergedDueStepsForPatient(patientId, date)` deduplicates due steps across parallel journeys by questionnaire `templateId` for dashboard display.
 - `InstructionTemplate` entities are stored in `AppState.instructionTemplates` and referenced from `JourneyTemplateInstruction` and `Instruction`.
 - `JourneyTemplate.parentTemplateId` tracks derivation lineage; `derivedAt` marks the last sync point for `computeParentDiff`.
 - `getEffectiveSteps` only resolves follow-up steps. Instruction rendering uses the dedicated instruction APIs and persisted `Instruction` records.

@@ -9,12 +9,13 @@ import {
   TableRow,
   Typography,
 } from '@mui/material'
+import { differenceInYears, parseISO } from 'date-fns'
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 
-import type { JourneyTemplate,Patient, PatientJourney } from '@/api/schemas'
-import { formatPersonnummer } from '@/api/utils/personnummer'
+import type { JourneyTemplate, Patient, PatientJourney } from '@/api/schemas'
+import PersonalNumberCopy from '@/components/common/PersonalNumberCopy'
 
 import JourneyChips from './JourneyChips'
 
@@ -44,7 +45,7 @@ export default function PatientTable({ patients, journeys, journeyTemplates, isC
           <TableRow>
             <TableCell>{t('patients.displayName')}</TableCell>
             <TableCell>{t('patients.personalNumber')}</TableCell>
-            <TableCell>{t('patients.dateOfBirth')}</TableCell>
+            <TableCell>{t('patients.age')}</TableCell>
             <TableCell>{t('patients.activeJourney')}</TableCell>
             {isClinician && <TableCell />}
           </TableRow>
@@ -73,8 +74,18 @@ export default function PatientTable({ patients, journeys, journeyTemplates, isC
                     {patient.displayName}
                   </Typography>
                 </TableCell>
-                <TableCell>{formatPersonnummer(patient.personalNumber)}</TableCell>
-                <TableCell>{patient.dateOfBirth}</TableCell>
+                <TableCell>
+                  <PersonalNumberCopy
+                    personalNumber={patient.personalNumber}
+                    labelFormat="short"
+                    color="text.primary"
+                  />
+                </TableCell>
+                <TableCell align="center">
+                  {patient.dateOfBirth
+                    ? differenceInYears(new Date(), parseISO(patient.dateOfBirth))
+                    : '—'}
+                </TableCell>
                 <TableCell>
                   <JourneyChips journeys={patientJourneys} journeyTemplates={journeyTemplates} />
                 </TableCell>

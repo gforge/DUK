@@ -37,6 +37,11 @@ export default function ClinicalReviewPanel({ caseData, onRefetch }: Props) {
   )
   const allReviews = reviewsData ?? []
 
+  const { data: patient } = useApi(
+    () => (caseData ? client.getPatient(caseData.patientId) : Promise.resolve(undefined)),
+    [caseData?.patientId],
+  )
+
   const { data: users } = useApi(() => client.getUsers(), [])
   const userMap = React.useMemo(() => {
     if (!users) return new Map()
@@ -45,6 +50,10 @@ export default function ClinicalReviewPanel({ caseData, onRefetch }: Props) {
 
   const pendingReviews = allReviews.filter((r) => r.reviewedAt === null)
   const completedReviews = allReviews.filter((r) => r.reviewedAt !== null)
+
+  const selectedReview = selectedReviewId
+    ? (allReviews.find((r) => r.id === selectedReviewId) ?? null)
+    : null
 
   const isClinician = isRole('NURSE', 'DOCTOR', 'PAL')
 
@@ -174,6 +183,9 @@ export default function ClinicalReviewPanel({ caseData, onRefetch }: Props) {
         onChangeOutcome={(o) => setReviewOutcome(o)}
         onChangeNote={(n) => setReviewNote(n)}
         onConfirm={() => selectedReviewId && handleCompleteReview(selectedReviewId)}
+        patientLabel={patient?.displayName}
+        personalNumber={patient?.personalNumber}
+        reviewType={selectedReview?.type ?? null}
       />
     </Box>
   )

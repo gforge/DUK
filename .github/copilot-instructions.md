@@ -76,10 +76,12 @@ src/
 ├── pages/                      # Route-level components (lazy imported by router)
 │   ├── Dashboard.tsx
 │   ├── CaseDetail.tsx
+│   ├── PatientDetail.tsx
 │   ├── Patients.tsx
 │   ├── PatientView.tsx
 │   ├── PolicyEditor.tsx
 │   ├── JourneyEditor.tsx
+│   ├── Worklist.tsx
 │   └── DemoTools.tsx
 ├── router/index.tsx            # HashRouter + lazy routes + AppShell wrapper
 ├── store/
@@ -110,11 +112,11 @@ All state lives in one JSON blob at `localStorage` key `duk_app_state`. Access f
 
 ### Schema versioning & migrations
 
-`CURRENT_SCHEMA_VERSION` in `src/api/schemaVersion.ts` is an integer that must be bumped whenever `AppStateSchema` changes in a breaking way. Currently **v5**. Every seed sets `schemaVersion: CURRENT_SCHEMA_VERSION`.
+`CURRENT_SCHEMA_VERSION` in `src/api/schemaVersion.ts` is an integer that must be bumped whenever `AppStateSchema` changes in a breaking way. Currently **v13**. Every seed sets `schemaVersion: CURRENT_SCHEMA_VERSION`.
 
 At boot, `main.tsx` calls `runMigrations(raw)` from `src/api/migrations.ts`:
 
-- Returns `{ ok: true, state: AppState }` on success (migrates v0 → v1 → v2 → v3 → v4 → v5).
+- Returns `{ ok: true, state: AppState }` on success (migrates v0 through v13 with a contiguous chain).
 - Returns `{ ok: false, reason, storedVersion, rawState }` when migration is impossible (downgrade or no chain).
 - On failure, `<App migrationError={...}>` renders `<MigrationErrorOverlay>` — a full-screen blocking UI with download-as-JSON and clear-and-restart actions.
 
@@ -158,12 +160,14 @@ All types derive from Zod schemas in `src/api/schemas/`. Never write manual type
 
 Key schemas:
 
-- `AppStateSchema` — flat object with top-level arrays for all entities + `schemaVersion: z.number().int().default(0)` + `researchConsents: ConsentSchema[]`
-- `CaseSchema` — `id`, `patientId`, `category` (`ACUTE|SUBACUTE|CONTROL`), `status` (`NEW|NEEDS_REVIEW|TRIAGED|FOLLOWING_UP|CLOSED`), `triggers[]`, `policyWarnings[]`, etc.
+- `AppStateSchema` — flat object with top-level arrays for all entities + `schemaVersion: z.number().int().default(0)` + `episodesOfCare[]` + `instructions[]` + `instructionTemplates[]` + `researchConsents[]`
+- `CaseSchema` — `id`, `patientId`, optional `episodeId`, `category`, `status`, `triggers[]`, `policyWarnings[]`, optional `triageDecision`, optional `bookings[]`, `reviews[]`, and lifecycle timestamps
 - `PatientSchema` — `id`, `displayName`, `personalNumber` (Swedish), `dateOfBirth`, `palId?`, etc.
-- `UserSchema` — `id`, `name`, `role` (`PATIENT|NURSE|DOCTOR|PAL`)
+- `UserSchema` — `id`, `name`, `role` (`PATIENT|NURSE|DOCTOR|PAL|SECRETARY`)
 - `JourneyTemplateSchema` — template for a follow-up journey with ordered entries (`offsetDays`, `windowDays`, `scoreAliases`, etc.)
-- `PatientJourneySchema` — assignment of a template to a patient with `status` (`ACTIVE|SUSPENDED|COMPLETED`), `modifications[]`, `pausedAt: string | null`, `totalPausedDays: number`
+- `PatientJourneySchema` — assignment of a template to a patient with `episodeId`, `phaseType`, optional `phaseLabel`, `startDate`, `joinedAt`, optional `transition`, `status`, `modifications[]`, `recurringCompletions[]`, `pausedAt`, `totalPausedDays`
+- `EpisodeOfCareSchema` — episode container for one clinical problem over time; links multiple journey phases
+- `InstructionTemplateSchema` / `InstructionSchema` — first-class instruction templates and persisted instruction records
 - `ResearchModuleSchema` — `id`, `name`, `studyInfoMarkdown: string` (Markdown shown in the consent dialog), `entries[]`
 - `ConsentSchema` — `id`, `patientId`, `researchModuleId`, `patientJourneyId`, `grantedAt`, `grantedByUserId`, `revokedAt: string | null`, `revokedByUserId: string | null` — stored in `AppState.researchConsents`
 - `PolicyRuleSchema` — `id`, `name`, `expression` (parsed by policyParser), `severity`, `enabled`
@@ -180,6 +184,16 @@ Key schemas:
 - **Effective-date shift**: `getEffectiveSteps` in `journeyResolver.ts` computes `totalPauseShift = totalPausedDays + currentPauseDays` (where `currentPauseDays` is the live elapsed time for a currently-suspended journey), and adds this shift to every step's `scheduledDate`. No store write occurs until `resumeJourney` is called.
 - The `JourneyTab` (clinician CaseDetail view) shows a pause/resume button and a paused-days banner while suspended.
 
+## Episode phases and transitions
+
+Journeys are organized into episodes of care and can transition between phases.
+
+- `startNextPhase(...)` in `src/api/service/patientJourneys.ts` completes the previous journey and creates a new journey linked to the same `episodeId`.
+- `PatientJourney.phaseType` records the semantic phase (`REFERRAL`, `INTAKE`, `FOLLOWUP`, `WAITING_LIST`, `POST_OP`, `MONITORING`, `DISCHARGE`).
+- `PatientJourney.transition` stores audit metadata (`fromJourneyId`, trigger type, actor, note).
+- Late enrollment via `joinedAt` removes already-missed steps and auto-cancels expired instructions with `cancelReason: 'LATE_JOIN'`.
+- Recurring steps are expanded by the resolver and tracked with `recurringCompletions[]`.
+
 ## Research consent model
 
 Consents for research modules are managed via `src/api/service/researchConsents.ts` and stored in `AppState.researchConsents`.
@@ -195,7 +209,7 @@ Consents for research modules are managed via `src/api/service/researchConsents.
 A patient can have any number of concurrent `PatientJourney` records (e.g., wrist fracture + hip fracture programmes running in parallel).
 
 - `JourneyTab` (CaseDetail) and `PatientCareplan` (PatientView) both render **all journeys** for the patient in MUI `Tabs`, sorted ACTIVE → SUSPENDED → COMPLETED, newest first within each status group. The previously-used "latest ACTIVE" single-journey selection is replaced by this multi-tab view.
-- **Form deduplication**: `getMergedDueStepsForPatient(patientId, date)` in `journeyResolver.ts` collects due steps from all ACTIVE journeys and deduplicates by `templateEntryId` so the same questionnaire is never shown twice on the dashboard, even when two parallel journeys schedule the same form on overlapping windows.
+- **Form deduplication**: `getMergedDueStepsForPatient(patientId, date)` in `journeyResolver.ts` collects due steps from ACTIVE/SUSPENDED journeys and deduplicates by questionnaire `templateId` so the same questionnaire is never shown twice on the dashboard, even when two parallel journeys schedule it on overlapping windows.
 
 ---
 
@@ -229,7 +243,7 @@ const { data, loading, error, refetch } = useApi(() => client.getSomething(id), 
 const { currentUser } = useRole()
 ```
 
-`currentUser.role` is `'PATIENT' | 'NURSE' | 'DOCTOR' | 'PAL'`. PAL is a Doctor with restricted patient filter. Guard admin-only UI with `currentUser.role !== 'PATIENT'`.
+`currentUser.role` is `'PATIENT' | 'NURSE' | 'DOCTOR' | 'PAL' | 'SECRETARY'`. PAL is a Doctor with restricted patient filter. Guard admin-only UI with `currentUser.role !== 'PATIENT'`.
 
 ### Notifications
 
@@ -302,16 +316,18 @@ Do not add `eval` or dynamic code execution under any circumstances.
 
 The router (`src/router/index.tsx`) uses `HashRouter` for static-site compatibility. All page components are **lazy-loaded**. Routes:
 
-| Path          | Page                                           |
-| ------------- | ---------------------------------------------- |
-| `/dashboard`  | Dashboard (default redirect)                   |
-| `/cases/:id`  | CaseDetail                                     |
-| `/patient`    | PatientView (self-service, role=PATIENT only)  |
-| `/patients`   | Patients list (clinicians)                     |
-| `/policy`     | PolicyEditor                                   |
-| `/journeys`   | JourneyEditor                                  |
-| `/worklist`   | Worklist (structured task list for clinicians) |
-| `/demo-tools` | DemoTools                                      |
+| Path                     | Page                                           |
+| ------------------------ | ---------------------------------------------- |
+| `/dashboard`             | Dashboard (default redirect)                   |
+| `/cases/:id`             | CaseDetail                                     |
+| `/cases/:id/:triageMode` | CaseDetail with triage mode context            |
+| `/patient`               | PatientView (self-service, role=PATIENT only)  |
+| `/patients`              | Patients list (clinicians)                     |
+| `/patients/:id`          | PatientDetail (clinician)                      |
+| `/policy`                | PolicyEditor                                   |
+| `/journeys`              | JourneyEditor                                  |
+| `/worklist`              | Worklist (structured task list for clinicians) |
+| `/demo-tools`            | DemoTools                                      |
 
 ---
 

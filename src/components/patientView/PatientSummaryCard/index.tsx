@@ -4,7 +4,7 @@ import React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import type { Patient } from '@/api/schemas'
-import { formatPersonnummer } from '@/api/utils/personnummer'
+import PersonalNumberCopy from '@/components/common/PersonalNumberCopy'
 
 interface Props {
   patient: Patient | null | undefined
@@ -22,9 +22,7 @@ export default function PatientSummaryCard({ patient, loading }: Props) {
         ) : patient ? (
           <Stack spacing={1}>
             <Typography variant="h6">{patient.displayName}</Typography>
-            <Typography variant="body2" color="text.secondary">
-              {t('patient.personalNumber')}: {formatPersonnummer(patient.personalNumber)}
-            </Typography>
+            <PersonalNumberCopy personalNumber={patient.personalNumber} labelFormat="long" />
             {patient.lastOpenedAt && (
               <Typography variant="body2" color="text.secondary">
                 {t('patient.lastOpened')}:{' '}

@@ -49,6 +49,7 @@ DUK is a fully client-side React/TypeScript demo of orthopaedic follow-up triage
 - `NURSE`: triage in scope, contact actions, workflow management.
 - `DOCTOR`: triage + journal approval.
 - `PAL`: doctor capabilities with dedicated queue filters.
+- `SECRETARY`: coordination-focused workflow support, including worklist operations.
 
 ## System Architecture
 
@@ -69,8 +70,9 @@ Key takeaway: business logic is centralized in service modules; UI layers remain
 
 What this diagram shows:
 
-- Primary entities: `Patient`, `Case`, `PatientJourney`, `JourneyTemplate`, `FormResponse`, `PolicyRule`, `JournalDraft`, `Consent`.
+- Primary entities: `Patient`, `Case`, `EpisodeOfCare`, `PatientJourney`, `JourneyTemplate`, `Instruction`, `FormResponse`, `PolicyRule`, `JournalDraft`, `Consent`.
 - A patient can have many journeys in parallel.
+- Journeys are grouped into episodes and can transition across phase types.
 - Consents are append-only audit records with revocation metadata.
 
 Key takeaway: patient follow-up is journey-centric, while triage and messaging are case-centric.
@@ -116,9 +118,9 @@ A patient may have multiple concurrent `PatientJourney` records (for example two
 What this diagram shows:
 
 - `ACTIVE`, `SUSPENDED`, `COMPLETED` lifecycle.
-- `SWITCH_TEMPLATE` and optional start-date reset behavior.
+- Phase progression is modeled by completing one journey and starting the next phase in the same episode.
 
-Key takeaway: suspension and template switching are first-class lifecycle operations.
+Key takeaway: suspension is stateful, while clinical progression is represented by explicit phase transitions.
 
 ### Parallel Journeys In The UI
 
@@ -137,7 +139,7 @@ Key takeaway: users navigate whole care history, not just a single active progra
 
 What this diagram shows:
 
-- `getMergedDueStepsForPatient(patientId, date)` deduplicates by `templateEntryId`.
+- `getMergedDueStepsForPatient(patientId, date)` deduplicates by questionnaire `templateId`.
 
 Key takeaway: the same questionnaire is shown at most once even when two journeys overlap.
 
@@ -159,8 +161,8 @@ Key takeaway: pause affects schedule calculations without rewriting all step dat
 
 What this diagram shows:
 
-- `ADD_STEP`, `REMOVE_STEP`, `SWITCH_TEMPLATE` flows.
-- `SWITCH_TEMPLATE` can carry `previousStartDate`/`newStartDate` audit context.
+- `ADD_STEP`, `REMOVE_STEP`, and `CANCEL` modification semantics.
+- Episode-phase transitions are handled by `startNextPhase(...)` and tracked with `PatientJourney.transition`.
 
 Key takeaway: modifications are auditable journey history, not destructive edits.
 

@@ -148,22 +148,22 @@ These stories map directly to the workflows and components described in the desi
 
 ---
 
-## US9 – Journey switching with date reset
+## US9 – Journey phase transitions within an episode
 
-**As a** clinician **I want** to switch a patient's journey template (e.g., from non‑op to post‑surgery protocol) and optionally reset the start date to a clinically relevant anchor (e.g. surgery date):
+**As a** clinician **I want** to transition a patient from one clinical phase to the next (for example referral -> intake -> follow-up) while preserving episode continuity:
 
-- the modification dialog shows a "New start date" field when switching templates
-- all subsequent steps recalculate relative to the new anchor date
-- the modification history clearly shows both the template switch and the date change
+- the previous journey phase is completed when the next phase starts
+- the new phase keeps the same `episodeId` and records transition metadata
+- the transition stores trigger type, actor, and optional note for auditability
 
 **Acceptance criteria**
 
-1. `SWITCH_TEMPLATE` modification accepts optional `newStartDate` and `previousStartDate`.
-2. After switching, `PatientJourney.startDate` reflects the new date and `getEffectiveSteps` returns dates relative to it.
-3. The modification history panel shows a date reset banner when applicable.
-4. Unit tests cover SWITCH_TEMPLATE with date reset.
+1. `startNextPhase(...)` marks `fromJourneyId` as `COMPLETED`.
+2. A new `PatientJourney` is created with the same `episodeId`, requested `phaseType`, and transition metadata.
+3. New phase assignment instantiates instruction records from the selected template.
+4. Unit tests cover phase transition state updates and episode continuity.
 
-> _Related code_: `src/api/service/patientJourneys.ts`, `src/components/journey/modify/ModifyForms.tsx`, `src/tests/journey.test.ts`.
+> _Related code_: `src/api/service/patientJourneys.ts`, `src/api/schemas/journey.ts`, `src/tests/journey.test.ts`.
 
 ---
 
@@ -284,7 +284,7 @@ These stories map directly to the workflows and components described in the desi
 1. `assignPatientJourney` creates a new `PatientJourney` record regardless of existing journeys; there is no single-journey-per-patient constraint.
 2. `JourneyTab` (CaseDetail) renders all journeys for the patient as MUI `Tabs` sorted by status (ACTIVE first), newest first within each group.
 3. `PatientCareplan` (PatientView) renders the same multi-tab layout for the patient self-view.
-4. `getMergedDueStepsForPatient(patientId, date)` deduplicates due steps across all ACTIVE journeys by `templateEntryId`.
+4. `getMergedDueStepsForPatient(patientId, date)` deduplicates due steps across ACTIVE/SUSPENDED journeys by questionnaire `templateId`.
 5. Unit tests verify that `getMergedDueStepsForPatient` deduplicates correctly when two journeys share the same questionnaire.
 
 > _Related code_: `src/api/service/journeyResolver.ts`, `src/components/case/JourneyTab/index.tsx`, `src/components/patientView/PatientCareplan/main.tsx`, `src/tests/journey.test.ts`.

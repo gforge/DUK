@@ -25,14 +25,13 @@ else REMOVE_STEP
   Store --> Service : updated journey
   Service --> Client : updated journey
   Client --> UI : success
-else SWITCH_TEMPLATE
-  Clinician -> UI : Submit SWITCH_TEMPLATE(reason, newTemplateId, newStartDate?)
-  UI -> Client : modifyPatientJourney(journeyId, SWITCH_TEMPLATE, payload)
-  Client -> Service : modifyPatientJourney(...)
-  Service -> Service : Validate newTemplateId exists
-  Service -> Store : Update journeyTemplateId\nOptionally reset startDate\nAppend JourneyModification(type=SWITCH_TEMPLATE, previous/new template and dates)
-  Store --> Service : updated journey
-  Service --> Client : updated journey
+else CANCEL
+  Clinician -> UI : Submit CANCEL(reason)
+  UI -> Client : cancelJourney(journeyId, reason, userId)
+  Client -> Service : cancelJourney(...)
+  Service -> Store : If data exists: append JourneyModification(type=CANCEL)\nset status COMPLETED; else delete journey
+  Store --> Service : cancel result
+  Service --> Client : cancel result
   Client --> UI : success
 end
 

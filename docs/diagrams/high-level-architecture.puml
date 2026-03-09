@@ -44,7 +44,7 @@ note bottom of [Journey Resolver]
   Computes effective steps,
   hydrates instructions,
   handles template derivation
-  and SWITCH_TEMPLATE,
+  and phase-aware scheduling,
   pause-shift calculation,
   getMergedDueStepsForPatient
 end note

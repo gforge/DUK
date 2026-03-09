@@ -584,6 +584,7 @@ interface Resources {
     }
     patients: {
       activeJourney: 'Aktiv patientresa'
+      age: 'Ålder'
       assignJourney: 'Tilldela resa'
       conflicts: {
         existingOn: 'befintlig'
@@ -724,6 +725,10 @@ interface Resources {
       outcome: 'Utfall'
       pending: 'Väntar på granskning'
       remove: 'Ta bort beställning'
+      reviewTypeTitle: {
+        Lab: 'Granska provsvar'
+        XRAY: 'Granska röntgenundersökning'
+      }
       reviewedAt: 'Granskat'
       reviewedBy: 'Granskat av'
       type: 'Typ'
@@ -747,6 +752,7 @@ interface Resources {
       NURSE: 'Sjuksköterska'
       PAL: 'PAL (Patientansvarig läkare)'
       PATIENT: 'Patient'
+      SECRETARY: 'Sekreterare'
       currentRole: 'Aktiv roll'
       switchRole: 'Byt roll'
     }
@@ -861,6 +867,7 @@ interface Resources {
     }
     worklist: {
       activeLabel: 'Aktiva'
+      assignmentModeAnyTooltip: 'Vem som helst'
       category: {
         DIGITAL: 'Digital uppföljning'
         PHONE: 'Telefonkontakt'
@@ -875,6 +882,7 @@ interface Resources {
       completionComment: 'Kommentar (valfri)'
       completionCommentHint: 'Lägg till en anteckning om avslutet om det behövs.'
       confirmDone: 'Avsluta ärende'
+      copyPersonalNumber: 'Kopiera personnummer'
       doneSuccess: 'Ärende avslutat'
       empty: 'Inga ärenden kräver åtgärd just nu.'
       emptyGroup: 'Inga ärenden i denna grupp.'
@@ -888,7 +896,6 @@ interface Resources {
       monitoringSectionTitle: 'Bevakning (tilldelade annan)'
       nextContactDate: 'Nästa kontakt (valfri)'
       nextContactDateHint: 'Ange datum om uppföljning behövs, annars lämna tomt.'
-      copyPersonalNumber: 'Kopiera personnummer'
       noDeadline: 'Ingen deadline'
       openCase: 'Öppna ärende'
       showCompleted: 'Visa avklarade'

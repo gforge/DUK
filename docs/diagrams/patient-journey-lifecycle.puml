@@ -12,8 +12,6 @@ SUSPENDED --> ACTIVE : resumeJourney\n(totalPausedDays += elapsedDays,\npausedAt
 ACTIVE --> COMPLETED : complete
 SUSPENDED --> COMPLETED : complete
 
-ACTIVE --> ACTIVE : SWITCH_TEMPLATE\n(change template\n& optional date reset)
-
 note right of SUSPENDED
   Step dates shift dynamically by
   totalPausedDays + currentPauseDays
@@ -27,9 +25,10 @@ note right of ACTIVE
 end note
 
 note bottom of ACTIVE
-  SWITCH_TEMPLATE modifies journeyTemplateId
-  and optionally resets startDate.
-  Recorded in modifications[].
+  Phase progression is handled by
+  startNextPhase(...): previous journey
+  becomes COMPLETED and a new
+  journey is created in the same episode.
 end note
 
 @enduml

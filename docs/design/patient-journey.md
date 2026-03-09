@@ -20,7 +20,7 @@ What this diagram shows:
 
 - Assignment starts at `ACTIVE` with `pausedAt = null` and `totalPausedDays = 0`.
 - Pause/resume transitions are explicit and guarded.
-- Template switching can reset `startDate` with audit context.
+- Phase progression is represented by creating a new journey phase linked to the same `episodeId`.
 
 ## Effective Step Computation
 
@@ -50,7 +50,7 @@ What this diagram shows:
 
 What this diagram shows:
 
-- Due steps are deduplicated by `templateEntryId` when journeys overlap.
+- Due steps are deduplicated by questionnaire `templateId` when journeys overlap.
 
 Clinical effect:
 
@@ -74,9 +74,11 @@ Supported operations:
 
 - `ADD_STEP`
 - `REMOVE_STEP`
-- `SWITCH_TEMPLATE` (optionally with date reset)
+- `CANCEL`
 
 All operations append to `PatientJourney.modifications[]` with reason text for auditability.
+
+Episode progression between templates is handled with `startNextPhase(...)` and recorded in `PatientJourney.transition`.
 
 ## Form Submission Coupling
 

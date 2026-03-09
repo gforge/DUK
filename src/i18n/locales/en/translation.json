@@ -582,6 +582,7 @@
   },
   "patients": {
     "activeJourney": "Active Journey",
+    "age": "Age",
     "assignJourney": "Assign Journey",
     "conflicts": {
       "existingOn": "existing on",
@@ -724,6 +725,10 @@
     "remove": "Cancel order",
     "reviewedAt": "Reviewed",
     "reviewedBy": "Reviewed by",
+    "reviewTypeTitle": {
+      "Lab": "Review lab results",
+      "XRAY": "Review X-Ray results"
+    },
     "type": "Type",
     "visit": "Visit"
   },
@@ -746,6 +751,7 @@
     "NURSE": "Nurse (RN)",
     "PAL": "PAL (Responsible Physician)",
     "PATIENT": "Patient",
+    "SECRETARY": "Secretary",
     "switchRole": "Switch Role"
   },
   "severity": {
@@ -874,6 +880,7 @@
     "completionComment": "Comment (optional)",
     "completionCommentHint": "Add a note about the completion if needed.",
     "confirmDone": "Close case",
+    "copyPersonalNumber": "Copy personal number",
     "doneSuccess": "Case closed",
     "empty": "No cases require action right now.",
     "emptyGroup": "No cases in this group.",
@@ -887,7 +894,6 @@
     "monitoringSectionTitle": "Monitoring (assigned to others)",
     "nextContactDate": "Next contact (optional)",
     "nextContactDateHint": "Set a date if follow-up is needed, otherwise leave blank.",
-    "copyPersonalNumber": "Copy personal number",
     "noDeadline": "No deadline",
     "openCase": "Open case",
     "showCompleted": "Show completed",

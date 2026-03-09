@@ -582,6 +582,7 @@
   },
   "patients": {
     "activeJourney": "Aktiv patientresa",
+    "age": "Ålder",
     "assignJourney": "Tilldela resa",
     "conflicts": {
       "existingOn": "befintlig",
@@ -724,6 +725,10 @@
     "remove": "Ta bort beställning",
     "reviewedAt": "Granskat",
     "reviewedBy": "Granskat av",
+    "reviewTypeTitle": {
+      "Lab": "Granska provsvar",
+      "XRAY": "Granska röntgenundersökning"
+    },
     "type": "Typ",
     "visit": "Besök"
   },
@@ -746,6 +751,7 @@
     "NURSE": "Sjuksköterska",
     "PAL": "PAL (Patientansvarig läkare)",
     "PATIENT": "Patient",
+    "SECRETARY": "Sekreterare",
     "switchRole": "Byt roll"
   },
   "severity": {
@@ -874,6 +880,7 @@
     "completionComment": "Kommentar (valfri)",
     "completionCommentHint": "Lägg till en anteckning om avslutet om det behövs.",
     "confirmDone": "Avsluta ärende",
+    "copyPersonalNumber": "Kopiera personnummer",
     "doneSuccess": "Ärende avslutat",
     "empty": "Inga ärenden kräver åtgärd just nu.",
     "emptyGroup": "Inga ärenden i denna grupp.",
@@ -887,7 +894,6 @@
     "monitoringSectionTitle": "Bevakning (tilldelade annan)",
     "nextContactDate": "Nästa kontakt (valfri)",
     "nextContactDateHint": "Ange datum om uppföljning behövs, annars lämna tomt.",
-    "copyPersonalNumber": "Kopiera personnummer",
     "noDeadline": "Ingen deadline",
     "openCase": "Öppna ärende",
     "showCompleted": "Visa avklarade",
