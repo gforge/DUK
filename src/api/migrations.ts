@@ -392,6 +392,94 @@ const MIGRATIONS: Migration[] = [
       }
     },
   },
+  {
+    from: 11,
+    to: 12,
+    up: (s) => {
+      const mapLegacyToDecision = (c: Record<string, unknown>) => {
+        const nextStep = c['nextStep']
+        const assignedRole = c['assignedRole']
+        const assignedUserId = c['assignedUserId']
+        const deadline = c['deadline']
+        const note = c['internalNote']
+
+        if (typeof c['triageDecision'] === 'object' && c['triageDecision'] !== null) {
+          return c['triageDecision']
+        }
+
+        if (nextStep === 'NO_ACTION') {
+          return {
+            contactMode: 'CLOSE',
+            careRole: null,
+            assignmentMode: null,
+            assignedUserId: null,
+            dueAt: null,
+            note: typeof note === 'string' ? note : null,
+          }
+        }
+
+        if (nextStep === 'PHONE_CALL') {
+          return {
+            contactMode: 'PHONE',
+            careRole: assignedRole === 'DOCTOR' || assignedRole === 'PAL' ? 'DOCTOR' : 'NURSE',
+            assignmentMode: assignedRole === 'PAL' ? 'PAL' : assignedUserId ? 'NAMED' : 'ANY',
+            assignedUserId: typeof assignedUserId === 'string' ? assignedUserId : null,
+            dueAt: typeof deadline === 'string' ? deadline : null,
+            note: typeof note === 'string' ? note : null,
+          }
+        }
+
+        if (nextStep === 'DIGITAL_CONTROL') {
+          return {
+            contactMode: 'DIGITAL',
+            careRole: assignedRole === 'DOCTOR' || assignedRole === 'PAL' ? 'DOCTOR' : 'NURSE',
+            assignmentMode: assignedRole === 'PAL' ? 'PAL' : assignedUserId ? 'NAMED' : 'ANY',
+            assignedUserId: typeof assignedUserId === 'string' ? assignedUserId : null,
+            dueAt: typeof deadline === 'string' ? deadline : null,
+            note: typeof note === 'string' ? note : null,
+          }
+        }
+
+        if (nextStep === 'PHYSIO_VISIT') {
+          return {
+            contactMode: 'VISIT',
+            careRole: 'PHYSIO',
+            assignmentMode: assignedUserId ? 'NAMED' : 'ANY',
+            assignedUserId: typeof assignedUserId === 'string' ? assignedUserId : null,
+            dueAt: typeof deadline === 'string' ? deadline : null,
+            note: typeof note === 'string' ? note : null,
+          }
+        }
+
+        const defaultCareRole =
+          assignedRole === 'DOCTOR' || assignedRole === 'PAL'
+            ? 'DOCTOR'
+            : assignedRole === 'NURSE'
+              ? 'NURSE'
+              : 'DOCTOR'
+
+        return {
+          contactMode: 'VISIT',
+          careRole: defaultCareRole,
+          assignmentMode: assignedRole === 'PAL' ? 'PAL' : assignedUserId ? 'NAMED' : 'ANY',
+          assignedUserId: typeof assignedUserId === 'string' ? assignedUserId : null,
+          dueAt: typeof deadline === 'string' ? deadline : null,
+          note: typeof note === 'string' ? note : null,
+        }
+      }
+
+      return {
+        ...s,
+        schemaVersion: 12,
+        cases: Array.isArray(s['cases'])
+          ? (s['cases'] as Record<string, unknown>[]).map((c) => ({
+              ...c,
+              triageDecision: mapLegacyToDecision(c),
+            }))
+          : [],
+      }
+    },
+  },
 ]
 
 // ---------------------------------------------------------------------------

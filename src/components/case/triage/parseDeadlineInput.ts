@@ -15,7 +15,7 @@
  * Returns null for empty or unrecognised input.
  */
 
-const SHORTHAND_RE = /^(\d+)\s*(d|v|w)$/i
+const SHORTHAND_RE = /^(\d+)\s*(d|dag|dagar|day|days|v|vecka|veckor|w|week|weeks)$/i
 const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}$/
 // day/month with / or . separator, e.g. "1/3" or "1.3"
 const SLASH_DOT_RE = /^(\d{1,2})[/.](\d{1,2})$/
@@ -87,12 +87,13 @@ export function parseDeadlineInput(input: string): string | null {
   const trimmed = input.trim()
   if (!trimmed) return null
 
-  // Relative offset: 3d, 2v, 1w
+  // Relative offset: 3d, 2v, 1w, 3 veckor, 3 weeks
   const shorthandMatch = trimmed.match(SHORTHAND_RE)
   if (shorthandMatch) {
     const n = parseInt(shorthandMatch[1], 10)
     const unit = shorthandMatch[2].toLowerCase()
-    const days = unit === 'd' ? n : n * 7
+    const isDay = ['d', 'dag', 'dagar', 'day', 'days'].includes(unit)
+    const days = isDay ? n : n * 7
     // Use noon to avoid DST-induced off-by-one on date boundaries
     const date = new Date(Date.now() + days * 86_400_000)
     return date.toISOString().slice(0, 10)

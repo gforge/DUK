@@ -1,4 +1,4 @@
-import { beforeEach,describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 
 import { SEED_STATE } from '@/api/seed'
 import * as service from '@/api/service'
@@ -16,12 +16,14 @@ describe('triageCase', () => {
     const result = service.triageCase(
       reviewCase.id,
       {
-        nextStep: 'PHONE_CALL',
-        deadline: new Date().toISOString(),
-        assignedRole: 'NURSE',
-        internalNote: 'Test note',
+        triageDecision: {
+          contactMode: 'PHONE',
+          careRole: 'NURSE',
+          assignmentMode: 'ANY',
+          dueAt: new Date().toISOString(),
+          note: 'Test note',
+        },
         patientMessage: 'Test msg',
-        closeImmediately: false,
       },
       'user-pal-1',
       'PAL',
@@ -29,6 +31,7 @@ describe('triageCase', () => {
 
     expect(result.status).toBe('TRIAGED')
     expect(result.nextStep).toBe('PHONE_CALL')
+    expect(result.triageDecision?.contactMode).toBe('PHONE')
     expect(result.internalNote).toBe('Test note')
     expect(result.patientMessage).toBe('Test msg')
   })
@@ -40,12 +43,11 @@ describe('triageCase', () => {
     const result = service.triageCase(
       triagedCase.id,
       {
-        nextStep: 'NO_ACTION',
-        deadline: new Date().toISOString(),
-        assignedRole: 'DOCTOR',
-        internalNote: '',
-        patientMessage: '',
-        closeImmediately: true,
+        triageDecision: {
+          contactMode: 'CLOSE',
+          careRole: null,
+          assignmentMode: null,
+        },
       },
       'user-doc-1',
       'DOCTOR',
@@ -62,12 +64,11 @@ describe('triageCase', () => {
       service.triageCase(
         newCase.id,
         {
-          nextStep: 'PHONE_CALL',
-          deadline: new Date().toISOString(),
-          assignedRole: 'NURSE',
-          internalNote: '',
-          patientMessage: '',
-          closeImmediately: false,
+          triageDecision: {
+            contactMode: 'PHONE',
+            careRole: 'NURSE',
+            assignmentMode: 'ANY',
+          },
         },
         'user-doc-1',
         'DOCTOR',

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useLocation,useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 import type { Role } from '@/api/schemas'
 import { useRole } from '@/store/roleContext'
@@ -33,7 +33,7 @@ export function useNavItems(): { navItems: NavItem[]; accessiblePaths: string[] 
       {
         label: t('nav.worklist'),
         path: '/worklist',
-        roles: ['NURSE', 'DOCTOR', 'PAL'] as const,
+        roles: ['NURSE', 'DOCTOR', 'PAL', 'SECRETARY'] as const,
       },
       {
         label: t('nav.policy'),
@@ -43,7 +43,7 @@ export function useNavItems(): { navItems: NavItem[]; accessiblePaths: string[] 
       {
         label: t('nav.patients'),
         path: '/patients',
-        roles: ['NURSE', 'DOCTOR', 'PAL'] as const,
+        roles: ['NURSE', 'DOCTOR', 'PAL', 'SECRETARY'] as const,
       },
       {
         label: t('nav.journeys'),
@@ -53,7 +53,7 @@ export function useNavItems(): { navItems: NavItem[]; accessiblePaths: string[] 
       {
         label: t('nav.demoTools'),
         path: '/demo-tools',
-        roles: ['NURSE', 'DOCTOR', 'PAL', 'PATIENT'] as const,
+        roles: ['NURSE', 'DOCTOR', 'PAL', 'PATIENT', 'SECRETARY'] as const,
       },
     ],
     [t],

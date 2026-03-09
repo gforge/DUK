@@ -1,6 +1,7 @@
-import type { Case, CaseStatus, Role,TriageInput } from '../schemas'
+import type { Case, CaseStatus, Role, TriageInput } from '../schemas'
 import type { CaseWithActiveCategory } from '../service'
 import * as service from '../service'
+import { contactModeToWorkCategory } from '../service/triageDecision'
 import { withDelay } from './delay'
 
 export const getCases = (): Promise<Case[]> => withDelay(() => service.getCases())
@@ -61,6 +62,12 @@ export const advanceCaseStatus = (
   userRole: Role,
 ): Promise<Case> => withDelay(() => service.advanceCaseStatus(caseId, toStatus, userId, userRole))
 
+export const claimCaseAssignment = (
+  caseId: string,
+  userId: string,
+  userRole: Role,
+): Promise<Case> => withDelay(() => service.claimCaseAssignment(caseId, userId, userRole))
+
 export const getCasesForDashboard = (): Promise<CaseWithActiveCategory[]> =>
   withDelay(() => service.getCasesForDashboard())
 
@@ -72,8 +79,9 @@ export const getWorklistCases = (): Promise<Case[]> =>
       .filter(
         (c) =>
           (c.status === 'TRIAGED' || c.status === 'FOLLOWING_UP') &&
-          c.nextStep !== undefined &&
-          c.nextStep !== 'NO_ACTION',
+          (c.triageDecision
+            ? contactModeToWorkCategory(c.triageDecision.contactMode) !== null
+            : c.nextStep !== undefined && c.nextStep !== 'NO_ACTION'),
       )
       .sort((a, b) => {
         if (!a.deadline && !b.deadline) return 0

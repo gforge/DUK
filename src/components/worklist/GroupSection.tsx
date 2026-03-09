@@ -1,31 +1,39 @@
-import { Box, Chip, Divider,Paper, Stack, Typography } from '@mui/material'
+import { Box, Chip, Divider, Paper, Stack, Typography } from '@mui/material'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 
-import type { Case, NextStep,Patient } from '@/api/schemas'
-import { useNextStepLabel } from '@/hooks/labels'
+import type { Case, Patient, WorkCategory } from '@/api/schemas'
 
 import WorklistRow from './WorklistRow'
 
 interface GroupSectionProps {
-  nextStep: NextStep
+  workCategory: WorkCategory
   cases: Case[]
   patientMap: Map<string, Patient>
+  highlightedCaseIds: Set<string>
   onBook: (caseId: string, scheduledAt?: string) => void
+  onClaim: (caseId: string) => void
   onMarkInProgress: (caseId: string) => void
   onMarkDone: (caseId: string) => void
 }
 
 export default function GroupSection({
-  nextStep,
+  workCategory,
   cases,
   patientMap,
+  highlightedCaseIds,
   onBook,
+  onClaim,
   onMarkInProgress,
   onMarkDone,
 }: GroupSectionProps) {
   const { t } = useTranslation()
-  const getNextStepLabel = useNextStepLabel()
+
+  const labelKeyByCategory: Record<WorkCategory, string> = {
+    VISIT: 'worklist.category.VISIT',
+    PHONE: 'worklist.category.PHONE',
+    DIGITAL: 'worklist.category.DIGITAL',
+  }
 
   return (
     <Paper variant="outlined" sx={{ borderRadius: 2, overflow: 'hidden', mb: 2 }}>
@@ -39,7 +47,7 @@ export default function GroupSection({
         sx={{ bgcolor: 'action.selected' }}
       >
         <Typography variant="subtitle2" fontWeight={700}>
-          {getNextStepLabel(nextStep)}
+          {t(labelKeyByCategory[workCategory] as never)}
         </Typography>
         <Chip label={cases.length} size="small" color="default" />
       </Stack>
@@ -56,7 +64,9 @@ export default function GroupSection({
             <WorklistRow
               caseData={c}
               patient={patientMap.get(c.patientId)}
+              highlighted={highlightedCaseIds.has(c.id)}
               onBook={onBook}
+              onClaim={onClaim}
               onMarkInProgress={onMarkInProgress}
               onMarkDone={onMarkDone}
             />

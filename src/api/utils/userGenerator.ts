@@ -1,4 +1,4 @@
-import type { AppState, Role,User } from '../schemas'
+import type { AppState, Role, User } from '../schemas'
 
 /**
  * Swedish first names for nurses (Sjuksköterskor)
@@ -171,6 +171,7 @@ function inferRoleFromUserId(userId: string): Role | null {
   if (userId.includes('nurse')) return 'NURSE'
   if (userId.includes('doc')) return 'DOCTOR'
   if (userId.includes('pal')) return 'PAL'
+  if (userId.includes('sec') || userId.includes('secretary')) return 'SECRETARY'
   if (userId.includes('patient') || userId.startsWith('p-')) return 'PATIENT'
   return null
 }
@@ -197,6 +198,9 @@ export function generateName(userId: string, role: Role): string {
       break
     case 'PATIENT':
       firstName = NURSE_FIRST_NAMES[hash % NURSE_FIRST_NAMES.length] // Reuse name pool
+      break
+    case 'SECRETARY':
+      firstName = NURSE_FIRST_NAMES[hash % NURSE_FIRST_NAMES.length]
       break
   }
 

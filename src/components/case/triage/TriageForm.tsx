@@ -1,195 +1,158 @@
-/* eslint-disable react-refresh/only-export-components */
 import { zodResolver } from '@hookform/resolvers/zod'
-import ArrowBackIcon from '@mui/icons-material/ArrowBack'
-import {
-  Box,
-  Button,
-  Chip,
-  CircularProgress,
-  Divider,
-  Paper,
-  Stack,
-  Typography,
-} from '@mui/material'
-import React, { useEffect, useRef } from 'react'
-import { useForm } from 'react-hook-form'
-import { useTranslation } from 'react-i18next'
-import { z } from 'zod'
+import { Box } from '@mui/material'
+import React from 'react'
+import { useForm, useWatch } from 'react-hook-form'
 
-import type { Case } from '@/api/schemas'
-import { TriageInputSchema } from '@/api/schemas'
+import * as client from '@/api/client'
+import type { AssignmentMode, CareRole, Case, ContactMode, User } from '@/api/schemas'
+import { useApi } from '@/hooks/useApi'
 
-import { ACTION_CONFIG, type TriageActionKey } from './actionConfig'
 import { parseDeadlineInput } from './parseDeadlineInput'
-import TriageActionCards from './TriageActionCards'
-import TriageActionDetails from './TriageActionDetails'
-import TriageContextBar from './TriageContextBar'
-
-export const TriageFormSchema = TriageInputSchema.extend({
-  deadline: z.string().optional(),
-  closeImmediately: z.boolean(),
-  bookingNote: z.string().optional(),
-})
-export type TriageForm = z.infer<typeof TriageFormSchema>
+import { type TriageForm, TriageFormSchema } from './schema'
+import { Step1 } from './Step1'
+import { Step2 } from './Step2'
 
 interface Props {
   caseData: Case
-  onSubmit: (data: TriageForm) => Promise<void>
+  onSubmit: (data: {
+    triageDecision: {
+      contactMode: ContactMode
+      careRole: CareRole
+      assignmentMode: AssignmentMode
+      assignedUserId?: string | null
+      dueAt?: string | null
+      note?: string | null
+    }
+    patientMessage?: string
+  }) => Promise<void>
 }
 
+export type TriageSubmitData = Parameters<Props['onSubmit']>[0]
+
 export default function TriageForm({ caseData, onSubmit }: Props) {
-  const { t } = useTranslation()
   const [step, setStep] = React.useState<1 | 2>(1)
-  const [selectedAction, setSelectedAction] = React.useState<TriageActionKey | null>(null)
-  const detailsRef = useRef<HTMLDivElement>(null)
+  const [dueAtPreset, setDueAtPreset] = React.useState<'1w' | '2w' | '1m' | 'custom' | null>(null)
 
   const {
-    register,
     control,
-    handleSubmit,
-    watch,
+    getValues,
     setValue,
+    handleSubmit,
     formState: { errors, isSubmitting },
     reset,
   } = useForm<TriageForm>({
     resolver: zodResolver(TriageFormSchema),
     defaultValues: {
-      nextStep: 'DIGITAL_CONTROL',
-      deadline: '',
-      internalNote: caseData.internalNote ?? '',
+      contactMode: null,
+      careRole: null,
+      assignmentMode: null,
+      assignedUserId: caseData.assignedUserId,
+      dueAtInput: '',
+      note: caseData.internalNote ?? '',
       patientMessage: caseData.patientMessage ?? '',
-      assignedRole: caseData.assignedRole,
-      closeImmediately: false,
     },
   })
 
-  function handleActionSelect(action: TriageActionKey) {
-    const cfg = ACTION_CONFIG[action]
-    setSelectedAction(action)
-    setStep(2)
+  const { data: users } = useApi(() => client.getUsers(), [])
 
-    // Pre-fill RHF fields from config
-    setValue('nextStep', cfg.nextStep)
-    setValue('closeImmediately', cfg.closeImmediately)
-    setValue('assignedRole', cfg.defaultAssignedRole ?? undefined)
+  const contactMode = useWatch({ control, name: 'contactMode' })
+  const careRole = useWatch({ control, name: 'careRole' })
+  const assignmentMode = useWatch({ control, name: 'assignmentMode' })
 
-    if (cfg.defaultDeadlineShorthand) {
-      const iso = parseDeadlineInput(cfg.defaultDeadlineShorthand)
-      setValue('deadline', iso ?? '', { shouldValidate: false })
-    } else {
-      setValue('deadline', '')
+  const eligibleNamedUsers = React.useMemo(() => {
+    const roleByCareRole: Record<Exclude<CareRole, null>, User['role'] | null> = {
+      DOCTOR: 'DOCTOR',
+      NURSE: 'NURSE',
+      PHYSIO: null,
     }
+
+    if (!careRole) return []
+    const mappedRole = roleByCareRole[careRole]
+    if (!mappedRole) return []
+
+    return (users ?? []).filter(
+      (u) => u.role === mappedRole || (mappedRole === 'DOCTOR' && u.role === 'PAL'),
+    )
+  }, [users, careRole])
+
+  function selectMode(mode: ContactMode) {
+    setValue('contactMode', mode, { shouldValidate: true })
+
+    if (mode === 'CLOSE') {
+      setValue('careRole', null)
+      setValue('assignmentMode', null)
+      setValue('assignedUserId', '')
+      setValue('dueAtInput', '')
+      setDueAtPreset(null)
+    }
+
+    setStep(2)
   }
 
   function handleBack() {
     setStep(1)
-    setSelectedAction(null)
+    const values = getValues()
     reset({
-      nextStep: 'DIGITAL_CONTROL',
-      deadline: '',
-      internalNote: caseData.internalNote ?? '',
-      patientMessage: caseData.patientMessage ?? '',
-      assignedRole: caseData.assignedRole,
-      closeImmediately: false,
+      contactMode: values.contactMode,
+      careRole: values.careRole,
+      assignmentMode: values.assignmentMode,
+      assignedUserId: values.assignedUserId,
+      dueAtInput: values.dueAtInput,
+      note: values.note,
+      patientMessage: values.patientMessage,
     })
   }
 
-  // Move focus to the details area after action selection
-  useEffect(() => {
-    if (step === 2) {
-      const timer = setTimeout(() => detailsRef.current?.focus(), 50)
-      return () => clearTimeout(timer)
-    }
-  }, [step])
+  async function submitForm(data: TriageForm) {
+    const dueAt = data.dueAtInput?.trim()
+      ? (() => {
+          const parsed = parseDeadlineInput(data.dueAtInput)
+          if (parsed) return parsed
+          const date = new Date(data.dueAtInput)
+          return Number.isNaN(date.getTime()) ? null : date.toISOString()
+        })()
+      : null
 
-  async function handleSubmitWithResolve(data: TriageForm) {
-    const resolved: TriageForm = {
-      ...data,
-      deadline: data.deadline?.trim()
-        ? (parseDeadlineInput(data.deadline) ?? data.deadline)
-        : undefined,
-    }
-    await onSubmit(resolved)
+    await onSubmit({
+      triageDecision: {
+        contactMode: data.contactMode as ContactMode,
+        careRole: data.contactMode === 'CLOSE' ? null : data.careRole,
+        assignmentMode: data.contactMode === 'CLOSE' ? null : data.assignmentMode,
+        assignedUserId:
+          data.contactMode === 'CLOSE' || data.assignmentMode !== 'NAMED'
+            ? null
+            : (data.assignedUserId ?? null),
+        dueAt: data.contactMode === 'CLOSE' ? null : dueAt,
+        note: data.note?.trim() ? data.note : null,
+      },
+      patientMessage: data.patientMessage?.trim() ? data.patientMessage : undefined,
+    })
   }
 
-  // eslint-disable-next-line react-hooks/incompatible-library
-  const deadlineRaw = watch('deadline') ?? ''
-
-  // ─── Step 1: Action cards ──────────────────────────────────────────────────
   if (step === 1) {
-    return (
-      <Box>
-        <TriageContextBar caseData={caseData} />
-        <TriageActionCards onSelect={handleActionSelect} />
-      </Box>
-    )
+    return <Step1 selectedMode={contactMode} onSelect={selectMode} />
   }
 
-  // ─── Step 2: Details ───────────────────────────────────────────────────────
-  const isClose = selectedAction === 'CLOSE_NOW'
+  if (!contactMode) {
+    return <Step1 selectedMode={contactMode} onSelect={selectMode} />
+  }
 
   return (
-    <Box
-      component="form"
-      onSubmit={handleSubmit(handleSubmitWithResolve)}
-      aria-label={t('triage.title')}
-      noValidate
-    >
-      {/* Context bar (compact, stays visible in step 2) */}
-      <TriageContextBar caseData={caseData} />
-
-      {/* Selected action summary */}
-      <Paper
-        variant="outlined"
-        sx={{ p: 1.5, mb: 2, display: 'flex', alignItems: 'center', gap: 1.5 }}
-      >
-        <Typography variant="body2" color="text.secondary">
-          {t('triage.selectedAction')}:
-        </Typography>
-        <Chip
-          label={t(`triage.actionLabel.${selectedAction!}`)}
-          size="small"
-          color={isClose ? 'default' : 'primary'}
-        />
-        <Box flexGrow={1} />
-        <Button
-          size="small"
-          startIcon={<ArrowBackIcon />}
-          onClick={handleBack}
-          sx={{ flexShrink: 0 }}
-        >
-          {t('triage.backToActions')}
-        </Button>
-      </Paper>
-
-      {/* Action-specific fields */}
-      <Box ref={detailsRef} tabIndex={-1} sx={{ outline: 'none', mb: 2 }}>
-        <TriageActionDetails
-          action={selectedAction!}
-          register={register}
-          control={control}
-          setValue={setValue}
-          errors={errors}
-          deadlineRaw={deadlineRaw}
-        />
-      </Box>
-
-      <Divider sx={{ mb: 2 }} />
-
-      <Stack direction="row" gap={1} justifyContent="flex-end">
-        <Button variant="outlined" onClick={handleBack} startIcon={<ArrowBackIcon />}>
-          {t('triage.backToActions')}
-        </Button>
-        <Button
-          type="submit"
-          variant="contained"
-          color={isClose ? 'inherit' : 'primary'}
-          disabled={isSubmitting}
-          startIcon={isSubmitting ? <CircularProgress size={16} /> : undefined}
-        >
-          {isSubmitting ? t('triage.submitting') : t('triage.submit')}
-        </Button>
-      </Stack>
+    <Box>
+      <Step2
+        control={control}
+        errors={errors}
+        contactMode={contactMode}
+        careRole={careRole}
+        assignmentMode={assignmentMode}
+        eligibleNamedUsers={eligibleNamedUsers}
+        dueAtPreset={dueAtPreset}
+        setDueAtPreset={setDueAtPreset}
+        setValue={setValue}
+        onBack={handleBack}
+        onSubmit={handleSubmit(submitForm)}
+        isSubmitting={isSubmitting}
+      />
     </Box>
   )
 }

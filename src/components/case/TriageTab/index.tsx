@@ -5,11 +5,12 @@ import { useTranslation } from 'react-i18next'
 import * as client from '@/api/client'
 import type { Case } from '@/api/schemas'
 import ClinicalReviewPanel from '@/components/case/ClinicalReviewPanel'
-import type { TriageForm as TriageFormData } from '@/components/case/triage/TriageForm'
-import TriageForm from '@/components/case/triage/TriageForm'
 import { useRoleLabel } from '@/hooks/labels'
 import { useRole } from '@/store/roleContext'
 import { useSnack } from '@/store/snackContext'
+
+import type { TriageSubmitData } from '../triage/TriageForm'
+import TriageForm from '../triage/TriageForm'
 
 interface TriageTabProps {
   readonly caseData: Case
@@ -24,18 +25,9 @@ export default function TriageTab({ caseData, onTriaged }: TriageTabProps) {
 
   const canTriage = isRole('NURSE', 'DOCTOR', 'PAL')
 
-  async function onSubmit(data: TriageFormData) {
+  async function onSubmit(data: TriageSubmitData) {
     try {
-      const deadline = data.deadline ? new Date(data.deadline).toISOString() : undefined
-      const internalNote =
-        [data.bookingNote, data.internalNote].filter(Boolean).join('\n') || undefined
-
-      await client.triageCase(
-        caseData.id,
-        { ...data, deadline, internalNote },
-        currentUser.id,
-        currentUser.role,
-      )
+      await client.triageCase(caseData.id, data, currentUser.id, currentUser.role)
       showSnack(t('triage.success'), 'success')
       onTriaged()
     } catch (err) {

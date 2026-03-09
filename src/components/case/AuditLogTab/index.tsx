@@ -29,6 +29,7 @@ const ROLE_COLORS = {
   NURSE: 'info',
   DOCTOR: 'primary',
   PAL: 'secondary',
+  SECRETARY: 'default',
 } as const
 
 export default function AuditLogTab({ caseId }: AuditLogTabProps) {

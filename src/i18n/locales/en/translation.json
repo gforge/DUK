@@ -745,6 +745,7 @@
     "DOCTOR": "Doctor",
     "NURSE": "Nurse (RN)",
     "PAL": "PAL (Responsible Physician)",
+    "SECRETARY": "Secretary",
     "PATIENT": "Patient",
     "switchRole": "Switch Role"
   },
@@ -826,7 +827,59 @@
     "quickWeek_other": "{{count}} weeks",
     "requiresClinician": "Triage requires clinical staff access.",
     "selectedAction": "Selected action",
-    "step1Title": "What does the patient need?",
+    "step1Title": "Next step for the patient",
+    "step2Title": "Who should handle this?",
+    "step2TitleByMode": {
+      "DIGITAL": "Digital follow-up - who is responsible?",
+      "PHONE": "Phone - who should call the patient?",
+      "VISIT": "Visit - who should handle the visit?",
+      "CLOSE": "Close - confirm"
+    },
+    "backToModes": "Choose contact mode",
+    "closeNoWorklist": "Case will be closed and normally does not create a worklist item.",
+    "careRole": "Who should handle this?",
+    "careRoleOption": {
+      "DOCTOR": "Doctor",
+      "NURSE": "Nurse",
+      "PHYSIO": "Physiotherapist"
+    },
+    "assignmentMode": "Assignment",
+    "assignmentModeOption": {
+      "ANY": "Any",
+      "PAL": "PAL doctor",
+      "NAMED": "Specific person"
+    },
+    "namedPerson": "Named person",
+    "noNamedUsers": "No users available for this profession in demo data.",
+    "dueAt": "When should this be arranged?",
+    "dueAtPlaceholder": "e.g. 1d, 2w, 2026-03-20",
+    "dueAtOpenPicker": "Choose date in calendar",
+    "dueAtQuick": {
+      "1w": "1 week",
+      "2w": "2 weeks",
+      "1m": "1 month",
+      "custom": "Custom"
+    },
+    "note": "Internal note",
+    "confirmCreatesWorklist": "When you confirm, a task will be created in the Worklist.",
+    "contactMode": {
+      "DIGITAL": "Digital",
+      "PHONE": "Phone",
+      "VISIT": "Visit",
+      "CLOSE": "Close"
+    },
+    "contactModeHelp": {
+      "DIGITAL": "Digital follow-up",
+      "PHONE": "Telephone follow-up",
+      "VISIT": "Plan a physical visit",
+      "CLOSE": "Close case without new follow-up"
+    },
+    "validation": {
+      "careRoleRequired": "Select profession",
+      "assignmentModeRequired": "Select assignment mode",
+      "namedPersonRequired": "Select a person",
+      "dueAtInvalid": "Invalid date format"
+    },
     "submit": "Confirm Triage",
     "submitting": "Submitting…",
     "success": "Triage saved",
@@ -846,6 +899,8 @@
   },
   "worklist": {
     "book": "Book",
+    "claim": "Claim",
+    "claimSuccess": "Item claimed",
     "bookDialogTitle": "Book — {{name}}",
     "bookSuccess": "Booking confirmed",
     "confirmBooking": "Confirm booking",
@@ -854,7 +909,14 @@
     "doneSuccess": "Case closed",
     "empty": "No cases require action right now.",
     "emptyGroup": "No cases in this group.",
-    "filterAll": "All roles",
+    "filterAll": "All categories",
+    "filterClaimedByMe": "Claimed by me",
+    "filterMyPatients": "My patients",
+    "category": {
+      "VISIT": "Visits",
+      "PHONE": "Phone follow-up",
+      "DIGITAL": "Digital follow-up"
+    },
     "markDone": "Done",
     "markInProgress": "Begin",
     "noDeadline": "No deadline",

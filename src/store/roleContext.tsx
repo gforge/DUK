@@ -7,6 +7,7 @@ const DEMO_USERS: User[] = [
   { id: 'user-doc-1', name: 'Dr. Erik Bergström', role: 'DOCTOR' },
   { id: 'user-nurse-1', name: 'SSK Anna Holmberg', role: 'NURSE' },
   { id: 'user-nurse-2', name: 'SSK Jonas Ekström', role: 'NURSE' },
+  { id: 'user-sec-1', name: 'Maria Lund (Sekreterare)', role: 'SECRETARY' },
   { id: 'user-patient-1', name: 'Anders Andersson', role: 'PATIENT' },
 ]
 

@@ -1,7 +1,19 @@
 import { z } from 'zod'
 
-export const RoleSchema = z.enum(['PATIENT', 'NURSE', 'DOCTOR', 'PAL'])
+export const RoleSchema = z.enum(['PATIENT', 'NURSE', 'DOCTOR', 'PAL', 'SECRETARY'])
 export type Role = z.infer<typeof RoleSchema>
+
+export const ContactModeSchema = z.enum(['DIGITAL', 'PHONE', 'VISIT', 'CLOSE'])
+export type ContactMode = z.infer<typeof ContactModeSchema>
+
+export const CareRoleSchema = z.enum(['DOCTOR', 'NURSE', 'PHYSIO']).nullable()
+export type CareRole = z.infer<typeof CareRoleSchema>
+
+export const AssignmentModeSchema = z.enum(['ANY', 'PAL', 'NAMED']).nullable()
+export type AssignmentMode = z.infer<typeof AssignmentModeSchema>
+
+export const WorkCategorySchema = z.enum(['VISIT', 'PHONE', 'DIGITAL'])
+export type WorkCategory = z.infer<typeof WorkCategorySchema>
 
 export const CaseStatusSchema = z.enum(['NEW', 'NEEDS_REVIEW', 'TRIAGED', 'FOLLOWING_UP', 'CLOSED'])
 export type CaseStatus = z.infer<typeof CaseStatusSchema>

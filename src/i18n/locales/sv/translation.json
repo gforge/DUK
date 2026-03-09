@@ -745,6 +745,7 @@
     "DOCTOR": "Läkare",
     "NURSE": "Sjuksköterska",
     "PAL": "PAL (Patientansvarig läkare)",
+    "SECRETARY": "Sekreterare",
     "PATIENT": "Patient",
     "switchRole": "Byt roll"
   },
@@ -826,7 +827,59 @@
     "quickWeek_other": "{{count}} veckor",
     "requiresClinician": "Triagering kräver åtkomst som klinisk personal.",
     "selectedAction": "Vald åtgärd",
-    "step1Title": "Vad behöver patienten göra?",
+    "step1Title": "Triagera till:",
+    "step2Title": "Vem ska hantera detta?",
+    "step2TitleByMode": {
+      "DIGITAL": "Digital uppföljning - vem ansvarar?",
+      "PHONE": "Telefon - vem ska ringa patienten?",
+      "VISIT": "Besök - vem ska ta besöket?",
+      "CLOSE": "Avslut - bekräfta"
+    },
+    "backToModes": "Välj kontaktläge",
+    "closeNoWorklist": "Ärendet stängs och skapar normalt ingen rad i åtgärdslistan.",
+    "careRole": "Vem ska hantera detta?",
+    "careRoleOption": {
+      "DOCTOR": "Läkare",
+      "NURSE": "Sjuksköterska",
+      "PHYSIO": "Fysioterapeut"
+    },
+    "assignmentMode": "Tilldelning",
+    "assignmentModeOption": {
+      "ANY": "Valfri",
+      "PAL": "PAL-läkare",
+      "NAMED": "Specifik person"
+    },
+    "namedPerson": "Specifik person",
+    "noNamedUsers": "Inga användare för vald profession i demodata.",
+    "dueAt": "Inom vilken tidsram?",
+    "dueAtPlaceholder": "t.ex. 1d, 2v, 2026-03-20",
+    "dueAtOpenPicker": "Välj datum i kalender",
+    "dueAtQuick": {
+      "1w": "1 vecka",
+      "2w": "2 veckor",
+      "1m": "1 månad",
+      "custom": "Anpassad"
+    },
+    "note": "Intern notering",
+    "confirmCreatesWorklist": "När du bekräftar skapas en uppgift i åtgärdslistan.",
+    "contactMode": {
+      "DIGITAL": "Digital",
+      "PHONE": "Telefon",
+      "VISIT": "Besök",
+      "CLOSE": "Avslut"
+    },
+    "contactModeHelp": {
+      "DIGITAL": "Skicka digital uppföljning",
+      "PHONE": "Ring patienten",
+      "VISIT": "Planera återbesök",
+      "CLOSE": "Ingen vidare uppföljning"
+    },
+    "validation": {
+      "careRoleRequired": "Välj profession",
+      "assignmentModeRequired": "Välj tilldelning",
+      "namedPersonRequired": "Välj person",
+      "dueAtInvalid": "Ogiltigt datumformat"
+    },
     "submit": "Bekräfta triage",
     "submitting": "Skickar…",
     "success": "Triage sparad",
@@ -846,6 +899,8 @@
   },
   "worklist": {
     "book": "Boka",
+    "claim": "Ta",
+    "claimSuccess": "Ärendet är taget",
     "bookDialogTitle": "Boka — {{name}}",
     "bookSuccess": "Bokning bekräftad",
     "confirmBooking": "Bekräfta bokning",
@@ -854,7 +909,14 @@
     "doneSuccess": "Ärende avslutat",
     "empty": "Inga ärenden kräver åtgärd just nu.",
     "emptyGroup": "Inga ärenden i denna grupp.",
-    "filterAll": "Alla roller",
+    "filterAll": "Alla kategorier",
+    "filterClaimedByMe": "Tagna av mig",
+    "filterMyPatients": "Mina patienter",
+    "category": {
+      "VISIT": "Besök",
+      "PHONE": "Telefonuppföljning",
+      "DIGITAL": "Digital uppföljning"
+    },
     "markDone": "Avklarad",
     "markInProgress": "Påbörja",
     "noDeadline": "Ingen deadline",

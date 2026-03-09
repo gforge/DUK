@@ -2,8 +2,10 @@ import CalendarMonthIcon from '@mui/icons-material/CalendarMonth'
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
+import PersonAddAlt1Icon from '@mui/icons-material/PersonAddAlt1'
 import PlayArrowIcon from '@mui/icons-material/PlayArrow'
 import {
+  alpha,
   Box,
   Button,
   Chip,
@@ -21,18 +23,17 @@ import React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 
-import type { Case, NextStep, Patient } from '@/api/schemas'
+import type { Case, Patient } from '@/api/schemas'
 import { formatPersonnummer } from '@/api/utils/personnummer'
 import { DeadlineLabel, StatusChip } from '@/components/common'
 import { useRoleLabel } from '@/hooks/labels'
 
-/** Steps that require scheduling an appointment */
-const BOOKABLE_STEPS: NextStep[] = ['DOCTOR_VISIT', 'NURSE_VISIT', 'PHYSIO_VISIT', 'PHONE_CALL']
-
 interface WorklistRowProps {
   caseData: Case
   patient: Patient | undefined
+  highlighted?: boolean
   onBook: (caseId: string, scheduledAt?: string) => void
+  onClaim: (caseId: string) => void
   onMarkInProgress: (caseId: string) => void
   onMarkDone: (caseId: string) => void
 }
@@ -40,18 +41,22 @@ interface WorklistRowProps {
 export default function WorklistRow({
   caseData,
   patient,
+  highlighted = false,
   onBook,
+  onClaim,
   onMarkInProgress,
   onMarkDone,
 }: WorklistRowProps) {
   const { t } = useTranslation()
+  const tr = (key: string) => t(key as never)
   const getRoleLabel = useRoleLabel()
   const navigate = useNavigate()
   const [dialogOpen, setDialogOpen] = React.useState(false)
   const [scheduledAt, setScheduledAt] = React.useState('')
   const [copied, setCopied] = React.useState(false)
 
-  const isBookable = caseData.nextStep ? BOOKABLE_STEPS.includes(caseData.nextStep) : false
+  const contactMode = caseData.triageDecision?.contactMode
+  const isBookable = contactMode === 'VISIT' || contactMode === 'PHONE'
   const isTriaged = caseData.status === 'TRIAGED'
   const isFollowingUp = caseData.status === 'FOLLOWING_UP'
 
@@ -79,7 +84,9 @@ export default function WorklistRow({
         gridTemplateColumns: { xs: '1fr', sm: '2fr 1.5fr 1fr auto' },
         gap: 1,
         alignItems: 'center',
-        '&:hover': { bgcolor: 'action.hover' },
+        bgcolor: highlighted ? alpha('#42a5f5', 0.12) : 'transparent',
+        transition: 'background-color 280ms ease-in-out',
+        '&:hover': { bgcolor: highlighted ? alpha('#42a5f5', 0.16) : 'action.hover' },
       }}
     >
       {/* Patient + status */}
@@ -92,6 +99,21 @@ export default function WorklistRow({
           {caseData.assignedRole && (
             <Chip
               label={getRoleLabel(caseData.assignedRole)}
+              size="small"
+              variant="outlined"
+              sx={{ height: 20, fontSize: 11 }}
+            />
+          )}
+          {caseData.triageDecision?.careRole && (
+            <Chip
+              label={tr(`triage.careRoleOption.${caseData.triageDecision.careRole}`)}
+              size="small"
+              sx={{ height: 20, fontSize: 11 }}
+            />
+          )}
+          {caseData.triageDecision?.assignmentMode && (
+            <Chip
+              label={tr(`triage.assignmentModeOption.${caseData.triageDecision.assignmentMode}`)}
               size="small"
               variant="outlined"
               sx={{ height: 20, fontSize: 11 }}
@@ -132,6 +154,18 @@ export default function WorklistRow({
       {/* Actions */}
       <Stack direction="row" gap={0.5} justifyContent="flex-end" alignItems="center">
         {/* TRIAGED + bookable → Boka dialog */}
+        {!caseData.assignedUserId && (
+          <Button
+            size="small"
+            variant="outlined"
+            startIcon={<PersonAddAlt1Icon />}
+            onClick={() => onClaim(caseData.id)}
+            sx={{ fontSize: 12, whiteSpace: 'nowrap' }}
+          >
+            {tr('worklist.claim')}
+          </Button>
+        )}
+
         {isTriaged && isBookable && (
           <Button
             size="small"
@@ -144,7 +178,7 @@ export default function WorklistRow({
           </Button>
         )}
 
-        {/* TRIAGED + non-bookable (DIGITAL_CONTROL) → Påbörja → FOLLOWING_UP */}
+        {/* TRIAGED + non-bookable (DIGITAL) → Påbörja → FOLLOWING_UP */}
         {isTriaged && !isBookable && (
           <Button
             size="small"

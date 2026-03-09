@@ -19,6 +19,8 @@ export function useRoleLabel() {
         return t('role.DOCTOR')
       case 'PAL':
         return t('role.PAL')
+      case 'SECRETARY':
+        return t('role.SECRETARY' as never)
       default:
         return assertNever(role)
     }

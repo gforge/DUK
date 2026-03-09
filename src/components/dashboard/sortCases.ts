@@ -23,6 +23,10 @@ export function sortCases(
     patientMap.get(c.patientId)?.displayName ?? c.patientId
 
   return [...cases].sort((a, b) => {
+    // Keep triaged rows at the bottom so users can track handoff movement.
+    if (a.status === 'TRIAGED' && b.status !== 'TRIAGED') return 1
+    if (b.status === 'TRIAGED' && a.status !== 'TRIAGED') return -1
+
     switch (mode) {
       case 'name':
         return displayName(a).localeCompare(displayName(b), 'sv')

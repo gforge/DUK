@@ -2,12 +2,10 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
 import { I18nextProvider } from 'react-i18next'
-import { beforeAll,describe, expect, it, vi } from 'vitest'
+import { beforeAll, describe, expect, it, vi } from 'vitest'
 
 import { SEED_STATE } from '@/api/seed'
 import { initStore } from '@/api/storage'
-import TriageActionCards from '@/components/case/triage/TriageActionCards'
-import TriageContextBar from '@/components/case/triage/TriageContextBar'
 import TriageForm from '@/components/case/triage/TriageForm'
 
 import i18n from '../i18n'
@@ -22,159 +20,65 @@ function wrap(ui: React.ReactElement) {
 
 const CASE_NEEDS_REVIEW = SEED_STATE.cases.find((c) => c.status === 'NEEDS_REVIEW')!
 
-// ─── TriageActionCards ────────────────────────────────────────────────────────
-
-describe('TriageActionCards', () => {
-  it('renders all 6 action cards', () => {
-    const onSelect = vi.fn()
-    wrap(<TriageActionCards onSelect={onSelect} />)
-
-    // Labels come from i18n sv keys
-    expect(screen.getByText('Digital kontroll')).toBeInTheDocument()
-    expect(screen.getByText('Telefonkontakt')).toBeInTheDocument()
-    expect(screen.getByText('Sköterskebesök')).toBeInTheDocument()
-    expect(screen.getByText('Läkarbesök')).toBeInTheDocument()
-    expect(screen.getByText('Fysiobesök')).toBeInTheDocument()
-    expect(screen.getByText('Stäng kontrollpunkt')).toBeInTheDocument()
-  })
-
-  it('calls onSelect with the correct action key on click', async () => {
-    const user = userEvent.setup()
-    const onSelect = vi.fn()
-    wrap(<TriageActionCards onSelect={onSelect} />)
-
-    await user.click(screen.getByText('Digital kontroll'))
-    expect(onSelect).toHaveBeenCalledWith('DIGITAL_CONTROL')
-  })
-
-  it('calls onSelect when Enter is pressed on a card', async () => {
-    const user = userEvent.setup()
-    const onSelect = vi.fn()
-    wrap(<TriageActionCards onSelect={onSelect} />)
-
-    const card = screen.getByRole('button', { name: /telefonkontakt/i })
-    card.focus()
-    await user.keyboard('{Enter}')
-    expect(onSelect).toHaveBeenCalledWith('PHONE_CALL')
-  })
-
-  it('calls onSelect when Space is pressed on a card', async () => {
-    const user = userEvent.setup()
-    const onSelect = vi.fn()
-    wrap(<TriageActionCards onSelect={onSelect} />)
-
-    const card = screen.getByRole('button', { name: /läkarbesök/i })
-    card.focus()
-    await user.keyboard(' ')
-    expect(onSelect).toHaveBeenCalledWith('DOCTOR_VISIT')
-  })
-})
-
-// ─── TriageContextBar ─────────────────────────────────────────────────────────
-
-describe('TriageContextBar', () => {
-  it('renders status and category chips', () => {
-    const caseData = SEED_STATE.cases[0]
-    wrap(<TriageContextBar caseData={caseData} />)
-    // Status chip renders the translated status
-    expect(document.querySelector('[class*="MuiChip"]')).toBeInTheDocument()
-  })
-})
-
-// ─── TriageForm step flow ─────────────────────────────────────────────────────
-
-describe('TriageForm — step flow', () => {
-  it('shows action cards on initial render (step 1)', () => {
+describe('TriageForm two-step flow', () => {
+  it('shows contact mode options in step 1', () => {
     const onSubmit = vi.fn().mockResolvedValue(undefined)
     wrap(<TriageForm caseData={CASE_NEEDS_REVIEW} onSubmit={onSubmit} />)
 
-    expect(screen.getByText('Digital kontroll')).toBeInTheDocument()
-    // Deadline field should NOT be visible yet
-    expect(screen.queryByLabelText(/deadline/i)).not.toBeInTheDocument()
+    expect(screen.getByText('Digital')).toBeInTheDocument()
+    expect(screen.getByText('Telefon')).toBeInTheDocument()
+    expect(screen.getByText('Besök')).toBeInTheDocument()
+    expect(screen.getByText('Avslut')).toBeInTheDocument()
   })
 
-  it('selecting DIGITAL_CONTROL shows deadline field in step 2', async () => {
+  it('selecting Avslut shows close info and submits CLOSE decision', async () => {
     const user = userEvent.setup()
     const onSubmit = vi.fn().mockResolvedValue(undefined)
     wrap(<TriageForm caseData={CASE_NEEDS_REVIEW} onSubmit={onSubmit} />)
 
-    await user.click(screen.getByText('Digital kontroll'))
-
-    // Step 2 should render deadline
-    await waitFor(() => {
-      expect(screen.getByLabelText(/deadline/i)).toBeInTheDocument()
-    })
-    // Action cards should be gone
-    expect(screen.queryByText('Telefonkontakt')).not.toBeInTheDocument()
-  })
-
-  it('selecting CLOSE_NOW shows confirmation text and no deadline field', async () => {
-    const user = userEvent.setup()
-    const onSubmit = vi.fn().mockResolvedValue(undefined)
-    wrap(<TriageForm caseData={CASE_NEEDS_REVIEW} onSubmit={onSubmit} />)
-
-    await user.click(screen.getByText('Stäng kontrollpunkt'))
+    await user.click(screen.getByText('Avslut'))
 
     await waitFor(() => {
-      expect(screen.getByText(/stängs utan uppföljning/i)).toBeInTheDocument()
+      expect(screen.getByText(/skapar normalt ingen rad i åtgärdslistan/i)).toBeInTheDocument()
     })
-    expect(screen.queryByLabelText(/deadline/i)).not.toBeInTheDocument()
-  })
 
-  it('back button returns to step 1', async () => {
-    const user = userEvent.setup()
-    const onSubmit = vi.fn().mockResolvedValue(undefined)
-    wrap(<TriageForm caseData={CASE_NEEDS_REVIEW} onSubmit={onSubmit} />)
-
-    await user.click(screen.getByText('Digital kontroll'))
-    await waitFor(() => screen.getAllByRole('button', { name: /välj annan åtgärd/i }))
-
-    // Click the first "back" button
-    await user.click(screen.getAllByRole('button', { name: /välj annan åtgärd/i })[0])
-
-    // Should be back at step 1
-    await waitFor(() => {
-      expect(screen.getByText('Digital kontroll')).toBeInTheDocument()
-    })
-  })
-
-  it('submitting DIGITAL_CONTROL with default deadline calls onSubmit with correct data', async () => {
-    const user = userEvent.setup()
-    const onSubmit = vi.fn().mockResolvedValue(undefined)
-    wrap(<TriageForm caseData={CASE_NEEDS_REVIEW} onSubmit={onSubmit} />)
-
-    await user.click(screen.getByText('Digital kontroll'))
-    await waitFor(() => screen.getByLabelText(/deadline/i))
-
-    // Submit with pre-filled deadline "2v"
     await user.click(screen.getByRole('button', { name: /bekräfta triage/i }))
 
     await waitFor(() => {
       expect(onSubmit).toHaveBeenCalledWith(
         expect.objectContaining({
-          nextStep: 'DIGITAL_CONTROL',
-          closeImmediately: false,
-          assignedRole: 'NURSE',
+          triageDecision: expect.objectContaining({
+            contactMode: 'CLOSE',
+            careRole: null,
+            assignmentMode: null,
+          }),
         }),
       )
     })
   })
 
-  it('CLOSE_NOW pre-fills closeImmediately=true and nextStep=NO_ACTION on submit', async () => {
+  it('selecting Telefon allows role + assignment and submits PHONE decision', async () => {
     const user = userEvent.setup()
     const onSubmit = vi.fn().mockResolvedValue(undefined)
     wrap(<TriageForm caseData={CASE_NEEDS_REVIEW} onSubmit={onSubmit} />)
 
-    await user.click(screen.getByText('Stäng kontrollpunkt'))
-    await waitFor(() => screen.getByText(/stängs utan uppföljning/i))
+    await user.click(screen.getByText('Telefon'))
 
-    await user.click(screen.getByText('Bekräfta triage'))
+    await user.click(screen.getByRole('button', { name: 'Sjuksköterska' }))
+
+    await user.click(screen.getByLabelText('Tilldelning'))
+    await user.click(screen.getByRole('option', { name: 'Valfri' }))
+
+    await user.click(screen.getByRole('button', { name: /bekräfta triage/i }))
 
     await waitFor(() => {
       expect(onSubmit).toHaveBeenCalledWith(
         expect.objectContaining({
-          nextStep: 'NO_ACTION',
-          closeImmediately: true,
+          triageDecision: expect.objectContaining({
+            contactMode: 'PHONE',
+            careRole: 'NURSE',
+            assignmentMode: 'ANY',
+          }),
         }),
       )
     })

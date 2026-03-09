@@ -1,8 +1,11 @@
 import { z } from 'zod'
 
 import {
+  AssignmentModeSchema,
+  CareRoleSchema,
   CaseCategorySchema,
   CaseStatusSchema,
+  ContactModeSchema,
   NextStepSchema,
   ReviewOutcomeSchema,
   ReviewTypeSchema,
@@ -50,6 +53,67 @@ export const CaseSchema = z.object({
   createdByUserId: z.string(),
   triagedByUserId: z.string().optional(),
   nextStep: NextStepSchema.optional(),
+  triageDecision: z
+    .object({
+      contactMode: ContactModeSchema,
+      careRole: CareRoleSchema,
+      assignmentMode: AssignmentModeSchema,
+      assignedUserId: z.string().nullable().optional(),
+      dueAt: z.string().datetime().nullable().optional(),
+      note: z.string().nullable().optional(),
+    })
+    .superRefine((value, ctx) => {
+      if (value.contactMode === 'CLOSE') {
+        if (value.careRole !== null) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['careRole'],
+            message: 'careRole must be null for CLOSE',
+          })
+        }
+        if (value.assignmentMode !== null) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['assignmentMode'],
+            message: 'assignmentMode must be null for CLOSE',
+          })
+        }
+      }
+
+      if (value.assignmentMode === 'PAL' && value.careRole !== 'DOCTOR') {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['assignmentMode'],
+          message: 'PAL is only valid when careRole is DOCTOR',
+        })
+      }
+
+      if (value.assignmentMode === 'NAMED') {
+        if (!value.careRole) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['careRole'],
+            message: 'careRole is required for NAMED',
+          })
+        }
+        if (!value.assignedUserId) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['assignedUserId'],
+            message: 'assignedUserId is required for NAMED',
+          })
+        }
+      }
+
+      if (value.assignmentMode !== 'NAMED' && value.assignedUserId) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['assignedUserId'],
+          message: 'assignedUserId is only valid for NAMED',
+        })
+      }
+    })
+    .optional(),
   deadline: z.string().optional(),
   internalNote: z.string().optional(),
   patientMessage: z.string().optional(),
@@ -75,13 +139,65 @@ export const CaseSchema = z.object({
 })
 export type Case = z.infer<typeof CaseSchema>
 
+export const TriageDecisionSchema = z
+  .object({
+    contactMode: ContactModeSchema,
+    careRole: CareRoleSchema,
+    assignmentMode: AssignmentModeSchema,
+    assignedUserId: z.string().nullable().optional(),
+    dueAt: z.string().datetime().nullable().optional(),
+    note: z.string().nullable().optional(),
+  })
+  .superRefine((value, ctx) => {
+    if (value.contactMode === 'CLOSE') {
+      if (value.careRole !== null) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['careRole'],
+          message: 'careRole must be null for CLOSE',
+        })
+      }
+      if (value.assignmentMode !== null) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['assignmentMode'],
+          message: 'assignmentMode must be null for CLOSE',
+        })
+      }
+    }
+    if (value.assignmentMode === 'PAL' && value.careRole !== 'DOCTOR') {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['assignmentMode'],
+        message: 'PAL is only valid when careRole is DOCTOR',
+      })
+    }
+    if (value.assignmentMode === 'NAMED' && !value.assignedUserId) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['assignedUserId'],
+        message: 'assignedUserId is required for NAMED',
+      })
+    }
+    if (value.assignmentMode !== 'NAMED' && value.assignedUserId) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['assignedUserId'],
+        message: 'assignedUserId is only valid for NAMED',
+      })
+    }
+  })
+export type TriageDecision = z.infer<typeof TriageDecisionSchema>
+
 export const TriageInputSchema = z.object({
-  nextStep: NextStepSchema,
+  triageDecision: TriageDecisionSchema,
+  // Legacy compatibility fields (kept optional during transition period).
+  nextStep: NextStepSchema.optional(),
   deadline: z.string().optional(),
   internalNote: z.string().optional(),
   patientMessage: z.string().optional(),
   assignedRole: RoleSchema.optional(),
   assignedUserId: z.string().optional(),
-  closeImmediately: z.boolean().default(false),
+  closeImmediately: z.boolean().optional(),
 })
 export type TriageInput = z.infer<typeof TriageInputSchema>

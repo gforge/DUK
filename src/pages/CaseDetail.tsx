@@ -32,6 +32,8 @@ import { AutoWarningsBadge, StatusChip } from '@/components/common'
 import { useApi } from '@/hooks/useApi'
 import { useHotkeys } from '@/hooks/useHotkeys'
 
+import { getCaseDetailBackPath } from '../utils/caseDetailBackPath'
+
 interface TabPanelProps {
   readonly children: React.ReactNode
   readonly value: number
@@ -89,10 +91,14 @@ export default function CaseDetail() {
     ),
   )
 
-  const handleBack = useCallback(
+  const handlePatientBack = useCallback(
     () => navigate(caseData ? `/patients/${caseData.patientId}` : '/patients'),
     [navigate, caseData],
   )
+
+  const handleBackButton = useCallback(() => {
+    navigate(getCaseDetailBackPath(caseData ?? undefined))
+  }, [navigate, caseData])
 
   const loading = caseLoading || patientLoading
 
@@ -128,7 +134,7 @@ export default function CaseDetail() {
           <ArrowBackIcon fontSize="inherit" />
           {t('nav.dashboard')}
         </Link>
-        <Link component="button" variant="body2" onClick={handleBack} underline="hover">
+        <Link component="button" variant="body2" onClick={handlePatientBack} underline="hover">
           {patient?.displayName ?? caseData.patientId}
         </Link>
         <Typography variant="body2" color="text.primary">
@@ -216,7 +222,7 @@ export default function CaseDetail() {
 
       {/* Back button */}
       <Box sx={{ mt: 2 }}>
-        <Button startIcon={<ArrowBackIcon />} onClick={handleBack} variant="outlined">
+        <Button startIcon={<ArrowBackIcon />} onClick={handleBackButton} variant="outlined">
           {t('common.back')}
         </Button>
       </Box>
