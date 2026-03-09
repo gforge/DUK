@@ -26,7 +26,7 @@ import { useNavigate } from 'react-router-dom'
 import type { Case, Patient } from '@/api/schemas'
 import { formatPersonnummer } from '@/api/utils/personnummer'
 import { DeadlineLabel, StatusChip } from '@/components/common'
-import { useRoleLabel } from '@/hooks/labels'
+import { useAssignmentModeLabel, useCareRoleLabel, useRoleLabel } from '@/hooks/labels'
 
 interface WorklistRowProps {
   caseData: Case
@@ -48,8 +48,9 @@ export default function WorklistRow({
   onMarkDone,
 }: WorklistRowProps) {
   const { t } = useTranslation()
-  const tr = (key: string) => t(key as never)
   const getRoleLabel = useRoleLabel()
+  const getCareRoleLabel = useCareRoleLabel()
+  const getAssignmentModeLabel = useAssignmentModeLabel()
   const navigate = useNavigate()
   const [dialogOpen, setDialogOpen] = React.useState(false)
   const [scheduledAt, setScheduledAt] = React.useState('')
@@ -106,14 +107,14 @@ export default function WorklistRow({
           )}
           {caseData.triageDecision?.careRole && (
             <Chip
-              label={tr(`triage.careRoleOption.${caseData.triageDecision.careRole}`)}
+              label={getCareRoleLabel(caseData.triageDecision.careRole)}
               size="small"
               sx={{ height: 20, fontSize: 11 }}
             />
           )}
           {caseData.triageDecision?.assignmentMode && (
             <Chip
-              label={tr(`triage.assignmentModeOption.${caseData.triageDecision.assignmentMode}`)}
+              label={getAssignmentModeLabel(caseData.triageDecision.assignmentMode)}
               size="small"
               variant="outlined"
               sx={{ height: 20, fontSize: 11 }}
@@ -162,7 +163,7 @@ export default function WorklistRow({
             onClick={() => onClaim(caseData.id)}
             sx={{ fontSize: 12, whiteSpace: 'nowrap' }}
           >
-            {tr('worklist.claim')}
+            {t('worklist.claim')}
           </Button>
         )}
 

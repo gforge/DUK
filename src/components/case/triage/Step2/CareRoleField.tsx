@@ -33,7 +33,6 @@ const CARE_ROLE_ICONS: Record<Exclude<CareRole, null>, React.ReactNode> = {
 
 export function CareRoleField({ control, error, assignmentMode, setValue }: Props) {
   const { t } = useTranslation()
-  const tr = (key: string) => t(key as never)
 
   return (
     <Controller
@@ -49,7 +48,7 @@ export function CareRoleField({ control, error, assignmentMode, setValue }: Prop
               },
             }}
           >
-            {tr('triage.careRole')}
+            {t('triage.careRole')}
           </FormLabel>
 
           <ToggleButtonGroup
@@ -69,32 +68,32 @@ export function CareRoleField({ control, error, assignmentMode, setValue }: Prop
               }
             }}
             size="small"
-            aria-label={tr('triage.careRole')}
+            aria-label={t('triage.careRole')}
             color="primary"
           >
-            <ToggleButton value="DOCTOR" aria-label={tr('triage.careRoleOption.DOCTOR')}>
+            <ToggleButton value="DOCTOR" aria-label={t('triage.careRoleOption.DOCTOR')}>
               <Stack direction="row" alignItems="center" gap={0.75}>
                 {CARE_ROLE_ICONS.DOCTOR}
-                <span>{tr('triage.careRoleOption.DOCTOR')}</span>
+                <span>{t('triage.careRoleOption.DOCTOR')}</span>
               </Stack>
             </ToggleButton>
 
-            <ToggleButton value="NURSE" aria-label={tr('triage.careRoleOption.NURSE')}>
+            <ToggleButton value="NURSE" aria-label={t('triage.careRoleOption.NURSE')}>
               <Stack direction="row" alignItems="center" gap={0.75}>
                 {CARE_ROLE_ICONS.NURSE}
-                <span>{tr('triage.careRoleOption.NURSE')}</span>
+                <span>{t('triage.careRoleOption.NURSE')}</span>
               </Stack>
             </ToggleButton>
 
-            <ToggleButton value="PHYSIO" aria-label={tr('triage.careRoleOption.PHYSIO')}>
+            <ToggleButton value="PHYSIO" aria-label={t('triage.careRoleOption.PHYSIO')}>
               <Stack direction="row" alignItems="center" gap={0.75}>
                 {CARE_ROLE_ICONS.PHYSIO}
-                <span>{tr('triage.careRoleOption.PHYSIO')}</span>
+                <span>{t('triage.careRoleOption.PHYSIO')}</span>
               </Stack>
             </ToggleButton>
           </ToggleButtonGroup>
 
-          {error && <FormHelperText>{tr('triage.validation.careRoleRequired')}</FormHelperText>}
+          {error && <FormHelperText>{t('triage.validation.careRoleRequired')}</FormHelperText>}
         </FormControl>
       )}
     />

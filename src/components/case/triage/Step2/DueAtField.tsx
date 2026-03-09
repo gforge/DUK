@@ -47,7 +47,6 @@ function normalizeDeadlineInput(input: string): string {
 
 export function DueAtField({ control, error, dueAtPreset, setDueAtPreset }: Props) {
   const { t } = useTranslation()
-  const tr = (key: string) => t(key as never)
   const dueDatePickerRef = React.useRef<HTMLInputElement>(null)
 
   return (
@@ -57,7 +56,7 @@ export function DueAtField({ control, error, dueAtPreset, setDueAtPreset }: Prop
       render={({ field }) => (
         <Stack gap={1}>
           <Typography variant="body2" color="text.default">
-            {tr('triage.dueAt')}
+            {t('triage.dueAt')}
           </Typography>
 
           <ToggleButtonGroup
@@ -73,20 +72,20 @@ export function DueAtField({ control, error, dueAtPreset, setDueAtPreset }: Prop
                 field.onChange(duePresetToIso(nextPreset))
               }
             }}
-            aria-label={tr('triage.dueAt')}
+            aria-label={t('triage.dueAt')}
             color="primary"
           >
-            <ToggleButton value="1w" aria-label={tr('triage.dueAtQuick.1w')}>
-              {tr('triage.dueAtQuick.1w')}
+            <ToggleButton value="1w" aria-label={t('triage.dueAtQuick.1w')}>
+              {t('triage.dueAtQuick.1w')}
             </ToggleButton>
-            <ToggleButton value="2w" aria-label={tr('triage.dueAtQuick.2w')}>
-              {tr('triage.dueAtQuick.2w')}
+            <ToggleButton value="2w" aria-label={t('triage.dueAtQuick.2w')}>
+              {t('triage.dueAtQuick.2w')}
             </ToggleButton>
-            <ToggleButton value="1m" aria-label={tr('triage.dueAtQuick.1m')}>
-              {tr('triage.dueAtQuick.1m')}
+            <ToggleButton value="1m" aria-label={t('triage.dueAtQuick.1m')}>
+              {t('triage.dueAtQuick.1m')}
             </ToggleButton>
-            <ToggleButton value="custom" aria-label={tr('triage.dueAtQuick.custom')}>
-              {tr('triage.dueAtQuick.custom')}
+            <ToggleButton value="custom" aria-label={t('triage.dueAtQuick.custom')}>
+              {t('triage.dueAtQuick.custom')}
             </ToggleButton>
           </ToggleButtonGroup>
 
@@ -94,7 +93,7 @@ export function DueAtField({ control, error, dueAtPreset, setDueAtPreset }: Prop
             <Stack direction="row" gap={1} alignItems="flex-start">
               <TextField
                 fullWidth
-                label={tr('triage.dueAt')}
+                label={t('triage.dueAt')}
                 value={field.value ?? ''}
                 onChange={field.onChange}
                 onBlur={(e) => {
@@ -106,11 +105,10 @@ export function DueAtField({ control, error, dueAtPreset, setDueAtPreset }: Prop
                     field.onChange(parsed)
                   }
                 }}
-                placeholder={tr('triage.dueAtPlaceholder')}
+                placeholder={t('triage.dueAtPlaceholder')}
                 error={Boolean(error)}
-                helperText={error ? tr('triage.validation.dueAtInvalid') : undefined}
+                helperText={error ? t('triage.validation.dueAtInvalid') : undefined}
               />
-
               <input
                 ref={dueDatePickerRef}
                 type="date"
@@ -127,13 +125,12 @@ export function DueAtField({ control, error, dueAtPreset, setDueAtPreset }: Prop
                     setDueAtPreset('custom')
                   }
                 }}
-              />
-
-              <Tooltip title={tr('triage.dueAtOpenPicker')}>
+              />{' '}
+              <Tooltip title={t('triage.dueAtOpenPicker')}>
                 <Button
                   type="button"
                   variant="outlined"
-                  aria-label={tr('triage.dueAtOpenPicker')}
+                  aria-label={t('triage.dueAtOpenPicker')}
                   onClick={() => dueDatePickerRef.current?.showPicker?.()}
                   sx={{ minWidth: 42, px: 1 }}
                 >

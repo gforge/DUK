@@ -17,9 +17,11 @@ import { Controller } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
 import type { AssignmentMode, CareRole, ContactMode, User } from '@/api/schemas'
+import { useContactModeLabel } from '@/hooks/labels'
 
 import type { TriageForm } from '../schema'
 import { CareRoleField } from './CareRoleField'
+import { AssignmentModeField } from './AssignmentModeField'
 import { DueAtField, type DueAtPreset } from './DueAtField'
 
 interface Props {
@@ -59,27 +61,27 @@ export function Step2({
   isSubmitting,
 }: Props) {
   const { t } = useTranslation()
-  const tr = (key: string) => t(key as never)
+  const getContactModeLabel = useContactModeLabel()
 
   return (
     <Box component="form" onSubmit={onSubmit} noValidate>
       <Stack direction="row" alignItems="center" gap={1} sx={{ mb: 1.5 }}>
         <Typography variant="subtitle1" fontWeight={700}>
-          {tr(STEP2_TITLE_KEY_BY_MODE[contactMode])}
+          {t(STEP2_TITLE_KEY_BY_MODE[contactMode])}
         </Typography>
 
-        <Chip size="small" color="primary" label={tr(`triage.contactMode.${contactMode}`)} />
+        <Chip size="small" color="primary" label={getContactModeLabel(contactMode)} />
 
         <Box sx={{ flexGrow: 1 }} />
 
         <Button size="small" startIcon={<ArrowBackIcon />} onClick={onBack}>
-          {tr('triage.backToModes')}
+          {t('triage.backToModes')}
         </Button>
       </Stack>
 
       {contactMode === 'CLOSE' ? (
         <Alert severity="info" sx={{ mb: 2 }}>
-          {tr('triage.closeNoWorklist')}
+          {t('triage.closeNoWorklist')}
         </Alert>
       ) : (
         <Stack gap={1.5} sx={{ mb: 2 }}>
@@ -90,34 +92,11 @@ export function Step2({
             setValue={setValue}
           />
 
-          <Controller
-            name="assignmentMode"
+          <AssignmentModeField
             control={control}
-            render={({ field }) => (
-              <TextField
-                select
-                label={tr('triage.assignmentMode')}
-                value={field.value ?? ''}
-                onChange={(e) => {
-                  const nextMode = e.target.value as AssignmentMode
-                  field.onChange(nextMode)
-
-                  if (nextMode !== 'NAMED') {
-                    setValue('assignedUserId', '')
-                  }
-                }}
-                error={Boolean(errors.assignmentMode)}
-                helperText={
-                  errors.assignmentMode ? tr('triage.validation.assignmentModeRequired') : undefined
-                }
-              >
-                <MenuItem value="ANY">{tr('triage.assignmentModeOption.ANY')}</MenuItem>
-                {careRole === 'DOCTOR' && (
-                  <MenuItem value="PAL">{tr('triage.assignmentModeOption.PAL')}</MenuItem>
-                )}
-                <MenuItem value="NAMED">{tr('triage.assignmentModeOption.NAMED')}</MenuItem>
-              </TextField>
-            )}
+            error={errors.assignmentMode}
+            careRole={careRole}
+            setValue={setValue}
           />
 
           {assignmentMode === 'NAMED' && (
@@ -127,15 +106,15 @@ export function Step2({
               render={({ field }) => (
                 <TextField
                   select
-                  label={tr('triage.namedPerson')}
+                  label={t('triage.namedPerson')}
                   value={field.value ?? ''}
                   onChange={field.onChange}
                   error={Boolean(errors.assignedUserId)}
                   helperText={
                     errors.assignedUserId
-                      ? tr('triage.validation.namedPersonRequired')
+                      ? t('triage.validation.namedPersonRequired')
                       : eligibleNamedUsers.length === 0
-                        ? tr('triage.noNamedUsers')
+                        ? t('triage.noNamedUsers')
                         : undefined
                   }
                 >
@@ -162,7 +141,7 @@ export function Step2({
             render={({ field }) => (
               <TextField
                 fullWidth
-                label={tr('triage.note')}
+                label={t('triage.note')}
                 value={field.value ?? ''}
                 onChange={field.onChange}
                 multiline
@@ -177,7 +156,7 @@ export function Step2({
 
       {contactMode !== 'CLOSE' && (
         <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-          {tr('triage.confirmCreatesWorklist')}
+          {t('triage.confirmCreatesWorklist')}
         </Typography>
       )}
 
@@ -187,7 +166,7 @@ export function Step2({
         render={({ field }) => (
           <TextField
             fullWidth
-            label={tr('triage.patientMessage')}
+            label={t('triage.patientMessage')}
             value={field.value ?? ''}
             onChange={field.onChange}
             multiline
@@ -199,7 +178,7 @@ export function Step2({
 
       <Stack direction="row" gap={1} justifyContent="flex-end">
         <Button variant="outlined" onClick={onBack} startIcon={<ArrowBackIcon />}>
-          {tr('triage.backToModes')}
+          {t('triage.backToModes')}
         </Button>
 
         <Button
@@ -208,7 +187,7 @@ export function Step2({
           disabled={isSubmitting}
           startIcon={isSubmitting ? <CircularProgress size={16} /> : undefined}
         >
-          {isSubmitting ? tr('triage.submitting') : tr('triage.submit')}
+          {isSubmitting ? t('triage.submitting') : t('triage.submit')}
         </Button>
       </Stack>
     </Box>

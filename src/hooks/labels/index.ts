@@ -17,3 +17,10 @@ export {
   useTransitionTriggerLabel,
 } from './useJourneyLabels'
 export { useRoleLabel } from './useRoleLabel'
+export {
+  useAssignmentModeHelpLabel,
+  useAssignmentModeLabel,
+  useCareRoleLabel,
+  useContactModeHelpLabel,
+  useContactModeLabel,
+} from './useTriageLabels'

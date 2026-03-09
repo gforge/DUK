@@ -63,7 +63,7 @@
     "edit": "Edit",
     "error": "An error occurred",
     "errorGeneric": "An error occurred. Please try again.",
-    "errorUnknown": "__NOT_TRANSLATED__",
+    "errorUnknown": "An unknown error occurred",
     "language": "Language",
     "mainNavigation": "Main navigation",
     "next": "Next",
@@ -324,10 +324,7 @@
       "windowDays": "Window (±days)"
     },
     "modType": {
-      "ADD_STEP": "Step added",
-      "CANCEL": "Cancelled",
-      "REMOVE_STEP": "Step removed",
-      "SWITCH_TEMPLATE": "Template switched"
+      "CANCEL": "Cancelled"
     },
     "nextPhase": {
       "confirm": "Start phase",
@@ -366,13 +363,13 @@
     "pausedDaysShort": "+{{days}}d paused",
     "pauseSuccess": "Journey paused",
     "phaseType": {
-      "DISCHARGE": "__NOT_TRANSLATED__",
-      "FOLLOWUP": "__NOT_TRANSLATED__",
-      "INTAKE": "__NOT_TRANSLATED__",
-      "MONITORING": "__NOT_TRANSLATED__",
-      "POST_OP": "__NOT_TRANSLATED__",
-      "REFERRAL": "__NOT_TRANSLATED__",
-      "WAITING_LIST": "__NOT_TRANSLATED__"
+      "DISCHARGE": "Discharge",
+      "FOLLOWUP": "Follow-up",
+      "INTAKE": "Intake",
+      "MONITORING": "Monitoring",
+      "POST_OP": "Post-op",
+      "REFERRAL": "Referral",
+      "WAITING_LIST": "Waiting list"
     },
     "qTemplate": {
       "addQuestion": "Add question",
@@ -468,14 +465,14 @@
       "referenceDateLabelHint": "Shown in the registration dialog instead of the generic “Reference date”. E.g. Surgery date, Injury date."
     },
     "transitionTrigger": {
-      "MANUAL": "__NOT_TRANSLATED__",
-      "MILESTONE": "__NOT_TRANSLATED__",
-      "PHYSIO_COMPLETED": "__NOT_TRANSLATED__",
-      "REFERRAL_RECEIVED": "__NOT_TRANSLATED__",
-      "SURGERY_COMPLETED": "__NOT_TRANSLATED__",
-      "SURGERY_SCHEDULED": "__NOT_TRANSLATED__",
-      "TRIAGE_DECISION": "__NOT_TRANSLATED__",
-      "VISIT_DECISION": "__NOT_TRANSLATED__"
+      "MANUAL": "Manual",
+      "MILESTONE": "Milestone",
+      "PHYSIO_COMPLETED": "Physio completed",
+      "REFERRAL_RECEIVED": "Referral received",
+      "SURGERY_COMPLETED": "Surgery completed",
+      "SURGERY_SCHEDULED": "Surgery scheduled",
+      "TRIAGE_DECISION": "Triage decision",
+      "VISIT_DECISION": "Visit decision"
     },
     "type": "Type",
     "window": "Window"
@@ -695,13 +692,6 @@
     "wound_discharge": "Discharge from wound?",
     "wound_healed": "Is the wound healed?"
   },
-  "questionType": {
-    "BOOLEAN": "Yes / No",
-    "NUMBER": "Number",
-    "SCALE": "Scale",
-    "SELECT": "Multiple choice",
-    "TEXT": "Free text"
-  },
   "review": {
     "addReview": "Add review",
     "comment": "Comment",
@@ -745,7 +735,6 @@
     "DOCTOR": "Doctor",
     "NURSE": "Nurse (RN)",
     "PAL": "PAL (Responsible Physician)",
-    "SECRETARY": "Secretary",
     "PATIENT": "Patient",
     "switchRole": "Switch Role"
   },
@@ -762,41 +751,20 @@
     "TRIAGED": "Triaged"
   },
   "triage": {
-    "actionDesc": {
-      "CLOSE_NOW": "Close the case without further action",
-      "DIGITAL_CONTROL": "Patient completes a digital follow-up form",
-      "DOCTOR_VISIT": "Patient visits a doctor at the clinic",
-      "NURSE_VISIT": "Patient visits a nurse at the clinic",
-      "PHONE_CALL": "Nurse calls the patient by phone",
-      "PHYSIO_VISIT": "Patient visits a physiotherapist"
-    },
-    "actionLabel": {
-      "CLOSE_NOW": "Close checkpoint",
-      "DIGITAL_CONTROL": "Digital control",
-      "DOCTOR_VISIT": "Doctor visit",
-      "NURSE_VISIT": "Nurse visit",
-      "PHONE_CALL": "Phone call",
-      "PHYSIO_VISIT": "Physio visit"
-    },
-    "actionRole": {
-      "CLOSE_NOW": "Clinician",
-      "DIGITAL_CONTROL": "Nurse",
-      "DOCTOR_VISIT": "Doctor",
-      "NURSE_VISIT": "Nurse",
-      "PHONE_CALL": "Nurse",
-      "PHYSIO_VISIT": "Physiotherapist"
-    },
-    "actionTooltip": {
-      "CLOSE_NOW": "Close case immediately without follow-up",
-      "DIGITAL_CONTROL": "Send a digital follow-up form to the patient",
-      "DOCTOR_VISIT": "Book a doctor appointment",
-      "NURSE_VISIT": "Book a nurse appointment",
-      "PHONE_CALL": "Book a phone consultation",
-      "PHYSIO_VISIT": "Book a physiotherapist appointment"
-    },
     "addToGoogle": "Add to Google Calendar",
+    "assignmentMode": "Assignment mode",
+    "assignmentModeHelp": {
+      "ANY": "Anyone with appropriate competence",
+      "NAMED": "Choose a specific person to assign",
+      "PAL": "Patient's primary attending physician (PAL)"
+    },
+    "assignmentModeOption": {
+      "ANY": "Any",
+      "NAMED": "Specific person",
+      "PAL": "Main doctor"
+    },
     "assignRole": "Book to",
-    "backToActions": "Choose different action",
+    "backToModes": "Back to modes",
     "bookingCancelConfirm": "Are you sure you want to cancel this booking? This action cannot be undone.",
     "bookingCancelSuccess": "Booking cancelled",
     "bookingCancelTitle": "Cancel booking",
@@ -804,86 +772,61 @@
     "bookings": "Bookings",
     "bookingTime": "Booking time",
     "bookingUpdated": "Booking updated",
-    "close": "Close Case",
-    "closeNowConfirm": "The case will be closed without follow-up. The patient will not be contacted.",
-    "contextWhy": "Why is this case here?",
-    "deadline": "Deadline for next check-in",
-    "deadlineBookBy": "Book by",
-    "deadlinePicker": "Open calendar",
-    "deadlinePlaceholder": "e.g. 1d, 2w, 1/3, 1 march or YYYY-MM-DD",
-    "deadlineRequired": "Deadline is required for this action",
-    "editBooking": "Edit booking",
-    "error": "Triage error",
-    "exportIcal": "Export iCal",
-    "followUp": "Set to Follow-Up",
-    "internalNote": "Internal note (optional)",
-    "more": "More information",
-    "nextStep": "Next Action",
-    "patientMessage": "Message to patient (demo)",
-    "quickDay_one": "{{count}} day",
-    "quickDay_other": "{{count}} days",
-    "quickDeadline": "Quick select",
-    "quickWeek_one": "{{count}} week",
-    "quickWeek_other": "{{count}} weeks",
-    "requiresClinician": "Triage requires clinical staff access.",
-    "selectedAction": "Selected action",
-    "step1Title": "Next step for the patient",
-    "step2Title": "Who should handle this?",
-    "step2TitleByMode": {
-      "DIGITAL": "Digital follow-up - who is responsible?",
-      "PHONE": "Phone - who should call the patient?",
-      "VISIT": "Visit - who should handle the visit?",
-      "CLOSE": "Close - confirm"
-    },
-    "backToModes": "Choose contact mode",
-    "closeNoWorklist": "Case will be closed and normally does not create a worklist item.",
-    "careRole": "Who should handle this?",
+    "careRole": "Competence",
     "careRoleOption": {
       "DOCTOR": "Doctor",
       "NURSE": "Nurse",
       "PHYSIO": "Physiotherapist"
     },
-    "assignmentMode": "Assignment",
-    "assignmentModeOption": {
-      "ANY": "Any",
-      "PAL": "PAL doctor",
-      "NAMED": "Specific person"
-    },
-    "namedPerson": "Named person",
-    "noNamedUsers": "No users available for this profession in demo data.",
-    "dueAt": "When should this be arranged?",
-    "dueAtPlaceholder": "e.g. 1d, 2w, 2026-03-20",
-    "dueAtOpenPicker": "Choose date in calendar",
-    "dueAtQuick": {
-      "1w": "1 week",
-      "2w": "2 weeks",
-      "1m": "1 month",
-      "custom": "Custom"
-    },
-    "note": "Internal note",
-    "confirmCreatesWorklist": "When you confirm, a task will be created in the Worklist.",
+    "close": "Close Case",
+    "closeNoWorklist": "Close the case without creating a worklist item",
+    "confirmCreatesWorklist": "Confirmation creates a worklist item",
     "contactMode": {
-      "DIGITAL": "Digital",
-      "PHONE": "Phone",
-      "VISIT": "Visit",
-      "CLOSE": "Close"
+      "CLOSE": "Close case",
+      "DIGITAL": "Digital follow-up",
+      "PHONE": "Phone contact",
+      "VISIT": "Clinic visit"
     },
     "contactModeHelp": {
-      "DIGITAL": "Digital follow-up",
-      "PHONE": "Telephone follow-up",
-      "VISIT": "Plan a physical visit",
-      "CLOSE": "Close case without new follow-up"
+      "CLOSE": "Close the case directly without follow-up",
+      "DIGITAL": "Patient answers digital form",
+      "PHONE": "Healthcare professional calls the patient",
+      "VISIT": "Patient visits the clinic"
     },
-    "validation": {
-      "careRoleRequired": "Select profession",
-      "assignmentModeRequired": "Select assignment mode",
-      "namedPersonRequired": "Select a person",
-      "dueAtInvalid": "Invalid date format"
+    "contextWhy": "Why is this case here?",
+    "dueAt": "Due date",
+    "dueAtOpenPicker": "Open calendar",
+    "dueAtPlaceholder": "e.g. 2w, 14d or YYYY-MM-DD",
+    "dueAtQuick": {
+      "1m": "1 month",
+      "1w": "1 week",
+      "2w": "2 weeks",
+      "custom": "Custom"
     },
-    "submit": "Confirm Triage",
-    "submitting": "Submitting…",
+    "editBooking": "Edit booking",
+    "error": "Triage error",
+    "exportIcal": "Export iCal",
+    "followUp": "Set to Follow-Up",
+    "namedPerson": "Assigned to",
+    "nextStep": "Next Action",
+    "noNamedUsers": "No users available for this role",
+    "note": "Internal note",
+    "patientMessage": "Message to patient",
+    "quickDay_one": "{{count}} day",
+    "quickDay_other": "{{count}} days",
+    "quickWeek_one": "{{count}} week",
+    "quickWeek_other": "{{count}} weeks",
+    "requiresClinician": "Triage requires clinical staff access.",
+    "step1Title": "Choose contact mode",
+    "submit": "Confirm triage",
+    "submitting": "Submitting...",
     "success": "Triage saved",
-    "title": "Triage"
+    "validation": {
+      "assignmentModeRequired": "Assignment mode is required",
+      "careRoleRequired": "Competence is required",
+      "dueAtInvalid": "Invalid date format",
+      "namedPersonRequired": "Person must be selected"
+    }
   },
   "trigger": {
     "ABNORMAL_ANSWER": "Abnormal Answer",
@@ -899,24 +842,15 @@
   },
   "worklist": {
     "book": "Book",
-    "claim": "Claim",
-    "claimSuccess": "Item claimed",
     "bookDialogTitle": "Book — {{name}}",
     "bookSuccess": "Booking confirmed",
+    "claim": "Claim",
     "confirmBooking": "Confirm booking",
     "copiedPnr": "Copied!",
     "copyPnr": "Copy personal number",
     "doneSuccess": "Case closed",
     "empty": "No cases require action right now.",
     "emptyGroup": "No cases in this group.",
-    "filterAll": "All categories",
-    "filterClaimedByMe": "Claimed by me",
-    "filterMyPatients": "My patients",
-    "category": {
-      "VISIT": "Visits",
-      "PHONE": "Phone follow-up",
-      "DIGITAL": "Digital follow-up"
-    },
     "markDone": "Done",
     "markInProgress": "Begin",
     "noDeadline": "No deadline",

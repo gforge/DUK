@@ -66,8 +66,10 @@ describe('TriageForm two-step flow', () => {
 
     await user.click(screen.getByRole('button', { name: 'Sjuksköterska' }))
 
-    await user.click(screen.getByLabelText('Tilldelning'))
-    await user.click(screen.getByRole('option', { name: 'Valfri' }))
+    // assignment mode is now a group of toggle buttons rather than a select
+    // button labels are localized; look up the correct text via i18n
+    const anyLabel = i18n.t('triage.assignmentModeOption.ANY') as string
+    await user.click(screen.getByRole('button', { name: anyLabel }))
 
     await user.click(screen.getByRole('button', { name: /bekräfta triage/i }))
 

@@ -299,10 +299,7 @@ interface Resources {
         "label": "Status"
       },
       "modType": {
-        "ADD_STEP": "Steg tillagt",
-        "CANCEL": "Avbruten",
-        "REMOVE_STEP": "Steg borttaget",
-        "SWITCH_TEMPLATE": "Mall bytt"
+        "CANCEL": "Avbruten"
       },
       "modificationHistory": "Justeringshistorik",
       "modifications": "Justeringar",
@@ -368,13 +365,13 @@ interface Resources {
       "pausedBanner_other": "Resa pausad sedan {{days}} dagar",
       "pausedDaysShort": "+{{days}}d pausad",
       "phaseType": {
-        "DISCHARGE": "__NOT_TRANSLATED__",
-        "FOLLOWUP": "__NOT_TRANSLATED__",
-        "INTAKE": "__NOT_TRANSLATED__",
-        "MONITORING": "__NOT_TRANSLATED__",
-        "POST_OP": "__NOT_TRANSLATED__",
-        "REFERRAL": "__NOT_TRANSLATED__",
-        "WAITING_LIST": "__NOT_TRANSLATED__"
+        "DISCHARGE": "Utskrivning",
+        "FOLLOWUP": "Uppföljning",
+        "INTAKE": "Intag",
+        "MONITORING": "Övervakning",
+        "POST_OP": "Post-op",
+        "REFERRAL": "Remiss",
+        "WAITING_LIST": "Väntelista"
       },
       "qTemplate": {
         "addQuestion": "Lägg till fråga",
@@ -470,14 +467,14 @@ interface Resources {
         "referenceDateLabelHint": "Visas i registreringsdialogen istället för „Referensdatum“. T.ex. Operationsdatum, Skadedatum."
       },
       "transitionTrigger": {
-        "MANUAL": "__NOT_TRANSLATED__",
-        "MILESTONE": "__NOT_TRANSLATED__",
-        "PHYSIO_COMPLETED": "__NOT_TRANSLATED__",
-        "REFERRAL_RECEIVED": "__NOT_TRANSLATED__",
-        "SURGERY_COMPLETED": "__NOT_TRANSLATED__",
-        "SURGERY_SCHEDULED": "__NOT_TRANSLATED__",
-        "TRIAGE_DECISION": "__NOT_TRANSLATED__",
-        "VISIT_DECISION": "__NOT_TRANSLATED__"
+        "MANUAL": "Manuell",
+        "MILESTONE": "Milstolpe",
+        "PHYSIO_COMPLETED": "Fysioterapi slutförd",
+        "REFERRAL_RECEIVED": "Remiss mottagen",
+        "SURGERY_COMPLETED": "Operation slutförd",
+        "SURGERY_SCHEDULED": "Operation schemalagd",
+        "TRIAGE_DECISION": "Triagebeslut",
+        "VISIT_DECISION": "Besöksbeslut"
       },
       "type": "Typ",
       "window": "Fönster"
@@ -675,13 +672,6 @@ interface Resources {
       "varDaysSinceTherapy": "Dagar sedan terapi",
       "varNumResponses": "Totalt antal svar"
     },
-    "questionType": {
-      "BOOLEAN": "Ja/Nej",
-      "NUMBER": "Siffra",
-      "SCALE": "Skala",
-      "SELECT": "Flerval",
-      "TEXT": "Fritext"
-    },
     "questionnaire": {
       "eq_anxiety": "Oro/nedstämdhet",
       "eq_mobility": "Rörlighet",
@@ -763,41 +753,20 @@ interface Resources {
       "TRIAGED": "Triagerad"
     },
     "triage": {
-      "actionDesc": {
-        "CLOSE_NOW": "Stäng ärendet utan ytterligare åtgärd",
-        "DIGITAL_CONTROL": "Patienten besvarar digitalt uppföljningsformulär",
-        "DOCTOR_VISIT": "Patient besöker läkare på mottagningen",
-        "NURSE_VISIT": "Patient besöker sjuksköterska på mottagningen",
-        "PHONE_CALL": "Sjuksköterska ringer upp patienten",
-        "PHYSIO_VISIT": "Patient besöker fysioterapeut"
-      },
-      "actionLabel": {
-        "CLOSE_NOW": "Stäng kontrollpunkt",
-        "DIGITAL_CONTROL": "Digital kontroll",
-        "DOCTOR_VISIT": "Läkarbesök",
-        "NURSE_VISIT": "Sköterskebesök",
-        "PHONE_CALL": "Telefonkontakt",
-        "PHYSIO_VISIT": "Fysiobesök"
-      },
-      "actionRole": {
-        "CLOSE_NOW": "Kliniker",
-        "DIGITAL_CONTROL": "Sjuksköterska",
-        "DOCTOR_VISIT": "Läkare",
-        "NURSE_VISIT": "Sjuksköterska",
-        "PHONE_CALL": "Sjuksköterska",
-        "PHYSIO_VISIT": "Fysioterapeut"
-      },
-      "actionTooltip": {
-        "CLOSE_NOW": "Stäng ärendet direkt utan uppföljning",
-        "DIGITAL_CONTROL": "Skicka digitalt uppföljningsformulär till patienten",
-        "DOCTOR_VISIT": "Boka ett läkarbesök",
-        "NURSE_VISIT": "Boka ett sjuksköterskebesök",
-        "PHONE_CALL": "Boka en telefonkonsultation",
-        "PHYSIO_VISIT": "Boka ett besök hos fysioterapeut"
-      },
       "addToGoogle": "Lägg till i Google Kalender",
       "assignRole": "Bokas till",
-      "backToActions": "Välj annan åtgärd",
+      "assignmentMode": "Tilldelningssätt",
+      "assignmentModeHelp": {
+        "ANY": "Vem som helst med rätt kompetens",
+        "NAMED": "Välj en specifik person att tilldela",
+        "PAL": "Patientens ordinarie läkare (PAL)"
+      },
+      "assignmentModeOption": {
+        "ANY": "VSH",
+        "NAMED": "Specifik person",
+        "PAL": "PAL"
+      },
+      "backToModes": "Tillbaka till lägen",
       "bookingCancelConfirm": "Är du säker på att du vill avboka? Åtgärden kan inte ångras.",
       "bookingCancelSuccess": "Bokning avbokad",
       "bookingCancelTitle": "Avboka bokning",
@@ -805,34 +774,61 @@ interface Resources {
       "bookingTime": "Bokad tid",
       "bookingUpdated": "Bokning uppdaterad",
       "bookings": "Bokningar",
+      "careRole": "Kompetens",
+      "careRoleOption": {
+        "DOCTOR": "Läkare",
+        "NURSE": "Sjuksköterska",
+        "PHYSIO": "Fysioterapeut"
+      },
       "close": "Stäng ärende",
-      "closeNowConfirm": "Ärendet stängs utan uppföljning. Patienten kommer inte att kontaktas.",
+      "closeNoWorklist": "Stäng ärendet utan att skapa en arbetsuppgift",
+      "confirmCreatesWorklist": "Bekräftelsen skapar en arbetsuppgift på arbetslistan",
+      "contactMode": {
+        "CLOSE": "Stäng ärendet",
+        "DIGITAL": "Digital uppföljning",
+        "PHONE": "Telefonkontakt",
+        "VISIT": "Besök på mottagning"
+      },
+      "contactModeHelp": {
+        "CLOSE": "Stäng ärendet direkt utan uppföljning",
+        "DIGITAL": "Patienten besvarar digitalt formulär",
+        "PHONE": "Personal ringer upp patienten",
+        "VISIT": "Patient besöker mottagningen"
+      },
       "contextWhy": "Varför är ärendet här?",
-      "deadline": "Deadline för nästa kontrollpunkt",
-      "deadlineBookBy": "Boka senast",
-      "deadlinePicker": "Välj datum i kalender",
-      "deadlinePlaceholder": "t.ex. 1d, 2v, 1/3, 1 mars eller ÅÅÅÅ-MM-DD",
-      "deadlineRequired": "Deadline krävs för denna åtgärd",
+      "dueAt": "Förfallodatum",
+      "dueAtOpenPicker": "Öppna kalender",
+      "dueAtPlaceholder": "t.ex. 2v, 14d eller ÅÅÅÅ-MM-DD",
+      "dueAtQuick": {
+        "1m": "1 månad",
+        "1w": "1 vecka",
+        "2w": "2 veckor",
+        "custom": "Anpassad"
+      },
       "editBooking": "Redigera bokning",
       "error": "Fel vid triage",
       "exportIcal": "Exportera till iCal",
       "followUp": "Sätt till uppföljning",
-      "internalNote": "Intern notering (valfri)",
-      "more": "Mer information",
+      "namedPerson": "Tilldelas till",
       "nextStep": "Nästa åtgärd",
-      "patientMessage": "Meddelande till patient (demo)",
+      "noNamedUsers": "Inga användare tillgängliga för denna roll",
+      "note": "Intern anteckning",
+      "patientMessage": "Meddelande till patient",
       "quickDay_one": "{{count}} dag",
       "quickDay_other": "{{count}} dagar",
-      "quickDeadline": "Snabbval",
       "quickWeek_one": "en vecka",
       "quickWeek_other": "{{count}} veckor",
       "requiresClinician": "Triagering kräver åtkomst som klinisk personal.",
-      "selectedAction": "Vald åtgärd",
-      "step1Title": "Vad behöver patienten göra?",
+      "step1Title": "Välj kontaktläge",
       "submit": "Bekräfta triage",
-      "submitting": "Skickar…",
+      "submitting": "Skickar...",
       "success": "Triage sparad",
-      "title": "Triagering"
+      "validation": {
+        "assignmentModeRequired": "Tilldelningssätt måste anges",
+        "careRoleRequired": "Kompetens måste anges",
+        "dueAtInvalid": "Ogiltigt datumformat",
+        "namedPersonRequired": "Person måste väljas"
+      }
     },
     "trigger": {
       "ABNORMAL_ANSWER": "Avvikande svar",
@@ -850,13 +846,13 @@ interface Resources {
       "book": "Boka",
       "bookDialogTitle": "Boka — {{name}}",
       "bookSuccess": "Bokning bekräftad",
+      "claim": "Ta",
       "confirmBooking": "Bekräfta bokning",
       "copiedPnr": "Kopierat!",
       "copyPnr": "Kopiera personnummer",
       "doneSuccess": "Ärende avslutat",
       "empty": "Inga ärenden kräver åtgärd just nu.",
       "emptyGroup": "Inga ärenden i denna grupp.",
-      "filterAll": "Alla roller",
       "markDone": "Avklarad",
       "markInProgress": "Påbörja",
       "noDeadline": "Ingen deadline",

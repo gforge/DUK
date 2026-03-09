@@ -4,8 +4,10 @@ import EventIcon from '@mui/icons-material/Event'
 import MonitorHeartIcon from '@mui/icons-material/MonitorHeart'
 import { Box, Card, CardActionArea, CardContent, Stack, Typography } from '@mui/material'
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 
 import type { ContactMode } from '@/api/schemas'
+import { useContactModeHelpLabel, useContactModeLabel } from '@/hooks/labels'
 
 const CONTACT_MODES: ContactMode[] = ['DIGITAL', 'PHONE', 'VISIT', 'CLOSE']
 
@@ -18,15 +20,18 @@ const CONTACT_MODE_ICONS: Record<ContactMode, React.ReactNode> = {
 
 interface Props {
   contactMode: ContactMode | null
-  tr: (key: string) => string
   onSelect: (mode: ContactMode) => void
 }
 
-export default function TriageContactModeStep({ contactMode, tr, onSelect }: Props) {
+export default function TriageContactModeStep({ contactMode, onSelect }: Props) {
+  const { t } = useTranslation()
+  const getContactModeLabel = useContactModeLabel()
+  const getContactModeHelpLabel = useContactModeHelpLabel()
+
   return (
     <Box>
       <Typography variant="subtitle1" fontWeight={700} sx={{ mb: 1 }}>
-        {tr('triage.step1Title')}
+        {t('triage.step1Title')}
       </Typography>
       <Stack direction={{ xs: 'column', sm: 'row' }} gap={1.25} flexWrap="wrap">
         {CONTACT_MODES.map((mode) => (
@@ -45,11 +50,11 @@ export default function TriageContactModeStep({ contactMode, tr, onSelect }: Pro
                 <Stack direction="row" alignItems="center" gap={0.75} sx={{ mb: 0.25 }}>
                   {CONTACT_MODE_ICONS[mode]}
                   <Typography variant="body1" fontWeight={700}>
-                    {tr(`triage.contactMode.${mode}`)}
+                    {getContactModeLabel(mode)}
                   </Typography>
                 </Stack>
                 <Typography variant="caption" color="text.secondary">
-                  {tr(`triage.contactModeHelp.${mode}`)}
+                  {getContactModeHelpLabel(mode)}
                 </Typography>
               </CardContent>
             </CardActionArea>
