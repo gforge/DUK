@@ -68,6 +68,7 @@ interface Resources {
       "errorUnknown": "An error occurred",
       "language": "Språk",
       "mainNavigation": "Huvudnavigering",
+      "moreActions": "Fler åtgärder",
       "next": "Nästa",
       "no": "Nej",
       "notSet": "Ej satt",
@@ -755,7 +756,7 @@ interface Resources {
     "triage": {
       "addToGoogle": "Lägg till i Google Kalender",
       "assignRole": "Bokas till",
-      "assignmentMode": "Tilldelningssätt",
+      "assignmentMode": "Välj vem som ska ringa patienten och hur uppgiften ska riktas",
       "assignmentModeHelp": {
         "ANY": "Vem som helst med rätt kompetens",
         "NAMED": "Välj en specifik person att tilldela",
@@ -766,7 +767,7 @@ interface Resources {
         "NAMED": "Specifik person",
         "PAL": "PAL"
       },
-      "backToModes": "Tillbaka till lägen",
+      "backToModes": "Byt typ av kontakt",
       "bookingCancelConfirm": "Är du säker på att du vill avboka? Åtgärden kan inte ångras.",
       "bookingCancelSuccess": "Bokning avbokad",
       "bookingCancelTitle": "Avboka bokning",
@@ -814,12 +815,19 @@ interface Resources {
       "noNamedUsers": "Inga användare tillgängliga för denna roll",
       "note": "Intern anteckning",
       "patientMessage": "Meddelande till patient",
+      "pendingReviews": "Kan inte triagera innan laboratorie- eller röntgengranskningar är färdiga.",
       "quickDay_one": "{{count}} dag",
       "quickDay_other": "{{count}} dagar",
       "quickWeek_one": "en vecka",
       "quickWeek_other": "{{count}} veckor",
       "requiresClinician": "Triagering kräver åtkomst som klinisk personal.",
       "step1Title": "Välj kontaktläge",
+      "step2TitleByMode": {
+        "CLOSE": "Stäng ärendet",
+        "DIGITAL": "Digital uppföljning",
+        "PHONE": "Telefonkontakt",
+        "VISIT": "Besök på mottagning"
+      },
       "submit": "Bekräfta triage",
       "submitting": "Skickar...",
       "success": "Triage sparad",
@@ -843,23 +851,36 @@ interface Resources {
       "XRAY_PENDING": "Röntgen väntar"
     },
     "worklist": {
+      "activeLabel": "Aktiva",
       "book": "Boka",
       "bookDialogTitle": "Boka — {{name}}",
       "bookSuccess": "Bokning bekräftad",
-      "claim": "Ta",
+      "category": {
+        "DIGITAL": "Digital uppföljning",
+        "PHONE": "Telefonkontakt",
+        "VISIT": "Besök på mottagning"
+      },
+      "claim": "Tilldela mig",
+      "claimSuccess": "Ärende tilldelat dig",
+      "completedLabel": "Avklarade",
+      "completedSectionHint": "Stängd historik för uppföljning vid behov.",
+      "completedSectionTitle": "Avklarade",
       "confirmBooking": "Bekräfta bokning",
       "copiedPnr": "Kopierat!",
       "copyPnr": "Kopiera personnummer",
       "doneSuccess": "Ärende avslutat",
       "empty": "Inga ärenden kräver åtgärd just nu.",
       "emptyGroup": "Inga ärenden i denna grupp.",
+      "filterAll": "Alla",
+      "filterClaimedByMe": "Mina tilldelade",
+      "filterMyPatients": "Mina patienter",
       "markDone": "Avklarad",
       "markInProgress": "Påbörja",
       "noDeadline": "Ingen deadline",
       "openCase": "Öppna ärende",
       "pnr": "Personnummer",
       "scheduledAt": "Bokad tid (valfri)",
-      "subtitle": "Triagerade ärenden som väntar på åtgärd",
+      "subtitle": "Aktiva arbetsuppgifter för nästa steg efter triage",
       "title": "Åtgärdslista"
     }
   }

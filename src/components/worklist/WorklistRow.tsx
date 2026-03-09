@@ -1,8 +1,8 @@
+import AssignmentIndIcon from '@mui/icons-material/AssignmentInd'
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth'
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
-import PersonAddAlt1Icon from '@mui/icons-material/PersonAddAlt1'
 import PlayArrowIcon from '@mui/icons-material/PlayArrow'
 import {
   alpha,
@@ -80,10 +80,10 @@ export default function WorklistRow({
     <Box
       sx={{
         px: 2,
-        py: 1.5,
+        py: 0.75,
         display: 'grid',
         gridTemplateColumns: { xs: '1fr', sm: '2fr 1.5fr 1fr auto' },
-        gap: 1,
+        gap: 0.75,
         alignItems: 'center',
         bgcolor: highlighted ? alpha('#42a5f5', 0.12) : 'transparent',
         transition: 'background-color 280ms ease-in-out',
@@ -91,25 +91,25 @@ export default function WorklistRow({
       }}
     >
       {/* Patient + status */}
-      <Stack gap={0.25}>
+      <Stack gap={0.125}>
         <Typography variant="body2" fontWeight={600}>
           {patient?.displayName ?? caseData.patientId}
         </Typography>
-        <Stack direction="row" gap={1} alignItems="center" flexWrap="wrap">
-          <StatusChip status={caseData.status} size="small" />
+        <Stack direction="row" gap={0.5} alignItems="center" flexWrap="wrap">
+          {caseData.status !== 'TRIAGED' && <StatusChip status={caseData.status} size="small" />}
           {caseData.assignedRole && (
             <Chip
               label={getRoleLabel(caseData.assignedRole)}
               size="small"
               variant="outlined"
-              sx={{ height: 20, fontSize: 11 }}
+              sx={{ height: 18, fontSize: 11 }}
             />
           )}
           {caseData.triageDecision?.careRole && (
             <Chip
               label={getCareRoleLabel(caseData.triageDecision.careRole)}
               size="small"
-              sx={{ height: 20, fontSize: 11 }}
+              sx={{ height: 18, fontSize: 11 }}
             />
           )}
           {caseData.triageDecision?.assignmentMode && (
@@ -117,7 +117,7 @@ export default function WorklistRow({
               label={getAssignmentModeLabel(caseData.triageDecision.assignmentMode)}
               size="small"
               variant="outlined"
-              sx={{ height: 20, fontSize: 11 }}
+              sx={{ height: 18, fontSize: 11 }}
             />
           )}
         </Stack>
@@ -126,7 +126,7 @@ export default function WorklistRow({
       {/* Deadline */}
       <Box>
         {caseData.deadline ? (
-          <DeadlineLabel deadline={caseData.deadline} />
+          <DeadlineLabel deadline={caseData.deadline} tone="queue" />
         ) : (
           <Typography variant="caption" color="text.disabled">
             {t('worklist.noDeadline')}
@@ -154,26 +154,14 @@ export default function WorklistRow({
 
       {/* Actions */}
       <Stack direction="row" gap={0.5} justifyContent="flex-end" alignItems="center">
-        {/* TRIAGED + bookable → Boka dialog */}
-        {!caseData.assignedUserId && (
-          <Button
-            size="small"
-            variant="outlined"
-            startIcon={<PersonAddAlt1Icon />}
-            onClick={() => onClaim(caseData.id)}
-            sx={{ fontSize: 12, whiteSpace: 'nowrap' }}
-          >
-            {t('worklist.claim')}
-          </Button>
-        )}
-
+        {/* Primary actions */}
         {isTriaged && isBookable && (
           <Button
             size="small"
             variant="contained"
             startIcon={<CalendarMonthIcon />}
             onClick={() => setDialogOpen(true)}
-            sx={{ fontSize: 12, whiteSpace: 'nowrap' }}
+            sx={{ fontSize: 12, whiteSpace: 'nowrap', fontWeight: 700 }}
           >
             {t('worklist.book')}
           </Button>
@@ -183,10 +171,10 @@ export default function WorklistRow({
         {isTriaged && !isBookable && (
           <Button
             size="small"
-            variant="outlined"
+            variant="contained"
             startIcon={<PlayArrowIcon />}
             onClick={() => onMarkInProgress(caseData.id)}
-            sx={{ fontSize: 12, whiteSpace: 'nowrap' }}
+            sx={{ fontSize: 12, whiteSpace: 'nowrap', fontWeight: 800, textTransform: 'uppercase' }}
           >
             {t('worklist.markInProgress')}
           </Button>
@@ -200,12 +188,26 @@ export default function WorklistRow({
             color="success"
             startIcon={<CheckCircleOutlineIcon />}
             onClick={() => onMarkDone(caseData.id)}
-            sx={{ fontSize: 12, whiteSpace: 'nowrap' }}
+            sx={{ fontSize: 12, whiteSpace: 'nowrap', fontWeight: 700 }}
           >
             {t('worklist.markDone')}
           </Button>
         )}
 
+        {/* Secondary action */}
+        {!caseData.assignedUserId && (
+          <Button
+            size="small"
+            variant="outlined"
+            startIcon={<AssignmentIndIcon />}
+            onClick={() => onClaim(caseData.id)}
+            sx={{ fontSize: 12, whiteSpace: 'nowrap' }}
+          >
+            {t('worklist.claim')}
+          </Button>
+        )}
+
+        {/* Tertiary action */}
         <Tooltip title={t('worklist.openCase')}>
           <IconButton size="small" onClick={() => navigate(`/cases/${caseData.id}`)}>
             <OpenInNewIcon fontSize="small" />

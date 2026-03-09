@@ -4,13 +4,13 @@ import { I18nextProvider } from 'react-i18next'
 import { MemoryRouter } from 'react-router-dom'
 import { beforeEach, describe, expect, it } from 'vitest'
 
-import { initStore, resetStore } from '@/api/storage'
-import Dashboard from '@/pages/Dashboard'
 import { SEED_STATE } from '@/api/seed'
-
-import i18n from '../i18n'
+import { initStore } from '@/api/storage'
+import Dashboard from '@/pages/Dashboard'
 import { RoleProvider } from '@/store/roleContext'
 import { SnackProvider } from '@/store/snackContext'
+
+import i18n from '../i18n'
 
 // helper that includes all context and wraps in a simple fragment
 function wrap(ui: React.ReactElement) {

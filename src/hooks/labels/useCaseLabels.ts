@@ -7,6 +7,7 @@ import type {
   ReviewOutcome,
   ReviewType,
   TriggerType,
+  WorkCategory,
 } from '@/api/schemas'
 
 // ── helpers ──────────────────────────────────────────────────────────────────
@@ -176,6 +177,23 @@ export function useNextStepLabel() {
         return t('nextStep.NO_ACTION')
       default:
         return assertNever(next)
+    }
+  }
+}
+
+/** Returns a label function for WorkCategory. */
+export function useWorkCategoryLabel() {
+  const { t } = useTranslation()
+  return (category: WorkCategory): string => {
+    switch (category) {
+      case 'VISIT':
+        return t('worklist.category.VISIT')
+      case 'PHONE':
+        return t('worklist.category.PHONE')
+      case 'DIGITAL':
+        return t('worklist.category.DIGITAL')
+      default:
+        return assertNever(category)
     }
   }
 }

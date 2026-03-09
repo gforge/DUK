@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+
 import type { CaseCategory } from '@/api/schemas'
 
 // key used in localStorage for this preference; kept outside hook so tests can share

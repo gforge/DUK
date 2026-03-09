@@ -1,29 +1,39 @@
 import { Alert, Box, Button, Stack } from '@mui/material'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
 
 import * as client from '@/api/client'
-import type { Case } from '@/api/schemas'
+import type { Case, ContactMode } from '@/api/schemas'
 import ClinicalReviewPanel from '@/components/case/ClinicalReviewPanel'
 import { useRoleLabel } from '@/hooks/labels'
 import { useRole } from '@/store/roleContext'
 import { useSnack } from '@/store/snackContext'
 
+import { contactModeToRouteSegment } from '../triage/routeContactMode'
 import type { TriageSubmitData } from '../triage/TriageForm'
 import TriageForm from '../triage/TriageForm'
 
 interface TriageTabProps {
   readonly caseData: Case
   readonly onTriaged: () => void
+  readonly routeContactMode: ContactMode | null
 }
 
-export default function TriageTab({ caseData, onTriaged }: TriageTabProps) {
+export default function TriageTab({ caseData, onTriaged, routeContactMode }: TriageTabProps) {
   const { t } = useTranslation()
+  const navigate = useNavigate()
   const { currentUser, isRole } = useRole()
   const { showSnack } = useSnack()
   const getRoleLabel = useRoleLabel()
 
   const canTriage = isRole('NURSE', 'DOCTOR', 'PAL')
+
+  // determine if any lab/xray reviews are pending for this case
+  const hasPendingReviews = React.useMemo(
+    () => (caseData.reviews ?? []).some((r) => r.reviewedAt === null),
+    [caseData.reviews],
+  )
 
   async function onSubmit(data: TriageSubmitData) {
     try {
@@ -68,7 +78,22 @@ export default function TriageTab({ caseData, onTriaged }: TriageTabProps) {
       {(caseData.status === 'NEW' || caseData.status === 'NEEDS_REVIEW') && (
         <>
           <ClinicalReviewPanel caseData={caseData} onRefetch={onTriaged} />
-          <TriageForm caseData={caseData} onSubmit={onSubmit} />
+          {hasPendingReviews ? (
+            <Alert severity="warning">{t('triage.pendingReviews')}</Alert>
+          ) : (
+            <TriageForm
+              caseData={caseData}
+              onSubmit={onSubmit}
+              contactModeFromRoute={routeContactMode}
+              onContactModeRouteChange={(mode) => {
+                if (!mode) {
+                  navigate(`/cases/${caseData.id}`)
+                  return
+                }
+                navigate(`/cases/${caseData.id}/${contactModeToRouteSegment(mode)}`)
+              }}
+            />
+          )}
         </>
       )}
 

@@ -7,6 +7,7 @@ export {
   useSeverityLabel,
   useStatusLabel,
   useTriggerLabel,
+  useWorkCategoryLabel,
 } from './useCaseLabels'
 export {
   type StepStatus,
@@ -23,4 +24,5 @@ export {
   useCareRoleLabel,
   useContactModeHelpLabel,
   useContactModeLabel,
+  useStep2TitleLabel,
 } from './useTriageLabels'

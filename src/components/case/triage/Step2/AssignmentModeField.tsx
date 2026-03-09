@@ -1,5 +1,3 @@
-import React from 'react'
-import { Controller } from 'react-hook-form'
 import {
   FormControl,
   FormHelperText,
@@ -9,10 +7,12 @@ import {
   ToggleButtonGroup,
   Tooltip,
 } from '@mui/material'
+import React from 'react'
+import type { Control, FieldError, UseFormSetValue } from 'react-hook-form'
+import { Controller } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
 import type { AssignmentMode, CareRole } from '@/api/schemas'
-import type { Control, FieldError, UseFormSetValue } from 'react-hook-form'
 
 import type { TriageForm } from '../schema'
 
@@ -54,31 +54,31 @@ export function AssignmentModeField({ control, error, careRole, setValue }: Prop
               }
             }}
             size="small"
-            aria-label={tr('triage.assignmentMode')}
+            aria-label={t('triage.assignmentMode')}
             color="primary"
           >
-            <Tooltip title={tr('triage.assignmentModeHelp.ANY')}>
-              <ToggleButton value="ANY" aria-label={tr('triage.assignmentModeOption.ANY')}>
+            <Tooltip title={t('triage.assignmentModeHelp.ANY')}>
+              <ToggleButton value="ANY" aria-label={t('triage.assignmentModeOption.ANY')}>
                 <Stack direction="row" alignItems="center" gap={0.5}>
-                  <span>{tr('triage.assignmentModeOption.ANY')}</span>
+                  <span>{t('triage.assignmentModeOption.ANY')}</span>
                 </Stack>
               </ToggleButton>
             </Tooltip>
 
             {careRole === 'DOCTOR' && (
-              <Tooltip title={tr('triage.assignmentModeHelp.PAL')}>
-                <ToggleButton value="PAL" aria-label={tr('triage.assignmentModeOption.PAL')}>
+              <Tooltip title={t('triage.assignmentModeHelp.PAL')}>
+                <ToggleButton value="PAL" aria-label={t('triage.assignmentModeOption.PAL')}>
                   <Stack direction="row" alignItems="center" gap={0.5}>
-                    <span>{tr('triage.assignmentModeOption.PAL')}</span>
+                    <span>{t('triage.assignmentModeOption.PAL')}</span>
                   </Stack>
                 </ToggleButton>
               </Tooltip>
             )}
 
-            <Tooltip title={tr('triage.assignmentModeHelp.NAMED')}>
-              <ToggleButton value="NAMED" aria-label={tr('triage.assignmentModeOption.NAMED')}>
+            <Tooltip title={t('triage.assignmentModeHelp.NAMED')}>
+              <ToggleButton value="NAMED" aria-label={t('triage.assignmentModeOption.NAMED')}>
                 <Stack direction="row" alignItems="center" gap={0.5}>
-                  <span>{tr('triage.assignmentModeOption.NAMED')}</span>
+                  <span>{t('triage.assignmentModeOption.NAMED')}</span>
                 </Stack>
               </ToggleButton>
             </Tooltip>

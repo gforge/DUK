@@ -3,7 +3,6 @@ import {
   Alert,
   Box,
   Button,
-  Chip,
   CircularProgress,
   Divider,
   MenuItem,
@@ -17,11 +16,11 @@ import { Controller } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
 import type { AssignmentMode, CareRole, ContactMode, User } from '@/api/schemas'
-import { useContactModeLabel } from '@/hooks/labels'
+import { useStep2TitleLabel } from '@/hooks/labels'
 
 import type { TriageForm } from '../schema'
-import { CareRoleField } from './CareRoleField'
 import { AssignmentModeField } from './AssignmentModeField'
+import { CareRoleField } from './CareRoleField'
 import { DueAtField, type DueAtPreset } from './DueAtField'
 
 interface Props {
@@ -39,13 +38,6 @@ interface Props {
   isSubmitting: boolean
 }
 
-const STEP2_TITLE_KEY_BY_MODE: Record<ContactMode, string> = {
-  DIGITAL: 'triage.step2TitleByMode.DIGITAL',
-  PHONE: 'triage.step2TitleByMode.PHONE',
-  VISIT: 'triage.step2TitleByMode.VISIT',
-  CLOSE: 'triage.step2TitleByMode.CLOSE',
-}
-
 export function Step2({
   control,
   errors,
@@ -61,16 +53,14 @@ export function Step2({
   isSubmitting,
 }: Props) {
   const { t } = useTranslation()
-  const getContactModeLabel = useContactModeLabel()
+  const getStep2Title = useStep2TitleLabel()
 
   return (
     <Box component="form" onSubmit={onSubmit} noValidate>
       <Stack direction="row" alignItems="center" gap={1} sx={{ mb: 1.5 }}>
-        <Typography variant="subtitle1" fontWeight={700}>
-          {t(STEP2_TITLE_KEY_BY_MODE[contactMode])}
+        <Typography variant="h6" fontWeight={700}>
+          {getStep2Title(contactMode)}
         </Typography>
-
-        <Chip size="small" color="primary" label={getContactModeLabel(contactMode)} />
 
         <Box sx={{ flexGrow: 1 }} />
 
@@ -177,10 +167,6 @@ export function Step2({
       />
 
       <Stack direction="row" gap={1} justifyContent="flex-end">
-        <Button variant="outlined" onClick={onBack} startIcon={<ArrowBackIcon />}>
-          {t('triage.backToModes')}
-        </Button>
-
         <Button
           type="submit"
           variant="contained"

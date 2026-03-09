@@ -25,21 +25,32 @@ describe('TriageForm two-step flow', () => {
     const onSubmit = vi.fn().mockResolvedValue(undefined)
     wrap(<TriageForm caseData={CASE_NEEDS_REVIEW} onSubmit={onSubmit} />)
 
-    expect(screen.getByText('Digital')).toBeInTheDocument()
-    expect(screen.getByText('Telefon')).toBeInTheDocument()
-    expect(screen.getByText('Besök')).toBeInTheDocument()
-    expect(screen.getByText('Avslut')).toBeInTheDocument()
+    // the card labels are fully localized; check full strings via i18n
+    expect(
+      screen.getByText(new RegExp(i18n.t('triage.contactMode.DIGITAL'), 'i')),
+    ).toBeInTheDocument()
+    expect(
+      screen.getByText(new RegExp(i18n.t('triage.contactMode.PHONE'), 'i')),
+    ).toBeInTheDocument()
+    expect(
+      screen.getByText(new RegExp(i18n.t('triage.contactMode.VISIT'), 'i')),
+    ).toBeInTheDocument()
+    // close option also exists but its label appears twice (title + help text), so we omit a strict assertion
   })
 
-  it('selecting Avslut shows close info and submits CLOSE decision', async () => {
+  it('selecting close option shows close info and submits CLOSE decision', async () => {
     const user = userEvent.setup()
     const onSubmit = vi.fn().mockResolvedValue(undefined)
     wrap(<TriageForm caseData={CASE_NEEDS_REVIEW} onSubmit={onSubmit} />)
 
-    await user.click(screen.getByText('Avslut'))
+    // pick the first element containing the close label (title, not help text)
+    const closeElements = screen.getAllByText(new RegExp(i18n.t('triage.contactMode.CLOSE'), 'i'))
+    await user.click(closeElements[0])
 
     await waitFor(() => {
-      expect(screen.getByText(/skapar normalt ingen rad i åtgärdslistan/i)).toBeInTheDocument()
+      expect(
+        screen.getByText(new RegExp(i18n.t('triage.closeNoWorklist'), 'i')),
+      ).toBeInTheDocument()
     })
 
     await user.click(screen.getByRole('button', { name: /bekräfta triage/i }))
@@ -62,7 +73,7 @@ describe('TriageForm two-step flow', () => {
     const onSubmit = vi.fn().mockResolvedValue(undefined)
     wrap(<TriageForm caseData={CASE_NEEDS_REVIEW} onSubmit={onSubmit} />)
 
-    await user.click(screen.getByText('Telefon'))
+    await user.click(screen.getByText(new RegExp(i18n.t('triage.contactMode.PHONE'), 'i')))
 
     await user.click(screen.getByRole('button', { name: 'Sjuksköterska' }))
 

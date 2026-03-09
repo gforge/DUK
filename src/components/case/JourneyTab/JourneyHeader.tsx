@@ -1,10 +1,23 @@
 import CancelIcon from '@mui/icons-material/Cancel'
 import EditIcon from '@mui/icons-material/Edit'
+import MoreVertIcon from '@mui/icons-material/MoreVert'
 import PauseIcon from '@mui/icons-material/Pause'
 import PlayArrowIcon from '@mui/icons-material/PlayArrow'
 import RouteIcon from '@mui/icons-material/Route'
 import SkipNextIcon from '@mui/icons-material/SkipNext'
-import { Button, Chip, CircularProgress, Stack, Tooltip, Typography } from '@mui/material'
+import {
+  Button,
+  Chip,
+  CircularProgress,
+  IconButton,
+  ListItemIcon,
+  ListItemText,
+  Menu,
+  MenuItem,
+  Stack,
+  Tooltip,
+  Typography,
+} from '@mui/material'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -42,10 +55,35 @@ export default function JourneyHeader({
 }: JourneyHeaderProps) {
   const { t } = useTranslation()
   const getJourneyStatusLabel = useJourneyStatusLabel()
+  const [menuAnchorEl, setMenuAnchorEl] = React.useState<null | HTMLElement>(null)
+
+  const isActive = journey.status === 'ACTIVE'
+  const isSuspended = journey.status === 'SUSPENDED'
+  const hasOverflowActions = isActive || isSuspended
+  const canStartNextPhase = isActive && !!onStartNextPhase
+  const showModify = isActive || isSuspended
+
+  const closeMenu = () => setMenuAnchorEl(null)
+
+  const handlePauseClick = () => {
+    onPauseClick()
+    closeMenu()
+  }
+
+  const handleCancelClick = () => {
+    onCancelClick()
+    closeMenu()
+  }
 
   return (
-    <Stack direction="row" alignItems="flex-start" justifyContent="space-between" mb={1.5}>
-      <Stack gap={0.5}>
+    <Stack
+      direction={{ xs: 'column', sm: 'row' }}
+      alignItems={{ xs: 'stretch', sm: 'flex-start' }}
+      justifyContent="space-between"
+      gap={1}
+      mb={1.5}
+    >
+      <Stack gap={0.5} sx={{ minWidth: 0 }}>
         <Stack direction="row" alignItems="center" gap={1}>
           <RouteIcon color="primary" fontSize="small" />
           <Typography variant="subtitle1" fontWeight={700}>
@@ -67,47 +105,30 @@ export default function JourneyHeader({
         </Typography>
       </Stack>
 
-      <Stack direction="row" gap={1}>
-        {journey.status === 'ACTIVE' && (
-          <>
-            <Tooltip title={t('journey.pause')}>
-              <Button
-                startIcon={pauseLoading ? <CircularProgress size={14} /> : <PauseIcon />}
-                size="small"
-                variant="outlined"
-                color="warning"
-                onClick={onPauseClick}
-                disabled={pauseLoading}
-              >
-                {t('journey.pause')}
-              </Button>
-            </Tooltip>
-            <Button
-              startIcon={<EditIcon />}
-              size="small"
-              variant="outlined"
-              onClick={onModifyClick}
-            >
-              {t('journey.modify.action')}
-            </Button>
-            {onStartNextPhase && (
-              <Button
-                startIcon={<SkipNextIcon />}
-                size="small"
-                variant="outlined"
-                color="secondary"
-                onClick={onStartNextPhase}
-              >
-                {t('journey.startNextPhase')}
-              </Button>
-            )}
-          </>
+      <Stack
+        direction="row"
+        alignItems="center"
+        justifyContent={{ xs: 'flex-start', sm: 'flex-end' }}
+        gap={1}
+        sx={{ flexWrap: 'wrap' }}
+      >
+        {canStartNextPhase && (
+          <Button
+            startIcon={<SkipNextIcon />}
+            size="small"
+            variant="contained"
+            color="primary"
+            onClick={onStartNextPhase}
+          >
+            {t('journey.startNextPhase')}
+          </Button>
         )}
-        {journey.status === 'SUSPENDED' && (
+
+        {isSuspended && (
           <Button
             startIcon={pauseLoading ? <CircularProgress size={14} /> : <PlayArrowIcon />}
             size="small"
-            variant="outlined"
+            variant="contained"
             color="success"
             onClick={onResume}
             disabled={pauseLoading}
@@ -115,18 +136,51 @@ export default function JourneyHeader({
             {t('journey.resume')}
           </Button>
         )}
-        {(journey.status === 'ACTIVE' || journey.status === 'SUSPENDED') && (
-          <Tooltip title={t('journey.cancel')}>
-            <Button
-              startIcon={<CancelIcon />}
-              size="small"
-              variant="outlined"
-              color="error"
-              onClick={onCancelClick}
+
+        {showModify && (
+          <Button startIcon={<EditIcon />} size="small" variant="outlined" onClick={onModifyClick}>
+            {t('journey.modify.action')}
+          </Button>
+        )}
+
+        {hasOverflowActions && (
+          <>
+            <Tooltip title={t('common.moreActions')}>
+              <IconButton
+                size="small"
+                aria-label={t('common.moreActions')}
+                aria-haspopup="true"
+                aria-expanded={Boolean(menuAnchorEl)}
+                onClick={(event) => setMenuAnchorEl(event.currentTarget)}
+              >
+                <MoreVertIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+            <Menu
+              anchorEl={menuAnchorEl}
+              open={Boolean(menuAnchorEl)}
+              onClose={closeMenu}
+              transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+              anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
             >
-              {t('journey.cancel')}
-            </Button>
-          </Tooltip>
+              {isActive && (
+                <MenuItem onClick={handlePauseClick} disabled={pauseLoading}>
+                  <ListItemIcon>
+                    {pauseLoading ? <CircularProgress size={14} /> : <PauseIcon fontSize="small" />}
+                  </ListItemIcon>
+                  <ListItemText>{t('journey.pause')}</ListItemText>
+                </MenuItem>
+              )}
+              {(isActive || isSuspended) && (
+                <MenuItem onClick={handleCancelClick} sx={{ color: 'error.main' }}>
+                  <ListItemIcon sx={{ color: 'inherit' }}>
+                    <CancelIcon fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText>{t('journey.cancel')}</ListItemText>
+                </MenuItem>
+              )}
+            </Menu>
+          </>
         )}
       </Stack>
     </Stack>

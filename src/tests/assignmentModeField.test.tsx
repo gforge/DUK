@@ -1,13 +1,14 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
+import { useForm } from 'react-hook-form'
 import { I18nextProvider } from 'react-i18next'
 import { beforeEach, describe, expect, it } from 'vitest'
-import { useForm } from 'react-hook-form'
 
-import { AssignmentModeField } from '@/components/case/triage/Step2/AssignmentModeField'
-import type { TriageForm } from '@/components/case/triage/schema'
 import type { CareRole } from '@/api/schemas'
+import type { TriageForm } from '@/components/case/triage/schema'
+import { AssignmentModeField } from '@/components/case/triage/Step2/AssignmentModeField'
+
 import i18n from '../i18n'
 
 function Wrapper({ careRole }: { careRole: CareRole }) {

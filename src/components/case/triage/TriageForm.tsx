@@ -25,11 +25,18 @@ interface Props {
     }
     patientMessage?: string
   }) => Promise<void>
+  contactModeFromRoute?: ContactMode | null
+  onContactModeRouteChange?: (mode: ContactMode | null) => void
 }
 
 export type TriageSubmitData = Parameters<Props['onSubmit']>[0]
 
-export default function TriageForm({ caseData, onSubmit }: Props) {
+export default function TriageForm({
+  caseData,
+  onSubmit,
+  contactModeFromRoute,
+  onContactModeRouteChange,
+}: Props) {
   const [step, setStep] = React.useState<1 | 2>(1)
   const [dueAtPreset, setDueAtPreset] = React.useState<'1w' | '2w' | '1m' | 'custom' | null>(null)
 
@@ -59,6 +66,25 @@ export default function TriageForm({ caseData, onSubmit }: Props) {
   const careRole = useWatch({ control, name: 'careRole' })
   const assignmentMode = useWatch({ control, name: 'assignmentMode' })
 
+  React.useEffect(() => {
+    if (contactModeFromRoute === undefined) return
+
+    if (contactModeFromRoute === null) {
+      setStep(1)
+      return
+    }
+
+    setValue('contactMode', contactModeFromRoute, { shouldValidate: true })
+    if (contactModeFromRoute === 'CLOSE') {
+      setValue('careRole', null)
+      setValue('assignmentMode', null)
+      setValue('assignedUserId', '')
+      setValue('dueAtInput', '')
+      setDueAtPreset(null)
+    }
+    setStep(2)
+  }, [contactModeFromRoute, setValue])
+
   const eligibleNamedUsers = React.useMemo(() => {
     const roleByCareRole: Record<Exclude<CareRole, null>, User['role'] | null> = {
       DOCTOR: 'DOCTOR',
@@ -86,11 +112,21 @@ export default function TriageForm({ caseData, onSubmit }: Props) {
       setDueAtPreset(null)
     }
 
+    if (onContactModeRouteChange) {
+      onContactModeRouteChange(mode)
+      return
+    }
+
     setStep(2)
   }
 
   function handleBack() {
-    setStep(1)
+    if (onContactModeRouteChange) {
+      onContactModeRouteChange(null)
+    } else {
+      setStep(1)
+    }
+
     const values = getValues()
     reset({
       contactMode: values.contactMode,

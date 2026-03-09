@@ -10,29 +10,71 @@
  * NO eval, NO user-defined helpers, NO arbitrary expressions.
  */
 
+import { t } from 'i18next'
+
 import type { Case, FormResponse, Patient, PolicyWarning } from './schemas'
 import type { TriggerType } from './schemas'
 
-// Locale-aware translation maps for enum values rendered into journal text
-const CATEGORY_LABELS: Record<string, Record<string, string>> = {
-  sv: { ACUTE: 'Akut', SUBACUTE: 'Subakut' },
-  en: { ACUTE: 'Acute', SUBACUTE: 'Subacute' },
-}
-const NEXT_STEP_LABELS: Record<string, Record<string, string>> = {
-  sv: {
-    DIGITAL_CONTROL: 'Digital kontroll',
-    DOCTOR_VISIT: 'Läkarbesök',
-    NO_ACTION: 'Ingen åtgärd',
-  },
-  en: { DIGITAL_CONTROL: 'Digital check-up', DOCTOR_VISIT: 'Doctor visit', NO_ACTION: 'No action' },
-}
-const SEVERITY_LABELS: Record<string, Record<string, string>> = {
-  sv: { HIGH: 'Hög', MEDIUM: 'Medel', LOW: 'Låg' },
-  en: { HIGH: 'High', MEDIUM: 'Medium', LOW: 'Low' },
+function categoryLabel(category: string, lang: string): string {
+  switch (category) {
+    case 'ACUTE':
+      return t('category.ACUTE', lang)
+    case 'SUBACUTE':
+      return t('category.SUBACUTE', lang)
+    case 'CONTROL':
+      return t('category.CONTROL', lang)
+    default:
+      return category
+  }
 }
 
-function tr(map: Record<string, Record<string, string>>, lang: string, key: string): string {
-  return (map[lang] ?? map['sv'])[key] ?? key
+function severityLabel(severity: string, lang: string): string {
+  switch (severity) {
+    case 'LOW':
+      return t('severity.LOW', lang)
+    case 'MEDIUM':
+      return t('severity.MEDIUM', lang)
+    case 'HIGH':
+      return t('severity.HIGH', lang)
+    default:
+      return severity
+  }
+}
+
+function statusLabel(status: string, lang: string): string {
+  switch (status) {
+    case 'NEW':
+      return t('status.NEW', lang)
+    case 'NEEDS_REVIEW':
+      return t('status.NEEDS_REVIEW', lang)
+    case 'TRIAGED':
+      return t('status.TRIAGED', lang)
+    case 'FOLLOWING_UP':
+      return t('status.FOLLOWING_UP', lang)
+    case 'CLOSED':
+      return t('status.CLOSED', lang)
+    default:
+      return status
+  }
+}
+
+function nextStepLabel(step: string, lang: string): string {
+  switch (step) {
+    case 'DIGITAL_CONTROL':
+      return t('nextStep.DIGITAL_CONTROL', lang)
+    case 'DOCTOR_VISIT':
+      return t('nextStep.DOCTOR_VISIT', lang)
+    case 'NURSE_VISIT':
+      return t('nextStep.NURSE_VISIT', lang)
+    case 'PHYSIO_VISIT':
+      return t('nextStep.PHYSIO_VISIT', lang)
+    case 'PHONE_CALL':
+      return t('nextStep.PHONE_CALL', lang)
+    case 'NO_ACTION':
+      return t('nextStep.NO_ACTION', lang)
+    default:
+      return step
+  }
 }
 
 // Whitelisted static token paths (backward compat)
@@ -108,8 +150,8 @@ function buildScope(ctx: TemplateContext): Record<string, string> {
   const staticScope: Record<string, string> = {
     'patient.displayName': patient.displayName,
     'patient.dateOfBirth': patient.dateOfBirth,
-    'case.category': tr(CATEGORY_LABELS, language, caseData.category),
-    'case.status': caseData.status,
+    'case.category': categoryLabel(caseData.category, language),
+    'case.status': statusLabel(caseData.status, language),
     'scores.PNRS_1': getScore('PNRS_1'),
     'scores.PNRS_2': getScore('PNRS_2'),
     'scores.PNRS_NIGHT': getScore('PNRS_NIGHT'),
@@ -118,14 +160,12 @@ function buildScope(ctx: TemplateContext): Record<string, string> {
     'scores.EQ_VAS': getScore('EQ_VAS'),
     'policyWarnings.list':
       warnings.length > 0
-        ? warnings
-            .map((w) => `${w.ruleName} (${tr(SEVERITY_LABELS, language, w.severity)})`)
-            .join(', ')
+        ? warnings.map((w) => `${w.ruleName} (${severityLabel(w.severity, language)})`).join(', ')
         : language === 'en'
           ? 'None'
           : 'Inga',
     'triage.nextStep': caseData.nextStep
-      ? tr(NEXT_STEP_LABELS, language, caseData.nextStep as string)
+      ? nextStepLabel(caseData.nextStep as string, language)
       : language === 'en'
         ? 'Not set'
         : 'Ej satt',

@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import React from 'react'
 import { beforeEach, describe, expect, it } from 'vitest'
 
-import { useExpandedCategories, EXPANDED_STORAGE_KEY } from '@/hooks/useExpandedCategories'
+import { EXPANDED_STORAGE_KEY,useExpandedCategories } from '@/hooks/useExpandedCategories'
 
 function TestComp() {
   const { expanded, toggleExpanded } = useExpandedCategories()

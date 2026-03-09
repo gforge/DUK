@@ -98,3 +98,26 @@ export function useAssignmentModeHelpLabel() {
     }
   }
 }
+
+/**
+ * Returns the title text for step 2 of the triage form depending on the contact
+ * mode.  We keep a hook so that each literal key is visible to the i18n extractor
+ * (vs. building the key dynamically from a map object).
+ */
+export function useStep2TitleLabel() {
+  const { t } = useTranslation()
+  return (mode: ContactMode): string => {
+    switch (mode) {
+      case 'DIGITAL':
+        return t('triage.step2TitleByMode.DIGITAL')
+      case 'PHONE':
+        return t('triage.step2TitleByMode.PHONE')
+      case 'VISIT':
+        return t('triage.step2TitleByMode.VISIT')
+      case 'CLOSE':
+        return t('triage.step2TitleByMode.CLOSE')
+      default:
+        return assertNever(mode)
+    }
+  }
+}

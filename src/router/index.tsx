@@ -1,6 +1,6 @@
-import { Box,CircularProgress } from '@mui/material'
-import React, { lazy,Suspense } from 'react'
-import { HashRouter, Navigate,Route, Routes } from 'react-router-dom'
+import { Box, CircularProgress } from '@mui/material'
+import React, { lazy, Suspense } from 'react'
+import { HashRouter, Navigate, Route, Routes } from 'react-router-dom'
 
 import AppShell from '@/components/layout/AppShell'
 
@@ -34,6 +34,7 @@ export function AppRouter() {
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/cases/:id" element={<CaseDetail />} />
+            <Route path="/cases/:id/:triageMode" element={<CaseDetail />} />
             <Route path="/patient" element={<PatientView />} />
             <Route path="/patients" element={<Patients />} />
             <Route path="/patients/:id" element={<PatientDetail />} />

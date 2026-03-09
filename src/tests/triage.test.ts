@@ -36,6 +36,46 @@ describe('triageCase', () => {
     expect(result.patientMessage).toBe('Test msg')
   })
 
+  it('blocks triage when pending reviews exist and allows once completed', () => {
+    // pick a NEEDS_REVIEW case and create a pending review
+    const reviewCase = SEED_STATE.cases.find((c) => c.status === 'NEEDS_REVIEW')
+    if (!reviewCase) throw new Error('No NEEDS_REVIEW case in seed data')
+
+    const newReview = service.createReview(reviewCase.id, 'LAB', 'user-doc-1', 'DOCTOR')
+    expect(service.getPendingReviews(reviewCase.id)).toHaveLength(1)
+
+    expect(() =>
+      service.triageCase(
+        reviewCase.id,
+        {
+          triageDecision: {
+            contactMode: 'PHONE',
+            careRole: 'NURSE',
+            assignmentMode: 'ANY',
+          },
+        },
+        'user-doc-1',
+        'DOCTOR',
+      ),
+    ).toThrow(/pending/i)
+
+    // complete the review then triage should succeed
+    service.completeReview(newReview.id, reviewCase.id, 'user-doc-1', 'DOCTOR', 'OK')
+    const result2 = service.triageCase(
+      reviewCase.id,
+      {
+        triageDecision: {
+          contactMode: 'PHONE',
+          careRole: 'NURSE',
+          assignmentMode: 'ANY',
+        },
+      },
+      'user-doc-1',
+      'DOCTOR',
+    )
+    expect(result2.status).toBe('TRIAGED')
+  })
+
   it('sets status to CLOSED when closeImmediately is true', () => {
     const triagedCase = SEED_STATE.cases.find((c) => c.status === 'TRIAGED')
     if (!triagedCase) throw new Error('No TRIAGED case in seed data')

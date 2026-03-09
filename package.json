@@ -14,7 +14,7 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint src --max-warnings 0 --fix",
     "format": "prettier --write src",
-    "generate:i18n": "i18next-cli extract --quiet && i18next-cli types",
+    "generate:i18n": "i18next-cli extract && i18next-cli types",
     "ncu": "ncu",
     "diagrams": "npm run diagrams:clean && npm run diagrams:render",
     "diagrams:render": "docker run --rm --user \"$(id -u):$(id -g)\" -v \"$PWD\":/workspace plantuml/plantuml -tsvg /workspace/docs/diagrams",

@@ -1,6 +1,7 @@
 import type { Case, CaseCategory, CaseStatus, Role, TriageInput } from '../schemas'
 import { getStore, setStore } from '../storage'
 import { getEffectiveSteps } from './journeyResolver'
+import { getPendingReviews } from './reviews'
 import { assignmentModeToAssignedRole, triageDecisionToNextStep } from './triageDecision'
 import { addAuditEvent, now } from './utils'
 
@@ -64,6 +65,13 @@ export function triageCase(
   if (!existing) throw new Error(`Case ${caseId} not found`)
 
   const nextStatus: CaseStatus = input.triageDecision.contactMode === 'CLOSE' ? 'CLOSED' : 'TRIAGED'
+
+  // Prevent triage when there are any unreviewed lab/xray results
+  const pending = getPendingReviews(caseId)
+  if (pending.length > 0) {
+    throw new Error('Cannot triage while clinical reviews are pending')
+  }
+
   if (!VALID_TRANSITIONS[existing.status]?.includes(nextStatus))
     throw new Error(`Invalid transition: ${existing.status} → ${nextStatus}`)
 

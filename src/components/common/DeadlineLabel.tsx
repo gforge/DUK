@@ -6,12 +6,13 @@ import { getDeadlineInfo } from '@/utils/deadline'
 
 interface Props {
   deadline: string
+  tone?: 'default' | 'queue'
 }
 
 /**
  * Renders a deadline as "14 mar 2026 · om 5 dagar" (or "Försenad 2 dagar" in red).
  */
-export default function DeadlineLabel({ deadline }: Props) {
+export default function DeadlineLabel({ deadline, tone = 'default' }: Props) {
   const { t } = useTranslation()
   const { dateLabel, days, isOverdue } = getDeadlineInfo(deadline)
 
@@ -28,12 +29,20 @@ export default function DeadlineLabel({ deadline }: Props) {
     relativeLabel = t('deadline.inMonths', { count: Math.floor(days / 30) })
   }
 
+  const isSoon = !isOverdue && days <= 3
+  const color =
+    tone === 'queue'
+      ? isOverdue
+        ? 'error.main'
+        : isSoon
+          ? 'warning.main'
+          : 'text.primary'
+      : isOverdue
+        ? 'error.main'
+        : 'warning.dark'
+
   return (
-    <Typography
-      component="span"
-      variant="caption"
-      sx={{ color: isOverdue ? 'error.main' : 'warning.dark' }}
-    >
+    <Typography component="span" variant="caption" sx={{ color }}>
       ⏱ {dateLabel} · {relativeLabel}
     </Typography>
   )

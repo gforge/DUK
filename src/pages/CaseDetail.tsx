@@ -4,7 +4,6 @@ import {
   Badge,
   Box,
   Breadcrumbs,
-  Button,
   Chip,
   Link,
   Paper,
@@ -28,6 +27,7 @@ import {
   PatientCard,
   TriageTab,
 } from '@/components/case'
+import { routeSegmentToContactMode } from '@/components/case/triage/routeContactMode'
 import { AutoWarningsBadge, StatusChip } from '@/components/common'
 import { useApi } from '@/hooks/useApi'
 import { useHotkeys } from '@/hooks/useHotkeys'
@@ -54,11 +54,13 @@ function TabPanel({ children, value, index }: TabPanelProps) {
 }
 
 export default function CaseDetail() {
-  const { id } = useParams<{ id: string }>()
+  const { id, triageMode } = useParams<{ id: string; triageMode?: string }>()
   const navigate = useNavigate()
   const { t } = useTranslation()
   const [activeTab, setActiveTab] = useState(0)
   const didAutoSelectTab = useRef(false)
+  const routeContactMode = routeSegmentToContactMode(triageMode)
+  const tabValue = routeContactMode ? 2 : activeTab
 
   const {
     data: caseData,
@@ -80,6 +82,12 @@ export default function CaseDetail() {
       }
     }
   }, [caseData])
+
+  useEffect(() => {
+    if (triageMode && !routeContactMode && id) {
+      navigate(`/cases/${id}`, { replace: true })
+    }
+  }, [triageMode, routeContactMode, navigate, id])
 
   useHotkeys(
     useMemo(
@@ -166,8 +174,13 @@ export default function CaseDetail() {
       {/* Tabs */}
       <Paper variant="outlined" sx={{ mt: 2, borderRadius: 2 }}>
         <Tabs
-          value={activeTab}
-          onChange={(_, v) => setActiveTab(v)}
+          value={tabValue}
+          onChange={(_, v) => {
+            setActiveTab(v)
+            if (v !== 2 && id && triageMode) {
+              navigate(`/cases/${id}`, { replace: true })
+            }
+          }}
           aria-label="case detail tabs"
           variant="scrollable"
           scrollButtons="auto"
@@ -194,19 +207,23 @@ export default function CaseDetail() {
         </Tabs>
 
         <Box sx={{ p: 2 }}>
-          <TabPanel value={activeTab} index={0}>
+          <TabPanel value={tabValue} index={0}>
             <FormResponsesTab caseId={caseData.id} />
           </TabPanel>
 
-          <TabPanel value={activeTab} index={1}>
+          <TabPanel value={tabValue} index={1}>
             <JourneyTab caseData={caseData} />
           </TabPanel>
 
-          <TabPanel value={activeTab} index={2}>
-            <TriageTab caseData={caseData} onTriaged={refetchCase} />
+          <TabPanel value={tabValue} index={2}>
+            <TriageTab
+              caseData={caseData}
+              onTriaged={refetchCase}
+              routeContactMode={routeContactMode}
+            />
           </TabPanel>
 
-          <TabPanel value={activeTab} index={3}>
+          <TabPanel value={tabValue} index={3}>
             <JournalTab
               caseData={caseData}
               patient={patient ?? undefined}
@@ -214,18 +231,11 @@ export default function CaseDetail() {
             />
           </TabPanel>
 
-          <TabPanel value={activeTab} index={4}>
+          <TabPanel value={tabValue} index={4}>
             <AuditLogTab caseId={caseData.id} />
           </TabPanel>
         </Box>
       </Paper>
-
-      {/* Back button */}
-      <Box sx={{ mt: 2 }}>
-        <Button startIcon={<ArrowBackIcon />} onClick={handleBackButton} variant="outlined">
-          {t('common.back')}
-        </Button>
-      </Box>
     </Box>
   )
 }
