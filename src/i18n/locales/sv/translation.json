@@ -717,6 +717,7 @@
     "descriptionPlaceholderXRAY": "t.ex. DT fotled, handled, axel",
     "expectedAtThisStep": "Förväntad granskning vid detta steg — klicka för att lägga till",
     "journeyStep": "Vårdplan steg: {{label}}",
+    "marked": "Bekräfta",
     "markReviewed": "Markera granskat",
     "notAvailableHere": "Ej tillgänglig i denna vy",
     "note": "Notering",

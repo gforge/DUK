@@ -122,7 +122,7 @@ export function CompleteReviewDialog({
           variant="contained"
           disabled={loading || (outcome !== 'OK' && !note.trim())}
         >
-          {loading ? <CircularProgress size={24} /> : (t as any)('review.marked')}
+          {loading ? <CircularProgress size={24} /> : t('review.marked')}
         </Button>
       </DialogActions>
     </Dialog>

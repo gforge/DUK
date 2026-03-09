@@ -717,6 +717,7 @@
     "descriptionPlaceholderXRAY": "e.g. CT ankle, wrist, shoulder",
     "expectedAtThisStep": "Expected review at this step — click to add",
     "journeyStep": "Care plan step: {{label}}",
+    "marked": "Confirmed",
     "markReviewed": "Mark as reviewed",
     "notAvailableHere": "Not available in this view",
     "note": "Note",
