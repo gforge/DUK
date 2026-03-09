@@ -7,6 +7,7 @@ import * as client from '@/api/client'
 import type { CaseCategory, Patient } from '@/api/schemas'
 import type { SortMode } from '@/components/dashboard'
 import { DashboardToolbar, QueueColumn, sortCases } from '@/components/dashboard'
+import { useExpandedCategories } from '@/hooks/useExpandedCategories'
 import { useApi } from '@/hooks/useApi'
 import { useFocusRestore } from '@/hooks/useFocusRestore'
 import { useHotkeys } from '@/hooks/useHotkeys'
@@ -25,16 +26,9 @@ export default function Dashboard() {
   const [palFilter, setPalFilter] = useState<PalFilter>('all')
   const [showWaiting, setShowWaiting] = useState(false)
   const [sortMode, setSortMode] = useState<SortMode>('time')
-  const [expanded, setExpanded] = useState<Set<CaseCategory>>(new Set())
 
-  const toggleExpanded = useCallback((cat: CaseCategory) => {
-    setExpanded((prev) => {
-      const next = new Set(prev)
-      if (next.has(cat)) next.delete(cat)
-      else next.add(cat)
-      return next
-    })
-  }, [])
+  // manage persistent accordion state via custom hook
+  const { expanded, toggleExpanded } = useExpandedCategories()
 
   useEffect(() => {
     restore()
