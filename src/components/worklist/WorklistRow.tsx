@@ -1,123 +1,138 @@
 import AssignmentIndIcon from '@mui/icons-material/AssignmentInd'
-import CalendarMonthIcon from '@mui/icons-material/CalendarMonth'
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
-import ContentCopyIcon from '@mui/icons-material/ContentCopy'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
-import PlayArrowIcon from '@mui/icons-material/PlayArrow'
-import {
-  alpha,
-  Box,
-  Button,
-  Chip,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  IconButton,
-  Stack,
-  TextField,
-  Tooltip,
-  Typography,
-} from '@mui/material'
+import { Box, Button, Chip, IconButton, Stack, Tooltip, Typography } from '@mui/material'
+import { alpha } from '@mui/material/styles'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 
 import type { Case, Patient } from '@/api/schemas'
-import { formatPersonnummer } from '@/api/utils/personnummer'
-import { DeadlineLabel, StatusChip } from '@/components/common'
-import { useAssignmentModeLabel, useCareRoleLabel, useRoleLabel } from '@/hooks/labels'
+import { CareRoleIcon, DeadlineLabel, StatusChip } from '@/components/common'
+import { useAssignmentModeLabel, useCareRoleLabel } from '@/hooks/labels'
+
+import CompletionDialog from './CompletionDialog'
 
 interface WorklistRowProps {
   caseData: Case
   patient: Patient | undefined
+  assignedUserName?: string
   highlighted?: boolean
-  onBook: (caseId: string, scheduledAt?: string) => void
   onClaim: (caseId: string) => void
-  onMarkInProgress: (caseId: string) => void
-  onMarkDone: (caseId: string) => void
+  onMarkDone: (
+    caseId: string,
+    options?: {
+      bookingId?: string
+      followUpDate?: string
+      completionComment?: string
+    },
+  ) => Promise<void> | void
 }
 
 export default function WorklistRow({
   caseData,
   patient,
+  assignedUserName,
   highlighted = false,
-  onBook,
   onClaim,
-  onMarkInProgress,
   onMarkDone,
 }: WorklistRowProps) {
   const { t } = useTranslation()
-  const getRoleLabel = useRoleLabel()
   const getCareRoleLabel = useCareRoleLabel()
   const getAssignmentModeLabel = useAssignmentModeLabel()
   const navigate = useNavigate()
-  const [dialogOpen, setDialogOpen] = React.useState(false)
-  const [scheduledAt, setScheduledAt] = React.useState('')
-  const [copied, setCopied] = React.useState(false)
+  const [completionDialogOpen, setCompletionDialogOpen] = React.useState(false)
+  const [followUpDate, setFollowUpDate] = React.useState<Date | null>(null)
+  const [completionComment, setCompletionComment] = React.useState('')
+  const [isCompleting, setIsCompleting] = React.useState(false)
 
-  const contactMode = caseData.triageDecision?.contactMode
-  const isBookable = contactMode === 'VISIT' || contactMode === 'PHONE'
   const isTriaged = caseData.status === 'TRIAGED'
   const isFollowingUp = caseData.status === 'FOLLOWING_UP'
+  const careRole = caseData.triageDecision?.careRole
 
-  function handleCopyPnr() {
-    if (patient?.personalNumber) {
-      navigator.clipboard.writeText(patient.personalNumber)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
-    }
-  }
+  const completionBooking = React.useMemo(() => {
+    const bookings = [...(caseData.bookings ?? [])].reverse()
+    return (
+      bookings.find((booking) => booking.status === 'SCHEDULED') ??
+      bookings.find((booking) => booking.status === 'PENDING') ??
+      bookings.find((booking) => booking.status !== 'CANCELLED')
+    )
+  }, [caseData.bookings])
 
-  function handleConfirmBooking() {
-    const iso = scheduledAt ? new Date(scheduledAt).toISOString() : undefined
-    onBook(caseData.id, iso)
-    setDialogOpen(false)
-    setScheduledAt('')
+  function handleDone() {
+    setIsCompleting(true)
+    setTimeout(() => {
+      void onMarkDone(caseData.id, {
+        bookingId: completionBooking?.id,
+        followUpDate: followUpDate ? followUpDate.toISOString() : undefined,
+        completionComment: completionComment.trim() ? completionComment.trim() : undefined,
+      })
+      setCompletionDialogOpen(false)
+      setFollowUpDate(null)
+      setCompletionComment('')
+    }, 220)
   }
 
   return (
     <Box
       sx={{
         px: 2,
-        py: 0.75,
+        py: 0.875,
         display: 'grid',
         gridTemplateColumns: { xs: '1fr', sm: '2fr 1.5fr 1fr auto' },
         gap: 0.75,
         alignItems: 'center',
-        bgcolor: highlighted ? alpha('#42a5f5', 0.12) : 'transparent',
-        transition: 'background-color 280ms ease-in-out',
-        '&:hover': { bgcolor: highlighted ? alpha('#42a5f5', 0.16) : 'action.hover' },
+        borderLeft: (theme) =>
+          highlighted
+            ? `2px solid ${alpha(theme.palette.primary.main, 0.4)}`
+            : '2px solid transparent',
+        transition:
+          'background-color 220ms ease-in-out, transform 220ms ease-in, opacity 220ms ease-in',
+        transform: isCompleting ? 'translateX(16px)' : 'translateX(0)',
+        opacity: isCompleting ? 0.12 : 1,
+        '&:hover': {
+          bgcolor: (theme) =>
+            highlighted ? alpha(theme.palette.primary.main, 0.03) : theme.palette.action.hover,
+        },
       }}
     >
       {/* Patient + status */}
-      <Stack gap={0.125}>
-        <Typography variant="body2" fontWeight={600}>
+      <Stack gap={0.25}>
+        <Typography variant="subtitle2" fontWeight={600} color="text.primary">
           {patient?.displayName ?? caseData.patientId}
         </Typography>
         <Stack direction="row" gap={0.5} alignItems="center" flexWrap="wrap">
           {caseData.status !== 'TRIAGED' && <StatusChip status={caseData.status} size="small" />}
-          {caseData.assignedRole && (
+          {careRole && (
             <Chip
-              label={getRoleLabel(caseData.assignedRole)}
+              icon={<CareRoleIcon role={careRole} />}
+              label={getCareRoleLabel(careRole)}
               size="small"
-              variant="outlined"
-              sx={{ height: 18, fontSize: 11 }}
-            />
-          )}
-          {caseData.triageDecision?.careRole && (
-            <Chip
-              label={getCareRoleLabel(caseData.triageDecision.careRole)}
-              size="small"
-              sx={{ height: 18, fontSize: 11 }}
+              sx={{ height: 18, fontSize: 11, color: 'text.secondary' }}
             />
           )}
           {caseData.triageDecision?.assignmentMode && (
+            <Tooltip
+              title={
+                caseData.triageDecision.assignmentMode === 'ANY'
+                  ? t('worklist.assignmentModeAnyTooltip', { defaultValue: 'Vem som helst' })
+                  : ''
+              }
+            >
+              <Chip
+                label={getAssignmentModeLabel(caseData.triageDecision.assignmentMode)}
+                size="small"
+                variant="outlined"
+                sx={{ height: 18, fontSize: 11, color: 'text.secondary' }}
+              />
+            </Tooltip>
+          )}
+          {assignedUserName && (
             <Chip
-              label={getAssignmentModeLabel(caseData.triageDecision.assignmentMode)}
+              label={`${t('case.assignedTo')}: ${assignedUserName}`}
               size="small"
               variant="outlined"
-              sx={{ height: 18, fontSize: 11 }}
+              sx={{ height: 18, fontSize: 11, color: 'text.secondary' }}
             />
           )}
         </Stack>
@@ -155,42 +170,17 @@ export default function WorklistRow({
       {/* Actions */}
       <Stack direction="row" gap={0.5} justifyContent="flex-end" alignItems="center">
         {/* Primary actions */}
-        {isTriaged && isBookable && (
+        {(isTriaged || isFollowingUp) && (
           <Button
             size="small"
             variant="contained"
-            startIcon={<CalendarMonthIcon />}
-            onClick={() => setDialogOpen(true)}
-            sx={{ fontSize: 12, whiteSpace: 'nowrap', fontWeight: 700 }}
-          >
-            {t('worklist.book')}
-          </Button>
-        )}
-
-        {/* TRIAGED + non-bookable (DIGITAL) → Påbörja → FOLLOWING_UP */}
-        {isTriaged && !isBookable && (
-          <Button
-            size="small"
-            variant="contained"
-            startIcon={<PlayArrowIcon />}
-            onClick={() => onMarkInProgress(caseData.id)}
-            sx={{ fontSize: 12, whiteSpace: 'nowrap', fontWeight: 800, textTransform: 'uppercase' }}
-          >
-            {t('worklist.markInProgress')}
-          </Button>
-        )}
-
-        {/* FOLLOWING_UP → Avklarad → CLOSED */}
-        {isFollowingUp && (
-          <Button
-            size="small"
-            variant="contained"
-            color="success"
+            color="primary"
             startIcon={<CheckCircleOutlineIcon />}
-            onClick={() => onMarkDone(caseData.id)}
+            onClick={() => setCompletionDialogOpen(true)}
+            disabled={isCompleting}
             sx={{ fontSize: 12, whiteSpace: 'nowrap', fontWeight: 700 }}
           >
-            {t('worklist.markDone')}
+            {t('worklist.initiate')}
           </Button>
         )}
 
@@ -215,50 +205,18 @@ export default function WorklistRow({
         </Tooltip>
       </Stack>
 
-      {/* Booking dialog */}
-      <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="xs" fullWidth>
-        <DialogTitle>
-          {t('worklist.bookDialogTitle', { name: patient?.displayName ?? caseData.patientId })}
-        </DialogTitle>
-        <DialogContent>
-          <Stack gap={2} sx={{ pt: 1 }}>
-            {patient?.personalNumber && (
-              <Stack direction="row" alignItems="center" gap={1}>
-                <Typography variant="body2" color="text.secondary" sx={{ minWidth: 110 }}>
-                  {t('worklist.pnr')}
-                </Typography>
-                <Typography variant="body2" fontWeight={600} sx={{ fontFamily: 'monospace' }}>
-                  {formatPersonnummer(patient.personalNumber)}
-                </Typography>
-                <Tooltip title={copied ? t('worklist.copiedPnr') : t('worklist.copyPnr')}>
-                  <IconButton size="small" onClick={handleCopyPnr}>
-                    <ContentCopyIcon fontSize="small" color={copied ? 'success' : 'inherit'} />
-                  </IconButton>
-                </Tooltip>
-              </Stack>
-            )}
-            {caseData.internalNote && (
-              <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
-                {caseData.internalNote}
-              </Typography>
-            )}
-            <TextField
-              label={t('worklist.scheduledAt')}
-              type="datetime-local"
-              size="small"
-              value={scheduledAt}
-              onChange={(e) => setScheduledAt(e.target.value)}
-              slotProps={{ inputLabel: { shrink: true } }}
-            />
-          </Stack>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDialogOpen(false)}>{t('common.cancel')}</Button>
-          <Button variant="contained" onClick={handleConfirmBooking}>
-            {t('worklist.confirmBooking')}
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <CompletionDialog
+        open={completionDialogOpen}
+        patientLabel={patient?.displayName ?? caseData.patientId}
+        personalNumber={patient?.personalNumber ?? null}
+        followUpDate={followUpDate}
+        completionComment={completionComment}
+        isCompleting={isCompleting}
+        onClose={() => setCompletionDialogOpen(false)}
+        onFollowUpDateChange={setFollowUpDate}
+        onCompletionCommentChange={setCompletionComment}
+        onConfirm={handleDone}
+      />
     </Box>
   )
 }

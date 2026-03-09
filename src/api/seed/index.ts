@@ -1,4 +1,4 @@
-import type { AppState } from '../schemas'
+import type { AppState, Case, TriageDecision } from '../schemas'
 import { CURRENT_SCHEMA_VERSION } from '../schemaVersion'
 import { ensureAllUsers } from '../utils/userGenerator'
 import { auditEvents } from './auditEvents'
@@ -97,8 +97,52 @@ function inferSeedAnchorDate(state: AppState): Date {
 }
 
 function buildBaseMinimalSeed(): AppState {
+  const deriveDecision = (c: Case): TriageDecision | undefined => {
+    if (c.triageDecision) return c.triageDecision
+
+    if (c.nextStep === 'NO_ACTION') {
+      return {
+        contactMode: 'CLOSE',
+        careRole: null,
+        assignmentMode: null,
+        assignedUserId: null,
+        dueAt: c.deadline ?? null,
+        note: c.internalNote ?? null,
+      }
+    }
+
+    const fromNextStep: Record<
+      Exclude<Case['nextStep'], undefined | 'NO_ACTION'>,
+      { contactMode: 'VISIT' | 'PHONE' | 'DIGITAL'; careRole: 'DOCTOR' | 'NURSE' | 'PHYSIO' }
+    > = {
+      DOCTOR_VISIT: { contactMode: 'VISIT', careRole: 'DOCTOR' },
+      NURSE_VISIT: { contactMode: 'VISIT', careRole: 'NURSE' },
+      PHYSIO_VISIT: { contactMode: 'VISIT', careRole: 'PHYSIO' },
+      PHONE_CALL: { contactMode: 'PHONE', careRole: 'NURSE' },
+      DIGITAL_CONTROL: { contactMode: 'DIGITAL', careRole: 'NURSE' },
+    }
+
+    if (!c.nextStep || !(c.nextStep in fromNextStep)) return undefined
+
+    const mapped = fromNextStep[c.nextStep]
+    return {
+      contactMode: mapped.contactMode,
+      careRole: mapped.careRole,
+      assignmentMode: 'ANY',
+      assignedUserId: null,
+      dueAt: c.deadline ?? null,
+      note: c.internalNote ?? null,
+    }
+  }
+
+  const patchedCases = baseSeedState.cases.map((c) => {
+    const shouldStampDecision = c.status === 'TRIAGED' || c.status === 'FOLLOWING_UP'
+    return shouldStampDecision ? { ...c, triageDecision: deriveDecision(c) ?? c.triageDecision } : c
+  })
+
   return {
     ...baseSeedState,
+    cases: patchedCases,
     users: ensureAllUsers(baseSeedState),
   }
 }

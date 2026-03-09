@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { I18nextProvider } from 'react-i18next'
 import { beforeEach, describe, expect, it } from 'vitest'
 
@@ -20,9 +20,11 @@ function Wrapper({ careRole }: { careRole: CareRole }) {
 }
 
 function InnerWrapper({ careRole }: { careRole: CareRole }) {
-  const { control, setValue, watch } = useForm<TriageForm>({
+  const { control, setValue } = useForm<TriageForm>({
     defaultValues: { assignmentMode: 'ANY', assignedUserId: 'foo' },
   })
+  const assignmentMode = useWatch({ control, name: 'assignmentMode' })
+  const assignedUserId = useWatch({ control, name: 'assignedUserId' })
 
   return (
     <>
@@ -32,8 +34,8 @@ function InnerWrapper({ careRole }: { careRole: CareRole }) {
         careRole={careRole}
         setValue={setValue}
       />
-      <div data-testid="mode">{watch('assignmentMode') ?? ''}</div>
-      <div data-testid="user">{watch('assignedUserId') ?? ''}</div>
+      <div data-testid="mode">{assignmentMode ?? ''}</div>
+      <div data-testid="user">{assignedUserId ?? ''}</div>
     </>
   )
 }

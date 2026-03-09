@@ -1,6 +1,3 @@
-import AccessibilityNewIcon from '@mui/icons-material/AccessibilityNew'
-import MedicalServicesIcon from '@mui/icons-material/MedicalServices'
-import VaccinesIcon from '@mui/icons-material/Vaccines'
 import {
   FormControl,
   FormHelperText,
@@ -15,6 +12,7 @@ import { Controller } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
 import type { AssignmentMode, CareRole } from '@/api/schemas'
+import { CareRoleIcon } from '@/components/common'
 
 import type { TriageForm } from '../schema'
 
@@ -23,12 +21,6 @@ interface Props {
   error?: FieldError
   assignmentMode: AssignmentMode
   setValue: UseFormSetValue<TriageForm>
-}
-
-const CARE_ROLE_ICONS: Record<Exclude<CareRole, null>, React.ReactNode> = {
-  DOCTOR: <MedicalServicesIcon fontSize="small" />,
-  NURSE: <VaccinesIcon fontSize="small" />,
-  PHYSIO: <AccessibilityNewIcon fontSize="small" />,
 }
 
 export function CareRoleField({ control, error, assignmentMode, setValue }: Props) {
@@ -73,21 +65,21 @@ export function CareRoleField({ control, error, assignmentMode, setValue }: Prop
           >
             <ToggleButton value="DOCTOR" aria-label={t('triage.careRoleOption.DOCTOR')}>
               <Stack direction="row" alignItems="center" gap={0.75}>
-                {CARE_ROLE_ICONS.DOCTOR}
+                <CareRoleIcon role="DOCTOR" />
                 <span>{t('triage.careRoleOption.DOCTOR')}</span>
               </Stack>
             </ToggleButton>
 
             <ToggleButton value="NURSE" aria-label={t('triage.careRoleOption.NURSE')}>
               <Stack direction="row" alignItems="center" gap={0.75}>
-                {CARE_ROLE_ICONS.NURSE}
+                <CareRoleIcon role="NURSE" />
                 <span>{t('triage.careRoleOption.NURSE')}</span>
               </Stack>
             </ToggleButton>
 
             <ToggleButton value="PHYSIO" aria-label={t('triage.careRoleOption.PHYSIO')}>
               <Stack direction="row" alignItems="center" gap={0.75}>
-                {CARE_ROLE_ICONS.PHYSIO}
+                <CareRoleIcon role="PHYSIO" />
                 <span>{t('triage.careRoleOption.PHYSIO')}</span>
               </Stack>
             </ToggleButton>

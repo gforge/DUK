@@ -4,14 +4,18 @@ import { useTranslation } from 'react-i18next'
 
 interface WorklistHeaderProps {
   activeCount: number
+  monitoringCount: number
   completedCount: number
   pulseCount: boolean
+  pulseCompletedCount: boolean
 }
 
 export default function WorklistHeader({
   activeCount,
+  monitoringCount,
   completedCount,
   pulseCount,
+  pulseCompletedCount,
 }: WorklistHeaderProps) {
   const { t } = useTranslation()
 
@@ -44,7 +48,20 @@ export default function WorklistHeader({
           size="small"
           color="primary"
         />
-        <Chip label={`${t('worklist.completedLabel')} (${completedCount})`} size="small" />
+        {monitoringCount > 0 && (
+          <Chip label={`${t('worklist.monitoringLabel')} (${monitoringCount})`} size="small" />
+        )}
+        <Chip
+          label={`${t('worklist.completedLabel')} (${completedCount})`}
+          size="small"
+          sx={
+            pulseCompletedCount
+              ? {
+                  animation: 'worklistPulse 0.5s ease-in-out',
+                }
+              : undefined
+          }
+        />
       </Stack>
       <Typography variant="body2" color="text.secondary" mb={2}>
         {t('worklist.subtitle')}

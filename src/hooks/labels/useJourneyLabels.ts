@@ -2,8 +2,10 @@ import { useTranslation } from 'react-i18next'
 
 import type {
   EpisodeOfCareStatus,
+  JourneyModificationType,
   PatientJourneyStatus,
   PhaseType,
+  QuestionType,
   TransitionTriggerType,
 } from '@/api/schemas'
 
@@ -119,6 +121,44 @@ export function useEpisodeStatusLabel() {
         return t('episode.status.DISCHARGED')
       default:
         return assertNever(status)
+    }
+  }
+}
+
+/** Returns a label function for JourneyModificationType. */
+export function useJourneyModificationTypeLabel() {
+  const { t } = useTranslation()
+  return (type: JourneyModificationType): string => {
+    switch (type) {
+      case 'ADD_STEP':
+        return t('journey.modType.ADD_STEP')
+      case 'REMOVE_STEP':
+        return t('journey.modType.REMOVE_STEP')
+      case 'CANCEL':
+        return t('journey.modType.CANCEL')
+      default:
+        return assertNever(type)
+    }
+  }
+}
+
+/** Returns a label function for questionnaire QuestionType. */
+export function useQuestionTypeLabel() {
+  const { t } = useTranslation()
+  return (type: QuestionType): string => {
+    switch (type) {
+      case 'SCALE':
+        return t('questionType.SCALE')
+      case 'BOOLEAN':
+        return t('questionType.BOOLEAN')
+      case 'TEXT':
+        return t('questionType.TEXT')
+      case 'SELECT':
+        return t('questionType.SELECT')
+      case 'NUMBER':
+        return t('questionType.NUMBER')
+      default:
+        return assertNever(type)
     }
   }
 }

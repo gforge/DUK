@@ -19,7 +19,7 @@ describe('worklist queue role filtering', () => {
     expect(resolveCaseCareRole(caseData)).toBe('NURSE')
   })
 
-  it('uses assignedRole fallback for legacy phone cases', () => {
+  it('does not infer care role from assignedRole for legacy phone cases', () => {
     const base = SEED_STATE.cases[0]
     const caseData: Case = {
       ...base,
@@ -29,7 +29,7 @@ describe('worklist queue role filtering', () => {
       assignedRole: 'PAL',
     }
 
-    expect(resolveCaseCareRole(caseData)).toBe('DOCTOR')
+    expect(resolveCaseCareRole(caseData)).toBeNull()
   })
 
   it('keeps nurse-filtered queue from becoming empty when legacy cases exist', () => {
@@ -62,6 +62,82 @@ describe('worklist queue role filtering', () => {
     expect(result.current.activeCount).toBe(1)
     expect(
       result.current.activeGroupedCases.some((g) => g.cases.some((c) => c.id === nurseLegacy.id)),
+    ).toBe(true)
+  })
+
+  it('splits active cases into actionable and monitoring buckets', () => {
+    const base = SEED_STATE.cases[0]
+    const mine: Case = {
+      ...base,
+      id: 'active-mine',
+      status: 'TRIAGED',
+      nextStep: 'NURSE_VISIT',
+      triageDecision: {
+        contactMode: 'VISIT',
+        careRole: 'NURSE',
+        assignmentMode: 'NAMED',
+        assignedUserId: 'user-nurse-1',
+        dueAt: null,
+        note: null,
+      },
+      assignedUserId: 'user-nurse-1',
+    }
+    const unclaimed: Case = {
+      ...base,
+      id: 'active-unclaimed',
+      status: 'TRIAGED',
+      nextStep: 'NURSE_VISIT',
+      triageDecision: {
+        contactMode: 'VISIT',
+        careRole: 'NURSE',
+        assignmentMode: 'ANY',
+        assignedUserId: null,
+        dueAt: null,
+        note: null,
+      },
+      assignedUserId: undefined,
+    }
+    const others: Case = {
+      ...base,
+      id: 'active-others',
+      status: 'FOLLOWING_UP',
+      nextStep: 'NURSE_VISIT',
+      triageDecision: {
+        contactMode: 'VISIT',
+        careRole: 'NURSE',
+        assignmentMode: 'NAMED',
+        assignedUserId: 'user-nurse-2',
+        dueAt: null,
+        note: null,
+      },
+      assignedUserId: 'user-nurse-2',
+    }
+
+    const { result } = renderHook(() =>
+      useWorklistQueue({
+        cases: [mine, unclaimed, others],
+        patients: SEED_STATE.patients,
+        currentUserId: 'user-nurse-1',
+        filters: {
+          categoryFilter: 'ALL',
+          careRoleFilter: 'ALL',
+          palOnly: false,
+          claimedByMe: false,
+          myPatientsOnly: false,
+        },
+      }),
+    )
+
+    expect(result.current.activeCount).toBe(2)
+    expect(result.current.monitoringCount).toBe(1)
+    expect(
+      result.current.activeGroupedCases.some((g) => g.cases.some((c) => c.id === mine.id)),
+    ).toBe(true)
+    expect(
+      result.current.activeGroupedCases.some((g) => g.cases.some((c) => c.id === unclaimed.id)),
+    ).toBe(true)
+    expect(
+      result.current.monitoringGroupedCases.some((g) => g.cases.some((c) => c.id === others.id)),
     ).toBe(true)
   })
 })

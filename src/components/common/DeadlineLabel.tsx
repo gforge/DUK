@@ -35,14 +35,15 @@ export default function DeadlineLabel({ deadline, tone = 'default' }: Props) {
       ? isOverdue
         ? 'error.main'
         : isSoon
-          ? 'warning.main'
-          : 'text.primary'
+          ? 'warning.dark'
+          : 'text.secondary'
       : isOverdue
         ? 'error.main'
         : 'warning.dark'
+  const fontWeight = tone === 'queue' ? (isOverdue ? 700 : isSoon ? 600 : 500) : 500
 
   return (
-    <Typography component="span" variant="caption" sx={{ color }}>
+    <Typography component="span" variant="caption" sx={{ color, fontWeight }}>
       ⏱ {dateLabel} · {relativeLabel}
     </Typography>
   )

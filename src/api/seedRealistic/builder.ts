@@ -98,6 +98,67 @@ export function buildRealisticSeed(): AppState {
         createdAt,
       })
 
+      // Determine a sensible nextStep for worklist eligibility when appropriate
+      let nextStep: Case['nextStep'] | undefined = undefined
+      if (status === 'TRIAGED' || status === 'FOLLOWING_UP') {
+        const STEPS: Case['nextStep'][] = [
+          'DOCTOR_VISIT',
+          'NURSE_VISIT',
+          'PHYSIO_VISIT',
+          'PHONE_CALL',
+          'DIGITAL_CONTROL',
+        ]
+        nextStep = STEPS[rng.int(0, STEPS.length - 1)]
+      }
+
+      const triageDecision =
+        nextStep === 'DOCTOR_VISIT'
+          ? {
+              contactMode: 'VISIT' as const,
+              careRole: 'DOCTOR' as const,
+              assignmentMode: 'ANY' as const,
+              assignedUserId: null,
+              dueAt: null,
+              note: null,
+            }
+          : nextStep === 'NURSE_VISIT'
+            ? {
+                contactMode: 'VISIT' as const,
+                careRole: 'NURSE' as const,
+                assignmentMode: 'ANY' as const,
+                assignedUserId: null,
+                dueAt: null,
+                note: null,
+              }
+            : nextStep === 'PHYSIO_VISIT'
+              ? {
+                  contactMode: 'VISIT' as const,
+                  careRole: 'PHYSIO' as const,
+                  assignmentMode: 'ANY' as const,
+                  assignedUserId: null,
+                  dueAt: null,
+                  note: null,
+                }
+              : nextStep === 'PHONE_CALL'
+                ? {
+                    contactMode: 'PHONE' as const,
+                    careRole: 'NURSE' as const,
+                    assignmentMode: 'ANY' as const,
+                    assignedUserId: null,
+                    dueAt: null,
+                    note: null,
+                  }
+                : nextStep === 'DIGITAL_CONTROL'
+                  ? {
+                      contactMode: 'DIGITAL' as const,
+                      careRole: 'NURSE' as const,
+                      assignmentMode: 'ANY' as const,
+                      assignedUserId: null,
+                      dueAt: null,
+                      note: null,
+                    }
+                  : undefined
+
       cases.push({
         id: caseId,
         patientId: pid,
@@ -110,6 +171,8 @@ export function buildRealisticSeed(): AppState {
         scheduledAt: createdAt,
         lastActivityAt: isoTs(-rng.int(0, 3)),
         reviews,
+        nextStep,
+        triageDecision,
       })
 
       const epId = `re-${idx}`

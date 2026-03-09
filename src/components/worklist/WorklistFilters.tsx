@@ -3,6 +3,7 @@ import React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import type { CareRole, WorkCategory } from '@/api/schemas'
+import { CareRoleIcon } from '@/components/common'
 import { useAssignmentModeLabel, useCareRoleLabel, useWorkCategoryLabel } from '@/hooks/labels'
 
 interface WorklistFiltersProps {
@@ -61,9 +62,17 @@ export default function WorklistFilters({
         {(['DOCTOR', 'NURSE', 'PHYSIO'] as const).map((role) => (
           <Chip
             key={role}
+            icon={<CareRoleIcon role={role} />}
             label={getCareRoleLabel(role)}
             variant={careRoleFilter === role ? 'filled' : 'outlined'}
             onClick={() => onCareRoleFilterChange(careRoleFilter === role ? 'ALL' : role)}
+            sx={{
+              pl: 0.5,
+              '& .MuiChip-icon': {
+                ml: 0.75,
+                mr: 0.5,
+              },
+            }}
           />
         ))}
         <Chip

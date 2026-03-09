@@ -26,6 +26,7 @@ import { useTranslation } from 'react-i18next'
 
 import type { QuestionnaireTemplate } from '@/api/schemas'
 import { QuestionnaireEditorDialog } from '@/components/journey/editor'
+import { useQuestionTypeLabel } from '@/hooks/labels'
 
 interface Props {
   questionnaires: QuestionnaireTemplate[] | null
@@ -36,6 +37,7 @@ interface Props {
 
 export function QuestionnaireTemplatesTab({ questionnaires, loading, onDelete, onSave }: Props) {
   const { t } = useTranslation()
+  const getQuestionTypeLabel = useQuestionTypeLabel()
   // null = closed, undefined = create new, QuestionnaireTemplate = edit existing
   const [editTarget, setEditTarget] = useState<QuestionnaireTemplate | null | undefined>(null)
 
@@ -133,7 +135,7 @@ export function QuestionnaireTemplatesTab({ questionnaires, loading, onDelete, o
                             </TableCell>
                             <TableCell>
                               <Chip
-                                label={t(`questionType.${q.type}`)}
+                                label={getQuestionTypeLabel(q.type)}
                                 size="small"
                                 variant="outlined"
                                 sx={{ fontSize: 10, height: 18 }}

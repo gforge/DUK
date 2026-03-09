@@ -1,6 +1,6 @@
 {
   "app": {
-    "disclaimer": "DEMO – All data is fictional/pseudonymized. No real patient data."
+    "disclaimer": "DEMO – All data is fictional. No real patient data."
   },
   "audit": {
     "action": "Event",
@@ -325,7 +325,9 @@
       "windowDays": "Window (±days)"
     },
     "modType": {
-      "CANCEL": "Cancelled"
+      "ADD_STEP": "Add step",
+      "CANCEL": "Cancelled",
+      "REMOVE_STEP": "Remove step"
     },
     "nextPhase": {
       "confirm": "Start phase",
@@ -693,6 +695,13 @@
     "wound_discharge": "Discharge from wound?",
     "wound_healed": "Is the wound healed?"
   },
+  "questionType": {
+    "BOOLEAN": "Yes/No",
+    "NUMBER": "Number",
+    "SCALE": "Scale",
+    "SELECT": "Select",
+    "TEXT": "Text"
+  },
   "review": {
     "addReview": "Add review",
     "comment": "Comment",
@@ -850,9 +859,7 @@
   },
   "worklist": {
     "activeLabel": "Active",
-    "book": "Book",
-    "bookDialogTitle": "Book — {{name}}",
-    "bookSuccess": "Booking confirmed",
+    "assignmentModeAnyTooltip": "Anyone",
     "category": {
       "DIGITAL": "Digital follow-up",
       "PHONE": "Phone contact",
@@ -860,24 +867,30 @@
     },
     "claim": "Claim",
     "claimSuccess": "Case assigned to you",
+    "completeDialogTitle": "Close - {{name}}",
     "completedLabel": "Completed",
     "completedSectionHint": "Closed history for follow-up if needed.",
     "completedSectionTitle": "Completed",
-    "confirmBooking": "Confirm booking",
-    "copiedPnr": "Copied!",
-    "copyPnr": "Copy personal number",
+    "completionComment": "Comment (optional)",
+    "completionCommentHint": "Add a note about the completion if needed.",
+    "confirmDone": "Close case",
     "doneSuccess": "Case closed",
     "empty": "No cases require action right now.",
     "emptyGroup": "No cases in this group.",
     "filterAll": "All",
     "filterClaimedByMe": "Claimed by me",
     "filterMyPatients": "My patients",
-    "markDone": "Done",
-    "markInProgress": "Begin",
+    "hideCompleted": "Hide completed",
+    "initiate": "Initiate",
+    "monitoringLabel": "Monitoring",
+    "monitoringSectionHint": "Shows cases already assigned to a colleague. Use for team visibility, sick-leave coverage, and overdue follow-up.",
+    "monitoringSectionTitle": "Monitoring (assigned to others)",
+    "nextContactDate": "Next contact (optional)",
+    "nextContactDateHint": "Set a date if follow-up is needed, otherwise leave blank.",
+    "copyPersonalNumber": "Copy personal number",
     "noDeadline": "No deadline",
     "openCase": "Open case",
-    "pnr": "Personal number",
-    "scheduledAt": "Appointment time (optional)",
+    "showCompleted": "Show completed",
     "subtitle": "Triaged cases awaiting action",
     "title": "Action List"
   }

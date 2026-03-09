@@ -38,15 +38,21 @@ export function Worklist() {
   } = useApi(() => client.getCases(), [])
 
   const { data: patients, loading: patientsLoading } = useApi(() => client.getPatients(), [])
+  const { data: users, loading: usersLoading } = useApi(() => client.getUsers(), [])
+
+  const userMap = React.useMemo(() => new Map((users ?? []).map((u) => [u.id, u.name])), [users])
 
   const {
     patientMap,
     activeGroupedCases,
+    monitoringGroupedCases,
     completedGroupedCases,
     activeCount,
+    monitoringCount,
     completedCount,
     highlightedCaseIds,
     pulseCount,
+    pulseCompletedCount,
   } = useWorklistQueue({
     cases: cases ?? [],
     patients: patients ?? [],
@@ -60,48 +66,8 @@ export function Worklist() {
     },
   })
 
-  const loading = casesLoading || patientsLoading
-
-  const handleBook = useCallback(
-    async (caseId: string, scheduledAt?: string) => {
-      try {
-        if (scheduledAt) {
-          const c = cases?.find((x) => x.id === caseId)
-          await client.createBooking(
-            caseId,
-            {
-              id: `${caseId}-${Date.now()}`,
-              type: c?.nextStep ?? 'DOCTOR_VISIT',
-              scheduledAt,
-              createdByUserId: currentUser.id,
-              createdAt: new Date().toISOString(),
-            },
-            currentUser.id,
-            currentUser.role,
-          )
-        }
-        await client.advanceCaseStatus(caseId, 'FOLLOWING_UP', currentUser.id, currentUser.role)
-        showSnack(t('worklist.bookSuccess'), 'success')
-        refetchCases()
-      } catch (err) {
-        showSnack(t('common.error') + ': ' + String(err), 'error')
-      }
-    },
-    [cases, currentUser, refetchCases, showSnack, t],
-  )
-
-  const handleMarkInProgress = useCallback(
-    async (caseId: string) => {
-      try {
-        await client.advanceCaseStatus(caseId, 'FOLLOWING_UP', currentUser.id, currentUser.role)
-        showSnack(t('triage.followUp'), 'success')
-        refetchCases()
-      } catch (err) {
-        showSnack(t('common.error') + ': ' + String(err), 'error')
-      }
-    },
-    [currentUser, refetchCases, showSnack, t],
-  )
+  const loading = casesLoading || patientsLoading || usersLoading
+  const isInitialLoading = loading && (!cases || !patients || !users)
 
   const handleClaim = useCallback(
     async (caseId: string) => {
@@ -117,24 +83,40 @@ export function Worklist() {
   )
 
   const handleMarkDone = useCallback(
-    async (caseId: string) => {
+    async (
+      caseId: string,
+      options?: {
+        bookingId?: string
+        followUpDate?: string
+        completionComment?: string
+      },
+    ) => {
       try {
-        await client.advanceCaseStatus(caseId, 'CLOSED', currentUser.id, currentUser.role)
+        const worklistCase = cases?.find((c) => c.id === caseId)
+        if (!worklistCase) throw new Error(`Case ${caseId} not found`)
+
+        if (worklistCase.status === 'TRIAGED') {
+          await client.advanceCaseStatus(caseId, 'FOLLOWING_UP', currentUser.id, currentUser.role)
+        }
+
+        await client.completeWorklistCase(caseId, currentUser.id, currentUser.role, options)
         showSnack(t('worklist.doneSuccess'), 'success')
         refetchCases()
       } catch (err) {
         showSnack(t('common.error') + ': ' + String(err), 'error')
       }
     },
-    [currentUser, refetchCases, showSnack, t],
+    [cases, currentUser, refetchCases, showSnack, t],
   )
 
   return (
-    <Box>
+    <Box sx={{ bgcolor: 'background.default' }}>
       <WorklistHeader
         activeCount={activeCount}
+        monitoringCount={monitoringCount}
         completedCount={completedCount}
         pulseCount={pulseCount}
+        pulseCompletedCount={pulseCompletedCount}
       />
 
       <WorklistFilters
@@ -151,7 +133,7 @@ export function Worklist() {
         onMyPatientsOnlyToggle={() => setMyPatientsOnly((v) => !v)}
       />
 
-      {loading && (
+      {isInitialLoading && (
         <Stack gap={2}>
           {[1, 2, 3].map((i) => (
             <Skeleton key={i} variant="rectangular" height={80} sx={{ borderRadius: 2 }} />
@@ -165,11 +147,11 @@ export function Worklist() {
         </Alert>
       )}
 
-      {!loading && !casesError && activeGroupedCases.length === 0 && (
+      {!isInitialLoading && !casesError && activeGroupedCases.length === 0 && (
         <Alert severity="info">{t('worklist.empty')}</Alert>
       )}
 
-      {!loading &&
+      {!isInitialLoading &&
         !casesError &&
         activeGroupedCases.map((g) => (
           <GroupSection
@@ -177,16 +159,41 @@ export function Worklist() {
             workCategory={g.workCategory}
             cases={g.cases}
             patientMap={patientMap}
+            userMap={userMap}
             highlightedCaseIds={highlightedCaseIds}
             defaultExpanded={g.cases.length <= 6}
-            onBook={handleBook}
             onClaim={handleClaim}
-            onMarkInProgress={handleMarkInProgress}
             onMarkDone={handleMarkDone}
           />
         ))}
 
-      {!loading && !casesError && completedCount > 0 && (
+      {!isInitialLoading && !casesError && monitoringCount > 0 && (
+        <Box sx={{ mt: 2.5 }}>
+          <Stack direction="row" alignItems="center" gap={1} mb={0.5}>
+            <Alert severity="warning" icon={false} sx={{ py: 0, px: 1 }}>
+              {t('worklist.monitoringSectionTitle')} ({monitoringCount})
+            </Alert>
+          </Stack>
+          <Alert severity="info" sx={{ mb: 1.5 }}>
+            {t('worklist.monitoringSectionHint')}
+          </Alert>
+          {monitoringGroupedCases.map((g) => (
+            <GroupSection
+              key={`monitoring-${g.workCategory}`}
+              workCategory={g.workCategory}
+              cases={g.cases}
+              patientMap={patientMap}
+              userMap={userMap}
+              highlightedCaseIds={highlightedCaseIds}
+              defaultExpanded={false}
+              onClaim={handleClaim}
+              onMarkDone={handleMarkDone}
+            />
+          ))}
+        </Box>
+      )}
+
+      {!isInitialLoading && !casesError && completedCount > 0 && (
         <CompletedSection
           expanded={completedExpanded}
           onToggle={setCompletedExpanded}
@@ -198,11 +205,10 @@ export function Worklist() {
               workCategory={g.workCategory}
               cases={g.cases}
               patientMap={patientMap}
+              userMap={userMap}
               highlightedCaseIds={highlightedCaseIds}
               defaultExpanded={false}
-              onBook={handleBook}
               onClaim={handleClaim}
-              onMarkInProgress={handleMarkInProgress}
               onMarkDone={handleMarkDone}
             />
           ))}

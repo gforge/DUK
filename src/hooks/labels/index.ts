@@ -12,8 +12,10 @@ export {
 export {
   type StepStatus,
   useEpisodeStatusLabel,
+  useJourneyModificationTypeLabel,
   useJourneyStatusLabel,
   usePhaseTypeLabel,
+  useQuestionTypeLabel,
   useStepStatusLabel,
   useTransitionTriggerLabel,
 } from './useJourneyLabels'

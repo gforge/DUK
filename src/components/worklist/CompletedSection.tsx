@@ -4,7 +4,9 @@ import {
   AccordionDetails,
   AccordionSummary,
   Box,
+  Button,
   Chip,
+  Paper,
   Stack,
   Typography,
 } from '@mui/material'
@@ -21,10 +23,28 @@ interface Props {
 export default function CompletedSection({ expanded, count, onToggle, children }: Props) {
   const { t } = useTranslation()
 
+  if (!expanded) {
+    return (
+      <Paper variant="outlined" sx={{ mt: 2, borderRadius: 2, p: 1.25 }}>
+        <Stack direction="row" alignItems="center" justifyContent="space-between" gap={1}>
+          <Stack direction="row" alignItems="center" gap={1}>
+            <Typography variant="subtitle2" fontWeight={700}>
+              {t('worklist.completedSectionTitle')}
+            </Typography>
+            <Chip label={count} size="small" />
+          </Stack>
+          <Button size="small" onClick={() => onToggle(true)}>
+            {t('worklist.showCompleted')}
+          </Button>
+        </Stack>
+      </Paper>
+    )
+  }
+
   return (
     <Accordion
-      expanded={expanded}
-      onChange={(_, isExpanded) => onToggle(isExpanded)}
+      expanded
+      onChange={() => onToggle(false)}
       disableGutters
       variant="outlined"
       sx={{
@@ -40,6 +60,9 @@ export default function CompletedSection({ expanded, count, onToggle, children }
             {t('worklist.completedSectionTitle')}
           </Typography>
           <Chip label={count} size="small" />
+          <Button size="small" onClick={() => onToggle(false)}>
+            {t('worklist.hideCompleted')}
+          </Button>
         </Stack>
       </AccordionSummary>
       <AccordionDetails sx={{ p: 0 }}>

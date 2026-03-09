@@ -125,7 +125,11 @@ export const CaseSchema = z.object({
         type: z.string(),
         role: RoleSchema.optional(),
         scheduledAt: z.string().datetime(),
-        status: z.enum(['PENDING', 'SCHEDULED', 'CANCELLED']).default('PENDING'),
+        status: z.enum(['PENDING', 'SCHEDULED', 'COMPLETED', 'CANCELLED']).default('PENDING'),
+        completedAt: z.string().datetime().nullable().optional(),
+        completedByUserId: z.string().nullable().optional(),
+        followUpDate: z.string().datetime().nullable().optional(),
+        completionComment: z.string().nullable().optional(),
         note: z.string().optional(),
         createdByUserId: z.string(),
         createdAt: z.string().datetime(),
@@ -135,6 +139,7 @@ export const CaseSchema = z.object({
   reviews: z.array(ClinicalReviewSchema).default([]),
   scheduledAt: z.string().datetime(),
   lastActivityAt: z.string().datetime(),
+  closedAt: z.string().datetime().nullable().optional(),
   createdAt: z.string().datetime(),
 })
 export type Case = z.infer<typeof CaseSchema>

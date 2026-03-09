@@ -6,6 +6,7 @@ import React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import type { JourneyModification } from '@/api/schemas'
+import { useJourneyModificationTypeLabel } from '@/hooks/labels'
 
 const MOD_ICON: Record<string, React.ReactNode> = {
   ADD_STEP: <AddIcon fontSize="small" />,
@@ -19,6 +20,7 @@ interface Props {
 
 export default function JourneyModHistory({ modifications }: Props) {
   const { t } = useTranslation()
+  const getModificationTypeLabel = useJourneyModificationTypeLabel()
 
   if (modifications.length === 0) return null
 
@@ -33,7 +35,7 @@ export default function JourneyModHistory({ modifications }: Props) {
             <Stack direction="row" alignItems="center" gap={1} mb={0.5}>
               {MOD_ICON[mod.type]}
               <Typography variant="caption" fontWeight={700}>
-                {t(`journey.modType.${mod.type}`)}
+                {getModificationTypeLabel(mod.type)}
               </Typography>
               <Typography variant="caption" color="text.secondary" ml="auto">
                 {new Date(mod.addedAt).toLocaleDateString()}

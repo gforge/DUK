@@ -51,9 +51,6 @@ export function resolveCaseCareRole(caseData: Case): Exclude<CareRole, null> | n
   if (caseData.nextStep === 'DOCTOR_VISIT') return 'DOCTOR'
   if (caseData.nextStep === 'NURSE_VISIT') return 'NURSE'
   if (caseData.nextStep === 'PHYSIO_VISIT') return 'PHYSIO'
-
-  if (caseData.assignedRole === 'DOCTOR' || caseData.assignedRole === 'PAL') return 'DOCTOR'
-  if (caseData.assignedRole === 'NURSE') return 'NURSE'
   return null
 }
 
@@ -76,10 +73,12 @@ function groupCases(items: CategorizedCase[]): GroupedCases {
 
 export function useWorklistQueue({ cases, patients, currentUserId, filters }: Params) {
   const [pulseCount, setPulseCount] = useState(false)
+  const [pulseCompletedCount, setPulseCompletedCount] = useState(false)
   const [highlightedCaseIds, setHighlightedCaseIds] = useState<Set<string>>(new Set())
 
   const previousCaseIdsRef = useRef<Set<string>>(new Set())
   const previousCountRef = useRef(0)
+  const previousCompletedCountRef = useRef(0)
 
   const patientMap = useMemo<Map<string, Patient>>(
     () => new Map(patients.map((p) => [p.id, p])),
@@ -120,16 +119,37 @@ export function useWorklistQueue({ cases, patients, currentUserId, filters }: Pa
     [filtered],
   )
 
+  const actionableActiveFiltered = useMemo(
+    () =>
+      activeFiltered.filter(
+        (item) => !item.caseData.assignedUserId || item.caseData.assignedUserId === currentUserId,
+      ),
+    [activeFiltered, currentUserId],
+  )
+
+  const monitoringFiltered = useMemo(
+    () =>
+      activeFiltered.filter(
+        (item) =>
+          Boolean(item.caseData.assignedUserId) && item.caseData.assignedUserId !== currentUserId,
+      ),
+    [activeFiltered, currentUserId],
+  )
+
   const completedFiltered = useMemo(
     () => filtered.filter((item) => item.caseData.status === 'CLOSED'),
     [filtered],
   )
 
-  const activeGroupedCases = useMemo(() => groupCases(activeFiltered), [activeFiltered])
+  const activeGroupedCases = useMemo(
+    () => groupCases(actionableActiveFiltered),
+    [actionableActiveFiltered],
+  )
+  const monitoringGroupedCases = useMemo(() => groupCases(monitoringFiltered), [monitoringFiltered])
   const completedGroupedCases = useMemo(() => groupCases(completedFiltered), [completedFiltered])
 
   useEffect(() => {
-    const currentIds = new Set(activeFiltered.map((item) => item.caseData.id))
+    const currentIds = new Set(actionableActiveFiltered.map((item) => item.caseData.id))
     const incoming = [...currentIds].filter((id) => !previousCaseIdsRef.current.has(id))
     previousCaseIdsRef.current = currentIds
 
@@ -139,10 +159,10 @@ export function useWorklistQueue({ cases, patients, currentUserId, filters }: Pa
       return () => clearTimeout(clearTimer)
     }
     return undefined
-  }, [activeFiltered])
+  }, [actionableActiveFiltered])
 
   useEffect(() => {
-    const count = activeFiltered.length
+    const count = actionableActiveFiltered.length
     if (count > previousCountRef.current) {
       const startTimer = setTimeout(() => setPulseCount(true), 0)
       const timer = setTimeout(() => setPulseCount(false), 520)
@@ -154,15 +174,33 @@ export function useWorklistQueue({ cases, patients, currentUserId, filters }: Pa
     }
     previousCountRef.current = count
     return undefined
-  }, [activeFiltered.length])
+  }, [actionableActiveFiltered.length])
+
+  useEffect(() => {
+    const count = completedFiltered.length
+    if (count > previousCompletedCountRef.current) {
+      const startTimer = setTimeout(() => setPulseCompletedCount(true), 0)
+      const timer = setTimeout(() => setPulseCompletedCount(false), 520)
+      previousCompletedCountRef.current = count
+      return () => {
+        clearTimeout(startTimer)
+        clearTimeout(timer)
+      }
+    }
+    previousCompletedCountRef.current = count
+    return undefined
+  }, [completedFiltered.length])
 
   return {
     patientMap,
     activeGroupedCases,
+    monitoringGroupedCases,
     completedGroupedCases,
-    activeCount: activeFiltered.length,
+    activeCount: actionableActiveFiltered.length,
+    monitoringCount: monitoringFiltered.length,
     completedCount: completedFiltered.length,
     highlightedCaseIds,
     pulseCount,
+    pulseCompletedCount,
   }
 }

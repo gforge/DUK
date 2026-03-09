@@ -50,7 +50,12 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
             color="warning"
             size="small"
             variant="outlined"
-            sx={{ color: 'white', borderColor: 'rgba(255,255,255,0.5)', cursor: 'default' }}
+            sx={{
+              color: 'white',
+              borderColor: 'rgba(255,255,255,0.5)',
+              cursor: 'default',
+              padding: '0 6px',
+            }}
           />
         </Tooltip>
 

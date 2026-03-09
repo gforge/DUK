@@ -96,6 +96,7 @@ export function triageCase(
     assignedUserId: assignedUserId ?? undefined,
     triagedByUserId: userId,
     lastActivityAt: now(),
+    closedAt: nextStatus === 'CLOSED' ? now() : (existing.closedAt ?? null),
   }
   state = { ...state, cases: state.cases.map((c) => (c.id === caseId ? updated : c)) }
   state = addAuditEvent(state, caseId, userId, userRole, 'TRIAGED', {
@@ -128,7 +129,14 @@ export function createBooking(
   userRole: Role,
 ): Case {
   // Ensure booking has a status
-  const bookingWithStatus = { ...booking, status: (booking as any).status ?? ('PENDING' as const) }
+  const bookingWithStatus = {
+    ...booking,
+    status: (booking as any).status ?? ('PENDING' as const),
+    completedAt: null,
+    completedByUserId: null,
+    followUpDate: null,
+    completionComment: null,
+  }
   let state = getStore()
   const existing = state.cases.find((c) => c.id === caseId)
   if (!existing) throw new Error(`Case ${caseId} not found`)
@@ -155,7 +163,11 @@ export function updateBooking(
     scheduledAt?: string
     role?: Role | undefined
     note?: string | undefined
-    status?: 'PENDING' | 'SCHEDULED' | 'CANCELLED'
+    status?: 'PENDING' | 'SCHEDULED' | 'COMPLETED' | 'CANCELLED'
+    completedAt?: string | null
+    completedByUserId?: string | null
+    followUpDate?: string | null
+    completionComment?: string | null
   },
   userId: string,
   userRole: Role,
@@ -203,11 +215,75 @@ export function advanceCaseStatus(
   if (!VALID_TRANSITIONS[existing.status]?.includes(toStatus))
     throw new Error(`Invalid transition: ${existing.status} → ${toStatus}`)
 
-  const updated: Case = { ...existing, status: toStatus, lastActivityAt: now() }
+  const changedAt = now()
+  const updated: Case = {
+    ...existing,
+    status: toStatus,
+    lastActivityAt: changedAt,
+    closedAt: toStatus === 'CLOSED' ? changedAt : existing.closedAt,
+  }
   state = { ...state, cases: state.cases.map((c) => (c.id === caseId ? updated : c)) }
   state = addAuditEvent(state, caseId, userId, userRole, 'STATUS_CHANGED', {
     from: existing.status,
     to: toStatus,
+  })
+  setStore(state)
+  return updated
+}
+
+export function completeWorklistCase(
+  caseId: string,
+  userId: string,
+  userRole: Role,
+  options?: {
+    bookingId?: string
+    followUpDate?: string
+    completedAt?: string
+    completionComment?: string
+  },
+): Case {
+  let state = getStore()
+  const existing = state.cases.find((c) => c.id === caseId)
+  if (!existing) throw new Error(`Case ${caseId} not found`)
+  if (!VALID_TRANSITIONS[existing.status]?.includes('CLOSED')) {
+    throw new Error(`Invalid transition: ${existing.status} → CLOSED`)
+  }
+
+  const completedAt = options?.completedAt ?? now()
+  let bookings = existing.bookings ?? []
+  if (options?.bookingId) {
+    let found = false
+    bookings = bookings.map((booking) => {
+      if (booking.id !== options.bookingId) return booking
+      found = true
+      return {
+        ...booking,
+        status: 'COMPLETED',
+        completedAt,
+        completedByUserId: userId,
+        followUpDate: options.followUpDate ?? null,
+        completionComment: options.completionComment ?? null,
+      }
+    })
+    if (!found) throw new Error(`Booking ${options.bookingId} not found for case ${caseId}`)
+  }
+
+  const updated: Case = {
+    ...existing,
+    status: 'CLOSED',
+    bookings,
+    closedAt: completedAt,
+    lastActivityAt: completedAt,
+  }
+
+  state = { ...state, cases: state.cases.map((c) => (c.id === caseId ? updated : c)) }
+  state = addAuditEvent(state, caseId, userId, userRole, 'STATUS_CHANGED', {
+    from: existing.status,
+    to: 'CLOSED',
+    closedAt: completedAt,
+    bookingId: options?.bookingId,
+    followUpDate: options?.followUpDate,
+    completionComment: options?.completionComment,
   })
   setStore(state)
   return updated

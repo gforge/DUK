@@ -41,7 +41,11 @@ export const updateBooking = (
     scheduledAt?: string
     role?: Role | undefined
     note?: string | undefined
-    status?: 'PENDING' | 'SCHEDULED' | 'CANCELLED'
+    status?: 'PENDING' | 'SCHEDULED' | 'COMPLETED' | 'CANCELLED'
+    completedAt?: string | null
+    completedByUserId?: string | null
+    followUpDate?: string | null
+    completionComment?: string | null
   },
   userId: string,
   userRole: Role,
@@ -67,6 +71,18 @@ export const claimCaseAssignment = (
   userId: string,
   userRole: Role,
 ): Promise<Case> => withDelay(() => service.claimCaseAssignment(caseId, userId, userRole))
+
+export const completeWorklistCase = (
+  caseId: string,
+  userId: string,
+  userRole: Role,
+  options?: {
+    bookingId?: string
+    followUpDate?: string
+    completedAt?: string
+    completionComment?: string
+  },
+): Promise<Case> => withDelay(() => service.completeWorklistCase(caseId, userId, userRole, options))
 
 export const getCasesForDashboard = (): Promise<CaseWithActiveCategory[]> =>
   withDelay(() => service.getCasesForDashboard())

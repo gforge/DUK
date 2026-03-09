@@ -32,8 +32,6 @@ import { AutoWarningsBadge, StatusChip } from '@/components/common'
 import { useApi } from '@/hooks/useApi'
 import { useHotkeys } from '@/hooks/useHotkeys'
 
-import { getCaseDetailBackPath } from '../utils/caseDetailBackPath'
-
 interface TabPanelProps {
   readonly children: React.ReactNode
   readonly value: number
@@ -103,10 +101,6 @@ export default function CaseDetail() {
     () => navigate(caseData ? `/patients/${caseData.patientId}` : '/patients'),
     [navigate, caseData],
   )
-
-  const handleBackButton = useCallback(() => {
-    navigate(getCaseDetailBackPath(caseData ?? undefined))
-  }, [navigate, caseData])
 
   const loading = caseLoading || patientLoading
 

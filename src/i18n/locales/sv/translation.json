@@ -1,6 +1,6 @@
 {
   "app": {
-    "disclaimer": "DEMO – All data är fiktiv/pseudonymiserad. Ingen riktig patientdata."
+    "disclaimer": "DEMO – All data är fiktiv. Ingen riktig patientdata."
   },
   "audit": {
     "action": "Händelse",
@@ -325,7 +325,9 @@
       "windowDays": "Fönster (±dagar)"
     },
     "modType": {
-      "CANCEL": "Avbruten"
+      "ADD_STEP": "Lägg till steg",
+      "CANCEL": "Avbruten",
+      "REMOVE_STEP": "Ta bort steg"
     },
     "nextPhase": {
       "confirm": "Starta fas",
@@ -693,6 +695,13 @@
     "wound_discharge": "Sekret från såret?",
     "wound_healed": "Är såret läkt?"
   },
+  "questionType": {
+    "BOOLEAN": "Ja/Nej",
+    "NUMBER": "Tal",
+    "SCALE": "Skala",
+    "SELECT": "Flerval",
+    "TEXT": "Text"
+  },
   "review": {
     "addReview": "Lägg till granskning",
     "comment": "Kommentar",
@@ -850,9 +859,7 @@
   },
   "worklist": {
     "activeLabel": "Aktiva",
-    "book": "Boka",
-    "bookDialogTitle": "Boka — {{name}}",
-    "bookSuccess": "Bokning bekräftad",
+    "assignmentModeAnyTooltip": "Vem som helst",
     "category": {
       "DIGITAL": "Digital uppföljning",
       "PHONE": "Telefonkontakt",
@@ -860,24 +867,30 @@
     },
     "claim": "Tilldela mig",
     "claimSuccess": "Ärende tilldelat dig",
+    "completeDialogTitle": "Patient: {{name}}",
     "completedLabel": "Avklarade",
     "completedSectionHint": "Stängd historik för uppföljning vid behov.",
     "completedSectionTitle": "Avklarade",
-    "confirmBooking": "Bekräfta bokning",
-    "copiedPnr": "Kopierat!",
-    "copyPnr": "Kopiera personnummer",
+    "completionComment": "Kommentar (valfri)",
+    "completionCommentHint": "Lägg till en anteckning om avslutet om det behövs.",
+    "confirmDone": "Avsluta ärende",
     "doneSuccess": "Ärende avslutat",
     "empty": "Inga ärenden kräver åtgärd just nu.",
     "emptyGroup": "Inga ärenden i denna grupp.",
     "filterAll": "Alla",
     "filterClaimedByMe": "Mina tilldelade",
     "filterMyPatients": "Mina patienter",
-    "markDone": "Avklarad",
-    "markInProgress": "Påbörja",
+    "hideCompleted": "Dölj avklarade",
+    "initiate": "Påbörja",
+    "monitoringLabel": "Bevakning",
+    "monitoringSectionHint": "Visar ärenden som redan är tilldelade en kollega. Används för överblick, frånvaro och förseningsbevakning.",
+    "monitoringSectionTitle": "Bevakning (tilldelade annan)",
+    "nextContactDate": "Nästa kontakt (valfri)",
+    "nextContactDateHint": "Ange datum om uppföljning behövs, annars lämna tomt.",
+    "copyPersonalNumber": "Kopiera personnummer",
     "noDeadline": "Ingen deadline",
     "openCase": "Öppna ärende",
-    "pnr": "Personnummer",
-    "scheduledAt": "Bokad tid (valfri)",
+    "showCompleted": "Visa avklarade",
     "subtitle": "Aktiva arbetsuppgifter för nästa steg efter triage",
     "title": "Åtgärdslista"
   }

@@ -480,6 +480,29 @@ const MIGRATIONS: Migration[] = [
       }
     },
   },
+  {
+    from: 12,
+    to: 13,
+    up: (s) => ({
+      ...s,
+      schemaVersion: 13,
+      cases: Array.isArray(s['cases'])
+        ? (s['cases'] as Record<string, unknown>[]).map((c) => ({
+            ...c,
+            closedAt: c['closedAt'] ?? null,
+            bookings: Array.isArray(c['bookings'])
+              ? (c['bookings'] as Record<string, unknown>[]).map((b) => ({
+                  ...b,
+                  completedAt: b['completedAt'] ?? null,
+                  completedByUserId: b['completedByUserId'] ?? null,
+                  followUpDate: b['followUpDate'] ?? null,
+                  completionComment: b['completionComment'] ?? null,
+                }))
+              : c['bookings'],
+          }))
+        : [],
+    }),
+  },
 ]
 
 // ---------------------------------------------------------------------------

@@ -23,6 +23,7 @@ import React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import type { Question } from '@/api/schemas'
+import { useQuestionTypeLabel } from '@/hooks/labels'
 
 interface Props {
   questions: Question[]
@@ -38,6 +39,7 @@ export default function QuestionnaireEditorQuestionsTab({
   deleteQuestion,
 }: Props) {
   const { t } = useTranslation()
+  const getQuestionTypeLabel = useQuestionTypeLabel()
 
   return (
     <Box>
@@ -85,7 +87,7 @@ export default function QuestionnaireEditorQuestionsTab({
                     >
                       {(['SCALE', 'BOOLEAN', 'TEXT', 'SELECT', 'NUMBER'] as const).map((tp) => (
                         <MenuItem key={tp} value={tp}>
-                          {t(`questionType.${tp}`)}
+                          {getQuestionTypeLabel(tp)}
                         </MenuItem>
                       ))}
                     </Select>

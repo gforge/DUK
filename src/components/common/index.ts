@@ -1,4 +1,5 @@
 export { default as AutoWarningsBadge } from './AutoWarningsBadge'
+export { default as CareRoleIcon } from './CareRoleIcon'
 export { default as ConfirmDialog } from './ConfirmDialog'
 export { default as DeadlineLabel } from './DeadlineLabel'
 export { default as LanguageSwitcher } from './LanguageSwitcher'
