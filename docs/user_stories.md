@@ -29,14 +29,15 @@ This document captures the key user stories for the Duk demo application. The li
 - open a case from the dashboard
 - view a summary (category, triggers, recent scores, policy warnings)
 - perform triage and either
-  - close the checkpoint immediately (TRIAGED → CLOSED) or
-  - schedule follow‑up with a deadline then close (TRIAGED → FOLLOWING_UP → CLOSED)
+  - close the checkpoint immediately (`contactMode = CLOSE` → status `CLOSED`) or
+  - assign a follow‑up task (status `TRIAGED`), which appears in the Worklist for a nurse/secretary to action (`TRIAGED → FOLLOWING_UP → CLOSED`)
 
 **Acceptance criteria**
 
-1. UI clearly exposes allowed state transitions (see state machine in `design.md`).
-2. Choosing “no action” with no deadline still allows the flow to go directly to CLOSED.
+1. After triage the TriageTab shows a read-only summary of the triage decision (contact mode, care role, assignment, due date, note) — no further action buttons.
+2. Choosing `contactMode = CLOSE` still allows the flow to go directly to CLOSED.
 3. An audit event is emitted for every state change.
+4. CLOSED cases are hidden from the main dashboard queue; cases closed within the last 7 days are accessible via a collapsible "Visa stängda" section at the bottom of each category column.
 
 ---
 

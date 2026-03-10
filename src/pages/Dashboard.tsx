@@ -79,10 +79,18 @@ export default function Dashboard() {
     })
   }, [cases, palFilter, currentUser.id, search, patientMap])
 
-  const { activeCases, waitingCases } = useMemo(() => {
-    const active = filteredCases.filter((c) => c.activeCategory !== null)
-    const waiting = filteredCases.filter((c) => c.activeCategory === null)
-    return { activeCases: active, waitingCases: waiting }
+  const { activeCases, waitingCases, closedCases } = useMemo(() => {
+    const sevenDaysAgo = new Date()
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
+    const sevenDaysAgoMs = sevenDaysAgo.getTime()
+    const active = filteredCases.filter((c) => c.status !== 'CLOSED' && c.activeCategory !== null)
+    const waiting = filteredCases.filter((c) => c.status !== 'CLOSED' && c.activeCategory === null)
+    const closed = filteredCases.filter((c) => {
+      if (c.status !== 'CLOSED') return false
+      const ts = c.closedAt ?? c.lastActivityAt
+      return new Date(ts).getTime() >= sevenDaysAgoMs
+    })
+    return { activeCases: active, waitingCases: waiting, closedCases: closed }
   }, [filteredCases])
 
   const effectiveShowWaiting = showWaiting || search.trim().length > 0
@@ -103,6 +111,10 @@ export default function Dashboard() {
     (cat: CaseCategory) =>
       effectiveShowWaiting ? sortedWaitingCases.filter((c) => c.category === cat) : [],
     [sortedWaitingCases, effectiveShowWaiting],
+  )
+  const closedByCategory = useCallback(
+    (cat: CaseCategory) => closedCases.filter((c) => c.category === cat),
+    [closedCases],
   )
 
   return (
@@ -146,6 +158,7 @@ export default function Dashboard() {
               category={cat}
               cases={byCategory(cat)}
               waitingCases={waitingByCategory(cat)}
+              closedCases={closedByCategory(cat)}
               patients={patientMap}
               onRefresh={refetch}
               expanded={expanded.has(cat)}

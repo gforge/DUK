@@ -67,9 +67,10 @@ Field-heavy details stay here instead of in overview diagrams.
     - `NEW → CLOSED` — clinician closes directly (contactMode = CLOSE)
     - `NEEDS_REVIEW → TRIAGED` — clinician reviews and triages
     - `NEEDS_REVIEW → CLOSED` — clinician closes directly
-    - `TRIAGED → FOLLOWING_UP` — follow-up scheduled
-    - `TRIAGED → CLOSED` — closed directly after triage
-    - `FOLLOWING_UP → CLOSED` — follow-up complete
+    - `TRIAGED → FOLLOWING_UP` — nurse/secretary starts working the worklist item
+    - `TRIAGED → CLOSED` — nurse/secretary completes the worklist item directly
+    - `FOLLOWING_UP → CLOSED` — nurse/secretary marks the worklist item done
+  - **Note:** `TRIAGED` and `FOLLOWING_UP` transitions are owned by the Worklist, not the TriageTab. The TriageTab shows a read-only summary of the triage decision for these statuses.
 - `category: ACUTE | SUBACUTE | CONTROL`
 - `triggers: TriggerType[]`
 - `policyWarnings: PolicyWarning[]`

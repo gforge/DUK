@@ -1,4 +1,4 @@
-import { Alert, Box, Button, Stack } from '@mui/material'
+import { Alert, Box, Divider, Paper, Stack, Typography } from '@mui/material'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
@@ -18,6 +18,46 @@ interface TriageTabProps {
   readonly caseData: Case
   readonly onTriaged: () => void
   readonly routeContactMode: ContactMode | null
+}
+
+function TriageDecisionSummary({ caseData }: { caseData: Case }) {
+  const { t } = useTranslation()
+  const td = caseData.triageDecision
+  if (!td) return null
+
+  const rows: { label: string; value: string | null | undefined }[] = [
+    { label: t('triage.step1Title'), value: t(`triage.contactMode.${td.contactMode}`) },
+    td.careRole
+      ? { label: t('triage.careRole'), value: t(`triage.careRoleOption.${td.careRole}`) }
+      : null,
+    td.assignmentMode
+      ? {
+          label: t('triage.assignRole'),
+          value: t(`triage.assignmentModeOption.${td.assignmentMode}`),
+        }
+      : null,
+    td.dueAt ? { label: t('triage.dueAt'), value: td.dueAt.slice(0, 10) } : null,
+    td.note ? { label: t('triage.note'), value: td.note } : null,
+  ].filter(Boolean) as { label: string; value: string }[]
+
+  return (
+    <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
+      <Typography variant="subtitle2" fontWeight={700} gutterBottom>
+        {t('triage.decisionSummary')}
+      </Typography>
+      <Divider sx={{ mb: 1.5 }} />
+      <Stack gap={0.75}>
+        {rows.map(({ label, value }) => (
+          <Stack key={label} direction="row" gap={1}>
+            <Typography variant="body2" color="text.secondary" sx={{ minWidth: 140 }}>
+              {label}
+            </Typography>
+            <Typography variant="body2">{value}</Typography>
+          </Stack>
+        ))}
+      </Stack>
+    </Paper>
+  )
 }
 
 export default function TriageTab({ caseData, onTriaged, routeContactMode }: TriageTabProps) {
@@ -43,26 +83,6 @@ export default function TriageTab({ caseData, onTriaged, routeContactMode }: Tri
     } catch (err) {
       console.error('Error triaging case:', err)
       showSnack(`${t('triage.error')}: ${String(err)}`, 'error')
-    }
-  }
-
-  async function handleFollowUp() {
-    try {
-      await client.advanceCaseStatus(caseData.id, 'FOLLOWING_UP', currentUser.id, currentUser.role)
-      showSnack(t('triage.followUp'), 'info')
-      onTriaged()
-    } catch (err) {
-      showSnack(String(err), 'error')
-    }
-  }
-
-  async function handleClose() {
-    try {
-      await client.advanceCaseStatus(caseData.id, 'CLOSED', currentUser.id, currentUser.role)
-      showSnack(t('triage.close'), 'success')
-      onTriaged()
-    } catch (err) {
-      showSnack(String(err), 'error')
     }
   }
 
@@ -99,20 +119,17 @@ export default function TriageTab({ caseData, onTriaged, routeContactMode }: Tri
       )}
 
       {caseData.status === 'TRIAGED' && (
-        <Stack direction="row" gap={1}>
-          <Button variant="outlined" size="small" onClick={handleFollowUp}>
-            {t('triage.followUp')}
-          </Button>
-          <Button variant="outlined" color="success" size="small" onClick={handleClose}>
-            {t('triage.close')}
-          </Button>
-        </Stack>
+        <>
+          <TriageDecisionSummary caseData={caseData} />
+          <Alert severity="info">{t('triage.handledInWorklist')}</Alert>
+        </>
       )}
 
       {caseData.status === 'FOLLOWING_UP' && (
-        <Button variant="outlined" color="success" size="small" onClick={handleClose}>
-          {t('triage.close')}
-        </Button>
+        <>
+          <TriageDecisionSummary caseData={caseData} />
+          <Alert severity="info">{t('triage.followingUpInWorklist')}</Alert>
+        </>
       )}
 
       {caseData.status === 'CLOSED' && <Alert severity="success">{t('status.CLOSED')}</Alert>}

@@ -94,7 +94,6 @@
       "yesterdayAt": "yesterday {{time}}"
     },
     "lastCallAttempt": "Attempted call {{date}}",
-    "contactedAt": "Contacted {{date}}",
     "lastReminderSent": "Reminder sent {{date}}",
     "reminded": "Reminder sent",
     "remindedDone": "Reminder event logged",
@@ -111,6 +110,7 @@
     "filterAll": "All",
     "filterCreatedByMe": "Created by Me",
     "filterMine": "My patients",
+    "hideClosed": "Hide closed",
     "lastActivity": "Last Activity",
     "noResults": "No cases found",
     "patientsCount_one": "{{count}} patient",
@@ -121,6 +121,8 @@
     "scheduledInDays_other": "in {{count}} days",
     "scheduledToday": "Today",
     "search": "Search by name or ID…",
+    "showClosed_one": "Show closed ({{count}})",
+    "showClosed_other": "Show closed ({{count}})",
     "sortFlags": "Priority",
     "sortLabel": "Sort by",
     "sortName": "Name",
@@ -821,7 +823,6 @@
       "NURSE": "Nurse",
       "PHYSIO": "Physiotherapist"
     },
-    "close": "Close Case",
     "closeNoWorklist": "Close the case without creating a worklist item",
     "confirmCreatesWorklist": "Confirmation creates a worklist item",
     "contactMode": {
@@ -837,6 +838,7 @@
       "VISIT": "Patient visits the clinic"
     },
     "contextWhy": "Why is this case here?",
+    "decisionSummary": "Triage decision",
     "dueAt": "Due date",
     "dueAtOpenPicker": "Open calendar",
     "dueAtPlaceholder": "e.g. 2w, 14d or YYYY-MM-DD",
@@ -849,7 +851,8 @@
     "editBooking": "Edit booking",
     "error": "Triage error",
     "exportIcal": "Export iCal",
-    "followUp": "Set to Follow-Up",
+    "followingUpInWorklist": "Follow-up in progress — handled via the worklist.",
+    "handledInWorklist": "Follow-up is handled via the worklist.",
     "namedPerson": "Assigned to",
     "nextStep": "Next Action",
     "noNamedUsers": "No users available for this role",

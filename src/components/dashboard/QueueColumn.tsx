@@ -9,16 +9,17 @@ import {
   AccordionDetails,
   AccordionSummary,
   Box,
+  Button,
   Chip,
   Divider,
   Stack,
   Typography,
 } from '@mui/material'
-import React from 'react'
+import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import type { Case, CaseCategory, Patient } from '@/api/schemas'
-import { useCategoryDescLabel,useCategoryLabel } from '@/hooks/labels'
+import { useCategoryDescLabel, useCategoryLabel } from '@/hooks/labels'
 import { useRovingTabIndex } from '@/hooks/useRovingTabIndex'
 
 import CaseListItem from './CaseListItem'
@@ -28,6 +29,7 @@ interface QueueColumnProps {
   readonly category: CaseCategory
   readonly cases: Case[]
   readonly waitingCases?: Case[]
+  readonly closedCases?: Case[]
   readonly patients: Map<string, Patient>
   readonly onRefresh: () => void
   readonly expanded: boolean
@@ -45,6 +47,7 @@ export default function QueueColumn({
   category,
   cases,
   waitingCases = [],
+  closedCases = [],
   patients,
   onRefresh,
   expanded,
@@ -54,7 +57,10 @@ export default function QueueColumn({
   const getCategoryLabel = useCategoryLabel()
   const getCategoryDescLabel = useCategoryDescLabel()
   const categoryLabel = getCategoryLabel(category)
-  const { getItemProps } = useRovingTabIndex(expanded ? cases.length + waitingCases.length : 0)
+  const [showClosed, setShowClosed] = useState(false)
+  const { getItemProps } = useRovingTabIndex(
+    expanded ? cases.length + waitingCases.length + (showClosed ? closedCases.length : 0) : 0,
+  )
 
   const warningCount = cases.filter((c) => c.policyWarnings.length > 0).length
   const contactCount = cases.filter(
@@ -165,7 +171,7 @@ export default function QueueColumn({
       <AccordionDetails sx={{ p: 0 }} id={`queue-${category}-content`}>
         {/* Active case list */}
         <Box role="list" aria-label={`${categoryLabel} queue`}>
-          {cases.length === 0 && waitingCases.length === 0 ? (
+          {cases.length === 0 && waitingCases.length === 0 && closedCases.length === 0 ? (
             <Box sx={{ px: 2, py: 3, textAlign: 'center' }}>
               <Typography variant="body2" color="text.secondary">
                 {t('dashboard.noResults')}
@@ -211,6 +217,63 @@ export default function QueueColumn({
                 />
               ))}
             </Box>
+          </>
+        )}
+
+        {/* Closed cases (last 7 days) */}
+        {closedCases.length > 0 && (
+          <>
+            <Divider />
+            <Box sx={{ px: 2, py: 0.5, bgcolor: 'action.hover' }}>
+              <Button
+                size="small"
+                variant="text"
+                onClick={() => setShowClosed((v) => !v)}
+                endIcon={
+                  <ExpandMoreIcon
+                    sx={{
+                      fontSize: 16,
+                      transition: 'transform 0.2s',
+                      transform: showClosed ? 'rotate(180deg)' : 'rotate(0deg)',
+                    }}
+                  />
+                }
+                sx={{
+                  color: 'text.secondary',
+                  textTransform: 'none',
+                  fontWeight: 600,
+                  fontSize: 12,
+                  p: 0,
+                }}
+              >
+                {showClosed
+                  ? t('dashboard.hideClosed')
+                  : t('dashboard.showClosed', { count: closedCases.length })}
+              </Button>
+            </Box>
+            {showClosed && (
+              <Box
+                role="list"
+                aria-label={`${t('status.CLOSED')} – ${categoryLabel}`}
+                sx={{ opacity: 0.65 }}
+              >
+                {[...closedCases]
+                  .sort((a, b) => {
+                    const aTs = new Date(a.closedAt ?? a.lastActivityAt).getTime()
+                    const bTs = new Date(b.closedAt ?? b.lastActivityAt).getTime()
+                    return bTs - aTs
+                  })
+                  .map((c, idx) => (
+                    <CaseListItem
+                      key={c.id}
+                      caseData={c}
+                      patient={patients.get(c.patientId)}
+                      onRefresh={onRefresh}
+                      {...getItemProps(cases.length + waitingCases.length + idx)}
+                    />
+                  ))}
+              </Box>
+            )}
           </>
         )}
       </AccordionDetails>

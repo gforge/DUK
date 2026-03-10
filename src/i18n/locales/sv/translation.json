@@ -95,8 +95,6 @@
     },
     "lastCallAttempt": "Försökte ringa {{date}}",
     "lastReminderSent": "Påminnelse skickad {{date}}",
-    "lastCallAttempt": "Försökte ringa {{date}}",
-    "contactedAt": "Kontaktad {{date}}",
     "reminded": "Påminnelse skickad",
     "remindedDone": "Påminnelse loggad i händelselogg",
     "suggestion": {
@@ -112,6 +110,7 @@
     "filterAll": "Alla",
     "filterCreatedByMe": "Anmälda av mig",
     "filterMine": "Mina patienter",
+    "hideClosed": "Dölj stängda",
     "lastActivity": "Senast aktiv",
     "noResults": "Inga ärenden hittades",
     "patientsCount_one": "{{count}} patient",
@@ -122,6 +121,8 @@
     "scheduledInDays_other": "om {{count}} dagar",
     "scheduledToday": "Idag",
     "search": "Sök på namn eller ID…",
+    "showClosed_one": "Visa stängda ({{count}})",
+    "showClosed_other": "Visa stängda ({{count}})",
     "sortFlags": "Prioritet",
     "sortLabel": "Sortera efter",
     "sortName": "Namn",
@@ -822,7 +823,6 @@
       "NURSE": "Sjuksköterska",
       "PHYSIO": "Fysioterapeut"
     },
-    "close": "Stäng ärende",
     "closeNoWorklist": "Stäng ärendet utan att skapa en arbetsuppgift",
     "confirmCreatesWorklist": "Bekräftelsen skapar en arbetsuppgift på arbetslistan",
     "contactMode": {
@@ -838,6 +838,7 @@
       "VISIT": "Patient besöker mottagningen"
     },
     "contextWhy": "Varför är ärendet här?",
+    "decisionSummary": "Triageringsbeslut",
     "dueAt": "Förfallodatum",
     "dueAtOpenPicker": "Öppna kalender",
     "dueAtPlaceholder": "t.ex. 2v, 14d eller ÅÅÅÅ-MM-DD",
@@ -850,7 +851,8 @@
     "editBooking": "Redigera bokning",
     "error": "Fel vid triage",
     "exportIcal": "Exportera till iCal",
-    "followUp": "Sätt till uppföljning",
+    "followingUpInWorklist": "Uppföljning pågår — hanteras via uppgiftslistan.",
+    "handledInWorklist": "Uppföljning sker via uppgiftslistan.",
     "namedPerson": "Tilldelas till",
     "nextStep": "Nästa åtgärd",
     "noNamedUsers": "Inga användare tillgängliga för denna roll",
