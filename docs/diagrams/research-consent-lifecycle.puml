@@ -1,5 +1,10 @@
 @startuml
-title Research Consent Lifecycle — State Diagram
+' Purpose: Research consent lifecycle states
+' Source of truth:
+'   src/api/schemas/journey.ts
+'   src/api/service/researchConsents.ts
+
+title Research Consent Lifecycle - State Diagram
 
 state "GRANTED\n(active)" as GRANTED
 state "REVOKED\n(terminal)" as REVOKED

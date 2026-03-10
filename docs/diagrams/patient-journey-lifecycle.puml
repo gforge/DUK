@@ -1,5 +1,11 @@
 @startuml
-title Patient Journey Lifecycle — State Diagram
+' Purpose: Patient journey lifecycle and phase progression
+' Source of truth:
+'   src/api/schemas/journey.ts
+'   src/api/service/patientJourneys.ts
+'   src/api/service/journeyDates.ts
+
+title Patient Journey Lifecycle - State Diagram
 
 state ACTIVE
 state SUSPENDED

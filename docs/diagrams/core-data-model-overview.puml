@@ -1,0 +1,74 @@
+@startuml
+' Purpose: Core Data Model - Overview
+' Source of truth:
+'   src/api/schemas/state.ts
+'   src/api/schemas/patient.ts
+'   src/api/schemas/case.ts
+'   src/api/schemas/journey.ts
+'   src/api/schemas/forms.ts
+'   src/api/schemas/journal.ts
+
+title Core Data Model - Overview
+
+top to bottom direction
+skinparam linetype ortho
+skinparam shadowing false
+skinparam classBackgroundColor white
+skinparam nodesep 50
+skinparam ranksep 70
+hide methods
+hide stereotypes
+
+package "Patient Core" #E3F2FD {
+  class Patient
+  class Case
+  class EpisodeOfCare
+}
+
+package "Runtime" #E8F5E9 {
+  class PatientJourney
+  class Instruction
+  class FormResponse
+  class JournalDraft
+}
+
+package "Templates" #FFF8E1 {
+  class JourneyTemplate
+  class JourneyTemplateEntry
+  class JourneyTemplateInstruction
+  class InstructionTemplate
+}
+
+package "Research" #F3E5F5 {
+  class ResearchModule
+  class Consent
+}
+
+Patient "1" -- "*" Case
+Patient "1" -- "*" EpisodeOfCare
+Patient "1" -- "*" Consent
+
+Case "0..1" -- "1" EpisodeOfCare
+Case "1" -- "*" FormResponse
+Case "1" -- "*" JournalDraft
+
+EpisodeOfCare "1" -- "*" PatientJourney
+PatientJourney "1" -- "*" Instruction
+
+PatientJourney "*" -- "1" JourneyTemplate
+FormResponse "*" -- "0..1" PatientJourney
+
+JourneyTemplate "1" -- "*" JourneyTemplateEntry
+JourneyTemplate "1" -- "*" JourneyTemplateInstruction
+JourneyTemplateInstruction "*" -- "1" InstructionTemplate
+
+Consent "*" -- "1" ResearchModule
+
+note right of Patient
+  Simplified overview.
+  Detailed fields and edge cases are documented in
+  core-data-model-reference.puml
+  and docs/design/data-model.md.
+end note
+
+@enduml

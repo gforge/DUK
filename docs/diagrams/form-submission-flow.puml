@@ -1,5 +1,11 @@
 @startuml
-title Form Submission to Case Update — Sequence Diagram
+' Purpose: Form submission pipeline to case/policy/audit updates
+' Source of truth:
+'   src/api/service/forms.ts
+'   src/api/service/policy.ts
+'   src/api/service/cases.ts
+
+title Form Submission to Case Update - Sequence Diagram
 
 actor "Patient/Clinician" as User
 participant "UI\n(PatientQuestionnaireForm / Case forms)" as UI

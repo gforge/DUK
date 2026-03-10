@@ -1,5 +1,10 @@
 @startuml
-title Dashboard Due-Step Computation — Activity Diagram
+' Purpose: Dashboard journey scheduling and due-step computation
+' Source of truth:
+'   src/api/service/journeyResolver.ts
+'   src/api/service/patientJourneys.ts
+
+title Dashboard Due-Step Computation - Activity Diagram
 
 start
 :Load patients & journeys;

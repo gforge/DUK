@@ -8,7 +8,7 @@ This document captures the key user stories for the Duk demo application. The li
 
 **As a** Patient‑Responsible Physician (PAL) **I want** to drill into queues and highlight the work that matters most to me:
 
-- see only patients for whom I am the PAL
+- see only patients for whom I am responsible physician (patient level or active journey ownership)
 - see cases that I myself have created/triaged
 - easily switch back to the full queue when needed
 
@@ -16,7 +16,7 @@ This document captures the key user stories for the Duk demo application. The li
 
 1. Dashboard has filter/toggles: **My patients (PAL)**, **Reported by me**, **All**.
 2. When a clinician triages a case, `createdBy`/`triagedBy` fields are set so that the “Reported by me” filter works.
-3. Patient cards show a PAL badge when appropriate and the filtering logic matches the badge.
+3. Patient cards show a PAL badge when appropriate and the filtering logic matches the badge for both patient-level and active-journey ownership.
 
 > _Related code_: `src/api/service/cases.ts` (state transitions), `src/store/roleContext.tsx` (role switch), `components/dashboard`.
 
@@ -102,7 +102,7 @@ This document captures the key user stories for the Duk demo application. The li
 - no executable code and no user‑defined helpers are permitted
 - preview page offers copy‑to‑clipboard
 - approving sets status `APPROVED` and emits an audit event
-- (optional) nurses can author drafts but only doctors/PALs may approve
+- (optional) nurses can author drafts but only doctors may approve
 
 **Acceptance criteria**
 
@@ -169,7 +169,7 @@ These stories map directly to the workflows and components described in the desi
 
 ## US10 – Patient registration & journey assignment
 
-**As a** clinician (nurse/doctor/PAL) **I want** to register new patients and assign them to a clinical journey with a configurable reference date:
+**As a** clinician (nurse/doctor) **I want** to register new patients and assign them to a clinical journey with a configurable reference date:
 
 - a dedicated `/patients` page lists all patients with search/filter
 - clicking "Register Patient" opens a 3-step wizard: patient details → journey assignment → review & confirm
@@ -178,7 +178,7 @@ These stories map directly to the workflows and components described in the desi
 
 **Acceptance criteria**
 
-1. `/patients` route exists and is accessible to NURSE, DOCTOR, PAL roles via the sidebar.
+1. `/patients` route exists and is accessible to NURSE and DOCTOR roles via the sidebar.
 2. `createPatient` service function creates a new patient record.
 3. `assignPatientJourney` assigns a journey template with the selected start date.
 4. The patients table shows active journey status per patient.
@@ -326,7 +326,7 @@ These stories map directly to the workflows and components described in the desi
 
 **Acceptance criteria**
 
-1. `GlobalSearch` button is shown in the TopBar for NURSE, DOCTOR, and PAL roles only.
+1. `GlobalSearch` button is shown in the TopBar for NURSE and DOCTOR roles only.
 2. Patients are fetched once on first open; subsequent opens reuse the cached list without a network round-trip.
 3. Up to 10 matching results are shown; filtering is case-insensitive and matches against `displayName` and `personalNumber`.
 4. Selecting a result navigates to `/patients/:id`.

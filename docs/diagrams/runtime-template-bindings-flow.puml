@@ -1,0 +1,39 @@
+@startuml
+' Purpose: Runtime <-> template bindings
+' Source of truth:
+'   src/api/service/patientJourneys.ts
+'   src/api/service/journeyResolver.ts
+'   src/api/schemas/forms.ts
+
+title Runtime-Template Bindings Flow
+
+left to right direction
+skinparam linetype ortho
+skinparam shadowing false
+
+rectangle "Template Layer" #FFF8E1 {
+  class JourneyTemplate
+  class JourneyTemplateEntry
+  class JourneyTemplateInstruction
+  class InstructionTemplate
+}
+
+rectangle "Runtime Layer" #E8F5E9 {
+  class PatientJourney
+  class Instruction
+  class FormResponse
+}
+
+JourneyTemplate --> PatientJourney : assignPatientJourney()
+JourneyTemplateInstruction --> Instruction : instantiate on assignment
+InstructionTemplate --> Instruction : instructionTemplateId
+JourneyTemplateEntry --> FormResponse : journeyTemplateEntryId
+PatientJourney --> FormResponse : patientJourneyId
+PatientJourney --> JourneyTemplate : journeyTemplateId
+
+note bottom
+  getEffectiveSteps() resolves due steps from JourneyTemplateEntry,
+  while Instruction rows are persisted runtime entities.
+end note
+
+@enduml

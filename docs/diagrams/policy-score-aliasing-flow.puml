@@ -1,5 +1,10 @@
 @startuml
-title Score Aliasing — Scope Mapping Sequence Diagram
+' Purpose: Score alias mapping into policy evaluation scope
+' Source of truth:
+'   src/api/service/journeyResolver.ts
+'   src/api/service/policy.ts
+
+title Score Aliasing - Scope Mapping Sequence Diagram
 
 actor System
 participant "JourneyTemplateEntry" as Entry

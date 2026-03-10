@@ -1,0 +1,45 @@
+@startuml
+' Purpose: Runtime entities and relationships
+' Source of truth:
+'   src/api/schemas/state.ts
+'   src/api/schemas/journey.ts
+'   src/api/schemas/forms.ts
+'   src/api/schemas/journal.ts
+
+title Runtime Model
+
+left to right direction
+skinparam linetype ortho
+skinparam shadowing false
+skinparam classBackgroundColor white
+hide methods
+hide stereotypes
+
+package "Runtime Core" #E8F5E9 {
+  class EpisodeOfCare
+  class PatientJourney
+  class Instruction
+  class FormResponse
+  class JournalDraft
+}
+
+package "Research Runtime" #F3E5F5 {
+  class Consent
+}
+
+EpisodeOfCare "1" -- "*" PatientJourney
+PatientJourney "1" -- "*" Instruction
+PatientJourney "1" -- "*" Consent
+PatientJourney "0..1" -- "*" FormResponse
+
+note right of JournalDraft
+  JournalDraft links to Case via caseId.
+  Case relations are shown in core-data-model-overview.puml.
+end note
+
+note bottom
+  Runtime records represent patient-specific state and history.
+  Template/configuration entities are modeled separately in template-model.puml.
+end note
+
+@enduml

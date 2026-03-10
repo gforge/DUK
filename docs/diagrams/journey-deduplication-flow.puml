@@ -1,5 +1,9 @@
 @startuml
-title Parallel Journeys — Due-Step Deduplication Activity Diagram
+' Purpose: Parallel journey due-step deduplication
+' Source of truth:
+'   src/api/service/journeyResolver.ts
+
+title Parallel Journeys - Due-Step Deduplication Activity Diagram
 
 start
 :Load ACTIVE/SUSPENDED journeys for patient;

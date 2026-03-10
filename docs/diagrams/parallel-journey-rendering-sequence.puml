@@ -1,5 +1,11 @@
 @startuml
-title Multiple Journeys — Combined Rendering And Deduplication
+' Purpose: Combined rendering and deduplication for parallel journeys
+' Source of truth:
+'   src/api/service/journeyResolver.ts
+'   src/components/case/JourneyTab/index.tsx
+'   src/components/patientView/PatientCareplan/main.tsx
+
+title Multiple Journeys - Combined Rendering And Deduplication
 
 actor Clinician
 participant "JourneyTab\n(CaseDetail UI)" as JT

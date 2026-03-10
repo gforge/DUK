@@ -1,5 +1,10 @@
 @startuml
-title Journey Modifications — Sequence Diagram
+' Purpose: Journey modification operations and audit trail
+' Source of truth:
+'   src/api/service/patientJourneys.ts
+'   src/api/service/journeyResolver.ts
+
+title Journey Modifications - Sequence Diagram
 
 actor Clinician
 participant "ModifyJourneyDialog\n(UI)" as UI

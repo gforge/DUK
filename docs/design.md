@@ -1,276 +1,115 @@
-**Design Document — DUK Clinical Triage Demo**
+# Design Document - DUK Clinical Triage Demo
 
-## How To Read This Document
+## Purpose
 
-Use this document as a guided tour.
+This document is the entry point for architecture and design review.
 
-1. Start with architecture and data model.
-2. Follow the core clinical flow (dashboard -> case triage -> journey operations).
-3. Continue to policy/journal and research consent.
-4. Use implementation mapping as a code index.
+Read in this order:
 
-Diagram reading order in this document:
+1. Primary overview diagrams (high-level and conceptual model).
+2. Domain deep dives (journeys, policy, journal templating).
+3. Reference documentation (field-level details and lifecycle appendices).
 
-1. `high-level-architecture.svg`
-2. `core-data-model.svg`
-3. `case-lifecycle.svg`
-4. `dashboard-journey-computation.svg`
-5. `patient-journey-lifecycle.svg`
-6. `journey-tabs-rendering.svg`
-7. `journey-deduplication-flow.svg`
-8. `pause-resume-sequence.svg`
-9. `journey-modifications-sequence.svg`
-10. `form-submission-flow.svg`
-11. `triage-policy-sequence.svg`
-12. `policy-grammar.svg`
-13. `score-aliasing.svg`
-14. `journal-generation.svg`
-15. `research-consent-sequence.svg`
-16. `consent-lifecycle.svg`
+The overview diagrams are intentionally incomplete so they remain readable.
+Detailed fields and edge-case semantics are moved to deep-dive and reference docs.
 
-## Executive Summary
+## Primary Overview Diagrams
 
-DUK is a fully client-side React/TypeScript demo of orthopaedic follow-up triage.
+These are the first diagrams to review.
 
-- No backend and no authentication.
-- All data is fictional and stored in memory + `localStorage`.
-- Primary workflow: identify risky patients, triage cases, maintain follow-up journeys, and produce audit-friendly clinical documentation.
+1. `docs/diagrams/architecture-overview.svg`
+2. `docs/diagrams/core-entity-relationship-overview.svg`
+3. `docs/diagrams/core-data-model-overview.svg`
 
-## Goals And Constraints
+![Architecture Overview](diagrams/architecture-overview.svg)
 
-- Tech: React, TypeScript, Vite, MUI, React Hook Form + Zod, i18next.
-- Runtime model: async client wrappers over synchronous in-memory services.
-- Safety: no `eval`, no dynamic code execution in policy/journal parsing.
-- Demo constraints: no real patient data, no network API.
+![Core Entity Relationship Overview](diagrams/core-entity-relationship-overview.svg)
 
-## Roles
+![Core Data Model Overview](diagrams/core-data-model-overview.svg)
 
-- `PATIENT`: self-service forms and care plan view.
-- `NURSE`: triage in scope, contact actions, workflow management.
-- `DOCTOR`: triage + journal approval.
-- `PAL`: doctor capabilities with dedicated queue filters.
-- `SECRETARY`: coordination-focused workflow support, including worklist operations.
+## Domain Deep Dives
 
-## System Architecture
+### Journey Domain
 
-![System Architecture](diagrams/high-level-architecture.svg)
+Use `docs/design/patient-journey.md` for lifecycle and runtime behavior details.
 
-What this diagram shows:
+Primary journey diagrams:
 
-- UI calls `src/api/client/*` asynchronous wrappers.
-- Client delegates to synchronous service modules.
-- Service layer owns business rules and state transitions.
-- Persistence is an in-memory singleton mirrored to `localStorage`.
+1. `docs/diagrams/patient-journey-lifecycle.svg`
+2. `docs/diagrams/journey-scheduling-flow.svg`
+3. `docs/diagrams/journey-tabs-sequence.svg`
+4. `docs/diagrams/journey-deduplication-flow.svg`
+5. `docs/diagrams/pause-resume-sequence.svg`
+6. `docs/diagrams/journey-modifications-sequence.svg`
+7. `docs/diagrams/form-submission-flow.svg`
 
-Key takeaway: business logic is centralized in service modules; UI layers remain orchestration-focused.
+### Policy Domain
 
-## Core Data Model
+Use `docs/design/policy.md` for policy evaluation, grammar, and alias-aware scope.
 
-![Core Data Model](diagrams/core-data-model.svg)
+Primary policy diagrams:
 
-What this diagram shows:
+1. `docs/diagrams/policy-evaluation-sequence.svg`
+2. `docs/diagrams/policy-grammar-model.svg`
+3. `docs/diagrams/policy-score-aliasing-flow.svg`
 
-- Primary entities: `Patient`, `Case`, `EpisodeOfCare`, `PatientJourney`, `JourneyTemplate`, `Instruction`, `FormResponse`, `PolicyRule`, `JournalDraft`, `Consent`.
-- A patient can have many journeys in parallel.
-- Journeys are grouped into episodes and can transition across phase types.
-- Consents are append-only audit records with revocation metadata.
+### Journal Templating Domain
 
-Key takeaway: patient follow-up is journey-centric, while triage and messaging are case-centric.
+Use `docs/design/templating.md` for renderer rules and token whitelist constraints.
 
-## Clinical Workflow Overview
+Primary templating diagram:
 
-- Dashboard groups active work by urgency categories.
-- Case detail combines forms, journey, triage decisioning, journal, and audit log.
-- Triage updates case state and may produce policy warnings.
-- Journey logic drives what is due and when.
+1. `docs/diagrams/journal-generation-sequence.svg`
 
-### Case Lifecycle
+## Reference Documentation
 
-![Case Lifecycle](diagrams/case-lifecycle.svg)
+### Data Model Reference
 
-What this diagram shows:
+Use `docs/design/data-model.md` for field-level detail and schema mapping.
 
-- State progression from `NEW` through `CLOSED`.
-- Optional direct close path from `TRIAGED`.
+Reference diagrams:
 
-Key takeaway: all state transitions are explicit service-layer decisions, not UI-only state.
+1. `docs/diagrams/core-data-model-reference.svg`
+2. `docs/diagrams/runtime-model.svg`
+3. `docs/diagrams/template-model.svg`
+4. `docs/diagrams/runtime-template-bindings-flow.svg`
 
-### Dashboard Due-Step Computation
+### Consent Reference
 
-![Dashboard Due-Step Computation](diagrams/dashboard-journey-computation.svg)
+Consent behavior is modeled separately from overview diagrams.
 
-What this diagram shows:
+1. `docs/diagrams/research-consent-sequence.svg`
+2. `docs/diagrams/research-consent-lifecycle.svg`
 
-- Effective steps are computed per journey.
-- Pause shifts and modifications are applied before queue construction.
-- Parallel journeys are merged with questionnaire deduplication.
+## Diagram Index By Intent
 
-Key takeaway: dashboard urgency is computed from current journey state, not static seed data.
-
-## Patient Journeys
-
-A patient may have multiple concurrent `PatientJourney` records (for example two independent programmes running in parallel).
-
-### Journey Lifecycle
-
-![Patient Journey Lifecycle](diagrams/patient-journey-lifecycle.svg)
-
-What this diagram shows:
-
-- `ACTIVE`, `SUSPENDED`, `COMPLETED` lifecycle.
-- Phase progression is modeled by completing one journey and starting the next phase in the same episode.
-
-Key takeaway: suspension is stateful, while clinical progression is represented by explicit phase transitions.
-
-### Parallel Journeys In The UI
-
-![Multiple Journeys Tab Rendering](diagrams/journey-tabs-rendering.svg)
-
-What this diagram shows:
-
-- Both clinician (`JourneyTab`) and patient (`PatientCareplan`) views render all journeys in tabs.
-- Sorting is consistent: `ACTIVE -> SUSPENDED -> COMPLETED`, newest first per group.
-
-Key takeaway: users navigate whole care history, not just a single active programme.
-
-### Parallel Journey Deduplication
-
-![Parallel Journey Deduplication](diagrams/journey-deduplication-flow.svg)
-
-What this diagram shows:
-
-- `getMergedDueStepsForPatient(patientId, date)` deduplicates by questionnaire `templateId`.
-
-Key takeaway: the same questionnaire is shown at most once even when two journeys overlap.
-
-### Pause And Resume
-
-![Journey Pause Resume Sequence](diagrams/pause-resume-sequence.svg)
-
-What this diagram shows:
-
-- `pauseJourney` stores `pausedAt` and moves to `SUSPENDED`.
-- `resumeJourney` accumulates elapsed days into `totalPausedDays`.
-- During suspension, date shift is computed dynamically in resolver logic.
-
-Key takeaway: pause affects schedule calculations without rewriting all step dates.
-
-### Journey Modifications
-
-![Journey Modifications](diagrams/journey-modifications-sequence.svg)
-
-What this diagram shows:
-
-- `ADD_STEP`, `REMOVE_STEP`, and `CANCEL` modification semantics.
-- Episode-phase transitions are handled by `startNextPhase(...)` and tracked with `PatientJourney.transition`.
-
-Key takeaway: modifications are auditable journey history, not destructive edits.
-
-### Journey Cancellation Rules
-
-- If no journey data exists: journey can be deleted.
-- If data exists: journey is archived as `COMPLETED` + `CANCEL` modification.
-- Form responses are never deleted.
-
-## Form Submission And Data Flow
-
-![Form Submission Flow](diagrams/form-submission-flow.svg)
-
-What this diagram shows:
-
-- Form submission writes `FormResponse`.
-- Scores/policy scope are recomputed.
-- Case warnings and audit events are updated.
-
-Key takeaway: submission is a pipeline that updates journey, case, and audit surfaces.
-
-## Policy Evaluation
-
-![Case Triage Policy Sequence](diagrams/triage-policy-sequence.svg)
-
-What this diagram shows:
-
-- Triage requests trigger policy scope building and expression evaluation.
-- Matched rules produce `policyWarnings` on the case.
-
-![Policy Grammar](diagrams/policy-grammar.svg)
-
-What this diagram shows:
-
-- Supported operator classes and precedence model.
-
-![Score Aliasing](diagrams/score-aliasing.svg)
-
-What this diagram shows:
-
-- Journey entry score aliases mapped into a stable numeric policy scope.
-
-Key takeaway: policy authoring is expressive but safe, and aliasing keeps rule identifiers stable over time.
-
-## Journal Generation
-
-![Journal Draft Generation](diagrams/journal-generation.svg)
-
-What this diagram shows:
-
-- Journal draft generation pulls patient/case/form context.
-- Content is rendered by a safe renderer and persisted with audit context.
-
-Key takeaway: journal generation is deterministic, templated, and auditable.
-
-## Research Consent
-
-![Research Consent Sequence](diagrams/research-consent-sequence.svg)
-
-What this diagram shows:
-
-- Consent grant requires acknowledgement in dialog UI.
-- Grant is idempotent per patient/module/journey.
-- Revocation sets metadata and preserves history.
-
-![Research Consent Lifecycle](diagrams/consent-lifecycle.svg)
-
-What this diagram shows:
-
-- State-level model of active vs revoked consent records.
-
-Key takeaway: consent storage is intentionally append-only for auditability.
-
-## Supporting UX Features
-
-- Global search for clinicians (`/patients/:id` navigation).
-- Contact action shortcuts for `SEEK_CONTACT`/`NOT_OPENED` triggers.
-- Print-friendly journal view (top bar and side nav hidden in print mode).
-- Shared `ConfirmDialog` for destructive actions.
-- Paginated patient lists with resilient page clamping.
+- `*-overview`: conceptual and navigation-first diagrams.
+- `*-model`: conceptual model structures.
+- `*-lifecycle`: state transitions over time.
+- `*-sequence`: service interaction chronology.
+- `*-flow`: process/activity pipeline.
+- `*-reference`: field-level and appendix style detail.
 
 ## Implementation Mapping
 
-Core code entry points:
+Core source-of-truth files:
 
-- Enums: `../src/api/schemas/enums.ts`
-- Case services: `../src/api/service/cases.ts`
-- Journey resolver: `../src/api/service/journeyResolver.ts`
-- Journey lifecycle services: `../src/api/service/patientJourneys.ts`
-- Policy parser: `../src/api/policyParser/parser.ts`
-- Policy service: `../src/api/service/policy.ts`
-- Journal renderer: `../src/api/journalRenderer.ts`
-- Research consent service: `../src/api/service/researchConsents.ts`
-- Case journey UI: `../src/components/case/JourneyTab/index.tsx`
-- Patient care plan UI: `../src/components/patientView/PatientCareplan/main.tsx`
+- `src/api/schemas/state.ts`
+- `src/api/schemas/patient.ts`
+- `src/api/schemas/case.ts`
+- `src/api/schemas/journey.ts`
+- `src/api/schemas/forms.ts`
+- `src/api/service/patientJourneys.ts`
+- `src/api/service/journeyResolver.ts`
+- `src/api/service/policy.ts`
+- `src/api/service/researchConsents.ts`
+- `src/api/journalRenderer.ts`
+- `src/api/policyParser/parser.ts`
 
-Focused docs:
+## Glossary
 
-- Journey deep dive: `design/patient-journey.md`
-- Policy deep dive: `design/policy.md`
-
-## Gaps And Future Enhancements
-
-- Add explicit Case -> Journey linkage only if business rules require one-to-one coupling.
-- Consider richer audit filtering (date range, actor, action type).
-- Consider per-step completion overlays in patient care plan timeline.
-- Keep diagram and docs synchronized when changing service contracts or state transitions.
-
-## Diagram Sources
-
-All diagrams are authored in `docs/diagrams/*.puml` and rendered to SVG via `npm run diagrams:render`.
+- `PAL`: responsible physician ownership assignment, not a standalone role enum.
+- `EpisodeOfCare`: container for journey phases for one clinical problem.
+- `PatientJourney`: one phase/program within an episode.
+- `Effective step`: computed follow-up step output from resolver logic.
+- `Score alias`: stable policy/journal key mapped from raw score fields.

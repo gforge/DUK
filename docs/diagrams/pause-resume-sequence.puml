@@ -1,5 +1,11 @@
 @startuml
-title Journey Pause & Resume — Sequence
+' Purpose: Journey pause and resume behavior
+' Source of truth:
+'   src/api/service/patientJourneys.ts
+'   src/api/service/journeyDates.ts
+'   src/api/service/journeyResolver.ts
+
+title Journey Pause and Resume - Sequence
 
 actor Clinician
 participant "JourneyTab\n(UI)" as UI

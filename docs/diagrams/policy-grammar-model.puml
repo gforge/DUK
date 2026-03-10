@@ -1,5 +1,10 @@
 @startuml
-title Policy Expression Language — Grammar Diagram
+' Purpose: Policy expression grammar and precedence model
+' Source of truth:
+'   src/api/policyParser/tokens.ts
+'   src/api/policyParser/parser.ts
+
+title Policy Expression Language - Grammar Diagram
 
 class "Expression" as Expression
 class "LogicalOr" as LogicalOr

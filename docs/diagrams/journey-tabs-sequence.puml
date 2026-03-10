@@ -1,5 +1,11 @@
 @startuml
-title Multiple Journeys — Tab Rendering Sequence Diagram
+' Purpose: Multi-journey tab rendering in clinician and patient views
+' Source of truth:
+'   src/components/case/JourneyTab/index.tsx
+'   src/components/patientView/PatientCareplan/main.tsx
+'   src/api/client/patientJourneys.ts
+
+title Multiple Journeys - Tab Rendering Sequence Diagram
 
 actor Clinician
 participant "JourneyTab\n(CaseDetail UI)" as JT

@@ -1,5 +1,10 @@
 @startuml
-title Journal Draft Generation — Sequence Diagram
+' Purpose: Journal draft generation and persistence flow
+' Source of truth:
+'   src/api/service/journal.ts
+'   src/api/journalRenderer.ts
+
+title Journal Draft Generation - Sequence Diagram
 
 actor Clinician
 participant "UI" as UI

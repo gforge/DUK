@@ -1,5 +1,11 @@
 @startuml
-title Case Triage — Policy Evaluation Sequence Diagram
+' Purpose: Case triage policy evaluation sequence
+' Source of truth:
+'   src/api/service/policy.ts
+'   src/api/service/journeyResolver.ts
+'   src/api/policyParser/parser.ts
+
+title Case Triage - Policy Evaluation Sequence Diagram
 
 actor Clinician
 participant "UI" as UI

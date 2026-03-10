@@ -1,5 +1,10 @@
 @startuml
-title Case Lifecycle — State Diagram
+' Purpose: Case lifecycle states and transitions
+' Source of truth:
+'   src/api/schemas/enums.ts
+'   src/api/service/cases.ts
+
+title Case Lifecycle - State Diagram
 
 state NEW
 state NEEDS_REVIEW

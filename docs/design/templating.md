@@ -1,31 +1,51 @@
-**Journal Templating — Whitelist & Rules**
+# Journal Templating - Renderer Scope and Safety
 
-![Journal Generation](../diagrams/journal-generation.svg)
+This page documents the journal renderer behavior only.
+It does not cover generic architecture or policy flow.
 
-Overview
+## Rendering Flow
 
-- Journal templates are rendered by a safe, Mustache-like renderer at `src/api/journalRenderer.ts`.
-- Only whitelisted tokens and boolean flags are supported. No helpers, no expressions, no code execution.
+![Journal Generation Sequence](../diagrams/journal-generation-sequence.svg)
 
-Allowed token patterns
+Source modules:
 
-- `{{patient.displayName}}`, `{{patient.personalNumber}}`, `{{patient.dateOfBirth}}`
-- `{{case.category}}`, `{{case.status}}`, `{{case.deadline}}`
-- `{{scores.ALIAS}}` — numeric score values (aliases injected from journeys)
-- `{{label.ALIAS}}` — human readable labels for scores or answers
-- `{{policyWarnings.list}}` — formatted list of policy warnings
+- `src/api/service/journal.ts`
+- `src/api/journalRenderer.ts`
 
-Conditionals
+## Allowed Token Scope
 
-- `{{#if triggers.NOT_OPENED}}...{{/if}}` — allowed only for a small whitelist of flags (e.g., `triggers.NOT_OPENED`, `triggers.NO_RESPONSE`, `triggers.HIGH_PAIN`).
-- Conditionals evaluate truthily only for boolean or existence checks; no nested expressions.
+Renderer supports whitelisted tokens, including:
 
-Security & authoring
+- `{{patient.displayName}}`
+- `{{patient.dateOfBirth}}`
+- `{{case.category}}`
+- `{{case.status}}`
+- `{{policyWarnings.list}}`
+- `{{triage.nextStep}}`
+- `{{score.ALIAS}}`
+- `{{label.ALIAS}}`
 
-- Templates are validated against `WHITELIST_TOKENS` inside `journalRenderer`. When creating new templates, ensure tokens are among the whitelist or update the whitelist in `journalRenderer`.
-- Examples are seeded in `src/api/seed/journalTemplates.ts`.
+Whitelists are enforced in `src/api/journalRenderer.ts`.
 
-Renderer behaviour
+## Conditionals
 
-- Missing tokens are rendered as empty strings and a warning is logged to the audit (template render warnings).
-- Approving a draft emits an audit event (JOURNAL_DRAFT_APPROVED) and sets `status=APPROVED`.
+Supported form:
+
+- `{{#if triggers.FLAG}}...{{/if}}`
+
+Only whitelisted trigger flags are valid.
+No nested expressions or helper execution is allowed.
+
+## Safety Constraints
+
+- No `eval()`.
+- No user-defined helper execution.
+- No arbitrary expression evaluation.
+- Unknown tokens resolve to validation markers in output.
+
+## Authoring Notes
+
+- Keep templates deterministic and auditable.
+- Prefer alias-based score references to raw keys.
+- Add new tokens by updating the whitelist in `journalRenderer.ts`.
+- Keep templates and language output aligned with clinical terminology.

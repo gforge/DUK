@@ -1,5 +1,11 @@
 @startuml
-title System Architecture — Component Diagram
+' Purpose: High-level architecture overview
+' Source of truth:
+'   src/api/client/index.ts
+'   src/api/service/index.ts
+'   src/api/storage.ts
+
+title System Architecture - Component Diagram
 
 left to right direction
 

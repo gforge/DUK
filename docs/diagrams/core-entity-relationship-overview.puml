@@ -1,0 +1,27 @@
+@startuml
+' Purpose: Tiny conceptual core entity relationships
+' Source of truth:
+'   src/api/schemas/patient.ts
+'   src/api/schemas/case.ts
+'   src/api/schemas/journey.ts
+
+title Core Entity Relationship - Overview
+
+left to right direction
+skinparam linetype ortho
+skinparam shadowing false
+skinparam classBackgroundColor white
+hide methods
+hide stereotypes
+
+class Patient
+class Case
+class EpisodeOfCare
+class PatientJourney
+
+Patient "1" -- "*" Case
+Patient "1" -- "*" EpisodeOfCare
+EpisodeOfCare "1" -- "*" PatientJourney
+Case "0..1" -- "1" EpisodeOfCare
+
+@enduml

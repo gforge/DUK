@@ -1,63 +1,69 @@
-**Policy Evaluation — Language, Scope, And Runtime Flow**
+# Policy Evaluation - Flow, Grammar, and Scope
 
-This document explains how policy rules are authored, parsed, evaluated, and surfaced in case triage.
+This page documents policy evaluation behavior.
+It intentionally excludes broad architecture overview content.
 
-Read `../design.md` first for the full clinical flow.
+## Evaluation Flow
 
-## End-To-End Evaluation Flow
+![Policy Evaluation Sequence](../diagrams/policy-evaluation-sequence.svg)
 
-![Case Triage Policy Sequence](../diagrams/triage-policy-sequence.svg)
+Policy warnings are produced during case policy re-evaluation.
 
-What this diagram shows:
+Primary flow:
 
-- Triage triggers policy evaluation as part of case update handling.
-- Scope is assembled from latest form responses and score aliases.
-- Matching rules become `Case.policyWarnings`.
+1. Collect case form responses.
+2. Build policy scope with alias support.
+3. Evaluate enabled rules for the applicable journey template.
+4. Persist `Case.policyWarnings`.
 
-## Language Model
+Source modules:
 
-![Policy Grammar](../diagrams/policy-grammar.svg)
+- `src/api/service/policy.ts`
+- `src/api/service/journeyResolver.ts`
 
-Supported categories:
+## Grammar Model
+
+![Policy Grammar Model](../diagrams/policy-grammar-model.svg)
+
+Parser is a handwritten recursive-descent parser.
+No `eval()` or dynamic execution is used.
+
+Operator classes supported by parser/tokenizer:
 
 - Arithmetic: `+ - * /`
 - Comparison: `== != < <= > >=`
 - Logical: `&& ||`
-- Parenthesized expressions and identifiers
 
-Design constraint:
+Source modules:
 
-- Parser is hand-written recursive descent; no `eval`, no dynamic execution.
+- `src/api/policyParser/tokens.ts`
+- `src/api/policyParser/parser.ts`
 
 ## Alias-Aware Scope Construction
 
-![Score Aliasing](../diagrams/score-aliasing.svg)
+![Policy Score Aliasing Flow](../diagrams/policy-score-aliasing-flow.svg)
 
-What this diagram shows:
+Alias mapping allows policies to use stable keys even when raw score names differ.
+Resolver logic builds a scope from latest relevant responses and journey template aliases.
 
-- Raw score keys are transformed into stable aliases for policy authors.
-- Aliases keep expressions readable and resilient to internal score key changes.
+Source module:
 
-## Input Pipeline Context
+- `src/api/service/journeyResolver.ts`
+
+## Input Coupling From Form Submission
 
 ![Form Submission Flow](../diagrams/form-submission-flow.svg)
 
-Why this matters for policy:
+Form submission is the runtime input path into policy evaluation.
 
-- New form responses feed scoring.
-- Scored outputs become policy scope inputs.
-- Policy warnings feed back into queue and case visuals.
+Source modules:
+
+- `src/api/service/forms.ts`
+- `src/api/service/policy.ts`
 
 ## Authoring Guidance
 
-- Prefer clinically meaningful aliases over raw score key names.
-- Keep rules short and composable.
-- Validate edge cases where fields may be missing.
-- Treat unknown identifiers as non-matching conditions.
-
-## Key Code References
-
-- `../../src/api/policyParser/tokens.ts`
-- `../../src/api/policyParser/parser.ts`
-- `../../src/api/service/policy.ts`
-- `../../src/api/service/journeyResolver.ts`
+- Prefer aliases with clinical meaning over raw score keys.
+- Keep expressions short and composable.
+- Handle missing values as non-matching conditions.
+- Bind policy rules to relevant `journeyTemplateId`.

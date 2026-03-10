@@ -25,13 +25,15 @@ Then open http://localhost:5173 in your browser.
 
 Switch role from the top bar to experience each perspective:
 
-| Role                             | Description                                                    |
-| -------------------------------- | -------------------------------------------------------------- |
-| **PAL** (Patientansvarig läkare) | Full access: dashboard, triage, journal approve, policy editor |
-| **Doctor**                       | Dashboard, triage, journal approve                             |
-| **Nurse**                        | Dashboard, triage, journal view                                |
-| **Secretary**                    | Worklist coordination, contact logistics, booking follow-up    |
-| **Patient**                      | Patient portal: view own cases, open app, seek contact         |
+| Role          | Description                                                 |
+| ------------- | ----------------------------------------------------------- |
+| **Doctor**    | Dashboard, triage, journal approve                          |
+| **Nurse**     | Dashboard, triage, journal view                             |
+| **Secretary** | Worklist coordination, contact logistics, booking follow-up |
+| **Patient**   | Patient portal: view own cases, open app, seek contact      |
+
+`PAL` (patient-responsible physician) is modeled as an ownership assignment, not as a separate user role.
+Ownership can be set on patient level and journey level (with episode fallback).
 
 ### Dashboard
 
@@ -89,7 +91,7 @@ Score: {{scores.PNRS_1}}
 ### Worklist (`/worklist`)
 
 - Structured queue for operational follow-up tasks
-- Filters for category, assigned role, PAL-only and ownership views
+- Filters for category, assigned role, responsible-physician and ownership views
 - Completion dialog with scheduling metadata and comments
 
 ### Patient Detail (`/patients/:id`)

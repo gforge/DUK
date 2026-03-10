@@ -1,5 +1,11 @@
 @startuml
-title Research Consent — Grant And Revoke Sequence Diagram
+' Purpose: Research consent grant and revoke flow
+' Source of truth:
+'   src/api/service/researchConsents.ts
+'   src/components/journey/ConsentDialog.tsx
+'   src/components/journey/RevokeConsentDialog.tsx
+
+title Research Consent - Grant And Revoke Sequence Diagram
 
 actor Clinician
 participant "JourneyTab\n(UI)" as UI

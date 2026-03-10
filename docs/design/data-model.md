@@ -1,209 +1,176 @@
-**Data Model — Detailed Fields**
+# Data Model - Conceptual and Reference Guide
 
-This document expands the core entities with field-level detail and references to the canonical Zod schemas in the codebase.
+This page explains the split data-model documentation layers.
 
-![Core Data Model](../diagrams/core-data-model.svg)
+1. Conceptual overview: tiny relationship map for fast orientation.
+2. Broader overview: cross-domain entity map for architecture review.
+3. Reference detail: field-level clarifications and non-obvious semantics.
 
-The ERD above is intentionally compact. For examples and clarifications of non-intuitive field names, see:
+## Conceptual Overview
 
-![Core Data Model Field Guide](../diagrams/core-data-model-help.svg)
+![Core Entity Relationship Overview](../diagrams/core-entity-relationship-overview.svg)
 
-Patient (src/api/schemas/patient.ts)
+Use this first to understand the kernel:
 
-- id: string (uuid)
-- displayName: string
-- personalNumber: string | null
-- dateOfBirth: string (ISO)
-- palId: string | null (user id of PAL)
-- lastOpenedAt: string | null (ISO)
-- createdAt: string (ISO)
+- `Patient`
+- `Case`
+- `EpisodeOfCare`
+- `PatientJourney`
 
-Case (src/api/schemas/case.ts)
+This diagram is intentionally minimal.
 
-- id: string
-- patientId: string (FK → Patient.id)
-- episodeId: string | undefined (FK → EpisodeOfCare.id)
-- status: enum (NEW, NEEDS_REVIEW, TRIAGED, FOLLOWING_UP, CLOSED)
-- category: enum (ACUTE, SUBACUTE, CONTROL)
-- triggers: string[] (named trigger keys)
-- policyWarnings: {ruleId, ruleName, severity, triggeredValues, expression}[]
-- triageDecision: {contactMode, careRole, assignmentMode, assignedUserId?, dueAt?, note?} | undefined
-- bookings: Booking[] | undefined
-- reviews: ClinicalReview[]
-- internalNote, patientMessage, deadline, formSeriesId: string | undefined
-- createdAt, lastActivityAt: string (ISO)
-- closedAt: string | null | undefined
+## Broader Model Overview
 
-PatientJourney (src/api/schemas/journey.ts)
+![Core Data Model Overview](../diagrams/core-data-model-overview.svg)
 
-- id: string
-- episodeId: string
-- patientId: string
-- journeyTemplateId: string
-- phaseType: enum (REFERRAL, INTAKE, FOLLOWUP, WAITING_LIST, POST_OP, MONITORING, DISCHARGE)
-- phaseLabel: string | undefined
-- startDate: string (YYYY-MM-DD)
-- joinedAt: string (YYYY-MM-DD; late enrollment anchor)
-- transition: JourneyPhaseTransition | undefined
-- status: enum (ACTIVE, SUSPENDED, COMPLETED)
-- pausedAt: string | null (ISO; set when SUSPENDED, cleared on resume)
-- totalPausedDays: number (accumulated whole-day pauses from all previous pause/resume cycles)
-- researchModuleIds: string[]
-- modifications: JourneyModification[]
-- recurringCompletions: RecurringCompletion[]
-- createdAt, updatedAt: string (ISO)
+This overview adds runtime, template, and research entities while staying readable.
 
-EpisodeOfCare (src/api/schemas/journey.ts)
+## Supporting Model Views
 
-- id: string
-- patientId: string
-- label: string
-- clinicalArea: string | undefined
-- status: enum (OPEN, COMPLETED, DISCHARGED)
-- openedAt: string (ISO)
-- closedAt: string | null (ISO)
-- responsibleUserId: string | undefined
-- primaryCaseId: string | undefined
-- createdAt, updatedAt: string (ISO)
+![Runtime Model](../diagrams/runtime-model.svg)
 
-JourneyTemplateEntry
+![Template Model](../diagrams/template-model.svg)
 
-- id: string
-- label: string
-- templateId: string | undefined (questionnaire template; optional for instruction-only steps)
-- order: number
-- offsetDays: number
-- windowDays: number
-- scoreAliases: Record<string, string> (raw score key → semantic alias)
-- scoreAliasLabels: Record<string, string> (alias → human label)
-- stepKey: string | undefined
-- dashboardCategory: enum (ACUTE, SUBACUTE, CONTROL)
-- recurrenceIntervalDays: number | undefined
-- reviewTypes: ReviewType[] | undefined
-- icon: string | undefined
+![Runtime Template Bindings Flow](../diagrams/runtime-template-bindings-flow.svg)
 
-JourneyTemplateInstruction
+These views answer different questions:
 
-- id: string
-- journeyTemplateId: string (FK → JourneyTemplate.id)
-- instructionTemplateId: string (FK → InstructionTemplate.id)
-- label: string | undefined
-- startDayOffset: number
-- endDayOffset: number | undefined
-- order: number
-- tags: string[]
+- Runtime model: what patient-specific records are persisted during operation.
+- Template model: what reusable configuration records define behavior.
+- Runtime-template bindings: how assignment and resolution map templates to runtime records.
 
-Instruction
+## Field-Level Reference
 
-- id: string
-- patientJourneyId: string (FK → PatientJourney.id)
-- journeyTemplateInstructionId: string | undefined
-- instructionTemplateId: string (FK → InstructionTemplate.id)
-- label: string | undefined
-- startDayOffset: number
-- endDayOffset: number | undefined
-- startAt: string (ISO)
-- endAt: string | null (ISO)
-- status: enum (ACTIVE, ACKNOWLEDGED, COMPLETED, CANCELLED)
-- acknowledgedAt, completedAt: string | null (ISO)
-- acknowledgedByUserId, completedByUserId: string | null
-- tags: string[]
-- createdAt, updatedAt: string (ISO)
+![Core Data Model Reference](../diagrams/core-data-model-reference.svg)
 
-JourneyTemplate
+Field-heavy details stay here instead of in overview diagrams.
 
-- id: string
-- name: string
-- description: string | undefined
-- entries: JourneyTemplateEntry[]
-- parentTemplateId: string | undefined (FK → parent JourneyTemplate.id for derived templates)
-- derivedAt: string | undefined (ISO; timestamp of last sync from parent)
-- referenceDateLabel: string
-- createdAt: string (ISO)
+### Patient (`src/api/schemas/patient.ts`)
 
-InstructionTemplate (src/api/schemas/journey.ts) — NEW
+- `id: string`
+- `displayName: string`
+- `personalNumber: string | null`
+- `dateOfBirth: string`
+- `palId?: string`
+- `lastOpenedAt: string | null`
+- `createdAt: string`
 
-- id: string
-- name: string
-- content: string (Markdown content shown to clinicians and patients)
-- tags: string[] (e.g., ["physio", "shoulder", "post-op"])
-- createdAt: string (ISO)
-- updatedAt: string (ISO)
+### Case (`src/api/schemas/case.ts`)
 
-JourneyModification (embedded in PatientJourney.modifications[])
+- `id: string`
+- `patientId: string`
+- `episodeId?: string`
+- `status: NEW | NEEDS_REVIEW | TRIAGED | FOLLOWING_UP | CLOSED`
+- `category: ACUTE | SUBACUTE | CONTROL`
+- `triggers: TriggerType[]`
+- `policyWarnings: PolicyWarning[]`
+- `triageDecision?: {...}`
+- `bookings?: Booking[]`
+- `reviews: ClinicalReview[]`
+- `createdAt: string`
+- `lastActivityAt: string`
+- `closedAt?: string | null`
 
-- id: string
-- type: enum (ADD_STEP, REMOVE_STEP, CANCEL)
-- addedByUserId: string
-- reason: string
-- addedAt: string (ISO)
-- entry: JourneyTemplateEntry | undefined (for ADD_STEP)
-- stepId: string | undefined (for REMOVE_STEP)
-- mergedFromJourneyId: string | undefined (audit trail for parallel-journey merge conflicts)
+### EpisodeOfCare (`src/api/schemas/journey.ts`)
 
-FormResponse (src/api/schemas/forms.ts)
+- `id: string`
+- `patientId: string`
+- `label: string`
+- `status: OPEN | COMPLETED | DISCHARGED`
+- `openedAt: string`
+- `closedAt: string | null`
+- `responsibleUserId?: string`
+- `primaryCaseId?: string`
 
-- id: string
-- patientId: string
-- templateId: string
-- caseId: string | null
-- answers: Record<string, number | string | boolean>
-- scores: Record<string, number> (computed using scoringRules)
-- submittedAt: string (ISO)
-- patientJourneyId: string | undefined (FK → PatientJourney.id; present when submitted via a journey step)
-- journeyTemplateEntryId: string | undefined (FK → JourneyTemplateEntry.id; present when submitted via a journey step)
-- occurrenceIndex: number | undefined (which recurrence instance; present for recurring steps)
+### PatientJourney (`src/api/schemas/journey.ts`)
 
-QuestionnaireTemplate (src/api/schemas/questionnaire.ts)
+- `id: string`
+- `episodeId: string`
+- `patientId: string`
+- `journeyTemplateId: string`
+- `phaseType: REFERRAL | INTAKE | FOLLOWUP | WAITING_LIST | POST_OP | MONITORING | DISCHARGE`
+- `phaseLabel?: string`
+- `startDate: string` (`YYYY-MM-DD`)
+- `joinedAt: string`
+- `transition?: JourneyPhaseTransition`
+- `status: ACTIVE | SUSPENDED | COMPLETED`
+- `responsiblePhysicianUserId?: string | null`
+- `pausedAt: string | null`
+- `totalPausedDays: number`
+- `researchModuleIds: string[]`
+- `modifications: JourneyModification[]`
+- `recurringCompletions: RecurringCompletion[]`
 
-- id: string
-- questions: {id, type, label, options?}[]
-- scoringRules: {id, expression, aggregation}[]
+### JourneyTemplate and entries (`src/api/schemas/journey.ts`)
 
-JournalDraft (src/api/schemas/journal.ts)
+- `JourneyTemplate.entries: JourneyTemplateEntry[]`
+- `JourneyTemplate.instructions: JourneyTemplateInstruction[]`
+- `JourneyTemplate.parentTemplateId?: string`
+- `JourneyTemplate.derivedAt?: string`
+- `JourneyTemplate.referenceDateLabel: string`
 
-- id, caseId, templateId
-- content: string
-- status: enum (DRAFT, APPROVED)
-- createdByUserId, createdAt, updatedAt
+- `JourneyTemplateEntry.templateId?: string`
+- `JourneyTemplateEntry.offsetDays: number`
+- `JourneyTemplateEntry.windowDays: number`
+- `JourneyTemplateEntry.scoreAliases: Record<string, string>`
+- `JourneyTemplateEntry.scoreAliasLabels: Record<string, string>`
+- `JourneyTemplateEntry.recurrenceIntervalDays?: number`
 
-PolicyRule (src/api/schemas/policy.ts)
+### Instruction model (`src/api/schemas/journey.ts`)
 
-- id, name, expression (string), severity (LOW/MEDIUM/HIGH), enabled, createdAt
+- `InstructionTemplate`: reusable markdown content and tags.
+- `JourneyTemplateInstruction`: scheduling binding from journey template to instruction template.
+- `Instruction`: runtime persisted instruction instance with status and timestamps.
 
-AuditEvent (src/api/schemas/audit.ts)
+Instruction status values:
 
-- id, caseId, userId, userRole, action, details (free-form), timestamp
+- `ACTIVE`
+- `ACKNOWLEDGED`
+- `COMPLETED`
+- `CANCELLED`
 
-ResearchModule (src/api/schemas/journey.ts)
+### FormResponse (`src/api/schemas/forms.ts`)
 
-- id: string
-- name: string
-- studyInfoMarkdown: string (Markdown rendered in ConsentDialog to inform the patient/clinician before granting consent)
-- entries: ResearchModuleEntry[] (questionnaire steps overlaid on the journey timeline)
+- `id: string`
+- `patientId: string`
+- `templateId: string`
+- `caseId?: string`
+- `answers: Record<string, string | number | boolean>`
+- `scores: Record<string, number>`
+- `submittedAt: string`
+- `patientJourneyId?: string`
+- `journeyTemplateEntryId?: string`
+- `occurrenceIndex?: number`
 
-Consent (src/api/schemas/journey.ts)
+### Research model (`src/api/schemas/journey.ts`)
 
-- id: string (uuid)
-- patientId: string
-- researchModuleId: string
-- patientJourneyId: string
-- grantedAt: string (ISO)
-- grantedByUserId: string
-- revokedAt: string | null (ISO; null = still active)
-- revokedByUserId: string | null
-- withdrawalReason: string | null
+- `ResearchModule`: configuration of study metadata and entry overlays.
+- `Consent`: audit record keyed by patient, module, and journey.
 
-All `Consent` records are stored in `AppState.researchConsents`. A revoked consent is never deleted — it stays as a permanent audit trail and a new grant creates a fresh record.
+Consent records are append-only in `AppState.researchConsents`; revocation timestamps the record, it is not deleted.
 
-![Consent Lifecycle](../diagrams/consent-lifecycle.svg)
+![Research Consent Lifecycle](../diagrams/research-consent-lifecycle.svg)
 
-Notes
+## AppState Top-Level Collections
 
-- The codebase stores journeys by `patientId` and the UI renders all journeys in tabbed views sorted ACTIVE → SUSPENDED → COMPLETED. There is no explicit Case→PatientJourney foreign key.
-- `getMergedDueStepsForPatient(patientId, date)` deduplicates due steps across parallel journeys by questionnaire `templateId` for dashboard display.
-- `InstructionTemplate` entities are stored in `AppState.instructionTemplates` and referenced from `JourneyTemplateInstruction` and `Instruction`.
-- `JourneyTemplate.parentTemplateId` tracks derivation lineage; `derivedAt` marks the last sync point for `computeParentDiff`.
-- `getEffectiveSteps` only resolves follow-up steps. Instruction rendering uses the dedicated instruction APIs and persisted `Instruction` records.
-- Effective step dates are shifted by `totalPausedDays + currentPauseDays` dynamically in `getEffectiveSteps`; no dates are rewritten to the store during display.
-- `cancelJourney` uses `FormResponse.patientJourneyId` and `PatientJourney.recurringCompletions` to determine whether a journey has recorded data and should be archived (→ `COMPLETED` + `CANCEL` modification) vs. deleted entirely.
+Source: `src/api/schemas/state.ts`.
+
+- `patients[]`
+- `cases[]`
+- `episodesOfCare[]`
+- `patientJourneys[]`
+- `journeyTemplates[]`
+- `instructionTemplates[]`
+- `instructions[]`
+- `formResponses[]`
+- `journalDrafts[]`
+- `journalTemplates[]`
+- `policyRules[]`
+- `researchModules[]`
+- `researchConsents[]`
+
+## Notes
+
+- There is no direct `Case -> PatientJourney` foreign key.
+- Dashboard due steps are merged across journeys by questionnaire `templateId` in `getMergedDueStepsForPatient(...)`.
+- Effective step dates are computed using pause-shift logic; they are not generally rewritten for display operations.
