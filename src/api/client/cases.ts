@@ -1,4 +1,4 @@
-import type { Case, CaseStatus, Role, TriageInput } from '../schemas'
+import type { BookingRole, Case, CaseStatus, Role, TriageInput } from '../schemas'
 import type { CaseWithActiveCategory } from '../service'
 import * as service from '../service'
 import { contactModeToWorkCategory } from '../service/triageDecision'
@@ -12,6 +12,12 @@ export const getCasesByPatient = (patientId: string): Promise<Case[]> =>
 export const getCase = (id: string): Promise<Case | undefined> =>
   withDelay(() => service.getCase(id))
 
+export const getResponsiblePhysicianUserIdForCase = (caseId: string): Promise<string | null> =>
+  withDelay(() => service.resolveResponsiblePhysicianUserIdForCase(caseId))
+
+export const hasPalOwnerForCase = (caseId: string): Promise<boolean> =>
+  withDelay(() => service.hasPalOwnerForCase(caseId))
+
 export const triageCase = (
   caseId: string,
   input: TriageInput,
@@ -24,7 +30,7 @@ export const createBooking = (
   booking: {
     id: string
     type: string
-    role?: Role
+    role?: BookingRole
     scheduledAt: string
     note?: string
     createdByUserId: string
@@ -39,7 +45,7 @@ export const updateBooking = (
   bookingId: string,
   patch: {
     scheduledAt?: string
-    role?: Role | undefined
+    role?: BookingRole | undefined
     note?: string | undefined
     status?: 'PENDING' | 'SCHEDULED' | 'COMPLETED' | 'CANCELLED'
     completedAt?: string | null

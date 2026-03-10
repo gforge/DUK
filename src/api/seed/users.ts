@@ -2,7 +2,7 @@ import type { Patient, User } from '../schemas'
 import { daysAgo, iso } from './shared'
 
 export const users: User[] = [
-  { id: 'user-pal-1', name: 'Dr. Sara Lindqvist (PAL)', role: 'PAL' },
+  { id: 'user-pal-1', name: 'Dr. Sara Lindqvist', role: 'DOCTOR' },
   { id: 'user-doc-1', name: 'Dr. Erik Bergström', role: 'DOCTOR' },
   { id: 'user-nurse-1', name: 'SSK Anna Holmberg', role: 'NURSE' },
   { id: 'user-nurse-2', name: 'SSK Jonas Ekström', role: 'NURSE' },
@@ -155,5 +155,24 @@ export const patients: Patient[] = [
     palId: 'user-doc-1',
     lastOpenedAt: iso(daysAgo(0)),
     createdAt: iso(daysAgo(0)),
+  },
+  // ── Extra PAL ownership demo patients ───────────────────────────────────
+  {
+    id: 'p-17',
+    displayName: 'Helena Holm',
+    personalNumber: '198909016543',
+    dateOfBirth: '1989-09-01',
+    palId: 'user-pal-1',
+    lastOpenedAt: iso(daysAgo(1)),
+    createdAt: iso(daysAgo(4)),
+  },
+  {
+    id: 'p-18',
+    displayName: 'Olof Olsson',
+    personalNumber: '196102102468',
+    dateOfBirth: '1961-02-10',
+    palId: 'user-doc-1',
+    lastOpenedAt: iso(daysAgo(2)),
+    createdAt: iso(daysAgo(6)),
   },
 ]

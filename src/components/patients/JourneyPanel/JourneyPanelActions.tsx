@@ -29,8 +29,7 @@ export function JourneyPanelActions({
   const { t } = useTranslation()
   const { currentUser } = useRole()
 
-  const canEdit =
-    currentUser.role === 'DOCTOR' || currentUser.role === 'PAL' || currentUser.role === 'NURSE'
+  const canEdit = currentUser.role === 'DOCTOR' || currentUser.role === 'NURSE'
   if (!canEdit) return null
 
   return (

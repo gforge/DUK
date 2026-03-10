@@ -39,7 +39,7 @@ export function triageDecisionToNextStep(decision: TriageDecision): NextStep {
   }
 }
 
-export function careRoleToAssignedRole(careRole: CareRole): 'DOCTOR' | 'NURSE' | 'PAL' | undefined {
+export function careRoleToAssignedRole(careRole: CareRole): 'DOCTOR' | 'NURSE' | undefined {
   switch (careRole) {
     case 'DOCTOR':
       return 'DOCTOR'
@@ -57,7 +57,7 @@ export function careRoleToAssignedRole(careRole: CareRole): 'DOCTOR' | 'NURSE' |
 export function assignmentModeToAssignedRole(
   assignmentMode: AssignmentMode,
   careRole: CareRole,
-): 'DOCTOR' | 'NURSE' | 'PAL' | undefined {
-  if (assignmentMode === 'PAL') return 'PAL'
+): 'DOCTOR' | 'NURSE' | undefined {
+  if (assignmentMode === 'PAL') return 'DOCTOR'
   return careRoleToAssignedRole(careRole)
 }

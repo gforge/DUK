@@ -18,3 +18,9 @@ export const updateEpisodeStatus = (
   episodeId: string,
   status: 'OPEN' | 'COMPLETED' | 'DISCHARGED',
 ): Promise<EpisodeOfCare> => withDelay(() => service.updateEpisodeStatus(episodeId, status))
+
+export const updateEpisodeResponsibleUser = (
+  episodeId: string,
+  responsibleUserId?: string,
+): Promise<EpisodeOfCare> =>
+  withDelay(() => service.updateEpisodeResponsibleUser(episodeId, responsibleUserId))

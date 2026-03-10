@@ -17,8 +17,6 @@ export function useRoleLabel() {
         return t('role.NURSE')
       case 'DOCTOR':
         return t('role.DOCTOR')
-      case 'PAL':
-        return t('role.PAL')
       case 'SECRETARY':
         return t('role.SECRETARY')
       default:

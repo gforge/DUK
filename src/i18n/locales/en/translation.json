@@ -87,7 +87,7 @@
     "contactCount_other": "{{count}} contacts",
     "filterAll": "All",
     "filterCreatedByMe": "Created by Me",
-    "filterMine": "My Patients (PAL)",
+    "filterMine": "My patients",
     "lastActivity": "Last Activity",
     "noResults": "No cases found",
     "patientsCount_one": "{{count}} patient",
@@ -570,14 +570,18 @@
     "cases": "Cases",
     "created": "Created",
     "episode": "Episode",
+    "journeyResponsiblePhysician": "Responsible physician on journey level",
     "journeys": "Journeys",
     "lastActivity": "Last Activity",
     "noCases": "No cases for this patient.",
     "noJourneys": "No journeys assigned.",
     "notFound": "Patient not found.",
+    "patientResponsiblePhysician": "Responsible physician on patient level",
     "phases_one": "{{count}} phase",
     "phases_other": "{{count}} phases",
     "registered": "Registered",
+    "responsiblePhysicianTitle": "Responsible physician (PAL ownership)",
+    "responsiblePhysicianUpdated": "Responsible physician updated",
     "triggers": "Triggers"
   },
   "patients": {
@@ -595,7 +599,14 @@
     },
     "dateOfBirth": "Date of Birth",
     "displayName": "Name",
+    "filters": {
+      "clear": "Clear filters",
+      "journeys": "Journeys",
+      "pal": "PAL",
+      "toggle": "Show filters"
+    },
     "journeyAssigned": "Journey assigned",
+    "myResponsiblePhysician": "You are the responsible physician (PAL) for this patient",
     "noJourney": "No journey",
     "noResults": "No patients found",
     "openView": "View patient",
@@ -773,7 +784,7 @@
     "assignmentModeHelp": {
       "ANY": "Anyone with appropriate competence",
       "NAMED": "Choose a specific person to assign",
-      "PAL": "Patient's primary attending physician (PAL)"
+      "PAL": "Assign to responsible physician (PAL ownership)"
     },
     "assignmentModeOption": {
       "ANY": "Any",
@@ -786,6 +797,8 @@
     "bookingCancelSuccess": "Booking cancelled",
     "bookingCancelTitle": "Cancel booking",
     "bookingNote": "Booking indication (optional)",
+    "bookingPalUnavailable": "Cannot book to PAL because no PAL ownership is assigned on journey/episode or patient.",
+    "bookingPalUnavailableTooltip": "No PAL assigned on this journey/episode or patient.",
     "bookings": "Bookings",
     "bookingTime": "Booking time",
     "bookingUpdated": "Booking updated",

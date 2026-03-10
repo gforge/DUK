@@ -1,4 +1,4 @@
-import type { NextStep,Role } from '@/api/schemas'
+import type { BookingRole, NextStep, Role } from '@/api/schemas'
 
 export type TriageActionKey =
   | 'DIGITAL_CONTROL'
@@ -26,7 +26,7 @@ export interface ActionConfig {
   /** Whether this action may create a booking/appointment */
   allowBooking?: boolean
   /** Roles recommended/allowed for booking (optional) */
-  bookingRoles?: Role[]
+  bookingRoles?: BookingRole[]
 }
 
 export const ACTION_CONFIG: Record<TriageActionKey, ActionConfig> = {

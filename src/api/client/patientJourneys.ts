@@ -22,6 +22,7 @@ export const assignPatientJourney = (
   researchModuleIds?: string[],
   mergedStepIds?: { stepId: string; fromJourneyId: string }[],
   joinedAt?: string,
+  responsiblePhysicianUserId?: string,
 ): Promise<PatientJourney> =>
   withDelay(() =>
     service.assignPatientJourney(
@@ -32,6 +33,7 @@ export const assignPatientJourney = (
       researchModuleIds,
       mergedStepIds,
       joinedAt,
+      responsiblePhysicianUserId,
     ),
   )
 
@@ -106,3 +108,11 @@ export const cancelJourney = (
 export const startNextPhase = (
   params: Parameters<typeof service.startNextPhase>[0],
 ): Promise<import('../schemas').PatientJourney> => withDelay(() => service.startNextPhase(params))
+
+export const updateJourneyResponsiblePhysicianUser = (
+  journeyId: string,
+  responsiblePhysicianUserId?: string | null,
+): Promise<PatientJourney> =>
+  withDelay(() =>
+    service.updateJourneyResponsiblePhysicianUser(journeyId, responsiblePhysicianUserId),
+  )

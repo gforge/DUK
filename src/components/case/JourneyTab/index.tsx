@@ -175,8 +175,7 @@ export default function JourneyTab({ caseData }: JourneyTabProps) {
             onResume={handleResume}
             onCancelClick={() => setCancelConfirmOpen(true)}
             onStartNextPhase={
-              selectedJourney.status === 'ACTIVE' &&
-              (currentUser.role === 'DOCTOR' || currentUser.role === 'PAL')
+              selectedJourney.status === 'ACTIVE' && currentUser.role === 'DOCTOR'
                 ? () => setStartNextPhaseOpen(true)
                 : undefined
             }

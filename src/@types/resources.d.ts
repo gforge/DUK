@@ -89,7 +89,7 @@ interface Resources {
       "contactCount_other": "{{count}} kontakter",
       "filterAll": "Alla",
       "filterCreatedByMe": "Anmälda av mig",
-      "filterMine": "Mina (PAL)",
+      "filterMine": "Mina patienter",
       "lastActivity": "Senast aktiv",
       "noResults": "Inga ärenden hittades",
       "patientsCount_one": "{{count}} patient",
@@ -572,14 +572,18 @@ interface Resources {
       "cases": "Ärenden",
       "created": "Skapad",
       "episode": "Episod",
+      "journeyResponsiblePhysician": "Ansvarig läkare på resenivå",
       "journeys": "Patientresor",
       "lastActivity": "Senaste aktivitet",
       "noCases": "Inga ärenden för denna patient.",
       "noJourneys": "Inga patientresor tilldelade.",
       "notFound": "Patienten hittades inte.",
+      "patientResponsiblePhysician": "Ansvarig läkare på patientnivå",
       "phases_one": "{{count}} fas",
       "phases_other": "{{count}} faser",
       "registered": "Registrerad",
+      "responsiblePhysicianTitle": "Ansvarig läkare (PAL-skap)",
+      "responsiblePhysicianUpdated": "Ansvarig läkare uppdaterad",
       "triggers": "Triggers"
     },
     "patients": {
@@ -597,7 +601,14 @@ interface Resources {
       },
       "dateOfBirth": "Födelsedatum",
       "displayName": "Namn",
+      "filters": {
+        "clear": "Rensa filter",
+        "journeys": "Resor",
+        "pal": "PAL",
+        "toggle": "Visa filter"
+      },
       "journeyAssigned": "Patientresa tilldelad",
+      "myResponsiblePhysician": "Du är ansvarig läkare (PAL) för denna patient",
       "noJourney": "Ingen resa",
       "noResults": "Inga patienter hittades",
       "openView": "Visa patient",
@@ -776,7 +787,7 @@ interface Resources {
       "assignmentModeHelp": {
         "ANY": "Vem som helst med rätt kompetens",
         "NAMED": "Välj en specifik person att tilldela",
-        "PAL": "Patientens ordinarie läkare (PAL)"
+        "PAL": "Till patientansvarig läkare (PAL-skap)"
       },
       "assignmentModeOption": {
         "ANY": "VSH",
@@ -788,6 +799,8 @@ interface Resources {
       "bookingCancelSuccess": "Bokning avbokad",
       "bookingCancelTitle": "Avboka bokning",
       "bookingNote": "Bokningsindikation (valfri)",
+      "bookingPalUnavailable": "Kan inte boka till PAL eftersom PAL-skap saknas för resa/episod och patient.",
+      "bookingPalUnavailableTooltip": "Ingen PAL tilldelad för denna resa/episod eller patient.",
       "bookingTime": "Bokad tid",
       "bookingUpdated": "Bokning uppdaterad",
       "bookings": "Bokningar",

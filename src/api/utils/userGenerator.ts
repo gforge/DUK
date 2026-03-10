@@ -30,7 +30,7 @@ const NURSE_FIRST_NAMES = [
 ]
 
 /**
- * Swedish first names for doctors and PAL
+ * Swedish first names for doctors
  */
 const DOCTOR_FIRST_NAMES = [
   'Erik',
@@ -88,7 +88,7 @@ const LAST_NAMES = [
 
 /**
  * Extract all userId + role combinations from AppState
- * Scans: cases, reviews, audit events, patients (PAL), form responses, journal drafts, consents
+ * Scans: cases, reviews, audit events, patients (PAL ownership), form responses, journal drafts, consents
  */
 export function extractUserRefs(state: AppState): Map<string, Role> {
   const refs = new Map<string, Role>()
@@ -127,10 +127,10 @@ export function extractUserRefs(state: AppState): Map<string, Role> {
     }
   }
 
-  // Patients: palId (PAL role)
+  // Patients: palId (doctor role via PAL ownership)
   for (const p of state.patients) {
     if (p.palId) {
-      refs.set(p.palId, 'PAL')
+      refs.set(p.palId, 'DOCTOR')
     }
   }
 
@@ -170,7 +170,7 @@ export function extractUserRefs(state: AppState): Map<string, Role> {
 function inferRoleFromUserId(userId: string): Role | null {
   if (userId.includes('nurse')) return 'NURSE'
   if (userId.includes('doc')) return 'DOCTOR'
-  if (userId.includes('pal')) return 'PAL'
+  if (userId.includes('pal')) return 'DOCTOR'
   if (userId.includes('sec') || userId.includes('secretary')) return 'SECRETARY'
   if (userId.includes('patient') || userId.startsWith('p-')) return 'PATIENT'
   return null
@@ -192,7 +192,6 @@ export function generateName(userId: string, role: Role): string {
       prefix = 'SSK'
       break
     case 'DOCTOR':
-    case 'PAL':
       firstName = DOCTOR_FIRST_NAMES[hash % DOCTOR_FIRST_NAMES.length]
       prefix = 'Dr.'
       break
@@ -206,9 +205,7 @@ export function generateName(userId: string, role: Role): string {
 
   const lastName = LAST_NAMES[(hash * 7) % LAST_NAMES.length]
 
-  if (role === 'PAL') {
-    return `${prefix} ${firstName} ${lastName} (PAL)`
-  } else if (prefix) {
+  if (prefix) {
     return `${prefix} ${firstName} ${lastName}`
   } else {
     return `${firstName} ${lastName}`

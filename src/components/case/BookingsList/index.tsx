@@ -18,6 +18,7 @@ import {
   Stack,
   TextField,
   Typography,
+  Tooltip,
 } from '@mui/material'
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -25,7 +26,8 @@ import { useTranslation } from 'react-i18next'
 import * as client from '@/api/client'
 import type { Case } from '@/api/schemas'
 import { ConfirmDialog } from '@/components/common'
-import { useNextStepLabel, useRoleLabel } from '@/hooks/labels'
+import { useApi } from '@/hooks/useApi'
+import { useNextStepLabel } from '@/hooks/labels'
 import { useRole } from '@/store/roleContext'
 import { useSnack } from '@/store/snackContext'
 
@@ -39,7 +41,12 @@ export default function BookingsList({ caseData, onChange }: Props) {
   const { currentUser } = useRole()
   const { showSnack } = useSnack()
   const getNextStepLabel = useNextStepLabel()
-  const getRoleLabel = useRoleLabel()
+  function getBookingRoleLabel(role?: string) {
+    if (role === 'DOCTOR') return t('role.DOCTOR')
+    if (role === 'NURSE') return t('role.NURSE')
+    if (role === 'PAL') return t('triage.assignmentModeOption.PAL')
+    return t('common.notSet')
+  }
 
   const [editing, setEditing] = useState<null | {
     id: string
@@ -48,6 +55,11 @@ export default function BookingsList({ caseData, onChange }: Props) {
     note?: string
   }>(null)
   const [cancelTarget, setCancelTarget] = useState<string | null>(null)
+  const { data: responsiblePhysicianUserId } = useApi(
+    () => client.getResponsiblePhysicianUserIdForCase(caseData.id),
+    [caseData.id],
+  )
+  const isPalBookingAvailable = Boolean(responsiblePhysicianUserId)
 
   async function handleCancel(bookingId: string) {
     setCancelTarget(null)
@@ -105,6 +117,10 @@ export default function BookingsList({ caseData, onChange }: Props) {
 
   async function handleSave() {
     if (!editing) return
+    if (editing.role === 'PAL' && !isPalBookingAvailable) {
+      showSnack(t('triage.bookingPalUnavailable'), 'warning')
+      return
+    }
     try {
       await client.updateBooking(
         caseData.id,
@@ -132,8 +148,7 @@ export default function BookingsList({ caseData, onChange }: Props) {
             <Box sx={{ flex: 1 }}>
               <Typography variant="body2">{getNextStepLabel(b.type as any) ?? b.type}</Typography>
               <Typography variant="caption" color="text.secondary">
-                {new Date(b.scheduledAt).toLocaleString()} —{' '}
-                {b.role ? getRoleLabel(b.role as any) : t('common.notSet')}
+                {new Date(b.scheduledAt).toLocaleString()} — {getBookingRoleLabel(b.role)}
               </Typography>
               {b.note && (
                 <Typography variant="caption" display="block">
@@ -203,7 +218,17 @@ export default function BookingsList({ caseData, onChange }: Props) {
                 </MenuItem>
                 <MenuItem value="NURSE">{t('role.NURSE')}</MenuItem>
                 <MenuItem value="DOCTOR">{t('role.DOCTOR')}</MenuItem>
-                <MenuItem value="PAL">{t('role.PAL')}</MenuItem>
+                <Tooltip
+                  title={isPalBookingAvailable ? '' : t('triage.bookingPalUnavailableTooltip')}
+                  disableHoverListener={isPalBookingAvailable}
+                  placement="right"
+                >
+                  <span>
+                    <MenuItem value="PAL" disabled={!isPalBookingAvailable}>
+                      {t('role.PAL')}
+                    </MenuItem>
+                  </span>
+                </Tooltip>
               </Select>
             </FormControl>
             <TextField

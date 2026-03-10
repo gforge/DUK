@@ -55,7 +55,7 @@ export default function ClinicalReviewPanel({ caseData, onRefetch }: Props) {
     ? (allReviews.find((r) => r.id === selectedReviewId) ?? null)
     : null
 
-  const isClinician = isRole('NURSE', 'DOCTOR', 'PAL')
+  const isClinician = isRole('NURSE', 'DOCTOR')
 
   async function handleCreateReview() {
     try {

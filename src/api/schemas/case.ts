@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 import {
   AssignmentModeSchema,
+  BookingRoleSchema,
   CareRoleSchema,
   CaseCategorySchema,
   CaseStatusSchema,
@@ -123,7 +124,7 @@ export const CaseSchema = z.object({
       z.object({
         id: z.string(),
         type: z.string(),
-        role: RoleSchema.optional(),
+        role: BookingRoleSchema.optional(),
         scheduledAt: z.string().datetime(),
         status: z.enum(['PENDING', 'SCHEDULED', 'COMPLETED', 'CANCELLED']).default('PENDING'),
         completedAt: z.string().datetime().nullable().optional(),

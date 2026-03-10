@@ -96,9 +96,7 @@ export default function TriageForm({
     const mappedRole = roleByCareRole[careRole]
     if (!mappedRole) return []
 
-    return (users ?? []).filter(
-      (u) => u.role === mappedRole || (mappedRole === 'DOCTOR' && u.role === 'PAL'),
-    )
+    return (users ?? []).filter((u) => u.role === mappedRole)
   }, [users, careRole])
 
   function selectMode(mode: ContactMode) {

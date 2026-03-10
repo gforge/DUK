@@ -122,8 +122,8 @@ export default function Dashboard() {
         showWaiting={showWaiting}
         onToggleWaiting={() => setShowWaiting((v) => !v)}
         waitingCount={waitingCases.length}
-        showPalFilter={isRole('PAL', 'DOCTOR', 'NURSE')}
-        showMineFilter={isRole('PAL')}
+        showPalFilter={isRole('DOCTOR', 'NURSE')}
+        showMineFilter={isRole('DOCTOR', 'NURSE')}
       />
 
       {casesError && (

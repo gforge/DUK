@@ -503,6 +503,53 @@ const MIGRATIONS: Migration[] = [
         : [],
     }),
   },
+  {
+    from: 13,
+    to: 14,
+    up: (s) => {
+      const normalizeRole = (value: unknown): unknown => (value === 'PAL' ? 'DOCTOR' : value)
+
+      return {
+        ...s,
+        schemaVersion: 14,
+        users: Array.isArray(s['users'])
+          ? (s['users'] as Record<string, unknown>[]).map((u) => ({
+              ...u,
+              role: normalizeRole(u['role']),
+            }))
+          : [],
+        auditEvents: Array.isArray(s['auditEvents'])
+          ? (s['auditEvents'] as Record<string, unknown>[]).map((e) => ({
+              ...e,
+              userRole: normalizeRole(e['userRole']),
+            }))
+          : [],
+        cases: Array.isArray(s['cases'])
+          ? (s['cases'] as Record<string, unknown>[]).map((c) => ({
+              ...c,
+              assignedRole: normalizeRole(c['assignedRole']),
+              reviews: Array.isArray(c['reviews'])
+                ? (c['reviews'] as Record<string, unknown>[]).map((r) => ({
+                    ...r,
+                    createdByRole: normalizeRole(r['createdByRole']),
+                    reviewedByRole: normalizeRole(r['reviewedByRole']),
+                  }))
+                : c['reviews'],
+              triageDecision:
+                c['triageDecision'] && typeof c['triageDecision'] === 'object'
+                  ? {
+                      ...(c['triageDecision'] as Record<string, unknown>),
+                      assignmentMode:
+                        (c['triageDecision'] as Record<string, unknown>)['assignmentMode'] === 'PAL'
+                          ? 'PAL'
+                          : (c['triageDecision'] as Record<string, unknown>)['assignmentMode'],
+                    }
+                  : c['triageDecision'],
+            }))
+          : [],
+      }
+    },
+  },
 ]
 
 // ---------------------------------------------------------------------------

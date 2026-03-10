@@ -23,7 +23,7 @@ export function useNavItems(): { navItems: NavItem[]; accessiblePaths: string[] 
       {
         label: t('nav.dashboard'),
         path: '/dashboard',
-        roles: ['NURSE', 'DOCTOR', 'PAL'] as const,
+        roles: ['NURSE', 'DOCTOR'] as const,
       },
       {
         label: t('patient.title'),
@@ -33,27 +33,27 @@ export function useNavItems(): { navItems: NavItem[]; accessiblePaths: string[] 
       {
         label: t('nav.worklist'),
         path: '/worklist',
-        roles: ['NURSE', 'DOCTOR', 'PAL', 'SECRETARY'] as const,
+        roles: ['NURSE', 'DOCTOR', 'SECRETARY'] as const,
       },
       {
         label: t('nav.policy'),
         path: '/policy',
-        roles: ['NURSE', 'DOCTOR', 'PAL'] as const,
+        roles: ['NURSE', 'DOCTOR'] as const,
       },
       {
         label: t('nav.patients'),
         path: '/patients',
-        roles: ['NURSE', 'DOCTOR', 'PAL', 'SECRETARY'] as const,
+        roles: ['NURSE', 'DOCTOR', 'SECRETARY'] as const,
       },
       {
         label: t('nav.journeys'),
         path: '/journeys',
-        roles: ['NURSE', 'DOCTOR', 'PAL'] as const,
+        roles: ['NURSE', 'DOCTOR'] as const,
       },
       {
         label: t('nav.demoTools'),
         path: '/demo-tools',
-        roles: ['NURSE', 'DOCTOR', 'PAL', 'PATIENT', 'SECRETARY'] as const,
+        roles: ['NURSE', 'DOCTOR', 'PATIENT', 'SECRETARY'] as const,
       },
     ],
     [t],

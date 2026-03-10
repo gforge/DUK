@@ -47,7 +47,7 @@ export default function JournalTab({ caseData, patient: _patient, onCaseChange }
     refetch: refetchDrafts,
   } = useApi(() => client.getJournalDrafts(caseData.id), [caseData.id])
 
-  const canApprove = isRole('DOCTOR', 'PAL')
+  const canApprove = isRole('DOCTOR')
 
   const currentLangTemplates = useMemo(() => {
     const all = allTemplates ?? []

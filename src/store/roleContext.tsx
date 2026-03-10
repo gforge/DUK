@@ -3,7 +3,7 @@ import React, { createContext, useContext, useEffect, useMemo, useState } from '
 import type { Role, User } from '@/api/schemas'
 
 const DEMO_USERS: User[] = [
-  { id: 'user-pal-1', name: 'Dr. Sara Lindqvist (PAL)', role: 'PAL' },
+  { id: 'user-pal-1', name: 'Dr. Sara Lindqvist', role: 'DOCTOR' },
   { id: 'user-doc-1', name: 'Dr. Erik Bergström', role: 'DOCTOR' },
   { id: 'user-nurse-1', name: 'SSK Anna Holmberg', role: 'NURSE' },
   { id: 'user-nurse-2', name: 'SSK Jonas Ekström', role: 'NURSE' },

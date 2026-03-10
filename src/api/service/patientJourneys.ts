@@ -55,9 +55,14 @@ export function assignPatientJourney(
   researchModuleIds: string[] = [],
   mergedStepIds: { stepId: string; fromJourneyId: string }[] = [],
   joinedAt: string = '',
+  responsiblePhysicianUserId?: string,
 ): PatientJourney {
   const state = getStore()
   const template = state.journeyTemplates.find((t) => t.id === journeyTemplateId)
+  const episode = episodeId ? state.episodesOfCare.find((e) => e.id === episodeId) : undefined
+  const patient = state.patients.find((p) => p.id === patientId)
+  const resolvedResponsiblePhysicianUserId =
+    responsiblePhysicianUserId ?? episode?.responsibleUserId ?? patient?.palId
 
   // Convert merged step IDs into REMOVE_STEP modifications so the new
   // journey never shows forms that will be filled through a parallel journey.
@@ -86,6 +91,7 @@ export function assignPatientJourney(
     patientId,
     journeyTemplateId,
     phaseType: 'FOLLOWUP',
+    responsiblePhysicianUserId: resolvedResponsiblePhysicianUserId,
     joinedAt,
     startDate,
     status: 'ACTIVE',
@@ -326,6 +332,27 @@ export function recordRecurringCompletion(
   return updated
 }
 
+export function updateJourneyResponsiblePhysicianUser(
+  journeyId: string,
+  responsiblePhysicianUserId?: string | null,
+): PatientJourney {
+  const state = getStore()
+  const journey = state.patientJourneys.find((j) => j.id === journeyId)
+  if (!journey) throw new Error(`Journey ${journeyId} not found`)
+
+  const updated: PatientJourney = {
+    ...journey,
+    responsiblePhysicianUserId,
+    updatedAt: now(),
+  }
+
+  setStore({
+    ...state,
+    patientJourneys: state.patientJourneys.map((j) => (j.id === journeyId ? updated : j)),
+  })
+  return updated
+}
+
 function instantiateInstructionsForJourney(
   journey: PatientJourney,
   templateInstructions: JourneyTemplateInstruction[],
@@ -394,6 +421,7 @@ export function startNextPhase(params: {
     note?: string
   }
   researchModuleIds?: string[]
+  responsiblePhysicianUserId?: string
 }): PatientJourney {
   const state = getStore()
   const fromJourney = state.patientJourneys.find((j) => j.id === params.fromJourneyId)
@@ -415,6 +443,8 @@ export function startNextPhase(params: {
     patientId: fromJourney.patientId,
     journeyTemplateId: params.journeyTemplateId,
     phaseType: params.phaseType,
+    responsiblePhysicianUserId:
+      params.responsiblePhysicianUserId ?? fromJourney.responsiblePhysicianUserId,
     joinedAt: '',
     startDate: params.startDate,
     status: 'ACTIVE',

@@ -66,3 +66,25 @@ export function updateEpisodeStatus(
 
   return updated
 }
+
+export function updateEpisodeResponsibleUser(
+  episodeId: string,
+  responsibleUserId?: string,
+): EpisodeOfCare {
+  const state = getStore()
+  const episode = state.episodesOfCare?.find((e) => e.id === episodeId)
+  if (!episode) throw new Error(`Episode ${episodeId} not found`)
+
+  const updated: EpisodeOfCare = {
+    ...episode,
+    responsibleUserId,
+    updatedAt: now(),
+  }
+
+  patchStore((s) => ({
+    ...s,
+    episodesOfCare: (s.episodesOfCare ?? []).map((e) => (e.id === episodeId ? updated : e)),
+  }))
+
+  return updated
+}

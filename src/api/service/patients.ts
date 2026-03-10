@@ -1,6 +1,6 @@
 import type { Patient } from '../schemas'
 import { getStore, patchStore, setStore } from '../storage'
-import { now,uuid } from './utils'
+import { now, uuid } from './utils'
 
 export function getPatients(): Patient[] {
   return getStore().patients
@@ -31,4 +31,19 @@ export function patientOpenedApp(patientId: string): Patient {
     patients: s.patients.map((p) => (p.id === patientId ? { ...p, lastOpenedAt: now() } : p)),
   }))
   return updated.patients.find((p) => p.id === patientId)!
+}
+
+export function updatePatientResponsiblePhysicianUser(
+  patientId: string,
+  responsiblePhysicianUserId?: string,
+): Patient {
+  const updated = patchStore((s) => ({
+    ...s,
+    patients: s.patients.map((p) =>
+      p.id === patientId ? { ...p, palId: responsiblePhysicianUserId } : p,
+    ),
+  }))
+  const patient = updated.patients.find((p) => p.id === patientId)
+  if (!patient) throw new Error(`Patient ${patientId} not found`)
+  return patient
 }

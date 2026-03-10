@@ -14,7 +14,7 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material'
-import React, { useMemo,useRef, useState } from 'react'
+import React, { useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 
@@ -35,7 +35,7 @@ export default function GlobalSearch() {
   const [patients, setPatients] = useState<Patient[]>([])
   const hasFetched = useRef(false)
 
-  const isClinician = isRole('NURSE', 'DOCTOR', 'PAL')
+  const isClinician = isRole('NURSE', 'DOCTOR')
 
   function handleOpen() {
     setOpen(true)

@@ -27,7 +27,7 @@ export default function TriageTab({ caseData, onTriaged, routeContactMode }: Tri
   const { showSnack } = useSnack()
   const getRoleLabel = useRoleLabel()
 
-  const canTriage = isRole('NURSE', 'DOCTOR', 'PAL')
+  const canTriage = isRole('NURSE', 'DOCTOR')
 
   // determine if any lab/xray reviews are pending for this case
   const hasPendingReviews = React.useMemo(

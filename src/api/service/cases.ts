@@ -1,4 +1,4 @@
-import type { Case, CaseCategory, CaseStatus, Role, TriageInput } from '../schemas'
+import type { BookingRole, Case, CaseCategory, CaseStatus, Role, TriageInput } from '../schemas'
 import { getStore, setStore } from '../storage'
 import { getEffectiveSteps } from './journeyResolver'
 import { getPendingReviews } from './reviews'
@@ -119,7 +119,7 @@ export function createBooking(
   booking: {
     id: string
     type: string
-    role?: Role
+    role?: BookingRole
     scheduledAt: string
     note?: string
     createdByUserId: string
@@ -161,7 +161,7 @@ export function updateBooking(
   bookingId: string,
   patch: {
     scheduledAt?: string
-    role?: Role | undefined
+    role?: BookingRole | undefined
     note?: string | undefined
     status?: 'PENDING' | 'SCHEDULED' | 'COMPLETED' | 'CANCELLED'
     completedAt?: string | null

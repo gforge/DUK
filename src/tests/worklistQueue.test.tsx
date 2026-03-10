@@ -26,7 +26,7 @@ describe('worklist queue role filtering', () => {
       status: 'TRIAGED',
       triageDecision: undefined,
       nextStep: 'PHONE_CALL',
-      assignedRole: 'PAL',
+      assignedRole: 'DOCTOR',
     }
 
     expect(resolveCaseCareRole(caseData)).toBeNull()

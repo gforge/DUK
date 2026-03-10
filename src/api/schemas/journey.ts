@@ -296,6 +296,13 @@ export const PatientJourneySchema = z.object({
   joinedAt: z.string().default(''), // YYYY-MM-DD; empty string coerced to startDate at read time
   /** How and why this phase was started. Absent on the first phase of an episode. */
   transition: JourneyPhaseTransitionSchema.optional(),
+  /**
+   * Responsible physician for this journey phase.
+   * In Swedish clinical context this corresponds to PAL (patientansvarig lakare).
+   * null means explicitly no responsible physician on this journey
+   * (do not inherit episode/patient fallback).
+   */
+  responsiblePhysicianUserId: z.string().nullable().optional(),
   status: PatientJourneyStatusSchema,
   researchModuleIds: z.array(z.string()),
   modifications: z.array(JourneyModificationSchema),

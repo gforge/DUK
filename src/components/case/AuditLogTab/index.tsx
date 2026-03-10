@@ -28,7 +28,6 @@ const ROLE_COLORS = {
   PATIENT: 'default',
   NURSE: 'info',
   DOCTOR: 'primary',
-  PAL: 'secondary',
   SECRETARY: 'default',
 } as const
 

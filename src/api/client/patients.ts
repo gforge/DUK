@@ -15,6 +15,14 @@ export const createPatient = (
 export const patientOpenedApp = (patientId: string): Promise<Patient> =>
   withDelay(() => service.patientOpenedApp(patientId))
 
+export const updatePatientResponsiblePhysicianUser = (
+  patientId: string,
+  responsiblePhysicianUserId?: string,
+): Promise<Patient> =>
+  withDelay(() =>
+    service.updatePatientResponsiblePhysicianUser(patientId, responsiblePhysicianUserId),
+  )
+
 // ─── Fake "befolkningsregistret" lookup ───────────────────────────────────────
 // In a real system this would call an external API. Here we simulate it with a
 // static table that covers the seeded demo patients plus a few extra entries.

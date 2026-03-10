@@ -25,7 +25,7 @@ export default function NurseContactActions({ caseData, onRefetch }: Props) {
   const { showSnack } = useSnack()
   const [loading, setLoading] = useState<ContactAction | null>(null)
 
-  const isClinician = isRole('NURSE', 'DOCTOR', 'PAL')
+  const isClinician = isRole('NURSE', 'DOCTOR')
   // Pick the first matching trigger to drive the suggestion text
   const primaryTrigger = caseData.triggers.find((tr): tr is 'SEEK_CONTACT' | 'NOT_OPENED' =>
     CONTACT_TRIGGERS.has(tr),

@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-export const RoleSchema = z.enum(['PATIENT', 'NURSE', 'DOCTOR', 'PAL', 'SECRETARY'])
+export const RoleSchema = z.enum(['PATIENT', 'NURSE', 'DOCTOR', 'SECRETARY'])
 export type Role = z.infer<typeof RoleSchema>
 
 export const ContactModeSchema = z.enum(['DIGITAL', 'PHONE', 'VISIT', 'CLOSE'])
@@ -11,6 +11,13 @@ export type CareRole = z.infer<typeof CareRoleSchema>
 
 export const AssignmentModeSchema = z.enum(['ANY', 'PAL', 'NAMED']).nullable()
 export type AssignmentMode = z.infer<typeof AssignmentModeSchema>
+
+/**
+ * Booking target role for contact routing.
+ * PAL here means responsible physician ownership, not a user role.
+ */
+export const BookingRoleSchema = z.enum(['DOCTOR', 'NURSE', 'PAL'])
+export type BookingRole = z.infer<typeof BookingRoleSchema>
 
 export const WorkCategorySchema = z.enum(['VISIT', 'PHONE', 'DIGITAL'])
 export type WorkCategory = z.infer<typeof WorkCategorySchema>

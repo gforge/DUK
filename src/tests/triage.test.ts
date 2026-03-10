@@ -26,7 +26,7 @@ describe('triageCase', () => {
         patientMessage: 'Test msg',
       },
       'user-pal-1',
-      'PAL',
+      'DOCTOR',
     )
 
     expect(result.status).toBe('TRIAGED')

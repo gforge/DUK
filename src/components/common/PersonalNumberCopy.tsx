@@ -89,7 +89,7 @@ export default function PersonalNumberCopy({
         )}
 
         {showCopy && personalNumber ? (
-          <Tooltip title={ariaLabel ?? t('worklist.copyPersonalNumber')}>
+          <Tooltip title={ariaLabel ?? t('worklist.copyPersonalNumber')} arrow>
             <IconButton
               size="small"
               aria-label={ariaLabel ?? t('worklist.copyPersonalNumber')}
