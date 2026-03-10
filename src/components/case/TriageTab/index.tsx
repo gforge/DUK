@@ -41,6 +41,7 @@ export default function TriageTab({ caseData, onTriaged, routeContactMode }: Tri
       showSnack(t('triage.success'), 'success')
       onTriaged()
     } catch (err) {
+      console.error('Error triaging case:', err)
       showSnack(`${t('triage.error')}: ${String(err)}`, 'error')
     }
   }

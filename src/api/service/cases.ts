@@ -11,7 +11,9 @@ export type CaseWithActiveCategory = Case & {
 }
 
 const VALID_TRANSITIONS: Record<CaseStatus, CaseStatus[]> = {
-  NEW: ['NEEDS_REVIEW'],
+  // NEW → NEEDS_REVIEW: patient opened app and submitted feedback
+  // NEW → TRIAGED / CLOSED: clinician acts directly (patient never opened app)
+  NEW: ['NEEDS_REVIEW', 'TRIAGED', 'CLOSED'],
   NEEDS_REVIEW: ['TRIAGED', 'CLOSED'],
   TRIAGED: ['FOLLOWING_UP', 'CLOSED'],
   FOLLOWING_UP: ['CLOSED'],

@@ -61,6 +61,15 @@ Field-heavy details stay here instead of in overview diagrams.
 - `patientId: string`
 - `episodeId?: string`
 - `status: NEW | NEEDS_REVIEW | TRIAGED | FOLLOWING_UP | CLOSED`
+  - Valid transitions:
+    - `NEW → NEEDS_REVIEW` — patient opened the app and submitted feedback
+    - `NEW → TRIAGED` — clinician acts directly; patient has not opened the app
+    - `NEW → CLOSED` — clinician closes directly (contactMode = CLOSE)
+    - `NEEDS_REVIEW → TRIAGED` — clinician reviews and triages
+    - `NEEDS_REVIEW → CLOSED` — clinician closes directly
+    - `TRIAGED → FOLLOWING_UP` — follow-up scheduled
+    - `TRIAGED → CLOSED` — closed directly after triage
+    - `FOLLOWING_UP → CLOSED` — follow-up complete
 - `category: ACUTE | SUBACUTE | CONTROL`
 - `triggers: TriggerType[]`
 - `policyWarnings: PolicyWarning[]`

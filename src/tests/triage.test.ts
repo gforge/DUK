@@ -96,24 +96,23 @@ describe('triageCase', () => {
     expect(result.status).toBe('CLOSED')
   })
 
-  it('throws when trying to triage a NEW case directly to TRIAGED', () => {
+  it('allows triaging a NEW case directly to TRIAGED (patient not yet active)', () => {
     const newCase = SEED_STATE.cases.find((c) => c.status === 'NEW')
     if (!newCase) throw new Error('No NEW case in seed data')
 
-    expect(() =>
-      service.triageCase(
-        newCase.id,
-        {
-          triageDecision: {
-            contactMode: 'PHONE',
-            careRole: 'NURSE',
-            assignmentMode: 'ANY',
-          },
+    const result = service.triageCase(
+      newCase.id,
+      {
+        triageDecision: {
+          contactMode: 'PHONE',
+          careRole: 'NURSE',
+          assignmentMode: 'ANY',
         },
-        'user-doc-1',
-        'DOCTOR',
-      ),
-    ).toThrow()
+      },
+      'user-doc-1',
+      'DOCTOR',
+    )
+    expect(result.status).toBe('TRIAGED')
   })
 })
 
@@ -132,11 +131,22 @@ describe('advanceCaseStatus', () => {
     expect(result.status).toBe('FOLLOWING_UP')
   })
 
-  it('throws on invalid transition', () => {
+  it('allows advancing NEW directly to CLOSED', () => {
     const newCase = SEED_STATE.cases.find((c) => c.status === 'NEW')
     if (!newCase) throw new Error('No NEW case in seed data')
 
-    expect(() => service.advanceCaseStatus(newCase.id, 'CLOSED', 'user-doc-1', 'DOCTOR')).toThrow()
+    const result = service.advanceCaseStatus(newCase.id, 'CLOSED', 'user-doc-1', 'DOCTOR')
+    expect(result.status).toBe('CLOSED')
+  })
+
+  it('throws on genuinely invalid transition (CLOSED → TRIAGED)', () => {
+    // Ensure transitions that are semantically impossible still throw
+    const closedCase = SEED_STATE.cases.find((c) => c.status === 'CLOSED')
+    if (!closedCase) throw new Error('No CLOSED case in seed data')
+
+    expect(() =>
+      service.advanceCaseStatus(closedCase.id, 'TRIAGED', 'user-doc-1', 'DOCTOR'),
+    ).toThrow()
   })
 
   it('advances FOLLOWING_UP → CLOSED', () => {

@@ -13,8 +13,11 @@ state FOLLOWING_UP
 state CLOSED
 
 [*] --> NEW
-NEW --> NEEDS_REVIEW : "submitForReview"
+NEW --> NEEDS_REVIEW : "submitForReview\n(patient opened app)"
+NEW --> TRIAGED : "triageCase\n(patient not yet active)"
+NEW --> CLOSED : "triageCase / contactMode=CLOSE"
 NEEDS_REVIEW --> TRIAGED : "triageCase"
+NEEDS_REVIEW --> CLOSED : "triageCase / contactMode=CLOSE"
 TRIAGED --> FOLLOWING_UP : "setFollowingUp / setDeadline"
 TRIAGED --> CLOSED : "closeDirectly"
 FOLLOWING_UP --> CLOSED : "followUpClosed"
@@ -22,6 +25,14 @@ FOLLOWING_UP --> CLOSED : "followUpClosed"
 note right
   Transitions enforced in
   src/api/service/cases.ts
+
+  NEEDS_REVIEW is the patient-initiated path:
+  the patient opened the app and flagged
+  something requiring clinician review.
+
+  NEW → TRIAGED / CLOSED is the clinician-
+  initiated path for passive patients who
+  have not yet opened the app.
 end note
 
 @enduml
