@@ -29,7 +29,7 @@ import type {
 } from '@/api/schemas'
 import { ScoreAliasEditor } from '@/components/journey/editor/entry-editor'
 import { useEntryEditor } from '@/components/journey/editor/useEntryEditor'
-import { JOURNEY_ICON_OPTIONS, JourneyIcon } from '@/utils/journeyIcons'
+import { JOURNEY_ICON_OPTIONS, JourneyIcon } from '@/utils'
 
 interface Props {
   entry?: JourneyTemplateEntry

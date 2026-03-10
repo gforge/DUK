@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { getCaseDetailBackPath } from '@/utils/caseDetailBackPath'
+import { getCaseDetailBackPath } from '@/utils'
 
 describe('getCaseDetailBackPath', () => {
   it('returns patient path for NEW and NEEDS_REVIEW', () => {

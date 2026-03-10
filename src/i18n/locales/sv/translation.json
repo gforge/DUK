@@ -5,6 +5,7 @@
   "audit": {
     "action": "Händelse",
     "actions": {
+      "CALL_ATTEMPT": "Försökte ringa patienten, ej nådd",
       "CASE_CLOSED": "Ärende stängt",
       "CASE_CREATED": "Ärende skapat",
       "CONTACTED": "Patient kontaktad",
@@ -80,6 +81,29 @@
     "searchNoResults": "Inga träffar",
     "searchPatients": "Sök patienter",
     "yes": "Ja"
+  },
+  "contactActions": {
+    "callAttempted": "Ringde – ej nådd",
+    "callAttemptedDone": "Kontaktförsök loggat i händelselogg",
+    "contacted": "Kontaktad",
+    "contactedDone": "Kontakt registrerad",
+    "date": {
+      "daysAgo_one": "för {{count}} dag sedan",
+      "daysAgo_other": "för {{count}} dagar sedan",
+      "todayAt": "idag {{time}}",
+      "yesterdayAt": "igår {{time}}"
+    },
+    "lastCallAttempt": "Försökte ringa {{date}}",
+    "lastReminderSent": "Påminnelse skickad {{date}}",
+    "lastCallAttempt": "Försökte ringa {{date}}",
+    "contactedAt": "Kontaktad {{date}}",
+    "reminded": "Påminnelse skickad",
+    "remindedDone": "Påminnelse loggad i händelselogg",
+    "suggestion": {
+      "NOT_OPENED": "Patienten har inte öppnat formuläret. Patienten påmind {{date}}.",
+      "NOT_OPENED_withDen": "Patienten har inte öppnat formuläret. Patienten påmind den {{date}}.",
+      "SEEK_CONTACT": "Patienten önskar bli kontaktad. Kontakta patienten eller skicka en påminnelse."
+    }
   },
   "dashboard": {
     "betweenPhase": "Mellan faser",
@@ -512,16 +536,6 @@
     "goHome": "Till startsidan",
     "message": "Adressen du försökte nå finns inte. Kontrollera att URL:en är korrekt.",
     "title": "Sidan hittades inte"
-  },
-  "nurseContact": {
-    "contacted": "Kontaktad",
-    "contactedDone": "Kontakt loggad i händelselogg",
-    "reminded": "Påminnelse skickad",
-    "remindedDone": "Påminnelse loggad i händelselogg",
-    "suggestion": {
-      "NOT_OPENED": "Patienten har inte öppnat formuläret. Kontakta patienten eller skicka en påminnelse.",
-      "SEEK_CONTACT": "Patienten önskar bli kontaktad. Kontakta patienten eller skicka en påminnelse."
-    }
   },
   "patient": {
     "appOpenedSuccess": "App markerad som öppnad",

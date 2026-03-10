@@ -47,9 +47,10 @@ describe('JournalTab template selector', () => {
     await userEvent.click(button)
     expect(button).toHaveClass('MuiButton-contained')
 
-    // generate button should now be enabled
-    const gen = screen.getByRole('button', { name: /generera/i })
-    expect(gen).toBeEnabled()
+    // generation is now automatic on selection; we simply ensure the handler
+    // does not crash by clicking a second time
+    await userEvent.click(button)
+    expect(button).toHaveClass('MuiButton-contained')
   })
 
   it('falls back to a Select when there are four or more templates', async () => {

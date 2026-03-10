@@ -1,3 +1,5 @@
+import '../i18n' // initialize translations for renderTemplate
+
 import { describe, expect, it } from 'vitest'
 
 import { renderTemplate } from '@/api/journalRenderer'

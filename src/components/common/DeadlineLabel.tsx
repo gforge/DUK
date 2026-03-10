@@ -2,7 +2,7 @@ import { Typography } from '@mui/material'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { getDeadlineInfo } from '@/utils/deadline'
+import { getDeadlineInfo } from '@/utils'
 
 interface Props {
   deadline: string

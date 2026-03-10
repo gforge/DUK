@@ -10,6 +10,7 @@ import {
 import { DateTimePicker, LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
 import type { Locale } from 'date-fns'
+import { setHours, setMinutes } from 'date-fns'
 import { enUS, sv } from 'date-fns/locale'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
@@ -45,7 +46,9 @@ export default function CompletionDialog({
   const { t, i18n } = useTranslation()
   const language = i18n.resolvedLanguage ?? i18n.language ?? 'sv'
   const adapterLocale = (language.startsWith('en') ? enUS : sv) as Locale
-
+  const minTime = setMinutes(setHours(new Date(), 8), 0)
+  const maxTime = setMinutes(setHours(new Date(), 17), 0)
+  const defaultReference = setMinutes(setHours(new Date(), 12), 30)
   return (
     <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
       <DialogTitle>{t('worklist.completeDialogTitle', { name: patientLabel })}</DialogTitle>
@@ -64,6 +67,9 @@ export default function CompletionDialog({
               slotProps={{
                 textField: { size: 'small', helperText: t('worklist.nextContactDateHint') },
               }}
+              minTime={minTime}
+              maxTime={maxTime}
+              referenceDate={defaultReference}
             />
           </LocalizationProvider>
           <TextField

@@ -1,30 +1,6 @@
-export {
-  useCategoryDescLabel,
-  useCategoryLabel,
-  useNextStepLabel,
-  useReviewOutcomeLabel,
-  useReviewTypeLabel,
-  useSeverityLabel,
-  useStatusLabel,
-  useTriggerLabel,
-  useWorkCategoryLabel,
-} from './useCaseLabels'
-export {
-  type StepStatus,
-  useEpisodeStatusLabel,
-  useJourneyModificationTypeLabel,
-  useJourneyStatusLabel,
-  usePhaseTypeLabel,
-  useQuestionTypeLabel,
-  useStepStatusLabel,
-  useTransitionTriggerLabel,
-} from './useJourneyLabels'
-export { useRoleLabel } from './useRoleLabel'
-export {
-  useAssignmentModeHelpLabel,
-  useAssignmentModeLabel,
-  useCareRoleLabel,
-  useContactModeHelpLabel,
-  useContactModeLabel,
-  useStep2TitleLabel,
-} from './useTriageLabels'
+// @index(['./*/index.ts(|x)', './*.ts(|x)'], f => `export * from '${f.path.replace(/\.tsx?$/, '').replace(/\/index$/, '')}'`)
+export * from './contacts'
+export * from './useCaseLabels'
+export * from './useJourneyLabels'
+export * from './useRoleLabel'
+export * from './useTriageLabels'

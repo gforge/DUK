@@ -2,7 +2,7 @@ import type { AuditEvent, Role } from '../schemas'
 import { getStore, patchStore } from '../storage'
 import { addAuditEvent } from './utils'
 
-export type ContactAction = 'CONTACTED' | 'REMINDER_SENT'
+export type ContactAction = 'CONTACTED' | 'REMINDER_SENT' | 'CALL_ATTEMPT'
 
 export function getAuditEvents(caseId: string): AuditEvent[] {
   return getStore().auditEvents.filter((e) => e.caseId === caseId)

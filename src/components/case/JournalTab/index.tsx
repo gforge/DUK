@@ -127,7 +127,10 @@ export default function JournalTab({ caseData, patient: _patient, onCaseChange }
                 <Button
                   key={tmpl.id}
                   variant={selectedTemplate === tmpl.id ? 'contained' : 'outlined'}
-                  onClick={() => setSelectedTemplate(tmpl.id)}
+                  onClick={() => {
+                    setSelectedTemplate(tmpl.id)
+                    handleGenerate()
+                  }}
                   disabled={generating}
                 >
                   {tmpl.name}
@@ -135,32 +138,33 @@ export default function JournalTab({ caseData, patient: _patient, onCaseChange }
               ))}
             </Stack>
           ) : (
-            // four or more templates, fall back to a select dropdown
-            <FormControl size="small" sx={{ minWidth: 260 }}>
-              <InputLabel id="journal-template-label">{t('journal.selectTemplate')}</InputLabel>
-              <Select
-                labelId="journal-template-label"
-                value={selectedTemplate}
-                onChange={(e) => setSelectedTemplate(e.target.value)}
-                label={t('journal.selectTemplate')}
+            <>
+              // four or more templates, fall back to a select dropdown
+              <FormControl size="small" sx={{ minWidth: 260 }}>
+                <InputLabel id="journal-template-label">{t('journal.selectTemplate')}</InputLabel>
+                <Select
+                  labelId="journal-template-label"
+                  value={selectedTemplate}
+                  onChange={(e) => setSelectedTemplate(e.target.value)}
+                  label={t('journal.selectTemplate')}
+                >
+                  {currentLangTemplates.map((tmpl) => (
+                    <MenuItem key={tmpl.id} value={tmpl.id}>
+                      {tmpl.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+              <Button
+                variant="contained"
+                onClick={handleGenerate}
+                disabled={!selectedTemplate || generating}
+                startIcon={generating ? <CircularProgress size={16} /> : undefined}
               >
-                {currentLangTemplates.map((tmpl) => (
-                  <MenuItem key={tmpl.id} value={tmpl.id}>
-                    {tmpl.name}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+                {generating ? t('journal.generating') : t('journal.generate')}
+              </Button>
+            </>
           )}
-
-          <Button
-            variant="contained"
-            onClick={handleGenerate}
-            disabled={!selectedTemplate || generating}
-            startIcon={generating ? <CircularProgress size={16} /> : undefined}
-          >
-            {generating ? t('journal.generating') : t('journal.generate')}
-          </Button>
         </Stack>
       </Paper>
 

@@ -16,62 +16,66 @@ import type { Case, FormResponse, Patient, PolicyWarning } from './schemas'
 import type { TriggerType } from './schemas'
 
 function categoryLabel(category: string, lang: string): string {
+  const opts = { lng: lang }
   switch (category) {
     case 'ACUTE':
-      return t('category.ACUTE', lang)
+      return t('category.ACUTE', opts)
     case 'SUBACUTE':
-      return t('category.SUBACUTE', lang)
+      return t('category.SUBACUTE', opts)
     case 'CONTROL':
-      return t('category.CONTROL', lang)
+      return t('category.CONTROL', opts)
     default:
       return category
   }
 }
 
 function severityLabel(severity: string, lang: string): string {
+  const opts = { lng: lang }
   switch (severity) {
     case 'LOW':
-      return t('severity.LOW', lang)
+      return t('severity.LOW', opts)
     case 'MEDIUM':
-      return t('severity.MEDIUM', lang)
+      return t('severity.MEDIUM', opts)
     case 'HIGH':
-      return t('severity.HIGH', lang)
+      return t('severity.HIGH', opts)
     default:
       return severity
   }
 }
 
 function statusLabel(status: string, lang: string): string {
+  const opts = { lng: lang }
   switch (status) {
     case 'NEW':
-      return t('status.NEW', lang)
+      return t('status.NEW', opts)
     case 'NEEDS_REVIEW':
-      return t('status.NEEDS_REVIEW', lang)
+      return t('status.NEEDS_REVIEW', opts)
     case 'TRIAGED':
-      return t('status.TRIAGED', lang)
+      return t('status.TRIAGED', opts)
     case 'FOLLOWING_UP':
-      return t('status.FOLLOWING_UP', lang)
+      return t('status.FOLLOWING_UP', opts)
     case 'CLOSED':
-      return t('status.CLOSED', lang)
+      return t('status.CLOSED', opts)
     default:
       return status
   }
 }
 
 function nextStepLabel(step: string, lang: string): string {
+  const opts = { lng: lang }
   switch (step) {
     case 'DIGITAL_CONTROL':
-      return t('nextStep.DIGITAL_CONTROL', lang)
+      return t('nextStep.DIGITAL_CONTROL', opts)
     case 'DOCTOR_VISIT':
-      return t('nextStep.DOCTOR_VISIT', lang)
+      return t('nextStep.DOCTOR_VISIT', opts)
     case 'NURSE_VISIT':
-      return t('nextStep.NURSE_VISIT', lang)
+      return t('nextStep.NURSE_VISIT', opts)
     case 'PHYSIO_VISIT':
-      return t('nextStep.PHYSIO_VISIT', lang)
+      return t('nextStep.PHYSIO_VISIT', opts)
     case 'PHONE_CALL':
-      return t('nextStep.PHONE_CALL', lang)
+      return t('nextStep.PHONE_CALL', opts)
     case 'NO_ACTION':
-      return t('nextStep.NO_ACTION', lang)
+      return t('nextStep.NO_ACTION', opts)
     default:
       return step
   }

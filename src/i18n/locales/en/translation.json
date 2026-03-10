@@ -5,6 +5,7 @@
   "audit": {
     "action": "Event",
     "actions": {
+      "CALL_ATTEMPT": "Call attempt, not reached",
       "CASE_CLOSED": "Case Closed",
       "CASE_CREATED": "Case Created",
       "CONTACTED": "Patient Contacted",
@@ -80,6 +81,28 @@
     "searchNoResults": "No patients found",
     "searchPatients": "Search patient (name or personal number)…",
     "yes": "Yes"
+  },
+  "contactActions": {
+    "callAttempted": "Attempted call (not reached)",
+    "callAttemptedDone": "Call attempt logged",
+    "contacted": "Contacted",
+    "contactedDone": "Contact logged",
+    "date": {
+      "daysAgo_one": "{{count}} day ago",
+      "daysAgo_other": "{{count}} days ago",
+      "todayAt": "today {{time}}",
+      "yesterdayAt": "yesterday {{time}}"
+    },
+    "lastCallAttempt": "Attempted call {{date}}",
+    "contactedAt": "Contacted {{date}}",
+    "lastReminderSent": "Reminder sent {{date}}",
+    "reminded": "Reminder sent",
+    "remindedDone": "Reminder event logged",
+    "suggestion": {
+      "NOT_OPENED": "The patient has not opened the form. Patient reminded {{date}}.",
+      "NOT_OPENED_withDen": "The patient has not opened the form. Patient reminded {{date}}.",
+      "SEEK_CONTACT": "The patient is requesting contact. Please reach out or send a reminder."
+    }
   },
   "dashboard": {
     "betweenPhase": "Between phases",
@@ -512,16 +535,6 @@
     "goHome": "Go to dashboard",
     "message": "The address you tried to reach does not exist. Please check that the URL is correct.",
     "title": "Page not found"
-  },
-  "nurseContact": {
-    "contacted": "Contacted",
-    "contactedDone": "Contact event logged",
-    "reminded": "Reminder sent",
-    "remindedDone": "Reminder event logged",
-    "suggestion": {
-      "NOT_OPENED": "The patient has not opened the form. Consider contacting them or sending a reminder.",
-      "SEEK_CONTACT": "The patient is requesting contact. Please reach out or send a reminder."
-    }
   },
   "patient": {
     "appOpenedSuccess": "App marked as opened",

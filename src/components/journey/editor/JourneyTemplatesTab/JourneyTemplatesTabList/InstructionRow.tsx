@@ -18,7 +18,7 @@ import ReactMarkdown from 'react-markdown'
 
 import type { JourneyTemplate, JourneyTemplateInstruction } from '@/api/schemas'
 import { useOffsetFormat } from '@/hooks/useOffsetFormat'
-import { JourneyIcon } from '@/utils/journeyIcons'
+import { JourneyIcon } from '@/utils'
 
 interface Props {
   jt: JourneyTemplate

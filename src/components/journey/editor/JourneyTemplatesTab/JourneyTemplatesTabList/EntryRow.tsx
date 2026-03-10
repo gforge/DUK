@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next'
 
 import type { JourneyTemplate, JourneyTemplateEntry } from '@/api/schemas'
 import { useOffsetFormat } from '@/hooks/useOffsetFormat'
-import { JourneyIcon } from '@/utils/journeyIcons'
+import { JourneyIcon } from '@/utils'
 
 interface Props {
   jt: JourneyTemplate

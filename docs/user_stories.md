@@ -40,21 +40,23 @@ This document captures the key user stories for the Duk demo application. The li
 
 ---
 
-## US3 – Nurse handling “no response / unopened”
+## US3 – Staff contact workflow for unresponsive patients
 
-**As a** Nurse (SSK) **I want** to see patients needing contact and record what I did:
+**As a** clinician or secretary **I want** to see patients needing outreach and record what I did:
 
 - both “no response” and “not opened” are managed as the same kind of workflow but shown with different icons/text
 - the case detail suggests an action (“Call the patient…”) based on the trigger that raised the alert
-- I can mark a demo action such as **Contacted** or **Reminder sent** and it is logged in the audit trail
+- I can mark an action such as **Contacted**, **Reminder sent** or **Attempted call (not reached)** and it is logged in the audit trail
+- the panel shows the date of the most recent reminder so it’s easy to know when we last tried
 
 **Acceptance criteria**
 
 1. Iconography and text differentiate the two triggers while reusing the same workflow code.
-2. Case detail page renders the suggested action dynamically.
-3. Audit log captures these contact events.
+2. Case detail page renders the suggested action dynamically and surface the latest reminder timestamp.
+3. Audit log captures full history of contact events, including call attempts.
+4. The outreach panel is accessible to NURSE, DOCTOR or SECRETARY roles.
 
-> _Related code_: `src/components/case/NurseContactActions.tsx`, `src/api/service/audit.ts` (`logContactEvent`), audit i18n keys `audit.actions.CONTACTED` / `audit.actions.REMINDER_SENT`.
+> _Related code_: `src/components/case/ContactActions.tsx`, `src/api/service/audit.ts` (`logContactEvent`), audit i18n keys `audit.actions.CONTACTED` / `audit.actions.REMINDER_SENT` / `audit.actions.CALL_ATTEMPT`.
 
 ---
 

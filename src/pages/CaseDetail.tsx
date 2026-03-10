@@ -20,10 +20,10 @@ import { useNavigate, useParams } from 'react-router-dom'
 import * as client from '@/api/client'
 import {
   AuditLogTab,
+  ContactActions,
   FormResponsesTab,
   JournalTab,
   JourneyTab,
-  NurseContactActions,
   PatientCard,
   TriageTab,
 } from '@/components/case'
@@ -162,8 +162,8 @@ export default function CaseDetail() {
       {/* Patient card */}
       {patient && <PatientCard patient={patient} caseData={caseData} />}
 
-      {/* Nurse contact action panel — shown when SEEK_CONTACT / NOT_OPENED triggers are active */}
-      <NurseContactActions caseData={caseData} onRefetch={refetchCase} />
+      {/* Contact action panel — shown when SEEK_CONTACT / NOT_OPENED triggers are active */}
+      <ContactActions caseData={caseData} onRefetch={refetchCase} />
 
       {/* Tabs */}
       <Paper variant="outlined" sx={{ mt: 2, borderRadius: 2 }}>

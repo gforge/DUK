@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next'
 import type { ClinicalReview } from '@/api/schemas'
 import type { EffectiveStep } from '@/api/service'
 import { type StepStatus, useStepStatusLabel } from '@/hooks/labels'
-import { JourneyIcon } from '@/utils/journeyIcons'
+import { JourneyIcon } from '@/utils'
 
 import { StatusIcon } from './JourneyTimeline/StatusIcon'
 import { ReviewTypeKey } from './JourneyTimeline/types'

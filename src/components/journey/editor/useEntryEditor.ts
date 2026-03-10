@@ -3,8 +3,7 @@ import { useState } from 'react'
 import type { JourneyTemplateEntry, QuestionnaireTemplate } from '@/api/schemas'
 import type { AliasRow } from '@/components/journey/editor/entry-editor'
 import { mkId } from '@/components/journey/editor/questionnaireUtils'
-import { suggestWindowDays } from '@/utils/journeyUtils'
-import { slugify } from '@/utils/slugify'
+import { slugify, suggestWindowDays } from '@/utils'
 
 export type InstructionMode = 'NONE' | 'TEMPLATE' | 'FREETEXT'
 
