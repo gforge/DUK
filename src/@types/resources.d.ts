@@ -14,6 +14,7 @@ interface Resources {
         "FORM_SUBMITTED": "Formulär skickat",
         "JOURNAL_DRAFT_APPROVED": "Journalutkast godkänt",
         "JOURNAL_DRAFT_CREATED": "Journalutkast skapat",
+        "JOURNAL_DRAFT_DELETED": "Journalutkast borttaget",
         "REMINDER_SENT": "Påminnelse skickad",
         "SEEK_CONTACT": "Söker kontakt",
         "STATUS_CHANGED": "Status ändrad",
@@ -202,9 +203,9 @@ interface Resources {
       "approvedBy": "Godkänd av",
       "copied": "Kopierat!",
       "copy": "Kopiera till urklipp",
+      "deleted": "Utkast borttaget",
       "draft": "Utkast",
       "generate": "Generera utkast",
-      "generating": "Genererar…",
       "noDrafts": "Inga utkast än",
       "onlyDoctorApprove": "Endast Läkare/PAL kan godkänna",
       "selectTemplate": "Välj mall"
@@ -510,13 +511,15 @@ interface Resources {
     "migration": {
       "clearCta": "Rensa och börja om",
       "clearHint": "Detta raderar all lagrad data permanent.",
-      "currentVersion": "App-version",
+      "currentVersion": "Aktuell version: v{{version}}",
       "downloadCta": "Ladda ner data som JSON",
       "downloadHint": "Spara en kopia av din data — den kan konverteras manuellt senare.",
+      "errorDetails": "Fel detaljerade i konsolen.",
       "reasonDowngrade": "Den sparade datan skapades av en nyare version av appen. Nedgradering stöds inte.",
+      "reasonInvalid": "Den sparade datan är ogiltig eller korrupt – appen kan inte läsa den.",
       "reasonNoPath": "Inget uppgraderingsstig finns från den lagrade schemaversionen till den aktuella versionen.",
       "reasonParseError": "Den lagrade datan kunde inte valideras efter migrering.",
-      "storedVersion": "Lagrad version",
+      "storedVersion": "Lagrad version: v{{version}}",
       "title": "Datakompabilitetsproblem"
     },
     "nav": {

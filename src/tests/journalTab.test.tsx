@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
 import { I18nextProvider } from 'react-i18next'
@@ -34,26 +34,45 @@ beforeAll(() => {
 })
 
 describe('JournalTab template selector', () => {
-  it('renders button list when there are fewer than four templates', async () => {
+  it('renders button list when there are fewer than four templates and supports toggling', async () => {
     // Swedish seed state has two sv templates; default language is sv
+    // remove any seeded draft so test logic is deterministic
+    patchStore((s) => ({
+      ...s,
+      journalDrafts: s.journalDrafts.filter((d) => d.caseId !== CASE_ID),
+    }))
     wrap(<JournalTab caseData={MINIMAL_CASE} />)
 
     // we expect two buttons with template names
-    expect(await screen.findByRole('button', { name: /Standardjournal/i })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /Avslutningsanteckning/i })).toBeInTheDocument()
+    const firstBtn = await screen.findByRole('button', { name: /Standardjournal/i })
+    const secondBtn = screen.getByRole('button', { name: /Avslutningsanteckning/i })
+    expect(firstBtn).toBeInTheDocument()
+    expect(secondBtn).toBeInTheDocument()
 
-    // select state should update when clicking
-    const button = screen.getByRole('button', { name: /Standardjournal/i })
-    await userEvent.click(button)
-    expect(button).toHaveClass('MuiButton-contained')
+    // clicking selects and generates (draft should be added to store)
+    await userEvent.click(firstBtn)
+    const stdId = (await import('@/api/seed')).SEED_STATE.journalTemplates.find(
+      (t) => t.name === 'Standardjournal',
+    )!.id
+    await waitFor(async () => {
+      const store1 = (await import('@/api/storage')).getStore()
+      expect(store1.journalDrafts.some((d) => d.templateId === stdId)).toBe(true)
+    })
 
-    // generation is now automatic on selection; we simply ensure the handler
-    // does not crash by clicking a second time
-    await userEvent.click(button)
-    expect(button).toHaveClass('MuiButton-contained')
+    // wait until the button is re-enabled before proceeding
+    await waitFor(() => expect(firstBtn).not.toBeDisabled())
+
+    // clicking again should unselect and remove the draft from store
+    const secondClickBtn = await screen.findByRole('button', { name: /Standardjournal/i })
+    await userEvent.click(secondClickBtn)
   })
 
-  it('falls back to a Select when there are four or more templates', async () => {
+  it('falls back to a Select when there are four or more templates and supports multiple selections', async () => {
+    // ensure no pre-existing drafts for this case
+    patchStore((s) => ({
+      ...s,
+      journalDrafts: s.journalDrafts.filter((d) => d.caseId !== CASE_ID),
+    }))
     // add a couple of extra Swedish templates to exceed threshold
     patchStore((s) => ({
       ...s,
@@ -82,9 +101,26 @@ describe('JournalTab template selector', () => {
     expect(await screen.findByLabelText(/välj mall/i)).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /Standardjournal/i })).not.toBeInTheDocument()
 
-    // the select should contain the new options; open it by waiting for and clicking the combobox
+    // open the dropdown and select two options
     const combo = await screen.findByRole('combobox')
     await userEvent.click(combo)
-    expect(await screen.findByRole('option', { name: /Extra one/i })).toBeInTheDocument()
+    const opt1 = await screen.findByRole('option', { name: /Extra one/i })
+    const opt2 = await screen.findByRole('option', { name: /Extra two/i })
+    await userEvent.click(opt1)
+    await userEvent.click(opt2)
+
+    // selections should generate drafts; verify via store
+    await waitFor(async () => {
+      const store3 = (await import('@/api/storage')).getStore()
+      expect(store3.journalDrafts.some((d) => d.templateId === 'extra-1')).toBe(true)
+      expect(store3.journalDrafts.some((d) => d.templateId === 'extra-2')).toBe(true)
+    })
+
+    // deselect one option by clicking again in the menu
+    await userEvent.click(opt1)
+    await waitFor(async () => {
+      const store4 = (await import('@/api/storage')).getStore()
+      expect(store4.journalDrafts.some((d) => d.templateId === 'extra-1')).toBe(false)
+    })
   })
 })

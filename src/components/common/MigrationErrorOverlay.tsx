@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next'
 import type { MigrationResultErr } from '@/api/migrations'
 import { CURRENT_SCHEMA_VERSION } from '@/api/schemaVersion'
 import { clearState } from '@/api/storage'
+import { useMigrationReason } from '@/hooks/labels/migration'
 
 interface Props {
   error: MigrationResultErr
@@ -22,7 +23,9 @@ interface Props {
  *  2. Clear immediately and start with fresh seed data.
  */
 export default function MigrationErrorOverlay({ error }: Props) {
+  const reasonText = useMigrationReason(error)
   const { t } = useTranslation()
+  const errorDetailsLabel = t('migration.errorDetails') as string
 
   function handleDownload() {
     const json = JSON.stringify(error.rawState, null, 2)
@@ -40,12 +43,8 @@ export default function MigrationErrorOverlay({ error }: Props) {
     window.location.reload()
   }
 
-  const reasonKey =
-    error.reason === 'downgrade'
-      ? 'migration.reasonDowngrade'
-      : error.reason === 'no-path'
-        ? 'migration.reasonNoPath'
-        : 'migration.reasonParseError'
+  const hasParseError = error.parseError != null
+  console.error('Migration error:', error)
 
   return (
     <Box
@@ -74,13 +73,13 @@ export default function MigrationErrorOverlay({ error }: Props) {
           {/* Version info */}
           <Stack direction="row" spacing={2} flexWrap="wrap">
             <Chip
-              label={`${t('migration.storedVersion')}: v${error.storedVersion}`}
+              label={t('migration.storedVersion', { version: error.storedVersion })}
               color="warning"
               size="small"
               variant="outlined"
             />
             <Chip
-              label={`${t('migration.currentVersion')}: v${CURRENT_SCHEMA_VERSION}`}
+              label={t('migration.currentVersion', { version: CURRENT_SCHEMA_VERSION })}
               color="primary"
               size="small"
               variant="outlined"
@@ -89,8 +88,23 @@ export default function MigrationErrorOverlay({ error }: Props) {
 
           {/* Reason */}
           <Typography variant="body2" color="text.secondary">
-            {t(reasonKey)}
+            {reasonText}
           </Typography>
+
+          {/* Detailed schema error for debugging */}
+          {hasParseError && (
+            <Box sx={{ mt: 1, p: 1, bgcolor: 'background.paper', borderRadius: 1 }}>
+              <Typography variant="caption" color="error">
+                {errorDetailsLabel}
+              </Typography>
+              <Box
+                component="pre"
+                sx={{ whiteSpace: 'pre-wrap', maxHeight: 200, overflow: 'auto' }}
+              >
+                {JSON.stringify(error.parseError, null, 2)}
+              </Box>
+            </Box>
+          )}
 
           <Divider />
 

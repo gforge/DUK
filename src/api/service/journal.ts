@@ -2,7 +2,7 @@ import { renderTemplate } from '../journalRenderer'
 import type { AppState, JournalDraft, JournalTemplate, Role } from '../schemas'
 import { getStore, setStore } from '../storage'
 import { getEffectiveSteps } from './journeyResolver'
-import { addAuditEvent,now, uuid } from './utils'
+import { addAuditEvent, now, uuid } from './utils'
 
 export function getJournalDrafts(caseId: string): JournalDraft[] {
   return getStore().journalDrafts.filter((d) => d.caseId === caseId)
@@ -106,4 +106,19 @@ export function approveJournalDraft(draftId: string, userId: string, userRole: R
   })
   setStore(state)
   return updated
+}
+
+export function deleteJournalDraft(draftId: string, userId: string, userRole: Role): JournalDraft {
+  let state = getStore()
+  const draft = state.journalDrafts.find((d) => d.id === draftId)
+  if (!draft) throw new Error('Draft not found')
+  state = {
+    ...state,
+    journalDrafts: state.journalDrafts.filter((d) => d.id !== draftId),
+  }
+  state = addAuditEvent(state, draft.caseId, userId, userRole, 'JOURNAL_DRAFT_DELETED', {
+    draftId,
+  })
+  setStore(state)
+  return draft
 }

@@ -10,11 +10,7 @@ import type {
   WorkCategory,
 } from '@/api/schemas'
 
-// ── helpers ──────────────────────────────────────────────────────────────────
-
-function assertNever(x: never): never {
-  throw new Error(`Unhandled enum value: ${String(x)}`)
-}
+import { assertNever } from './never'
 
 type Severity = 'LOW' | 'MEDIUM' | 'HIGH'
 

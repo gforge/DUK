@@ -200,9 +200,9 @@
     "approvedBy": "Approved by",
     "copied": "Copied!",
     "copy": "Copy to clipboard",
+    "deleted": "Draft removed",
     "draft": "Draft",
     "generate": "Generate Draft",
-    "generating": "Generating…",
     "noDrafts": "No drafts yet",
     "onlyDoctorApprove": "Only Doctor/PAL can approve",
     "selectTemplate": "Select template"
@@ -508,13 +508,15 @@
   "migration": {
     "clearCta": "Clear and start fresh",
     "clearHint": "This permanently deletes all stored data.",
-    "currentVersion": "App version",
+    "currentVersion": "Current app version: v{{version}}",
     "downloadCta": "Download data as JSON",
     "downloadHint": "Save a copy of your data — it can be converted manually later.",
+    "errorDetails": "Error details logged in console.",
     "reasonDowngrade": "The stored data was created by a newer version of this app. Downgrade migrations are not supported.",
+    "reasonInvalid": "The stored data is invalid or corrupted – the app can't read it.",
     "reasonNoPath": "No upgrade path exists from the stored schema version to the current version.",
     "reasonParseError": "The stored data could not be validated after migration.",
-    "storedVersion": "Stored version",
+    "storedVersion": "Stored version: v{{version}}",
     "title": "Data Compatibility Issue"
   },
   "nav": {

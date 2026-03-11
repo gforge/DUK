@@ -1,5 +1,6 @@
 import { defineConfig } from 'i18next-cli'
 
+// eslint-disable-next-line import/no-default-export
 export default defineConfig({
   locales: ['sv', 'en'],
 

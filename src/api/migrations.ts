@@ -19,8 +19,9 @@ export type MigrationResultErr = {
   ok: false
   /** 'downgrade'  – stored version is newer than the app
    *  'no-path'    – no migration chain exists between stored and current version
-   *  'parse-error'– migration ran but the result failed Zod validation */
-  reason: 'downgrade' | 'no-path' | 'parse-error'
+   *  'parse-error'– migration ran but the result failed Zod validation
+   *  'invalid'    – data already at current version but failed schema validation */
+  reason: 'downgrade' | 'no-path' | 'parse-error' | 'invalid'
   storedVersion: number
   rawState: unknown
   parseError?: unknown
@@ -550,6 +551,38 @@ const MIGRATIONS: Migration[] = [
       }
     },
   },
+  {
+    from: 14,
+    to: 15,
+    up: (s) => {
+      // Ensure any date-only or otherwise malformed dueAt values are converted
+      // to full ISO timestamps, since the schema requires datetime format.
+      const normalize = (val: unknown): string | null => {
+        if (typeof val !== 'string' || !val) return null
+        const d = new Date(val)
+        if (Number.isNaN(d.getTime())) return null
+        return d.toISOString()
+      }
+
+      return {
+        ...s,
+        schemaVersion: 15,
+        cases: Array.isArray(s['cases'])
+          ? (s['cases'] as Record<string, unknown>[]).map((c) => {
+              if (c['triageDecision'] && typeof c['triageDecision'] === 'object') {
+                const td = { ...(c['triageDecision'] as Record<string, unknown>) }
+                if (typeof td['dueAt'] === 'string') {
+                  const iso = normalize(td['dueAt'])
+                  if (iso) td['dueAt'] = iso
+                }
+                return { ...c, triageDecision: td }
+              }
+              return c
+            })
+          : s['cases'],
+      }
+    },
+  },
 ]
 
 // ---------------------------------------------------------------------------
@@ -578,9 +611,18 @@ export function runMigrations(raw: unknown): MigrationResult {
   if (storedVersion === CURRENT_SCHEMA_VERSION) {
     const parsed = AppStateSchema.safeParse(raw)
     if (parsed.success) return { ok: true, state: parsed.data }
+    // Data is already at the current version but doesn't match the schema.
+    // This can happen if the stored JSON has been corrupted or manually
+    // edited.  We treat it specially so that the UI can show a clearer
+    // message than the generic "after migration" text.
+    console.error(
+      'runMigrations: stored state is at current version but invalid',
+      parsed.error,
+      raw,
+    )
     return {
       ok: false,
-      reason: 'parse-error',
+      reason: 'invalid',
       storedVersion,
       rawState: raw,
       parseError: parsed.error,
@@ -602,6 +644,7 @@ export function runMigrations(raw: unknown): MigrationResult {
 
   const parsed = AppStateSchema.safeParse(current)
   if (!parsed.success) {
+    console.error('runMigrations: migration result failed validation', parsed.error, current)
     return {
       ok: false,
       reason: 'parse-error',

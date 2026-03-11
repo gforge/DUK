@@ -7,10 +7,10 @@ import * as client from '@/api/client'
 import type { AssignmentMode, CareRole, Case, ContactMode, User } from '@/api/schemas'
 import { useApi } from '@/hooks/useApi'
 
-import { parseDeadlineInput } from './parseDeadlineInput'
 import { type TriageForm, TriageFormSchema } from './schema'
 import { Step1 } from './Step1'
 import { Step2 } from './Step2'
+import { computeDueAtFromInput } from './utils'
 
 interface Props {
   caseData: Case
@@ -138,14 +138,7 @@ export default function TriageForm({
   }
 
   async function submitForm(data: TriageForm) {
-    const dueAt = data.dueAtInput?.trim()
-      ? (() => {
-          const parsed = parseDeadlineInput(data.dueAtInput)
-          if (parsed) return parsed
-          const date = new Date(data.dueAtInput)
-          return Number.isNaN(date.getTime()) ? null : date.toISOString()
-        })()
-      : null
+    const dueAt = computeDueAtFromInput(data.dueAtInput)
 
     await onSubmit({
       triageDecision: {

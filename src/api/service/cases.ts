@@ -3,7 +3,7 @@ import { getStore, setStore } from '../storage'
 import { getEffectiveSteps } from './journeyResolver'
 import { getPendingReviews } from './reviews'
 import { assignmentModeToAssignedRole, triageDecisionToNextStep } from './triageDecision'
-import { addAuditEvent, now } from './utils'
+import { addAuditEvent, normalizeIsoDateTime, now } from './utils'
 
 export type CaseWithActiveCategory = Case & {
   /** null = between phases (not in any step window today) */
@@ -83,7 +83,13 @@ export function triageCase(
     input.triageDecision.careRole,
   )
   const note = input.triageDecision.note ?? input.internalNote
-  const deadline = input.triageDecision.dueAt ?? input.deadline
+
+  // Normalize any date-only dueAt or deadline values to a full ISO timestamp.
+  // This guards against the UI accidentally passing "YYYY-MM-DD" strings.
+  const rawDueAt = input.triageDecision.dueAt ?? input.deadline
+  const dueAt = normalizeIsoDateTime(rawDueAt) ?? null
+
+  const deadline: string | undefined = dueAt ?? undefined
   const assignedUserId = input.triageDecision.assignedUserId ?? input.assignedUserId
 
   const updated: Case = {

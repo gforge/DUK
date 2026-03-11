@@ -2,11 +2,7 @@ import { useTranslation } from 'react-i18next'
 
 import type { AssignmentMode, CareRole, ContactMode } from '@/api/schemas'
 
-// ── helpers ──────────────────────────────────────────────────────────────────
-
-function assertNever(x: never): never {
-  throw new Error(`Unhandled enum value: ${String(x)}`)
-}
+import { assertNever } from './never'
 
 // ── hooks ─────────────────────────────────────────────────────────────────────
 

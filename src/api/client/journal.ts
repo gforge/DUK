@@ -25,3 +25,9 @@ export const approveJournalDraft = (
   userId: string,
   userRole: Role,
 ): Promise<JournalDraft> => withDelay(() => service.approveJournalDraft(draftId, userId, userRole))
+
+export const deleteJournalDraft = (
+  draftId: string,
+  userId: string,
+  userRole: Role,
+): Promise<JournalDraft> => withDelay(() => service.deleteJournalDraft(draftId, userId, userRole))

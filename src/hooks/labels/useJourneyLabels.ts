@@ -9,11 +9,7 @@ import type {
   TransitionTriggerType,
 } from '@/api/schemas'
 
-// ── helpers ──────────────────────────────────────────────────────────────────
-
-function assertNever(x: never): never {
-  throw new Error(`Unhandled enum value: ${String(x)}`)
-}
+import { assertNever } from './never'
 
 // ── types ─────────────────────────────────────────────────────────────────────
 
