@@ -1,0 +1,1 @@
+import{t as a,c as n}from"./normalizeDates-RXgdkmJP.js";import{C as i,F as o}from"./index-XQU4YtQb.js";function g(e,r,s){const t=a(e,s?.in);return isNaN(r)?n(s?.in||e,NaN):(r&&t.setDate(t.getDate()+r),t)}function c(){return i().users}const D=()=>o(()=>c());export{g as a,D as g};
