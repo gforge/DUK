@@ -81,6 +81,8 @@ export const cases: Case[] = [
     status: 'NEW',
     triggers: ['NOT_OPENED'],
     policyWarnings: [],
+    internalNote:
+      'Ny patient — opererad i går. Inbjudan skickad men formuläret ej öppnat ännu. Kontrollera att inloggningsuppgifterna fungerar.',
     createdByUserId: 'user-nurse-1',
     scheduledAt: iso(daysAgo(1)),
     lastActivityAt: iso(daysAgo(1)),
@@ -116,6 +118,8 @@ export const cases: Case[] = [
     status: 'NEEDS_REVIEW',
     triggers: ['NOT_OPENED', 'SEEK_CONTACT'],
     policyWarnings: [],
+    internalNote:
+      'Patienten har inte öppnat formuläret men kontaktat kliniken per telefon. Uppger oro kring sårläkning och frågar om gipset sitter rätt. Telefonkontakt bör prioriteras.',
     createdByUserId: 'user-nurse-2',
     scheduledAt: iso(daysAgo(25)),
     lastActivityAt: iso(daysAgo(5)),
@@ -207,6 +211,8 @@ export const cases: Case[] = [
     status: 'NEEDS_REVIEW',
     triggers: ['NO_RESPONSE'],
     policyWarnings: [],
+    internalNote:
+      'Patienten har inte svarat på 3-månaders enkäten trots två påminnelser. Okänt om patienten upplever problem eller är svårkontaktad. Telefonkontakt rekommenderas.',
     createdByUserId: 'user-doc-1',
     scheduledAt: iso(daysAgo(70)),
     lastActivityAt: iso(daysAgo(5)),
@@ -241,6 +247,8 @@ export const cases: Case[] = [
     status: 'NEEDS_REVIEW',
     triggers: ['HIGH_PAIN', 'SEEK_CONTACT'],
     policyWarnings: [],
+    internalNote:
+      'Patienten ringer och uppger tilltagande smärta (NRS 9/10) sedan gårdagen samt domningskänsla i ringfingret. Misstänkt neurogen komponent. Snar läkarbedömning motiverad.',
     assignedRole: 'NURSE',
     createdByUserId: 'user-nurse-1',
     scheduledAt: iso(daysAgo(2)),
@@ -271,6 +279,8 @@ export const cases: Case[] = [
         expression: 'OSS_week4 < 25',
       },
     ],
+    internalNote:
+      'V4-kontroll: NRS 7/10, OSS 20/48. Avsevärt sämre funktion och kvarstående hög smärta jämfört med förväntat förlopp vid 4 veckor post-op. Läkarbedömning motiverad.',
     assignedRole: 'DOCTOR',
     assignedUserId: 'user-doc-1',
     createdByUserId: 'user-nurse-1',
@@ -296,6 +306,8 @@ export const cases: Case[] = [
         expression: 'PNRS_1 - PNRS_2 <= 0',
       },
     ],
+    internalNote:
+      'Smärtan har ökat från v1 (NRS 6/10) till v2 (NRS 8/10). Sårsekretion kvarstår. Patienten uppger oro för felläkning. Röntgen beställd men ej granskad — prioritera.',
     assignedRole: 'DOCTOR',
     assignedUserId: 'user-doc-1',
     createdByUserId: 'user-nurse-1',
@@ -340,6 +352,8 @@ export const cases: Case[] = [
         expression: 'OSS_week8 < 26',
       },
     ],
+    internalNote:
+      'OSS-trend: V4 36/48 → V8 20/48. Smärta återkommer: NRS v4 4/10 → v8 6/10. Oväntat försämringsförlopp — ny läkarbedömning planeras. Laboratorieprover inväntas (CRP, SR).',
     assignedRole: 'NURSE',
     createdByUserId: 'user-nurse-1',
     scheduledAt: iso(daysAgo(52)),
@@ -371,7 +385,8 @@ export const cases: Case[] = [
     policyWarnings: [],
     nextStep: 'DIGITAL_CONTROL',
     deadline: iso(daysFromNow(14)),
-    internalNote: 'Postoperativ kontroll — 14 dagar efter protesoperation.',
+    internalNote:
+      'Postoperativ knäkontroll v2. Sår läker utan tecken på infektion. Patienten har nattsmärta NRS 5–6/10 — förväntat förlopp. Digital kontroll räcker, ingen åtgärd krävs.',
     assignedRole: 'NURSE',
     createdByUserId: 'user-pal-1',
     triagedByUserId: 'user-pal-1',
@@ -388,6 +403,8 @@ export const cases: Case[] = [
     status: 'NEW',
     triggers: [],
     policyWarnings: [],
+    internalNote:
+      'Fraktur inträffade för ~4 veckor sedan. Patienten registrerades ej i systemet initialt. Startar uppföljning direkt i subakut fas — vecka 4-enkät skickas nu.',
     createdByUserId: 'user-doc-1',
     scheduledAt: iso(daysAgo(0)),
     lastActivityAt: iso(daysAgo(0)),

@@ -21,7 +21,7 @@ export const patients: Patient[] = [
   },
   {
     id: 'p-2',
-    displayName: 'Elin Elinsson',
+    displayName: 'Elin Söderberg',
     personalNumber: '196503152222',
     dateOfBirth: '1965-03-15',
     palId: 'user-pal-1',
@@ -47,7 +47,7 @@ export const patients: Patient[] = [
   },
   {
     id: 'p-5',
-    displayName: 'Torkel Torkelson',
+    displayName: 'Torkel Håkansson',
     personalNumber: '198804086666',
     dateOfBirth: '1988-04-08',
     palId: 'user-doc-1',
@@ -101,7 +101,7 @@ export const patients: Patient[] = [
   // ── Proximal Humerus patients ────────────────────────────────────────────
   {
     id: 'p-11',
-    displayName: 'Ingrid Ingvarsson',
+    displayName: 'Ingrid Persson',
     personalNumber: '195206144321',
     dateOfBirth: '1952-06-14',
     palId: 'user-pal-1',
