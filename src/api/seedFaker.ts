@@ -8,6 +8,7 @@ import type { AppState, AuditEvent, Case, EpisodeOfCare, Patient, PatientJourney
 import { SEED_STATE } from './seed'
 import type { Cohort } from './seed/seedHelpers'
 import {
+  categoryFromDaysAgo,
   isoDateOffset as isoDate,
   isoTsOffset as isoTs,
   PAL_IDS,
@@ -165,7 +166,7 @@ export async function buildFakerSeed(): Promise<AppState> {
       cases.push({
         id: caseId,
         patientId: pid,
-        category: 'CONTROL', // static fallback; dashboard derives category via journey
+        category: categoryFromDaysAgo(cohort.startDaysAgo),
         status: status as Case['status'],
         triggers: triggers as Case['triggers'],
         policyWarnings: [],
@@ -183,7 +184,7 @@ export async function buildFakerSeed(): Promise<AppState> {
       episodes.push({
         id: epId,
         patientId: pid,
-        label: isComplex ? 'Complex fracture follow-up' : 'Standard fracture follow-up',
+        label: isComplex ? 'Komplex frakturuppföljning' : 'Standarduppföljning fraktur',
         clinicalArea: 'Ortopedi',
         status: 'OPEN',
         openedAt: createdAt,
@@ -200,7 +201,7 @@ export async function buildFakerSeed(): Promise<AppState> {
         patientId: pid,
         journeyTemplateId,
         phaseType: 'FOLLOWUP',
-        joinedAt: '',
+        joinedAt: startDate,
         startDate,
         status: 'ACTIVE',
         researchModuleIds: [],

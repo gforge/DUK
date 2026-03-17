@@ -212,4 +212,107 @@ export const episodesOfCare: EpisodeOfCare[] = [
     createdAt: iso(daysAgo(0)),
     updatedAt: iso(daysAgo(0)),
   },
+  // ── Hindfoot elective surgery pathway — Eva Lindqvist (p-19) ─────────────
+  {
+    // Full 3-phase hindfoot journey — now at 6-month post-op followup
+    id: 'ep-19',
+    patientId: 'p-19',
+    label: 'Hindfoot fusion — subtalar artros höger fot',
+    clinicalArea: 'Fot & Fotled',
+    status: 'OPEN',
+    openedAt: iso(daysAgo(540)),
+    closedAt: null,
+    responsibleUserId: 'user-pal-1',
+    primaryCaseId: 'case-19',
+    createdAt: iso(daysAgo(540)),
+    updatedAt: iso(daysAgo(0)),
+  },
+  // ── Hindfoot WL mid-journey — Margareta Pettersson (p-20) ────────────────
+  {
+    // Mid-waiting-list: 3-month surgery interest form pending (NOT_OPENED)
+    id: 'ep-20',
+    patientId: 'p-20',
+    label: 'Hindfoot fusion — planus deformitet vänster fot',
+    clinicalArea: 'Fot & Fotled',
+    status: 'OPEN',
+    openedAt: iso(daysAgo(300)),
+    closedAt: null,
+    responsibleUserId: 'user-doc-1',
+    primaryCaseId: 'case-20',
+    createdAt: iso(daysAgo(300)),
+    updatedAt: iso(daysAgo(5)),
+  },
+  // ── Journey-switch demo — Axel Lindström (p-21) ───────────────────────────
+  {
+    // Ankle fracture: simple standard → switched to complex at day 3
+    id: 'ep-21',
+    patientId: 'p-21',
+    label: 'Ankelfraktur — omklassificerad bimalleolär',
+    clinicalArea: 'Fot & Fotled',
+    status: 'OPEN',
+    openedAt: iso(daysAgo(42)),
+    closedAt: null,
+    responsibleUserId: 'user-pal-1',
+    primaryCaseId: 'case-21',
+    createdAt: iso(daysAgo(42)),
+    updatedAt: iso(daysAgo(2)),
+  },
+  // ── Two simultaneous fractures — Gunnar Eriksson (p-22) ──────────────────
+  {
+    // Right distal radius — reasonable recovery
+    id: 'ep-22',
+    patientId: 'p-22',
+    label: 'Distala radiusfraktur höger — trauma 35 dagar sedan',
+    clinicalArea: 'Hand',
+    status: 'OPEN',
+    openedAt: iso(daysAgo(35)),
+    closedAt: null,
+    responsibleUserId: 'user-doc-1',
+    primaryCaseId: 'case-22',
+    createdAt: iso(daysAgo(35)),
+    updatedAt: iso(daysAgo(2)),
+  },
+  {
+    // Left calcaneus — same patient, separate episode, difficult recovery
+    id: 'ep-23',
+    patientId: 'p-22',
+    label: 'Calcaneusfraktur vänster — trauma 35 dagar sedan',
+    clinicalArea: 'Fot & Fotled',
+    status: 'OPEN',
+    openedAt: iso(daysAgo(35)),
+    closedAt: null,
+    responsibleUserId: 'user-doc-1',
+    primaryCaseId: 'case-23',
+    createdAt: iso(daysAgo(35)),
+    updatedAt: iso(daysAgo(1)),
+  },
+  // ── Old fracture 1yr + new acute fracture — Birgit Magnusson (p-23) ───────
+  {
+    // Femoral neck fracture 1 year ago — now at 1-year control
+    id: 'ep-24',
+    patientId: 'p-23',
+    label: 'Proximal femurfraktur höger — 1-årsuppföljning',
+    clinicalArea: 'Ortopedi',
+    status: 'OPEN',
+    openedAt: iso(daysAgo(365)),
+    closedAt: null,
+    responsibleUserId: 'user-pal-1',
+    primaryCaseId: 'case-24',
+    createdAt: iso(daysAgo(365)),
+    updatedAt: iso(daysAgo(1)),
+  },
+  {
+    // New distal radius fracture 10 days ago — concurrent with 1-year control
+    id: 'ep-25',
+    patientId: 'p-23',
+    label: 'Distala radiusfraktur vänster — nytt trauma',
+    clinicalArea: 'Hand',
+    status: 'OPEN',
+    openedAt: iso(daysAgo(10)),
+    closedAt: null,
+    responsibleUserId: 'user-pal-1',
+    primaryCaseId: 'case-25',
+    createdAt: iso(daysAgo(10)),
+    updatedAt: iso(daysAgo(1)),
+  },
 ]

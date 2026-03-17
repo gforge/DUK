@@ -1,6 +1,7 @@
 import type { AppState, AuditEvent, Case, EpisodeOfCare, Patient, PatientJourney } from '../schemas'
 import { SEED_STATE } from '../seed'
 import {
+  categoryFromDaysAgo,
   isoDateOffset as isoDate,
   isoTsOffset as isoTs,
   PAL_IDS,
@@ -11,7 +12,12 @@ import { COHORTS } from './cohorts'
 import { FIRST_NAMES, LAST_NAMES, personalNumber } from './namePools'
 import { makePrng } from './prng'
 
-function generateReviews(rng: ReturnType<typeof makePrng>, caseId: string, createdAt: string) {
+function generateReviews(
+  rng: ReturnType<typeof makePrng>,
+  caseId: string,
+  createdAt: string,
+  palId: string,
+) {
   const reviews = []
   const reviewProb = 0.15 // ~15% of cases have pending reviews
 
@@ -21,7 +27,7 @@ function generateReviews(rng: ReturnType<typeof makePrng>, caseId: string, creat
       id: `${caseId}-rev-${rng.int(0, 9999)}`,
       type,
       createdAt,
-      createdByUserId: '???',
+      createdByUserId: palId,
       createdByRole: 'NURSE' as const,
       source: 'MANUAL' as const,
       reviewedAt: null,
@@ -66,7 +72,7 @@ export function buildRealisticSeed(): AppState {
       const createdAt = isoTs(-cohort.startDaysAgo)
 
       // Generate reviews for this case
-      const reviews = generateReviews(rng, caseId, createdAt)
+      const reviews = generateReviews(rng, caseId, createdAt, palId)
 
       // Add review triggers if there are pending reviews
       const triggers = [...baseTriggers]
@@ -162,7 +168,7 @@ export function buildRealisticSeed(): AppState {
       cases.push({
         id: caseId,
         patientId: pid,
-        category: 'CONTROL',
+        category: categoryFromDaysAgo(cohort.startDaysAgo),
         status,
         triggers: triggers as Case['triggers'],
         policyWarnings: [],
@@ -180,7 +186,7 @@ export function buildRealisticSeed(): AppState {
       episodes.push({
         id: epId,
         patientId: pid,
-        label: isComplex ? 'Complex fracture follow-up' : 'Standard fracture follow-up',
+        label: isComplex ? 'Komplex frakturuppföljning' : 'Standarduppföljning fraktur',
         clinicalArea: 'Ortopedi',
         status: 'OPEN',
         openedAt: createdAt,
@@ -197,7 +203,7 @@ export function buildRealisticSeed(): AppState {
         patientId: pid,
         journeyTemplateId,
         phaseType: 'FOLLOWUP',
-        joinedAt: '',
+        joinedAt: startDate,
         startDate,
         status: 'ACTIVE',
         researchModuleIds: [],
