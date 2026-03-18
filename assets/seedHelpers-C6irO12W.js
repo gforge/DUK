@@ -1,1 +1,0 @@
-const s=["HIGH_PAIN","NO_RESPONSE","NOT_OPENED","INFECTION_SUSPECTED","LOW_FUNCTION","LOW_QOL"],n=["user-pal-1","user-doc-1"];const e=(()=>{const t=new Date;return t.setHours(0,0,0,0),t.getTime()})();function o(t){return new Date(e+t*864e5).toISOString().slice(0,10)}function O(t){return new Date(e+t*864e5).toISOString()}export{n as P,s as T,O as a,o as i};
