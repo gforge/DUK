@@ -117,8 +117,11 @@ export default function CaseListItem({
         }}
       >
         {/* Row 1: Patient name + Status badge */}
-        <Stack direction="row" alignItems="center" justifyContent="space-between" gap={1}>
-          <Typography variant="body2" fontWeight={600} noWrap sx={{ maxWidth: 160 }}>
+        <Stack
+          sx={{ alignItems: 'center', justifyContent: 'space-between', gap: 1 }}
+          direction="row"
+        >
+          <Typography sx={{ fontWeight: 600, maxWidth: 160 }} variant="body2" noWrap>
             {patient?.displayName ?? caseData.patientId}
           </Typography>
           <StatusChip status={caseData.status} />
@@ -126,18 +129,21 @@ export default function CaseListItem({
 
         {/* Row 2: Trigger chips */}
         {caseData.triggers.length > 0 && (
-          <Box mt={0.5}>
+          <Box sx={{ mt: 0.5 }}>
             <TriggerChips triggers={caseData.triggers} />
           </Box>
         )}
 
         {/* Row 3: Auto-warnings badge + meta */}
-        <Stack direction="row" alignItems="center" justifyContent="space-between" gap={1} mt={0.5}>
+        <Stack
+          sx={{ alignItems: 'center', justifyContent: 'space-between', gap: 1, mt: 0.5 }}
+          direction="row"
+        >
           <AutoWarningsBadge
             warnings={caseData.policyWarnings}
             lastActivityAt={caseData.lastActivityAt}
           />
-          <Stack direction="row" gap={1} flexWrap="wrap" justifyContent="flex-end">
+          <Stack sx={{ gap: 1, flexWrap: 'wrap', justifyContent: 'flex-end' }} direction="row">
             {caseData.scheduledAt && <ScheduledLabel scheduledAt={caseData.scheduledAt} />}
             <Typography variant="caption" color="text.secondary">
               {t('dashboard.lastActivity')}: {lastActivity}

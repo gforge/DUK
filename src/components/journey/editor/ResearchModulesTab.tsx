@@ -29,7 +29,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import ScienceIcon from '@mui/icons-material/Science'
 import AddIcon from '@mui/icons-material/Add'
 import EditIcon from '@mui/icons-material/Edit'
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlineOutlined'
 import { useTranslation } from 'react-i18next'
 import type {
   ResearchModule,
@@ -126,13 +126,13 @@ function ModuleEditorDialog({ module, questionnaires, onSave, onClose }: ModuleE
   }
 
   return (
-    <Dialog open onClose={onClose} maxWidth="md" fullWidth>
+    <Dialog maxWidth="md" open onClose={onClose} fullWidth>
       <DialogTitle>
         {isCreate ? t('journey.research.createModule') : t('journey.research.editModule')}
       </DialogTitle>
       <DialogContent>
-        <Stack gap={2} sx={{ mt: 0.5 }}>
-          <Stack direction="row" gap={2}>
+        <Stack sx={{ gap: 2, mt: 0.5 }}>
+          <Stack sx={{ gap: 2 }} direction="row">
             <TextField
               label={t('journey.template.name')}
               value={name}
@@ -163,7 +163,7 @@ function ModuleEditorDialog({ module, questionnaires, onSave, onClose }: ModuleE
             helperText={t('journey.research.studyInfoHint')}
           />
 
-          <Stack direction="row" alignItems="center" justifyContent="space-between">
+          <Stack sx={{ alignItems: 'center', justifyContent: 'space-between' }} direction="row">
             <Typography variant="overline" color="text.secondary">
               {t('journey.research.entries')}
             </Typography>
@@ -306,7 +306,7 @@ export default function ResearchModulesTab({
 
   return (
     <>
-      <Stack direction="row" justifyContent="flex-end" sx={{ mb: 1.5 }}>
+      <Stack sx={{ justifyContent: 'flex-end', mb: 1.5 }} direction="row">
         <Button
           size="small"
           variant="outlined"
@@ -320,14 +320,14 @@ export default function ResearchModulesTab({
       {!researchModules?.length ? (
         <Typography color="text.secondary">{t('journey.editor.noModules')}</Typography>
       ) : (
-        <Stack gap={1.5}>
+        <Stack sx={{ gap: 1.5 }}>
           {researchModules.map((rm) => (
             <Accordion key={rm.id} variant="outlined" sx={{ borderRadius: '8px !important' }}>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Stack direction="row" alignItems="center" gap={1.5} sx={{ flex: 1, pr: 1 }}>
+                <Stack sx={{ alignItems: 'center', gap: 1.5, flex: 1, pr: 1 }} direction="row">
                   <ScienceIcon color="secondary" fontSize="small" />
                   <Box sx={{ flex: 1 }}>
-                    <Typography variant="subtitle2" fontWeight={700}>
+                    <Typography sx={{ fontWeight: 700 }} variant="subtitle2">
                       {rm.name}
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
@@ -378,7 +378,7 @@ export default function ResearchModulesTab({
                     {rm.entries.map((entry) => (
                       <TableRow key={entry.id} hover>
                         <TableCell>
-                          <Typography variant="body2" fontWeight={600}>
+                          <Typography sx={{ fontWeight: 600 }} variant="body2">
                             {entry.label}
                           </Typography>
                         </TableCell>

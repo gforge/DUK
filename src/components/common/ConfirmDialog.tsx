@@ -30,7 +30,7 @@ export default function ConfirmDialog({
 }: Props) {
   const { t } = useTranslation()
   return (
-    <Dialog open={open} onClose={onCancel} maxWidth="xs" fullWidth>
+    <Dialog maxWidth="xs" open={open} onClose={onCancel} fullWidth>
       <DialogTitle>{title}</DialogTitle>
       <DialogContent>
         <DialogContentText>{message}</DialogContentText>

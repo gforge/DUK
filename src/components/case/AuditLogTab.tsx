@@ -65,12 +65,12 @@ export default function AuditLogTab({ caseId }: AuditLogTabProps) {
                 {format(new Date(event.timestamp), 'dd MMM yyyy HH:mm:ss')}
               </TableCell>
               <TableCell>
-                <Typography variant="body2" fontWeight={500}>
+                <Typography sx={{ fontWeight: 500 }} variant="body2">
                   {t(`audit.actions.${event.action}`, { defaultValue: event.action })}
                 </Typography>
               </TableCell>
               <TableCell>
-                <Stack direction="row" gap={0.5} alignItems="center">
+                <Stack sx={{ gap: 0.5, alignItems: 'center' }} direction="row">
                   <Chip
                     label={t(`role.${event.userRole}`)}
                     size="small"

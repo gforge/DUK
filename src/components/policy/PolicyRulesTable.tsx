@@ -54,11 +54,13 @@ export default function PolicyRulesTable({ rules, deleting, onToggle, onEdit, on
                   size="small"
                   checked={rule.enabled}
                   onChange={() => onToggle(rule)}
-                  inputProps={{ 'aria-label': t('policy.toggleEnabled', { name: rule.name }) }}
+                  slotProps={{
+                    input: { 'aria-label': t('policy.toggleEnabled', { name: rule.name }) },
+                  }}
                 />
               </TableCell>
               <TableCell>
-                <Typography variant="body2" fontWeight={500}>
+                <Typography sx={{ fontWeight: 500 }} variant="body2">
                   {rule.name}
                 </Typography>
               </TableCell>
@@ -90,7 +92,7 @@ export default function PolicyRulesTable({ rules, deleting, onToggle, onEdit, on
                 </Typography>
               </TableCell>
               <TableCell align="right">
-                <Stack direction="row" spacing={0.5} justifyContent="flex-end">
+                <Stack sx={{ justifyContent: 'flex-end' }} direction="row" spacing={0.5}>
                   <IconButton
                     size="small"
                     aria-label={t('common.edit')}

@@ -120,7 +120,7 @@ export default function ModifyJourneyDialog({
   const otherTemplates = journeyTemplates.filter((jt) => jt.id !== currentTemplateId)
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
+    <Dialog maxWidth="sm" open={open} onClose={handleClose} fullWidth>
       <DialogTitle>{t('journey.modify.title')}</DialogTitle>
       <DialogContent sx={{ p: 0 }}>
         <Tabs

@@ -36,10 +36,10 @@ export default function Patients() {
 
   return (
     <Box>
-      <Stack direction="row" alignItems="center" justifyContent="space-between" mb={2}>
-        <Stack direction="row" alignItems="center" gap={1.5}>
+      <Stack sx={{ alignItems: 'center', justifyContent: 'space-between', mb: 2 }} direction="row">
+        <Stack sx={{ alignItems: 'center', gap: 1.5 }} direction="row">
           <PersonIcon color="primary" />
-          <Typography variant="h5" fontWeight={700}>
+          <Typography sx={{ fontWeight: 700 }} variant="h5">
             {t('patients.title')}
           </Typography>
         </Stack>

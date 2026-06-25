@@ -61,7 +61,10 @@ export default function DashboardToolbar({
         bgcolor: 'background.paper',
       }}
     >
-      <Stack direction={{ xs: 'column', sm: 'row' }} gap={2} alignItems="center" flexWrap="wrap">
+      <Stack
+        sx={{ gap: 2, alignItems: 'center', flexWrap: 'wrap' }}
+        direction={{ xs: 'column', sm: 'row' }}
+      >
         <TextField
           inputRef={searchRef}
           size="small"

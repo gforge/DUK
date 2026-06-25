@@ -138,9 +138,9 @@ export default function AssignJourneyDialog({
   const wizardSteps = [t('patients.register.stepJourney'), t('patients.conflicts.step')]
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
+    <Dialog maxWidth="sm" open={open} onClose={handleClose} fullWidth>
       <DialogTitle>
-        <Stack direction="row" alignItems="center" gap={1}>
+        <Stack sx={{ alignItems: 'center', gap: 1 }} direction="row">
           <RouteIcon color="primary" />
           {t('patients.assignJourney')} — {patientName}
         </Stack>
@@ -162,7 +162,7 @@ export default function AssignJourneyDialog({
 
         {/* ── Step 0: Template / start date / research ── */}
         {wizardStep === 0 && (
-          <Stack gap={2}>
+          <Stack sx={{ gap: 2 }}>
             <FormControl size="small" fullWidth required>
               <InputLabel>{t('patients.register.selectTemplate')}</InputLabel>
               <Select
@@ -186,12 +186,12 @@ export default function AssignJourneyDialog({
               type="date"
               fullWidth
               required
-              InputLabelProps={{ shrink: true }}
+              slotProps={{ inputLabel: { shrink: true } }}
             />
             {researchModules && researchModules.length > 0 && (
               <>
                 <Divider />
-                <Typography variant="body2" fontWeight={600}>
+                <Typography sx={{ fontWeight: 600 }} variant="body2">
                   {t('patients.register.stepStudies')}
                 </Typography>
                 <FormGroup>
@@ -212,7 +212,7 @@ export default function AssignJourneyDialog({
                         />
                       }
                       label={
-                        <Stack direction="row" alignItems="center" gap={0.5}>
+                        <Stack sx={{ alignItems: 'center', gap: 0.5 }} direction="row">
                           <ScienceIcon fontSize="small" color="secondary" />
                           <Typography variant="body2">{rm.studyName}</Typography>
                         </Stack>
@@ -227,7 +227,7 @@ export default function AssignJourneyDialog({
 
         {/* ── Step 1: Conflict resolution ── */}
         {wizardStep === 1 && (
-          <Stack gap={2}>
+          <Stack sx={{ gap: 2 }}>
             {loadingConflicts ? (
               <Box sx={{ display: 'flex', justifyContent: 'center', py: 3 }}>
                 <CircularProgress size={28} />
@@ -268,8 +268,8 @@ export default function AssignJourneyDialog({
                           />
                         }
                         label={
-                          <Stack gap={0}>
-                            <Typography variant="body2" fontWeight={600}>
+                          <Stack sx={{ gap: 0 }}>
+                            <Typography sx={{ fontWeight: 600 }} variant="body2">
                               {c.newStep.label}
                             </Typography>
                             <Typography variant="caption" color="text.secondary">

@@ -66,44 +66,52 @@ export default function AutoWarningsBadge({ warnings, lastActivityAt }: AutoWarn
       </Tooltip>
 
       <Dialog
+        maxWidth="sm"
         open={open}
         onClose={() => setOpen(false)}
-        maxWidth="sm"
         fullWidth
         onClick={(e) => e.stopPropagation()}
         aria-labelledby="warnings-dialog-title"
       >
         <DialogTitle id="warnings-dialog-title">
-          <Stack direction="row" alignItems="center" gap={1}>
+          <Stack sx={{ alignItems: 'center', gap: 1 }} direction="row">
             <WarningAmberIcon color="warning" />
             {t('case.autoWarningsDialogTitle')}
           </Stack>
         </DialogTitle>
         <DialogContent dividers>
-          <Typography variant="caption" color="text.secondary" display="block" mb={1}>
+          <Typography sx={{ display: 'block', mb: 1 }} variant="caption" color="text.secondary">
             {t('case.autoWarningsLastCalc', { date: lastCalc })}
           </Typography>
           <List disablePadding>
             {warnings.map((w, i) => (
               <React.Fragment key={w.ruleId}>
                 {i > 0 && <Divider />}
-                <ListItem alignItems="flex-start" sx={{ px: 0, py: 1 }}>
+                <ListItem sx={{ alignItems: 'flex-start', px: 0, py: 1 }}>
                   <ListItemIcon sx={{ minWidth: 32, mt: 0.5 }}>
                     <WarningAmberIcon fontSize="small" color={SEVERITY_COLOR[w.severity]} />
                   </ListItemIcon>
                   <ListItemText
                     primary={
-                      <Typography variant="body2" fontWeight={600}>
+                      <Typography sx={{ fontWeight: 600 }} variant="body2">
                         {w.ruleName}
                       </Typography>
                     }
                     secondary={
                       <Box>
-                        <Typography variant="caption" color="text.secondary" display="block">
+                        <Typography
+                          sx={{ display: 'block' }}
+                          variant="caption"
+                          color="text.secondary"
+                        >
                           {t('case.autoWarningsExpression')}: <code>{w.expression}</code>
                         </Typography>
                         {Object.entries(w.triggeredValues).length > 0 && (
-                          <Typography variant="caption" color="text.secondary" display="block">
+                          <Typography
+                            sx={{ display: 'block' }}
+                            variant="caption"
+                            color="text.secondary"
+                          >
                             {t('case.autoWarningsValues')}:{' '}
                             {Object.entries(w.triggeredValues)
                               .map(([k, v]) => `${k} = ${v}`)
@@ -111,10 +119,9 @@ export default function AutoWarningsBadge({ warnings, lastActivityAt }: AutoWarn
                           </Typography>
                         )}
                         <Typography
-                          variant="caption"
-                          display="inline-block"
-                          mt={0.5}
                           sx={{
+                            display: 'inline-block',
+                            mt: 0.5,
                             px: 0.75,
                             py: 0.25,
                             borderRadius: 1,
@@ -128,6 +135,7 @@ export default function AutoWarningsBadge({ warnings, lastActivityAt }: AutoWarn
                             fontWeight: 700,
                             fontSize: '0.65rem',
                           }}
+                          variant="caption"
                         >
                           {t(`severity.${w.severity}`)}
                         </Typography>

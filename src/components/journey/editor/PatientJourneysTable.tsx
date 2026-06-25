@@ -13,7 +13,7 @@ import {
 } from '@mui/material'
 import ScienceIcon from '@mui/icons-material/Science'
 import AddIcon from '@mui/icons-material/Add'
-import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline'
+import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutlineOutlined'
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz'
 import { useTranslation } from 'react-i18next'
 import type {
@@ -77,7 +77,7 @@ export default function PatientJourneysTable({
         {patientJourneys.map((pj) => (
           <TableRow key={pj.id} hover>
             <TableCell>
-              <Typography variant="body2" fontWeight={600}>
+              <Typography sx={{ fontWeight: 600 }} variant="body2">
                 {patientName(pj.patientId)}
               </Typography>
             </TableCell>
@@ -104,7 +104,7 @@ export default function PatientJourneysTable({
             </TableCell>
             <TableCell>
               {pj.researchModuleIds.length > 0 ? (
-                <Stack direction="row" gap={0.5} flexWrap="wrap">
+                <Stack sx={{ gap: 0.5, flexWrap: 'wrap' }} direction="row">
                   {pj.researchModuleIds.map((rmId) => (
                     <Chip
                       key={rmId}
@@ -125,9 +125,9 @@ export default function PatientJourneysTable({
             </TableCell>
             <TableCell>
               {pj.modifications.length > 0 ? (
-                <Stack gap={0.25}>
+                <Stack sx={{ gap: 0.25 }}>
                   {pj.modifications.map((mod) => (
-                    <Stack key={mod.id} direction="row" alignItems="center" gap={0.5}>
+                    <Stack sx={{ alignItems: 'center', gap: 0.5 }} key={mod.id} direction="row">
                       {MOD_ICON[mod.type]}
                       <Typography variant="caption">{modSummary(mod, templateName)}</Typography>
                       <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />

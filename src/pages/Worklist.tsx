@@ -20,7 +20,7 @@ import {
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 import PlayArrowIcon from '@mui/icons-material/PlayArrow'
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth'
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutlineOutlined'
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
@@ -101,11 +101,11 @@ function WorklistRow({
       }}
     >
       {/* Patient + status */}
-      <Stack gap={0.25}>
-        <Typography variant="body2" fontWeight={600}>
+      <Stack sx={{ gap: 0.25 }}>
+        <Typography sx={{ fontWeight: 600 }} variant="body2">
           {patient?.displayName ?? caseData.patientId}
         </Typography>
-        <Stack direction="row" gap={1} alignItems="center" flexWrap="wrap">
+        <Stack sx={{ gap: 1, alignItems: 'center', flexWrap: 'wrap' }} direction="row">
           <StatusChip status={caseData.status} size="small" />
           {caseData.assignedRole && (
             <Chip
@@ -148,7 +148,7 @@ function WorklistRow({
       </Box>
 
       {/* Actions */}
-      <Stack direction="row" gap={0.5} justifyContent="flex-end" alignItems="center">
+      <Stack sx={{ gap: 0.5, justifyContent: 'flex-end', alignItems: 'center' }} direction="row">
         {/* TRIAGED + bookable → Boka dialog */}
         {isTriaged && isBookable && (
           <Button
@@ -197,18 +197,23 @@ function WorklistRow({
       </Stack>
 
       {/* Booking dialog */}
-      <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="xs" fullWidth>
+      <Dialog
+        maxWidth="xs"
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        fullWidth
+      >
         <DialogTitle>
           {t('worklist.bookDialogTitle', { name: patient?.displayName ?? caseData.patientId })}
         </DialogTitle>
         <DialogContent>
-          <Stack gap={2} sx={{ pt: 1 }}>
+          <Stack sx={{ gap: 2, pt: 1 }}>
             {patient?.personalNumber && (
-              <Stack direction="row" alignItems="center" gap={1}>
+              <Stack sx={{ alignItems: 'center', gap: 1 }} direction="row">
                 <Typography variant="body2" color="text.secondary" sx={{ minWidth: 110 }}>
                   {t('worklist.pnr')}
                 </Typography>
-                <Typography variant="body2" fontWeight={600} sx={{ fontFamily: 'monospace' }}>
+                <Typography sx={{ fontWeight: 600, fontFamily: 'monospace' }} variant="body2">
                   {formatPersonnummer(patient.personalNumber)}
                 </Typography>
                 <Tooltip title={copied ? t('worklist.copiedPnr') : t('worklist.copyPnr')}>
@@ -235,7 +240,7 @@ function WorklistRow({
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setDialogOpen(false)}>{t('common.cancel')}</Button>
-          <Button variant="contained" onClick={handleConfirmBooking}>
+          <Button variant="contained" onClick={handleConfirmBooking} disabled={!scheduledAt}>
             {t('worklist.confirmBooking')}
           </Button>
         </DialogActions>
@@ -267,21 +272,17 @@ function GroupSection({
     <Paper variant="outlined" sx={{ borderRadius: 2, overflow: 'hidden', mb: 2 }}>
       {/* Group header */}
       <Stack
+        sx={{ alignItems: 'center', gap: 1, px: 2, py: 1, bgcolor: 'action.selected' }}
         direction="row"
-        alignItems="center"
-        gap={1}
-        px={2}
-        py={1}
-        sx={{ bgcolor: 'action.selected' }}
       >
-        <Typography variant="subtitle2" fontWeight={700}>
+        <Typography sx={{ fontWeight: 700 }} variant="subtitle2">
           {t(`nextStep.${nextStep}`)}
         </Typography>
         <Chip label={cases.length} size="small" color="default" />
       </Stack>
 
       {cases.length === 0 ? (
-        <Box px={2} py={1.5}>
+        <Box sx={{ px: 2, py: 1.5 }}>
           <Typography variant="body2" color="text.secondary">
             {t('worklist.emptyGroup')}
           </Typography>
@@ -398,15 +399,15 @@ export default function Worklist() {
 
   return (
     <Box>
-      <Typography variant="h5" fontWeight={700} mb={0.5}>
+      <Typography sx={{ fontWeight: 700, mb: 0.5 }} variant="h5">
         {t('worklist.title')}
       </Typography>
-      <Typography variant="body2" color="text.secondary" mb={2}>
+      <Typography sx={{ mb: 2 }} variant="body2" color="text.secondary">
         {t('worklist.subtitle')}
       </Typography>
 
       {/* Role filter chips */}
-      <Stack direction="row" gap={1} mb={3} flexWrap="wrap">
+      <Stack sx={{ gap: 1, mb: 3, flexWrap: 'wrap' }} direction="row">
         <Chip
           label={t('worklist.filterAll')}
           variant={roleFilter === null ? 'filled' : 'outlined'}
@@ -425,7 +426,7 @@ export default function Worklist() {
       </Stack>
 
       {loading && (
-        <Stack gap={2}>
+        <Stack sx={{ gap: 2 }}>
           {[1, 2, 3].map((i) => (
             <Skeleton key={i} variant="rectangular" height={80} sx={{ borderRadius: 2 }} />
           ))}

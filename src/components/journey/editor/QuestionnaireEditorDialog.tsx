@@ -28,7 +28,7 @@ import {
   Typography,
 } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlineOutlined'
 import { useTranslation } from 'react-i18next'
 import type { QuestionnaireTemplate, Question } from '../../../api/schemas'
 
@@ -162,13 +162,13 @@ export default function QuestionnaireEditorDialog({ template, onSave, onClose }:
   }
 
   return (
-    <Dialog open onClose={onClose} maxWidth="lg" fullWidth>
+    <Dialog maxWidth="lg" open onClose={onClose} fullWidth>
       <DialogTitle>
         {isCreate ? t('journey.editor.createQuestionnaire') : t('journey.editor.editQuestionnaire')}
       </DialogTitle>
 
       <DialogContent sx={{ pb: 0 }}>
-        <Stack gap={2} sx={{ mt: 0.5 }}>
+        <Stack sx={{ gap: 2, mt: 0.5 }}>
           <TextField
             label={t('journey.qTemplate.name')}
             value={name}
@@ -188,7 +188,7 @@ export default function QuestionnaireEditorDialog({ template, onSave, onClose }:
           {/* ── Questions tab ──────────────────────────────────────────────── */}
           {tab === 0 && (
             <Box>
-              <Stack direction="row" justifyContent="flex-end" mb={1}>
+              <Stack sx={{ justifyContent: 'flex-end', mb: 1 }} direction="row">
                 <Button
                   size="small"
                   startIcon={<AddIcon />}
@@ -246,10 +246,14 @@ export default function QuestionnaireEditorDialog({ template, onSave, onClose }:
                           </FormControl>
                         </TableCell>
                         <TableCell>
-                          <Stack gap={0.5}>
+                          <Stack sx={{ gap: 0.5 }}>
                             {Object.entries(q.label.sv != null ? q.label : { sv: '' }).map(
                               ([lang, text]) => (
-                                <Stack key={lang} direction="row" alignItems="center" gap={0.5}>
+                                <Stack
+                                  sx={{ alignItems: 'center', gap: 0.5 }}
+                                  key={lang}
+                                  direction="row"
+                                >
                                   <Chip
                                     label={lang.toUpperCase()}
                                     size="small"
@@ -327,7 +331,7 @@ export default function QuestionnaireEditorDialog({ template, onSave, onClose }:
                         </TableCell>
                         <TableCell>
                           {(q.type === 'SCALE' || q.type === 'NUMBER') && (
-                            <Stack direction="row" gap={0.5}>
+                            <Stack sx={{ gap: 0.5 }} direction="row">
                               <TextField
                                 value={q.min ?? ''}
                                 onChange={(e) =>
@@ -388,7 +392,10 @@ export default function QuestionnaireEditorDialog({ template, onSave, onClose }:
           {/* ── Scoring rules tab ──────────────────────────────────────────── */}
           {tab === 1 && (
             <Box>
-              <Stack direction="row" justifyContent="space-between" alignItems="center" mb={1}>
+              <Stack
+                sx={{ justifyContent: 'space-between', alignItems: 'center', mb: 1 }}
+                direction="row"
+              >
                 <Typography variant="caption" color="text.secondary">
                   {t('journey.qTemplate.scoringHint', { keys: questionKeys.join(', ') || '—' })}
                 </Typography>

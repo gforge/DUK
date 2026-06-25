@@ -6,7 +6,7 @@ import { useRole } from '../../store/roleContext'
 import { useSnack } from '../../store/snackContext'
 import * as client from '../../api/client'
 import TriageForm from './triage/TriageForm'
-import type { TriageForm as TriageFormData } from './triage/TriageForm'
+import type { TriageForm as TriageFormData } from './triage/triageFormSchema'
 
 interface TriageTabProps {
   caseData: Case
@@ -74,7 +74,7 @@ export default function TriageTab({ caseData, onTriaged }: TriageTabProps) {
       )}
 
       {caseData.status === 'TRIAGED' && (
-        <Stack direction="row" gap={1}>
+        <Stack sx={{ gap: 1 }} direction="row">
           <Button variant="outlined" size="small" onClick={handleFollowUp}>
             {t('triage.followUp')}
           </Button>

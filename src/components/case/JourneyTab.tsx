@@ -22,7 +22,7 @@ import PauseIcon from '@mui/icons-material/Pause'
 import PlayArrowIcon from '@mui/icons-material/PlayArrow'
 import RouteIcon from '@mui/icons-material/Route'
 import ScienceIcon from '@mui/icons-material/Science'
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutlineOutlined'
 import BlockIcon from '@mui/icons-material/Block'
 import { useTranslation } from 'react-i18next'
 import { useApi } from '../../hooks/useApi'
@@ -80,13 +80,6 @@ export default function JourneyTab({ caseData }: JourneyTabProps) {
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
     )
   }, [journeys])
-
-  // Auto-select first journey when data loads or when the list changes
-  useEffect(() => {
-    if (sortedJourneys.length > 0 && !selectedJourneyId) {
-      setSelectedJourneyId(sortedJourneys[0].id)
-    }
-  }, [sortedJourneys, selectedJourneyId])
 
   const selectedJourney =
     sortedJourneys.find((j) => j.id === selectedJourneyId) ?? sortedJourneys[0] ?? null
@@ -188,18 +181,22 @@ export default function JourneyTab({ caseData }: JourneyTabProps) {
 
   // ------- Pause banner helper -------
 
+  const [nowMs, setNowMs] = useState(() => Date.now())
+
+  useEffect(() => {
+    const intervalId = window.setInterval(() => setNowMs(Date.now()), 60_000)
+    return () => window.clearInterval(intervalId)
+  }, [])
+
   const pausedDays = selectedJourney?.pausedAt
-    ? Math.max(
-        0,
-        Math.floor((Date.now() - new Date(selectedJourney.pausedAt).getTime()) / 86_400_000),
-      )
+    ? Math.max(0, Math.floor((nowMs - new Date(selectedJourney.pausedAt).getTime()) / 86_400_000))
     : 0
 
   // ------- Loading / empty states -------
 
   if (journeysLoading) {
     return (
-      <Stack gap={1}>
+      <Stack sx={{ gap: 1 }}>
         <Skeleton variant="text" width={200} />
         <Skeleton variant="rectangular" height={200} sx={{ borderRadius: 1 }} />
       </Stack>
@@ -234,7 +231,7 @@ export default function JourneyTab({ caseData }: JourneyTabProps) {
                 key={j.id}
                 value={j.id}
                 label={
-                  <Stack direction="row" alignItems="center" gap={0.5}>
+                  <Stack sx={{ alignItems: 'center', gap: 0.5 }} direction="row">
                     <span>{tmpl?.name ?? j.journeyTemplateId}</span>
                     <Chip
                       label={t(`journey.journeyStatus.${j.status}`)}
@@ -260,11 +257,14 @@ export default function JourneyTab({ caseData }: JourneyTabProps) {
       {selectedJourney && (
         <>
           {/* Journey header */}
-          <Stack direction="row" alignItems="flex-start" justifyContent="space-between" mb={1.5}>
-            <Stack gap={0.5}>
-              <Stack direction="row" alignItems="center" gap={1}>
+          <Stack
+            sx={{ alignItems: 'flex-start', justifyContent: 'space-between', mb: 1.5 }}
+            direction="row"
+          >
+            <Stack sx={{ gap: 0.5 }}>
+              <Stack sx={{ alignItems: 'center', gap: 1 }} direction="row">
                 <RouteIcon color="primary" fontSize="small" />
-                <Typography variant="subtitle1" fontWeight={700}>
+                <Typography sx={{ fontWeight: 700 }} variant="subtitle1">
                   {currentTemplate?.name ?? selectedJourney.journeyTemplateId}
                 </Typography>
                 {sortedJourneys.length === 1 && (
@@ -289,7 +289,7 @@ export default function JourneyTab({ caseData }: JourneyTabProps) {
               </Typography>
             </Stack>
 
-            <Stack direction="row" gap={1}>
+            <Stack sx={{ gap: 1 }} direction="row">
               {selectedJourney.status === 'ACTIVE' && (
                 <>
                   <Tooltip title={t('journey.pause')}>
@@ -340,7 +340,7 @@ export default function JourneyTab({ caseData }: JourneyTabProps) {
 
           {/* Research module chips with consent actions */}
           {enrolledModules && enrolledModules.length > 0 && (
-            <Stack direction="row" gap={1} mb={2} flexWrap="wrap" alignItems="center">
+            <Stack sx={{ gap: 1, mb: 2, flexWrap: 'wrap', alignItems: 'center' }} direction="row">
               {enrolledModules.map((rm) => {
                 const consent = allConsents?.find(
                   (c) =>
@@ -442,7 +442,11 @@ export default function JourneyTab({ caseData }: JourneyTabProps) {
           )}
 
           {/* Pause confirmation dialog */}
-          <Dialog open={pauseConfirmOpen} onClose={() => setPauseConfirmOpen(false)} maxWidth="xs">
+          <Dialog
+            maxWidth="xs"
+            open={pauseConfirmOpen}
+            onClose={() => setPauseConfirmOpen(false)}
+          >
             <DialogTitle>{t('journey.pauseConfirmTitle')}</DialogTitle>
             <DialogContent>
               <Typography variant="body2">{t('journey.pauseConfirmBody')}</Typography>

@@ -22,7 +22,7 @@ export default function ImportPanel({
 
   return (
     <Paper variant="outlined" sx={{ borderRadius: 2, p: 2.5, mb: 3 }}>
-      <Typography variant="subtitle1" fontWeight={600} gutterBottom>
+      <Typography sx={{ fontWeight: 600 }} variant="subtitle1" gutterBottom>
         {t('demoTools.importTitle')}
       </Typography>
       <Typography variant="body2" color="text.secondary" gutterBottom>
@@ -38,7 +38,7 @@ export default function ImportPanel({
         error={!!parseError}
         helperText={parseError}
         sx={{ mt: 1.5, fontFamily: 'monospace' }}
-        inputProps={{ style: { fontFamily: 'monospace', fontSize: '0.75rem' } }}
+        slotProps={{ htmlInput: { style: { fontFamily: 'monospace', fontSize: '0.75rem' } } }}
       />
       <Button
         variant="contained"

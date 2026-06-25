@@ -10,24 +10,16 @@ import {
   Divider,
 } from '@mui/material'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslation } from 'react-i18next'
-import { TriageInputSchema } from '../../../api/schemas'
 import type { Case } from '../../../api/schemas'
-import { z } from 'zod'
 import { parseDeadlineInput } from './parseDeadlineInput'
 import { ACTION_CONFIG, ACTION_ORDER, type TriageActionKey } from './actionConfig'
 import TriageContextBar from './TriageContextBar'
 import TriageActionCards from './TriageActionCards'
 import TriageActionDetails from './TriageActionDetails'
-
-export const TriageFormSchema = TriageInputSchema.extend({
-  deadline: z.string().optional(),
-  closeImmediately: z.boolean(),
-  bookingNote: z.string().optional(),
-})
-export type TriageForm = z.infer<typeof TriageFormSchema>
+import { TriageFormSchema, type TriageForm } from './triageFormSchema'
 
 interface Props {
   caseData: Case
@@ -44,7 +36,6 @@ export default function TriageForm({ caseData, onSubmit }: Props) {
     register,
     control,
     handleSubmit,
-    watch,
     setValue,
     formState: { errors, isSubmitting },
     reset,
@@ -109,7 +100,7 @@ export default function TriageForm({ caseData, onSubmit }: Props) {
     await onSubmit(resolved)
   }
 
-  const deadlineRaw = watch('deadline') ?? ''
+  const deadlineRaw = useWatch({ control, name: 'deadline' }) ?? ''
 
   // ─── Step 1: Action cards ──────────────────────────────────────────────────
   if (step === 1) {
@@ -147,7 +138,7 @@ export default function TriageForm({ caseData, onSubmit }: Props) {
           size="small"
           color={isClose ? 'default' : 'primary'}
         />
-        <Box flexGrow={1} />
+        <Box sx={{ flexGrow: 1 }} />
         <Button
           size="small"
           startIcon={<ArrowBackIcon />}
@@ -172,7 +163,7 @@ export default function TriageForm({ caseData, onSubmit }: Props) {
 
       <Divider sx={{ mb: 2 }} />
 
-      <Stack direction="row" gap={1} justifyContent="flex-end">
+      <Stack sx={{ gap: 1, justifyContent: 'flex-end' }} direction="row">
         <Button variant="outlined" onClick={handleBack} startIcon={<ArrowBackIcon />}>
           {t('triage.backToActions')}
         </Button>

@@ -41,7 +41,7 @@ export default function PatientDetail() {
 
   if (loading) {
     return (
-      <Box display="flex" justifyContent="center" mt={8}>
+      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 8 }}>
         <CircularProgress />
       </Box>
     )
@@ -49,7 +49,7 @@ export default function PatientDetail() {
 
   if (error || !patient) {
     return (
-      <Box p={3}>
+      <Box sx={{ p: 3 }}>
         <Alert severity="error">{t('patientDetail.notFound')}</Alert>
       </Box>
     )
@@ -93,25 +93,25 @@ export default function PatientDetail() {
           <PersonIcon fontSize="small" />
           {t('patients.title')}
         </MuiLink>
-        <Typography color="text.primary" fontWeight={600}>
+        <Typography sx={{ fontWeight: 600 }} color="text.primary">
           {patient.displayName}
         </Typography>
       </Breadcrumbs>
 
       {/* Patient summary */}
       <Paper variant="outlined" sx={{ p: 2.5, borderRadius: 2, mb: 3 }}>
-        <Stack direction="row" alignItems="center" gap={1.5} mb={1}>
+        <Stack sx={{ alignItems: 'center', gap: 1.5, mb: 1 }} direction="row">
           <PersonIcon color="primary" />
-          <Typography variant="h5" fontWeight={700}>
+          <Typography sx={{ fontWeight: 700 }} variant="h5">
             {patient.displayName}
           </Typography>
         </Stack>
-        <Stack direction="row" gap={4} flexWrap="wrap">
+        <Stack sx={{ gap: 4, flexWrap: 'wrap' }} direction="row">
           <Box>
             <Typography variant="caption" color="text.secondary">
               {t('patients.personalNumber')}
             </Typography>
-            <Typography variant="body2" fontWeight={500}>
+            <Typography sx={{ fontWeight: 500 }} variant="body2">
               {formatPersonnummer(patient.personalNumber)}
             </Typography>
           </Box>
@@ -119,7 +119,7 @@ export default function PatientDetail() {
             <Typography variant="caption" color="text.secondary">
               {t('patients.dateOfBirth')}
             </Typography>
-            <Typography variant="body2" fontWeight={500}>
+            <Typography sx={{ fontWeight: 500 }} variant="body2">
               {patient.dateOfBirth}
             </Typography>
           </Box>
@@ -128,7 +128,7 @@ export default function PatientDetail() {
               <Typography variant="caption" color="text.secondary">
                 {t('patient.lastOpened')}
               </Typography>
-              <Typography variant="body2" fontWeight={500}>
+              <Typography sx={{ fontWeight: 500 }} variant="body2">
                 {format(new Date(patient.lastOpenedAt), 'dd MMM yyyy HH:mm')}
               </Typography>
             </Box>
@@ -137,7 +137,7 @@ export default function PatientDetail() {
             <Typography variant="caption" color="text.secondary">
               {t('patientDetail.registered')}
             </Typography>
-            <Typography variant="body2" fontWeight={500}>
+            <Typography sx={{ fontWeight: 500 }} variant="body2">
               {format(new Date(patient.createdAt), 'dd MMM yyyy')}
             </Typography>
           </Box>
@@ -146,9 +146,9 @@ export default function PatientDetail() {
 
       {/* Cases */}
       <Paper variant="outlined" sx={{ p: 2.5, borderRadius: 2, mb: 3 }}>
-        <Stack direction="row" alignItems="center" gap={1} mb={1.5}>
+        <Stack sx={{ alignItems: 'center', gap: 1, mb: 1.5 }} direction="row">
           <AssignmentIcon color="primary" fontSize="small" />
-          <Typography variant="subtitle1" fontWeight={600}>
+          <Typography sx={{ fontWeight: 600 }} variant="subtitle1">
             {t('patientDetail.cases')}
           </Typography>
           <Chip label={sortedCases.length} size="small" variant="outlined" />
@@ -185,7 +185,7 @@ export default function PatientDetail() {
                   </TableCell>
                   <TableCell>
                     {c.triggers.length > 0 ? (
-                      <Stack direction="row" gap={0.5} flexWrap="wrap">
+                      <Stack sx={{ gap: 0.5, flexWrap: 'wrap' }} direction="row">
                         {c.triggers.map((tr) => (
                           <Chip
                             key={tr}
@@ -222,9 +222,9 @@ export default function PatientDetail() {
 
       {/* Journeys */}
       <Paper variant="outlined" sx={{ p: 2.5, borderRadius: 2, mb: 3 }}>
-        <Stack direction="row" alignItems="center" gap={1} mb={1.5}>
+        <Stack sx={{ alignItems: 'center', gap: 1, mb: 1.5 }} direction="row">
           <RouteIcon color="primary" fontSize="small" />
-          <Typography variant="subtitle1" fontWeight={600}>
+          <Typography sx={{ fontWeight: 600 }} variant="subtitle1">
             {t('patientDetail.journeys')}
           </Typography>
           <Chip label={sortedJourneys.length} size="small" variant="outlined" />
@@ -248,7 +248,7 @@ export default function PatientDetail() {
               {sortedJourneys.map((j) => (
                 <TableRow key={j.id}>
                   <TableCell>
-                    <Typography variant="body2" fontWeight={500}>
+                    <Typography sx={{ fontWeight: 500 }} variant="body2">
                       {templateName(j.journeyTemplateId)}
                     </Typography>
                   </TableCell>
@@ -276,8 +276,8 @@ export default function PatientDetail() {
       {/* Research consents */}
       {consents && consents.length > 0 && (
         <Paper variant="outlined" sx={{ p: 2.5, borderRadius: 2, mb: 3 }}>
-          <Stack direction="row" alignItems="center" gap={1} mb={1.5}>
-            <Typography variant="subtitle1" fontWeight={600}>
+          <Stack sx={{ alignItems: 'center', gap: 1, mb: 1.5 }} direction="row">
+            <Typography sx={{ fontWeight: 600 }} variant="subtitle1">
               {t('patientDetail.consents')}
             </Typography>
             <Chip label={consents.length} size="small" variant="outlined" />

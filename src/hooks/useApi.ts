@@ -22,11 +22,13 @@ export function useApi<T>(
 
   const [trigger, setTrigger] = useState(0)
 
-  const refetch = useCallback(() => setTrigger((t) => t + 1), [])
+  const refetch = useCallback(() => {
+    setState((s) => ({ ...s, loading: true, error: null }))
+    setTrigger((t) => t + 1)
+  }, [])
 
   useEffect(() => {
     let cancelled = false
-    setState((s) => ({ ...s, loading: true, error: null }))
 
     fn()
       .then((data) => {

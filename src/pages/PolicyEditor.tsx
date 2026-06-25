@@ -12,23 +12,19 @@ import {
   Typography,
 } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline'
+import HelpOutlineIcon from '@mui/icons-material/HelpOutlineOutlined'
 import RouteIcon from '@mui/icons-material/Route'
 import { useTranslation } from 'react-i18next'
 import { useApi } from '../hooks/useApi'
 import { useSnack } from '../store/snackContext'
 import * as client from '../api/client'
 import type { PolicyRule } from '../api/schemas'
-import PolicyRuleDialog, { ruleSchema, SEVERITIES } from '../components/policy/PolicyRuleDialog'
+import PolicyRuleDialog from '../components/policy/PolicyRuleDialog'
 import PolicyHelpDialog from '../components/policy/PolicyHelpDialog'
-import type { RuleForm } from '../components/policy/PolicyRuleDialog'
+import type { RuleForm } from '../components/policy/policyRuleForm'
 import PolicyRulesTable from '../components/policy/PolicyRulesTable'
 
 const EMPTY_FORM: RuleForm = { severity: 'MEDIUM', name: '', expression: '', description: '' }
-
-// suppress unused imports
-void ruleSchema
-void SEVERITIES
 
 export default function PolicyEditor() {
   const { t } = useTranslation()
@@ -124,8 +120,8 @@ export default function PolicyEditor() {
 
   return (
     <Box sx={{ p: 3 }}>
-      <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 3 }}>
-        <Typography variant="h5" fontWeight={700} flex={1}>
+      <Stack sx={{ alignItems: 'center', mb: 3 }} direction="row" spacing={1}>
+        <Typography sx={{ fontWeight: 700, flex: 1 }} variant="h5">
           {t('policy.title')}
         </Typography>
         <Tooltip title={t('policy.help')}>
@@ -136,7 +132,7 @@ export default function PolicyEditor() {
       </Stack>
 
       {/* Template selector */}
-      <Stack direction="row" alignItems="center" gap={2} sx={{ mb: 3 }}>
+      <Stack sx={{ alignItems: 'center', gap: 2, mb: 3 }} direction="row">
         <RouteIcon color="primary" />
         <TextField
           select

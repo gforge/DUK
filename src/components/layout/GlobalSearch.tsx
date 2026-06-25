@@ -75,7 +75,7 @@ export default function GlobalSearch() {
         </IconButton>
       </Tooltip>
 
-      <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
+      <Dialog maxWidth="sm" open={open} onClose={handleClose} fullWidth>
         <DialogContent sx={{ p: 0 }}>
           <TextField
             autoFocus
@@ -83,12 +83,14 @@ export default function GlobalSearch() {
             placeholder={t('common.searchPatients')}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start" sx={{ ml: 1 }}>
-                  <SearchIcon color="action" />
-                </InputAdornment>
-              ),
+            slotProps={{
+              input: {
+                startAdornment: (
+                  <InputAdornment position="start" sx={{ ml: 1 }}>
+                    <SearchIcon color="action" />
+                  </InputAdornment>
+                ),
+              },
             }}
             sx={{
               '& .MuiOutlinedInput-notchedOutline': { border: 0 },
@@ -110,7 +112,7 @@ export default function GlobalSearch() {
                   <ListItemText
                     primary={patient.displayName}
                     secondary={formatPersonnummer(patient.personalNumber)}
-                    secondaryTypographyProps={{ variant: 'caption' }}
+                    slotProps={{ secondary: { variant: 'caption' } }}
                   />
                 </ListItemButton>
               ))}

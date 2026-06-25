@@ -19,7 +19,7 @@ export default function DeadlineQuickChips({ onSelect, label }: Props) {
   const { t } = useTranslation()
 
   return (
-    <Stack direction="row" gap={1} flexWrap="wrap" alignItems="center">
+    <Stack sx={{ gap: 1, flexWrap: 'wrap', alignItems: 'center' }} direction="row">
       <Typography variant="caption" color="text.secondary" sx={{ minWidth: 80 }}>
         {label}:
       </Typography>

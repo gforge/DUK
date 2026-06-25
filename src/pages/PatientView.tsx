@@ -73,7 +73,7 @@ export default function PatientView() {
 
   return (
     <Box sx={{ p: 3, maxWidth: 720, mx: 'auto' }}>
-      <Typography variant="h5" fontWeight={700} gutterBottom>
+      <Typography sx={{ fontWeight: 700 }} variant="h5" gutterBottom>
         {t('patient.myPage')}
       </Typography>
 
@@ -93,7 +93,7 @@ export default function PatientView() {
         patientId={currentUser.id}
       />
 
-      <Typography variant="subtitle1" fontWeight={600} gutterBottom>
+      <Typography sx={{ fontWeight: 600 }} variant="subtitle1" gutterBottom>
         {t('patient.myCases')}
       </Typography>
 

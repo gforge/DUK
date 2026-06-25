@@ -122,7 +122,7 @@ export default function BookingsList({ caseData, onChange }: Props) {
       <Typography variant="subtitle2" gutterBottom>
         {t('triage.bookings')}
       </Typography>
-      <Stack gap={1}>
+      <Stack sx={{ gap: 1 }}>
         {(caseData.bookings ?? []).map((b) => (
           <Paper key={b.id} variant="outlined" sx={{ p: 1, display: 'flex', alignItems: 'center' }}>
             <Box sx={{ flex: 1 }}>
@@ -132,7 +132,7 @@ export default function BookingsList({ caseData, onChange }: Props) {
                 {b.role ? t(`role.${b.role}`) : t('common.notSet')}
               </Typography>
               {b.note && (
-                <Typography variant="caption" display="block">
+                <Typography sx={{ display: 'block' }} variant="caption">
                   {b.note}
                 </Typography>
               )}
@@ -177,13 +177,13 @@ export default function BookingsList({ caseData, onChange }: Props) {
       <Dialog open={!!editing} onClose={() => setEditing(null)}>
         <DialogTitle>{t('triage.editBooking')}</DialogTitle>
         <DialogContent>
-          <Stack gap={2} sx={{ mt: 1 }}>
+          <Stack sx={{ gap: 2, mt: 1 }}>
             <TextField
               label={t('triage.bookingTime')}
               type="datetime-local"
               value={editing?.scheduledAt ?? ''}
               onChange={(e) => setEditing((s) => (s ? { ...s, scheduledAt: e.target.value } : s))}
-              InputLabelProps={{ shrink: true }}
+              slotProps={{ inputLabel: { shrink: true } }}
               size="small"
             />
             <FormControl size="small">

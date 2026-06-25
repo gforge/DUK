@@ -29,7 +29,7 @@ import {
 import AddIcon from '@mui/icons-material/Add'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import RouteIcon from '@mui/icons-material/Route'
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlineOutlined'
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 import ForkRightIcon from '@mui/icons-material/ForkRight'
 import SyncIcon from '@mui/icons-material/Sync'
@@ -135,7 +135,7 @@ export default function JourneyTemplatesTab({
 
   return (
     <>
-      <Stack direction="row" justifyContent="flex-end" sx={{ mb: 1.5 }}>
+      <Stack sx={{ justifyContent: 'flex-end', mb: 1.5 }} direction="row">
         <Button
           size="small"
           variant="outlined"
@@ -149,15 +149,15 @@ export default function JourneyTemplatesTab({
       {!journeyTemplates?.length ? (
         <Typography color="text.secondary">{t('journey.editor.noTemplates')}</Typography>
       ) : (
-        <Stack gap={1.5}>
+        <Stack sx={{ gap: 1.5 }}>
           {journeyTemplates.map((jt) => (
             <Accordion key={jt.id} variant="outlined" sx={{ borderRadius: '8px !important' }}>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Stack direction="row" alignItems="center" gap={1.5} sx={{ flex: 1, pr: 1 }}>
+                <Stack sx={{ alignItems: 'center', gap: 1.5, flex: 1, pr: 1 }} direction="row">
                   <RouteIcon color="primary" fontSize="small" />
                   <Box sx={{ flex: 1 }}>
-                    <Stack direction="row" alignItems="center" gap={0.75}>
-                      <Typography variant="subtitle2" fontWeight={700}>
+                    <Stack sx={{ alignItems: 'center', gap: 0.75 }} direction="row">
+                      <Typography sx={{ fontWeight: 700 }} variant="subtitle2">
                         {jt.name}
                       </Typography>
                       {jt.parentTemplateId && (
@@ -242,7 +242,7 @@ export default function JourneyTemplatesTab({
                         </TableCell>
                         <TableCell>{t('journey.questionnaire')}</TableCell>
                         <TableCell>
-                          <Stack direction="row" alignItems="center" gap={0.5}>
+                          <Stack sx={{ alignItems: 'center', gap: 0.5 }} direction="row">
                             {t('journey.scoreAliases')}
                             <Tooltip title={t('journey.scoreAliasesHint')}>
                               <InfoOutlinedIcon fontSize="inherit" color="action" />
@@ -256,7 +256,7 @@ export default function JourneyTemplatesTab({
                       {jt.entries.map((entry) => (
                         <TableRow key={entry.id} hover>
                           <TableCell sx={{ minWidth: 120 }}>
-                            <Typography variant="body2" fontWeight={600}>
+                            <Typography sx={{ fontWeight: 600 }} variant="body2">
                               {entry.label}
                             </Typography>
                             {entry.stepKey && (
@@ -325,7 +325,7 @@ export default function JourneyTemplatesTab({
                             )}
                           </TableCell>
                           <TableCell>
-                            <Stack direction="row" flexWrap="wrap" gap={0.5}>
+                            <Stack sx={{ flexWrap: 'wrap', gap: 0.5 }} direction="row">
                               {Object.entries(entry.scoreAliases).map(([raw, alias]) => {
                                 const aliasLabel = entry.scoreAliasLabels?.[alias]
                                 return (
@@ -373,7 +373,7 @@ export default function JourneyTemplatesTab({
                   </Table>
                 </Box>
                 <Divider sx={{ my: 1 }} />
-                <Stack direction="row" justifyContent="flex-end">
+                <Stack sx={{ justifyContent: 'flex-end' }} direction="row">
                   <Button
                     size="small"
                     startIcon={<AddIcon />}
@@ -481,7 +481,7 @@ function DeriveDialog({
   }
 
   return (
-    <Dialog open onClose={onClose} maxWidth="xs" fullWidth>
+    <Dialog maxWidth="xs" open onClose={onClose} fullWidth>
       <DialogTitle>
         {t('journey.editor.deriveDialogTitle', { name: parentTemplate.name })}
       </DialogTitle>
@@ -577,7 +577,7 @@ function SyncFromParentDialog({
   }
 
   return (
-    <Dialog open onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog maxWidth="sm" open onClose={onClose} fullWidth>
       <DialogTitle>{t('journey.editor.syncDialogTitle')}</DialogTitle>
       <DialogContent>
         {loadingDiff ? (
@@ -585,7 +585,7 @@ function SyncFromParentDialog({
         ) : !diffs || diffs.length === 0 ? (
           <Typography color="text.secondary">{t('journey.editor.syncNoChanges')}</Typography>
         ) : (
-          <Stack gap={1} sx={{ mt: 1 }}>
+          <Stack sx={{ gap: 1, mt: 1 }}>
             {diffs.map((d) => (
               <FormControlLabel
                 key={d.entryId}
@@ -597,7 +597,7 @@ function SyncFromParentDialog({
                   />
                 }
                 label={
-                  <Stack direction="row" alignItems="center" gap={1}>
+                  <Stack sx={{ alignItems: 'center', gap: 1 }} direction="row">
                     <Chip
                       label={diffLabel[d.type]}
                       size="small"
@@ -676,12 +676,12 @@ function EditTemplateDialog({
   }
 
   return (
-    <Dialog open onClose={onClose} maxWidth="xs" fullWidth>
+    <Dialog maxWidth="xs" open onClose={onClose} fullWidth>
       <DialogTitle>
         {template ? t('journey.editor.editTemplate') : t('journey.editor.createTemplate')}
       </DialogTitle>
       <DialogContent>
-        <Stack gap={2} sx={{ mt: 1 }}>
+        <Stack sx={{ gap: 2, mt: 1 }}>
           <TextField
             label={t('journey.template.name')}
             value={name}

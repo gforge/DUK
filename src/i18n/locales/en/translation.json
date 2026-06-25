@@ -644,7 +644,11 @@
     "NURSE": "Nurse (RN)",
     "PAL": "PAL (Responsible Physician)",
     "PATIENT": "Patient",
-    "switchRole": "Switch Role"
+    "accountMenu": "Account",
+    "loginHint": "Choose a demo user to continue.",
+    "loginTitle": "Log in",
+    "logout": "Log out",
+    "signedInAs": "Signed in as"
   },
   "severity": {
     "HIGH": "High",

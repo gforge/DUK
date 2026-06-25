@@ -187,9 +187,9 @@ export default function JourneyEditor() {
 
   return (
     <Box>
-      <Stack direction="row" alignItems="center" gap={1.5} mb={2}>
+      <Stack sx={{ alignItems: 'center', gap: 1.5, mb: 2 }} direction="row">
         <RouteIcon color="primary" />
-        <Typography variant="h5" fontWeight={700} sx={{ flex: 1 }}>
+        <Typography sx={{ fontWeight: 700, flex: 1 }} variant="h5">
           {t('journey.editor.title')}
         </Typography>
         <Tooltip

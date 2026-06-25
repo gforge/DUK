@@ -41,9 +41,8 @@ export default function TriggerChips({ triggers, maxVisible = 3 }: TriggerChipsP
 
   return (
     <Stack
+      sx={{ flexWrap: 'wrap', gap: 0.5 }}
       direction="row"
-      flexWrap="wrap"
-      gap={0.5}
       role="list"
       aria-label={t('dashboard.triggers')}
     >

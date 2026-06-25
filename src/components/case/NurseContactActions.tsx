@@ -48,9 +48,9 @@ export default function NurseContactActions({ caseData, onRefetch }: Props) {
 
   return (
     <Alert severity="warning" sx={{ mt: 2 }} icon={false}>
-      <Stack gap={1.5}>
+      <Stack sx={{ gap: 1.5 }}>
         <span>{t(`nurseContact.suggestion.${primaryTrigger}`)}</span>
-        <Stack direction="row" gap={1} flexWrap="wrap">
+        <Stack sx={{ gap: 1, flexWrap: 'wrap' }} direction="row">
           <Button
             size="small"
             variant="contained"

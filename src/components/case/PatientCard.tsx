@@ -24,7 +24,7 @@ export default function PatientCard({ patient, caseData }: PatientCardProps) {
 
   return (
     <Paper variant="outlined" sx={{ p: 2, borderRadius: 2 }}>
-      <Stack direction={{ xs: 'column', sm: 'row' }} gap={2}>
+      <Stack sx={{ gap: 2 }} direction={{ xs: 'column', sm: 'row' }}>
         {/* Patient info */}
         <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1, flex: 1 }}>
           <Box
@@ -43,7 +43,7 @@ export default function PatientCard({ patient, caseData }: PatientCardProps) {
             <PersonIcon fontSize="small" />
           </Box>
           <Box>
-            <Typography variant="subtitle1" fontWeight={700}>
+            <Typography sx={{ fontWeight: 700 }} variant="subtitle1">
               {patient.displayName}
             </Typography>
             <Typography variant="body2" color="text.secondary">
@@ -68,13 +68,13 @@ export default function PatientCard({ patient, caseData }: PatientCardProps) {
         <Divider orientation="vertical" flexItem sx={{ display: { xs: 'none', sm: 'block' } }} />
 
         {/* Case meta */}
-        <Box flex={1}>
+        <Box sx={{ flex: 1 }}>
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
             <Box sx={{ width: '45%', minWidth: 100 }}>
               <Typography variant="caption" color="text.secondary">
                 {t('case.category')}
               </Typography>
-              <Typography variant="body2" fontWeight={600}>
+              <Typography sx={{ fontWeight: 600 }} variant="body2">
                 {t(`category.${caseData.category}`)}
               </Typography>
             </Box>
@@ -82,7 +82,7 @@ export default function PatientCard({ patient, caseData }: PatientCardProps) {
               <Typography variant="caption" color="text.secondary">
                 {t('case.assignedTo')}
               </Typography>
-              <Typography variant="body2" fontWeight={600}>
+              <Typography sx={{ fontWeight: 600 }} variant="body2">
                 {caseData.assignedRole ? t(`role.${caseData.assignedRole}`) : t('common.notSet')}
               </Typography>
             </Box>
@@ -91,7 +91,7 @@ export default function PatientCard({ patient, caseData }: PatientCardProps) {
                 <Typography variant="caption" color="text.secondary">
                   {t('triage.nextStep')}
                 </Typography>
-                <Typography variant="body2" fontWeight={600}>
+                <Typography sx={{ fontWeight: 600 }} variant="body2">
                   {t(`nextStep.${caseData.nextStep}`)}
                 </Typography>
               </Box>
@@ -101,7 +101,7 @@ export default function PatientCard({ patient, caseData }: PatientCardProps) {
                 <Typography variant="caption" color="text.secondary">
                   {t('case.deadline')}
                 </Typography>
-                <Box mt={0.25}>
+                <Box sx={{ mt: 0.25 }}>
                   <DeadlineLabel deadline={caseData.deadline} />
                 </Box>
               </Box>
@@ -117,13 +117,13 @@ export default function PatientCard({ patient, caseData }: PatientCardProps) {
               flexItem
               sx={{ display: { xs: 'none', sm: 'block' } }}
             />
-            <Box flex={1}>
+            <Box sx={{ flex: 1 }}>
               {caseData.triggers.length > 0 && (
-                <Box mb={1}>
-                  <Typography variant="caption" color="text.secondary" display="block">
+                <Box sx={{ mb: 1 }}>
+                  <Typography sx={{ display: 'block' }} variant="caption" color="text.secondary">
                     {t('dashboard.triggers')}
                   </Typography>
-                  <Box mt={0.5}>
+                  <Box sx={{ mt: 0.5 }}>
                     <TriggerChips triggers={caseData.triggers} />
                   </Box>
                 </Box>
@@ -131,7 +131,11 @@ export default function PatientCard({ patient, caseData }: PatientCardProps) {
 
               {caseData.policyWarnings.length > 0 && (
                 <Box>
-                  <Typography variant="caption" color="text.secondary" display="block" mb={0.5}>
+                  <Typography
+                    sx={{ display: 'block', mb: 0.5 }}
+                    variant="caption"
+                    color="text.secondary"
+                  >
                     {t('case.policyWarnings')}
                   </Typography>
                   <AutoWarningsBadge

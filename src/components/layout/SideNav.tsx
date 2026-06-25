@@ -105,7 +105,7 @@ export default function SideNav({ drawerWidth, mobileOpen, onClose, isMobile }: 
                 </ListItemIcon>
                 <ListItemText
                   primary={item.label}
-                  primaryTypographyProps={{ fontSize: 14, fontWeight: active ? 600 : 400 }}
+                  slotProps={{ primary: { sx: { fontSize: 14, fontWeight: active ? 600 : 400 } } }}
                 />
               </ListItemButton>
             </ListItem>

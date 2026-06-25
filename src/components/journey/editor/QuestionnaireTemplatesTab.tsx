@@ -21,7 +21,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import AssignmentIcon from '@mui/icons-material/Assignment'
 import AddIcon from '@mui/icons-material/Add'
 import EditIcon from '@mui/icons-material/Edit'
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlineOutlined'
 import { useTranslation } from 'react-i18next'
 import type { QuestionnaireTemplate } from '../../../api/schemas'
 import QuestionnaireEditorDialog from './QuestionnaireEditorDialog'
@@ -47,7 +47,7 @@ export default function QuestionnaireTemplatesTab({
 
   return (
     <>
-      <Stack direction="row" justifyContent="flex-end" sx={{ mb: 1.5 }}>
+      <Stack sx={{ justifyContent: 'flex-end', mb: 1.5 }} direction="row">
         <Button
           size="small"
           variant="outlined"
@@ -61,14 +61,14 @@ export default function QuestionnaireTemplatesTab({
       {!questionnaires?.length ? (
         <Typography color="text.secondary">{t('journey.editor.noQuestionnaires')}</Typography>
       ) : (
-        <Stack gap={1.5}>
+        <Stack sx={{ gap: 1.5 }}>
           {questionnaires.map((qt) => (
             <Accordion key={qt.id} variant="outlined" sx={{ borderRadius: '8px !important' }}>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Stack direction="row" alignItems="center" gap={1.5} sx={{ flex: 1, pr: 1 }}>
+                <Stack sx={{ alignItems: 'center', gap: 1.5, flex: 1, pr: 1 }} direction="row">
                   <AssignmentIcon color="action" fontSize="small" />
                   <Box sx={{ flex: 1 }}>
-                    <Typography variant="subtitle2" fontWeight={700}>
+                    <Typography sx={{ fontWeight: 700 }} variant="subtitle2">
                       {qt.name}
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
@@ -112,7 +112,7 @@ export default function QuestionnaireTemplatesTab({
                 </Stack>
               </AccordionSummary>
               <AccordionDetails sx={{ pt: 0 }}>
-                <Stack gap={2}>
+                <Stack sx={{ gap: 2 }}>
                   {/* Questions table */}
                   <Box>
                     <Typography variant="overline" color="text.secondary">
@@ -131,7 +131,7 @@ export default function QuestionnaireTemplatesTab({
                         {qt.questions.map((q) => (
                           <TableRow key={q.id} hover>
                             <TableCell>
-                              <Typography variant="caption" fontFamily="monospace">
+                              <Typography variant="caption" sx={{ fontFamily: 'monospace' }}>
                                 {q.key}
                               </Typography>
                             </TableCell>
@@ -161,7 +161,7 @@ export default function QuestionnaireTemplatesTab({
                       <Typography variant="overline" color="text.secondary">
                         {t('journey.qTemplate.scoringRules')}
                       </Typography>
-                      <Stack direction="row" flexWrap="wrap" gap={0.75} mt={0.5}>
+                      <Stack sx={{ flexWrap: 'wrap', gap: 0.75, mt: 0.5 }} direction="row">
                         {qt.scoringRules.map((r, i) => (
                           <Chip
                             key={i}

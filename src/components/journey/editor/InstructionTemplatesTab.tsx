@@ -19,7 +19,7 @@ import {
 } from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined'
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlineOutlined'
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
 import AddIcon from '@mui/icons-material/Add'
 import { useTranslation } from 'react-i18next'
@@ -63,7 +63,7 @@ function EditInstructionDialog({
   }
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog maxWidth="sm" open={open} onClose={onClose} fullWidth>
       <DialogTitle>{initial ? t('common.edit') : t('journey.editor.tabInstructions')}</DialogTitle>
       <DialogContent>
         {error && (
@@ -71,7 +71,7 @@ function EditInstructionDialog({
             {error}
           </Typography>
         )}
-        <Stack gap={2} sx={{ mt: 1 }}>
+        <Stack sx={{ gap: 2, mt: 1 }}>
           <TextField
             label={t('policy.name')}
             value={name}
@@ -136,7 +136,7 @@ export default function InstructionTemplatesTab({
 
   return (
     <Box>
-      <Stack direction="row" justifyContent="flex-end" sx={{ mb: 1.5 }}>
+      <Stack sx={{ justifyContent: 'flex-end', mb: 1.5 }} direction="row">
         <Button size="small" variant="outlined" startIcon={<AddIcon />} onClick={handleCreate}>
           {t('journey.editor.addInstruction')}
         </Button>
@@ -145,18 +145,18 @@ export default function InstructionTemplatesTab({
       {!instructionTemplates?.length ? (
         <Typography color="text.secondary">{t('journey.editor.noInstructions')}</Typography>
       ) : (
-        <Stack gap={1.5}>
+        <Stack sx={{ gap: 1.5 }}>
           {instructionTemplates.map((it) => (
             <Accordion key={it.id} variant="outlined" sx={{ borderRadius: '8px !important' }}>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Stack direction="row" alignItems="center" gap={1.5} sx={{ flex: 1, pr: 1 }}>
+                <Stack sx={{ alignItems: 'center', gap: 1.5, flex: 1, pr: 1 }} direction="row">
                   <DescriptionOutlinedIcon color="primary" fontSize="small" />
                   <Box sx={{ flex: 1 }}>
-                    <Typography variant="subtitle2" fontWeight={700}>
+                    <Typography sx={{ fontWeight: 700 }} variant="subtitle2">
                       {it.name}
                     </Typography>
                     {it.tags.length > 0 && (
-                      <Stack direction="row" gap={0.5} mt={0.25}>
+                      <Stack sx={{ gap: 0.5, mt: 0.25 }} direction="row">
                         {it.tags.map((tag) => (
                           <Chip
                             key={tag}

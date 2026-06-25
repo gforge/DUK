@@ -63,7 +63,7 @@ export function ConsentDialog({
   }
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog maxWidth="sm" open={open} onClose={onClose} fullWidth>
       <DialogTitle>
         {t('journey.research.consent.dialogTitle', { studyName: module.studyName })}
       </DialogTitle>
@@ -82,7 +82,11 @@ export function ConsentDialog({
               '& h3': { typography: 'subtitle2', fontWeight: 600 },
             }}
           >
-            <Typography variant="overline" color="text.secondary" display="block" mb={0.5}>
+            <Typography
+              sx={{ display: 'block', mb: 0.5 }}
+              variant="overline"
+              color="text.secondary"
+            >
               {t('journey.research.consent.infoLabel')}
             </Typography>
             <ReactMarkdown>{module.studyInfoMarkdown}</ReactMarkdown>
@@ -152,7 +156,7 @@ export function RevokeConsentDialog({
   }
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="xs">
+    <Dialog maxWidth="xs" open={open} onClose={onClose}>
       <DialogTitle>{t('journey.research.consent.revokeConfirmTitle')}</DialogTitle>
       <DialogContent>
         <Alert severity="warning">

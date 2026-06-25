@@ -39,9 +39,9 @@ export default function PatientDueForms({ patientId, onSelectForm }: Props) {
 
   return (
     <Paper variant="outlined" sx={{ borderRadius: 2, p: 2, mb: 3 }}>
-      <Stack direction="row" alignItems="center" gap={1} mb={1.5}>
+      <Stack sx={{ alignItems: 'center', gap: 1, mb: 1.5 }} direction="row">
         <AssignmentIcon color="primary" fontSize="small" />
-        <Typography variant="subtitle1" fontWeight={600}>
+        <Typography sx={{ fontWeight: 600 }} variant="subtitle1">
           {t('patient.form.dueForms')}
         </Typography>
       </Stack>
@@ -55,11 +55,9 @@ export default function PatientDueForms({ patientId, onSelectForm }: Props) {
 
           return (
             <Stack
-              key={step.id}
-              direction="row"
-              alignItems="center"
-              justifyContent="space-between"
               sx={{
+                alignItems: 'center',
+                justifyContent: 'space-between',
                 border: 1,
                 borderColor: isOverdue ? 'error.light' : 'divider',
                 borderRadius: 1,
@@ -67,12 +65,14 @@ export default function PatientDueForms({ patientId, onSelectForm }: Props) {
                 py: 1.5,
                 bgcolor: isOverdue ? 'error.50' : undefined,
               }}
+              key={step.id}
+              direction="row"
             >
-              <Stack gap={0.25}>
-                <Typography variant="body2" fontWeight={600}>
+              <Stack sx={{ gap: 0.25 }}>
+                <Typography sx={{ fontWeight: 600 }} variant="body2">
                   {template.name}
                 </Typography>
-                <Stack direction="row" gap={1} alignItems="center">
+                <Stack sx={{ gap: 1, alignItems: 'center' }} direction="row">
                   <ScheduleIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
                   <Typography variant="caption" color="text.secondary">
                     {step.scheduledDate}

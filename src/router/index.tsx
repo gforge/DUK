@@ -1,5 +1,5 @@
-import React, { Suspense, lazy } from 'react'
-import { HashRouter, Routes, Route, Navigate } from 'react-router-dom'
+import React, { Suspense, lazy, useEffect } from 'react'
+import { HashRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom'
 import { CircularProgress, Box } from '@mui/material'
 import AppShell from '../components/layout/AppShell'
 
@@ -16,15 +16,30 @@ const NotFound = lazy(() => import('../pages/NotFound'))
 
 function Loader() {
   return (
-    <Box display="flex" justifyContent="center" alignItems="center" height="60vh">
+    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh' }}>
       <CircularProgress />
     </Box>
   )
 }
 
-export default function AppRouter() {
+function LoginRedirect({ path }: { path?: string }) {
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    if (path) navigate(path, { replace: true })
+  }, [navigate, path])
+
+  return null
+}
+
+interface AppRouterProps {
+  loginRedirectPath?: string
+}
+
+export default function AppRouter({ loginRedirectPath }: AppRouterProps = {}) {
   return (
     <HashRouter>
+      <LoginRedirect path={loginRedirectPath} />
       <AppShell>
         <Suspense fallback={<Loader />}>
           <Routes>

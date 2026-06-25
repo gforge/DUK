@@ -1,5 +1,7 @@
-import React, { createContext, useContext, useState } from 'react'
+import React, { createContext, useContext, useMemo, useState } from 'react'
 import type { Role, User } from '../api/schemas'
+
+const CURRENT_USER_STORAGE_KEY = 'duk_current_user_id'
 
 const DEMO_USERS: User[] = [
   { id: 'user-pal-1', name: 'Dr. Sara Lindqvist (PAL)', role: 'PAL' },
@@ -12,21 +14,59 @@ const DEMO_USERS: User[] = [
 interface RoleContextValue {
   currentUser: User
   setCurrentUser: (user: User) => void
+  logout: () => void
   availableUsers: User[]
+  isLoggedIn: boolean
   isRole: (...roles: Role[]) => boolean
 }
 
 const RoleContext = createContext<RoleContextValue | null>(null)
 
-export function RoleProvider({ children }: { children: React.ReactNode }) {
-  const [currentUser, setCurrentUser] = useState<User>(DEMO_USERS[0])
-
-  const value: RoleContextValue = {
-    currentUser,
-    setCurrentUser,
-    availableUsers: DEMO_USERS,
-    isRole: (...roles) => roles.includes(currentUser.role),
+function getInitialUser(): User {
+  try {
+    const savedUserId = localStorage.getItem(CURRENT_USER_STORAGE_KEY)
+    return DEMO_USERS.find((user) => user.id === savedUserId) ?? DEMO_USERS[0]
+  } catch {
+    return DEMO_USERS[0]
   }
+}
+
+export function RoleProvider({ children }: { children: React.ReactNode }) {
+  const [currentUser, setCurrentUserState] = useState<User>(getInitialUser)
+  const [isLoggedIn, setIsLoggedIn] = useState(() => {
+    try {
+      return localStorage.getItem(CURRENT_USER_STORAGE_KEY) !== null
+    } catch {
+      return false
+    }
+  })
+
+  const value: RoleContextValue = useMemo(
+    () => ({
+      currentUser,
+      setCurrentUser: (user: User) => {
+        setCurrentUserState(user)
+        setIsLoggedIn(true)
+        try {
+          localStorage.setItem(CURRENT_USER_STORAGE_KEY, user.id)
+        } catch {
+          // Ignore storage failures; the in-memory role still changes for this session.
+        }
+      },
+      logout: () => {
+        setIsLoggedIn(false)
+        try {
+          localStorage.removeItem(CURRENT_USER_STORAGE_KEY)
+        } catch {
+          // Ignore storage failures; logout still clears the in-memory session.
+        }
+      },
+      availableUsers: DEMO_USERS,
+      isLoggedIn,
+      isRole: (...roles) => isLoggedIn && roles.includes(currentUser.role),
+    }),
+    [currentUser, isLoggedIn],
+  )
 
   return <RoleContext.Provider value={value}>{children}</RoleContext.Provider>
 }

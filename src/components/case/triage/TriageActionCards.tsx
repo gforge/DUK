@@ -15,7 +15,7 @@ import LocalHospitalIcon from '@mui/icons-material/LocalHospital'
 import MedicalServicesIcon from '@mui/icons-material/MedicalServices'
 import AccessibilityNewIcon from '@mui/icons-material/AccessibilityNew'
 import MonitorHeartIcon from '@mui/icons-material/MonitorHeart'
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutlineOutlined'
 import { useTranslation } from 'react-i18next'
 import type { SvgIconComponent } from '@mui/icons-material'
 import { ACTION_ORDER, type TriageActionKey } from './actionConfig'
@@ -38,7 +38,7 @@ export default function TriageActionCards({ onSelect }: Props) {
 
   return (
     <Box sx={{ mt: 1 }}>
-      <Typography variant="subtitle2" color="text.secondary" mb={1.5}>
+      <Typography sx={{ mb: 1.5 }} variant="subtitle2" color="text.secondary">
         {t('triage.step1Title')}
       </Typography>
       <Grid container spacing={1.5}>
@@ -73,7 +73,7 @@ export default function TriageActionCards({ onSelect }: Props) {
                     }}
                   >
                     <CardContent>
-                      <Stack direction="row" gap={1.5} alignItems="flex-start">
+                      <Stack sx={{ gap: 1.5, alignItems: 'flex-start' }} direction="row">
                         <Icon
                           sx={{
                             mt: 0.25,
@@ -81,8 +81,8 @@ export default function TriageActionCards({ onSelect }: Props) {
                             color: isClose ? 'text.secondary' : 'primary.main',
                           }}
                         />
-                        <Box flexGrow={1}>
-                          <Typography variant="body1" fontWeight={600}>
+                        <Box sx={{ flexGrow: 1 }}>
+                          <Typography sx={{ fontWeight: 600 }} variant="body1">
                             {t(`triage.actionLabel.${key}`)}
                           </Typography>
                           <Typography

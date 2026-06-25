@@ -79,7 +79,7 @@ export default function QueueColumn({
       >
         {/* Category title + desc */}
         <Box sx={{ flex: 1 }}>
-          <Typography variant="subtitle1" fontWeight={700} component="span">
+          <Typography sx={{ fontWeight: 700 }} variant="subtitle1" component="span">
             {t(`category.${category}`)}
           </Typography>
           <Typography variant="caption" color="text.secondary" sx={{ ml: 1 }}>
@@ -88,7 +88,11 @@ export default function QueueColumn({
         </Box>
 
         {/* Stat chips — shown always so summary is informative when collapsed */}
-        <Stack direction="row" gap={0.75} alignItems="center" onClick={(e) => e.stopPropagation()}>
+        <Stack
+          sx={{ gap: 0.75, alignItems: 'center' }}
+          direction="row"
+          onClick={(e) => e.stopPropagation()}
+        >
           <Chip
             label={t('dashboard.patientsCount', { count: cases.length })}
             size="small"
@@ -157,9 +161,9 @@ export default function QueueColumn({
           <>
             <Divider />
             <Box sx={{ px: 2, py: 0.75, bgcolor: 'action.hover' }}>
-              <Stack direction="row" alignItems="center" gap={0.5}>
+              <Stack sx={{ alignItems: 'center', gap: 0.5 }} direction="row">
                 <HourglassEmptyIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
-                <Typography variant="caption" color="text.secondary" fontWeight={600}>
+                <Typography sx={{ fontWeight: 600 }} variant="caption" color="text.secondary">
                   {t('dashboard.betweenPhase')} ({waitingCases.length})
                 </Typography>
               </Stack>

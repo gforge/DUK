@@ -35,7 +35,7 @@ export default function PatientCaseList({ cases, loading, error }: Props) {
       {cases.map((c) => (
         <Accordion key={c.id} variant="outlined" disableGutters>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Stack direction="row" spacing={1.5} alignItems="center" flex={1}>
+            <Stack sx={{ alignItems: 'center', flex: 1 }} direction="row" spacing={1.5}>
               <StatusChip status={c.status} />
               <Chip label={t(`category.${c.category}`)} size="small" variant="outlined" />
               <Typography variant="body2" color="text.secondary" sx={{ ml: 'auto', pr: 1 }}>
@@ -51,7 +51,7 @@ export default function PatientCaseList({ cases, loading, error }: Props) {
                   <Typography variant="caption" color="text.secondary">
                     {t('patient.triggers')}:
                   </Typography>
-                  <Stack direction="row" flexWrap="wrap" gap={0.5} mt={0.5}>
+                  <Stack sx={{ flexWrap: 'wrap', gap: 0.5, mt: 0.5 }} direction="row">
                     {c.triggers.map((tr) => (
                       <Chip
                         key={tr}

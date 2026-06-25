@@ -95,7 +95,7 @@ export default function JournalTab({ caseData, patient: _patient, onCaseChange }
 
   return (
     <Box>
-      <Stack direction="row" justifyContent="flex-end" sx={{ mb: 1, displayPrint: 'none' }}>
+      <Stack sx={{ justifyContent: 'flex-end', mb: 1, displayPrint: 'none' }} direction="row">
         <Tooltip title={t('common.print')}>
           <IconButton size="small" onClick={() => window.print()} aria-label={t('common.print')}>
             <PrintIcon fontSize="small" />
@@ -111,10 +111,10 @@ export default function JournalTab({ caseData, patient: _patient, onCaseChange }
         />
       </Paper>
       <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
-        <Typography variant="subtitle2" fontWeight={600} gutterBottom>
+        <Typography sx={{ fontWeight: 600 }} variant="subtitle2" gutterBottom>
           {t('journal.generate')}
         </Typography>
-        <Stack direction="row" gap={2} flexWrap="wrap" alignItems="flex-end">
+        <Stack sx={{ gap: 2, flexWrap: 'wrap', alignItems: 'flex-end' }} direction="row">
           <FormControl size="small" sx={{ minWidth: 260 }}>
             <InputLabel id="journal-template-label">{t('journal.selectTemplate')}</InputLabel>
             <Select
@@ -148,7 +148,7 @@ export default function JournalTab({ caseData, patient: _patient, onCaseChange }
         </Typography>
       )}
 
-      <Stack gap={2}>
+      <Stack sx={{ gap: 2 }}>
         {drafts?.map((draft) => (
           <JournalDraftCard
             key={draft.id}

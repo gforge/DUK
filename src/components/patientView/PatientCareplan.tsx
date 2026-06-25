@@ -57,9 +57,9 @@ export default function PatientCareplan({ journeys, journeyTemplates, patientId 
 
   return (
     <Paper variant="outlined" sx={{ mb: 3, borderRadius: 2, p: 2 }}>
-      <Stack direction="row" alignItems="center" gap={1} mb={1.5}>
+      <Stack sx={{ alignItems: 'center', gap: 1, mb: 1.5 }} direction="row">
         <RouteIcon color="primary" fontSize="small" />
-        <Typography variant="subtitle1" fontWeight={600}>
+        <Typography sx={{ fontWeight: 600 }} variant="subtitle1">
           {t('patient.carePlan')}
         </Typography>
       </Stack>
@@ -85,7 +85,7 @@ export default function PatientCareplan({ journeys, journeyTemplates, patientId 
                     key={j.id}
                     value={j.id}
                     label={
-                      <Stack direction="row" alignItems="center" gap={0.5}>
+                      <Stack sx={{ alignItems: 'center', gap: 0.5 }} direction="row">
                         <span>{tmpl?.name ?? j.journeyTemplateId}</span>
                         <Chip
                           label={t(`journey.journeyStatus.${j.status}`)}
@@ -119,13 +119,13 @@ export default function PatientCareplan({ journeys, journeyTemplates, patientId 
           {enrolledModules.length > 0 && (
             <>
               <Divider sx={{ my: 2 }} />
-              <Stack direction="row" alignItems="center" gap={1} mb={1}>
+              <Stack sx={{ alignItems: 'center', gap: 1, mb: 1 }} direction="row">
                 <ScienceIcon color="secondary" fontSize="small" />
-                <Typography variant="subtitle2" fontWeight={600}>
+                <Typography sx={{ fontWeight: 600 }} variant="subtitle2">
                   {t('patient.researchStudies')}
                 </Typography>
               </Stack>
-              <Stack gap={1.5}>
+              <Stack sx={{ gap: 1.5 }}>
                 {enrolledModules.map((rm) => {
                   const activeConsent = consents?.find(
                     (c) =>
@@ -135,20 +135,20 @@ export default function PatientCareplan({ journeys, journeyTemplates, patientId 
                   )
                   return (
                     <Stack
-                      key={rm.id}
-                      direction="row"
-                      alignItems="center"
-                      justifyContent="space-between"
                       sx={{
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
                         border: 1,
                         borderColor: 'divider',
                         borderRadius: 1,
                         px: 1.5,
                         py: 1,
                       }}
+                      key={rm.id}
+                      direction="row"
                     >
-                      <Stack gap={0}>
-                        <Typography variant="body2" fontWeight={600}>
+                      <Stack sx={{ gap: 0 }}>
+                        <Typography sx={{ fontWeight: 600 }} variant="body2">
                           {rm.studyName}
                         </Typography>
                         {activeConsent ? (

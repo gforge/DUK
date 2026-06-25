@@ -18,12 +18,12 @@ import CalendarMonthIcon from '@mui/icons-material/CalendarMonth'
 import { useTranslation } from 'react-i18next'
 import type { UseFormRegister, Control, UseFormSetValue, FieldErrors } from 'react-hook-form'
 import { Controller } from 'react-hook-form'
-import type { TriageForm } from './TriageForm'
+import type { TriageForm } from './triageFormSchema'
 import type { TriageActionKey } from './actionConfig'
 import { ACTION_CONFIG } from './actionConfig'
 import { parseDeadlineInput, isDeadlineShorthand } from './parseDeadlineInput'
 import DeadlineQuickChips from './DeadlineQuickChips'
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutlineOutlined'
 
 const ROLES: Array<'NURSE' | 'DOCTOR' | 'PAL'> = ['NURSE', 'DOCTOR', 'PAL']
 
@@ -58,7 +58,7 @@ export default function TriageActionDetails({
 
   if (action === 'CLOSE_NOW') {
     return (
-      <Stack gap={2}>
+      <Stack sx={{ gap: 2 }}>
         <Alert severity="warning">{t('triage.closeNowConfirm')}</Alert>
         <TextField
           {...register('internalNote')}
@@ -73,7 +73,7 @@ export default function TriageActionDetails({
   }
 
   return (
-    <Stack gap={2}>
+    <Stack sx={{ gap: 2 }}>
       {/* Deadline */}
       {cfg.showDeadline && (
         <Box>
@@ -184,7 +184,7 @@ export default function TriageActionDetails({
             <Typography variant="body2">{t('triage.more')}</Typography>
           </AccordionSummary>
           <AccordionDetails sx={{ pt: 0 }}>
-            <Stack gap={2}>
+            <Stack sx={{ gap: 2 }}>
               <TextField
                 {...register('internalNote')}
                 label={t('triage.internalNote')}

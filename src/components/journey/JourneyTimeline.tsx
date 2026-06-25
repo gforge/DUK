@@ -13,7 +13,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked'
 import ErrorIcon from '@mui/icons-material/Error'
 import ScienceIcon from '@mui/icons-material/Science'
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutlineOutlined'
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 import RepeatIcon from '@mui/icons-material/Repeat'
 import { useTranslation } from 'react-i18next'
@@ -112,8 +112,11 @@ export default function JourneyTimeline({
 
               {/* Right column: content */}
               <Box sx={{ pb: isLast ? 0 : 2, flex: 1 }}>
-                <Stack direction="row" alignItems="center" flexWrap="wrap" gap={0.5} mb={0.25}>
-                  <Typography variant="body2" fontWeight={600}>
+                <Stack
+                  sx={{ alignItems: 'center', flexWrap: 'wrap', gap: 0.5, mb: 0.25 }}
+                  direction="row"
+                >
+                  <Typography sx={{ fontWeight: 600 }} variant="body2">
                     {step.label}
                   </Typography>
 

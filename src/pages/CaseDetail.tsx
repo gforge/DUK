@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react'
+import React, { useState, useMemo, useCallback } from 'react'
 import {
   Badge,
   Box,
@@ -53,8 +53,7 @@ export default function CaseDetail() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const { t } = useTranslation()
-  const [activeTab, setActiveTab] = useState(0)
-  const didAutoSelectTab = useRef(false)
+  const [selectedTab, setSelectedTab] = useState<{ caseId: string; tab: number } | null>(null)
 
   const {
     data: caseData,
@@ -67,15 +66,6 @@ export default function CaseDetail() {
     () => (caseData ? client.getPatient(caseData.patientId) : Promise.resolve(undefined)),
     [caseData?.patientId],
   )
-
-  useEffect(() => {
-    if (!didAutoSelectTab.current && caseData) {
-      didAutoSelectTab.current = true
-      if (['NEW', 'NEEDS_REVIEW'].includes(caseData.status)) {
-        setActiveTab(2)
-      }
-    }
-  }, [caseData])
 
   useHotkeys(
     useMemo(
@@ -109,6 +99,9 @@ export default function CaseDetail() {
     )
   }
 
+  const defaultTab = ['NEW', 'NEEDS_REVIEW'].includes(caseData.status) ? 2 : 0
+  const activeTab = selectedTab?.caseId === caseData.id ? selectedTab.tab : defaultTab
+
   return (
     <Box>
       {/* Breadcrumbs */}
@@ -129,8 +122,8 @@ export default function CaseDetail() {
       </Breadcrumbs>
 
       {/* Header */}
-      <Stack direction="row" alignItems="center" gap={2} mb={2} flexWrap="wrap">
-        <Typography variant="h5" fontWeight={700}>
+      <Stack sx={{ alignItems: 'center', gap: 2, mb: 2, flexWrap: 'wrap' }} direction="row">
+        <Typography sx={{ fontWeight: 700 }} variant="h5">
           {t('case.title')}
         </Typography>
         <StatusChip status={caseData.status} size="medium" />
@@ -153,7 +146,7 @@ export default function CaseDetail() {
       <Paper variant="outlined" sx={{ mt: 2, borderRadius: 2 }}>
         <Tabs
           value={activeTab}
-          onChange={(_, v) => setActiveTab(v)}
+          onChange={(_, v) => setSelectedTab({ caseId: caseData.id, tab: v })}
           aria-label="case detail tabs"
           variant="scrollable"
           scrollButtons="auto"

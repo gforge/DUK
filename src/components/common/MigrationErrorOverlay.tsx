@@ -1,6 +1,6 @@
 import React from 'react'
 import { Box, Button, Chip, Divider, Paper, Stack, Typography } from '@mui/material'
-import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline'
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutlineOutlined'
 import DownloadIcon from '@mui/icons-material/Download'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import { useTranslation } from 'react-i18next'
@@ -63,15 +63,15 @@ export default function MigrationErrorOverlay({ error }: Props) {
       <Paper elevation={8} sx={{ maxWidth: 520, width: '100%', p: 4, borderRadius: 3 }}>
         <Stack spacing={3}>
           {/* Header */}
-          <Stack direction="row" spacing={1.5} alignItems="center">
+          <Stack sx={{ alignItems: 'center' }} direction="row" spacing={1.5}>
             <ErrorOutlineIcon color="error" sx={{ fontSize: 32 }} />
-            <Typography variant="h6" fontWeight={700}>
+            <Typography sx={{ fontWeight: 700 }} variant="h6">
               {t('migration.title')}
             </Typography>
           </Stack>
 
           {/* Version info */}
-          <Stack direction="row" spacing={2} flexWrap="wrap">
+          <Stack sx={{ flexWrap: 'wrap' }} direction="row" spacing={2}>
             <Chip
               label={`${t('migration.storedVersion')}: v${error.storedVersion}`}
               color="warning"
@@ -103,7 +103,7 @@ export default function MigrationErrorOverlay({ error }: Props) {
             >
               {t('migration.downloadCta')}
             </Button>
-            <Typography variant="caption" color="text.secondary" textAlign="center">
+            <Typography variant="caption" color="text.secondary" sx={{ textAlign: 'center' }}>
               {t('migration.downloadHint')}
             </Typography>
           </Stack>
@@ -119,7 +119,7 @@ export default function MigrationErrorOverlay({ error }: Props) {
             >
               {t('migration.clearCta')}
             </Button>
-            <Typography variant="caption" color="text.secondary" textAlign="center">
+            <Typography variant="caption" color="text.secondary" sx={{ textAlign: 'center' }}>
               {t('migration.clearHint')}
             </Typography>
           </Stack>

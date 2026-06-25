@@ -12,7 +12,7 @@ import {
 import { useTranslation } from 'react-i18next'
 import type { EffectiveStep } from '../../../api/service'
 import type { QuestionnaireTemplate } from '../../../api/schemas'
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlineOutlined'
 
 // ─── Add Step ─────────────────────────────────────────────────────────────────
 
@@ -45,7 +45,7 @@ export function AddStepForm({
 }: AddStepProps) {
   const { t } = useTranslation()
   return (
-    <Stack gap={2}>
+    <Stack sx={{ gap: 2 }}>
       <TextField
         label={t('journey.modify.stepLabel')}
         value={label}
@@ -54,7 +54,7 @@ export function AddStepForm({
         fullWidth
         placeholder={t('journey.modify.stepLabelPlaceholder')}
       />
-      <Stack direction="row" gap={1}>
+      <Stack sx={{ gap: 1 }} direction="row">
         <TextField
           label={t('journey.modify.offsetDays')}
           value={offset}
@@ -62,7 +62,7 @@ export function AddStepForm({
           size="small"
           type="number"
           sx={{ flex: 1 }}
-          inputProps={{ min: 0 }}
+          slotProps={{ htmlInput: { min: 0 } }}
         />
         <TextField
           label={t('journey.modify.windowDays')}
@@ -71,7 +71,7 @@ export function AddStepForm({
           size="small"
           type="number"
           sx={{ width: 120 }}
-          inputProps={{ min: 0 }}
+          slotProps={{ htmlInput: { min: 0 } }}
         />
       </Stack>
       <FormControl size="small" fullWidth>
@@ -122,21 +122,28 @@ export function RemoveStepForm({
 }: RemoveStepProps) {
   const { t } = useTranslation()
   return (
-    <Stack gap={2}>
+    <Stack sx={{ gap: 2 }}>
       <Typography variant="body2" color="text.secondary">
         {t('journey.modify.removeStepHint')}
       </Typography>
-      <Stack gap={0}>
+      <Stack sx={{ gap: 0 }}>
         {steps.map((step) => (
           <Stack
+            sx={{
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              px: 1,
+              py: 0.75,
+              border: 1,
+              borderColor: 'divider',
+              borderRadius: 1,
+              mb: 0.5,
+            }}
             key={step.id}
             direction="row"
-            alignItems="center"
-            justifyContent="space-between"
-            sx={{ px: 1, py: 0.75, border: 1, borderColor: 'divider', borderRadius: 1, mb: 0.5 }}
           >
             <Stack>
-              <Typography variant="body2" fontWeight={600}>
+              <Typography sx={{ fontWeight: 600 }} variant="body2">
                 {step.label}
               </Typography>
               <Typography variant="caption" color="text.secondary">
@@ -197,7 +204,7 @@ export function SwitchTemplateForm({
 }: SwitchTemplateProps) {
   const { t } = useTranslation()
   return (
-    <Stack gap={2}>
+    <Stack sx={{ gap: 2 }}>
       <Typography variant="body2">
         {t('journey.modify.currentTemplate')}: <strong>{currentTemplateName}</strong>
       </Typography>
@@ -228,7 +235,7 @@ export function SwitchTemplateForm({
         size="small"
         type="date"
         fullWidth
-        InputLabelProps={{ shrink: true }}
+        slotProps={{ inputLabel: { shrink: true } }}
       />
       <TextField
         label={t('journey.modify.reason')}

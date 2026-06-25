@@ -1,6 +1,6 @@
 import React from 'react'
 import { Alert, Box, Button, Stack, Typography } from '@mui/material'
-import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline'
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutlineOutlined'
 import HomeIcon from '@mui/icons-material/Home'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
@@ -11,14 +11,11 @@ export default function NotFound() {
 
   return (
     <Box
-      display="flex"
-      justifyContent="center"
-      alignItems="center"
-      minHeight="60vh"
+      sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}
     >
-      <Stack alignItems="center" spacing={2}>
+      <Stack sx={{ alignItems: 'center' }} spacing={2}>
         <ErrorOutlineIcon sx={{ fontSize: 64, color: 'text.secondary' }} />
-        <Typography variant="h5" fontWeight={700}>
+        <Typography sx={{ fontWeight: 700 }} variant="h5">
           {t('notFound.title')}
         </Typography>
         <Alert severity="info" sx={{ maxWidth: 400 }}>

@@ -50,7 +50,7 @@ export default function FormResponsesTab({ caseId }: FormResponsesTabProps) {
   )
 
   return (
-    <Stack gap={1}>
+    <Stack sx={{ gap: 1 }}>
       {sortedResponses.map((resp) => {
         const template = templateMap.get(resp.templateId)
         return (
@@ -64,8 +64,11 @@ export default function FormResponsesTab({ caseId }: FormResponsesTabProps) {
               aria-controls={`form-${resp.id}-content`}
               id={`form-${resp.id}-header`}
             >
-              <Stack direction="row" gap={2} alignItems="center" width="100%" flexWrap="wrap">
-                <Typography variant="subtitle2" fontWeight={600}>
+              <Stack
+                sx={{ gap: 2, alignItems: 'center', flexWrap: 'wrap', width: '100%' }}
+                direction="row"
+              >
+                <Typography sx={{ fontWeight: 600 }} variant="subtitle2">
                   {template?.name ?? resp.templateId}
                 </Typography>
                 <Typography variant="caption" color="text.secondary">

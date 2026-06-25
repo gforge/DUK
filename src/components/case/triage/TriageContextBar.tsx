@@ -26,7 +26,7 @@ export default function TriageContextBar({ caseData }: Props) {
       }}
     >
       {/* Status + category row */}
-      <Stack direction="row" gap={1} flexWrap="wrap" alignItems="center" mb={1}>
+      <Stack sx={{ gap: 1, flexWrap: 'wrap', alignItems: 'center', mb: 1 }} direction="row">
         <StatusChip status={caseData.status} />
         <Chip label={t(`category.${caseData.category}`)} size="small" variant="outlined" />
         {caseData.policyWarnings?.length > 0 && (
@@ -40,7 +40,7 @@ export default function TriageContextBar({ caseData }: Props) {
           <Typography variant="caption" color="text.secondary">
             {t('triage.contextWhy')}
           </Typography>
-          <Box mt={0.5}>
+          <Box sx={{ mt: 0.5 }}>
             <TriggerChips triggers={caseData.triggers} />
           </Box>
         </>

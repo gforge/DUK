@@ -114,7 +114,7 @@ export default function Dashboard() {
 
   return (
     <Box>
-      <Typography variant="h5" fontWeight={700} gutterBottom>
+      <Typography sx={{ fontWeight: 700 }} variant="h5" gutterBottom>
         {t('dashboard.title')}
       </Typography>
 
@@ -140,13 +140,13 @@ export default function Dashboard() {
       )}
 
       {casesLoading || patientsLoading ? (
-        <Stack gap={1.5}>
+        <Stack sx={{ gap: 1.5 }}>
           {[0, 1, 2].map((i) => (
             <Skeleton key={i} variant="rectangular" height={64} sx={{ borderRadius: 2 }} />
           ))}
         </Stack>
       ) : (
-        <Stack gap={1.5}>
+        <Stack sx={{ gap: 1.5 }}>
           {(['ACUTE', 'SUBACUTE', 'CONTROL'] as CaseCategory[]).map((cat) => (
             <QueueColumn
               key={cat}

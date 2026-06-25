@@ -33,7 +33,7 @@ import {
   Typography,
 } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlineOutlined'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import ReactMarkdown from 'react-markdown'
 import { useTranslation } from 'react-i18next'
@@ -179,15 +179,15 @@ export default function EntryEditorDialog({
   }
 
   return (
-    <Dialog open onClose={onClose} maxWidth="md" fullWidth>
+    <Dialog maxWidth="md" open onClose={onClose} fullWidth>
       <DialogTitle>
         {isCreate ? t('journey.editor.addEntry') : t('journey.editor.editEntry')}
       </DialogTitle>
 
       <DialogContent>
-        <Stack gap={2.5} sx={{ mt: 0.5 }}>
+        <Stack sx={{ gap: 2.5, mt: 0.5 }}>
           {/* ── Basic ── */}
-          <Stack direction="row" gap={2}>
+          <Stack sx={{ gap: 2 }} direction="row">
             <TextField
               label={t('journey.entry.label')}
               value={label}
@@ -215,7 +215,7 @@ export default function EntryEditorDialog({
               size="small"
               sx={{ minWidth: 130 }}
               required
-              inputProps={{ min: 0 }}
+              slotProps={{ htmlInput: { min: 0 } }}
               helperText={t('journey.entry.offsetDaysHint')}
             />
             <TextField
@@ -228,10 +228,12 @@ export default function EntryEditorDialog({
               }}
               size="small"
               sx={{ minWidth: 110 }}
-              inputProps={{ min: 0 }}
+              slotProps={{ htmlInput: { min: 0 } }}
               helperText={
                 !windowDaysManuallySet && offsetDays !== ''
-                  ? t('journey.entry.windowDaysSuggest', { n: suggestWindowDays(offsetDays as number) })
+                  ? t('journey.entry.windowDaysSuggest', {
+                      n: suggestWindowDays(offsetDays as number),
+                    })
                   : t('journey.entry.windowDaysHint')
               }
             />
@@ -252,7 +254,7 @@ export default function EntryEditorDialog({
           </Stack>
 
           {/* ── Step key ── */}
-          <Stack direction="row" alignItems="flex-start" gap={1} sx={{ mt: -1 }}>
+          <Stack sx={{ alignItems: 'flex-start', gap: 1, mt: -1 }} direction="row">
             <TextField
               label={t('journey.entry.stepKey')}
               value={stepKey}
@@ -269,7 +271,7 @@ export default function EntryEditorDialog({
               }}
               size="small"
               sx={{ maxWidth: 260, fontFamily: 'monospace' }}
-              inputProps={{ style: { fontFamily: 'monospace', fontSize: 13 } }}
+              slotProps={{ htmlInput: { style: { fontFamily: 'monospace', fontSize: 13 } } }}
               helperText={t('journey.entry.stepKeyHint')}
               placeholder={t('journey.entry.stepKeyPlaceholder')}
             />
@@ -376,7 +378,7 @@ export default function EntryEditorDialog({
                       >
                         {t('journey.entry.scoringOutputKeys')}
                       </Typography>
-                      <Stack direction="row" flexWrap="wrap" gap={0.5}>
+                      <Stack sx={{ flexWrap: 'wrap', gap: 0.5 }} direction="row">
                         {selectedQT.scoringRules.map((r) => (
                           <Tooltip
                             key={r.outputKey}
@@ -422,7 +424,10 @@ export default function EntryEditorDialog({
           {/* ── Score aliases ── */}
           {templateId && (
             <Box>
-              <Stack direction="row" alignItems="center" justifyContent="space-between" mb={0.5}>
+              <Stack
+                sx={{ alignItems: 'center', justifyContent: 'space-between', mb: 0.5 }}
+                direction="row"
+              >
                 <Typography variant="overline" color="text.secondary">
                   {t('journey.scoreAliases')}
                 </Typography>
@@ -626,7 +631,7 @@ export default function EntryEditorDialog({
                 }
                 size="small"
                 sx={{ mt: 1, display: 'block', maxWidth: 220 }}
-                inputProps={{ min: 1 }}
+                slotProps={{ htmlInput: { min: 1 } }}
               />
             )}
           </Box>

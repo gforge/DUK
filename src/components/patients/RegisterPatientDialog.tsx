@@ -30,7 +30,7 @@ import {
   Typography,
 } from '@mui/material'
 import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt'
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutlineOutlined'
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 import ScienceIcon from '@mui/icons-material/Science'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
@@ -189,9 +189,9 @@ export default function RegisterPatientDialog({ open, onClose, onCreated }: Prop
   }
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
+    <Dialog maxWidth="sm" open={open} onClose={handleClose} fullWidth>
       <DialogTitle>
-        <Stack direction="row" alignItems="center" gap={1}>
+        <Stack sx={{ alignItems: 'center', gap: 1 }} direction="row">
           <PersonAddAltIcon color="primary" />
           {t('patients.register.title')}
         </Stack>
@@ -214,9 +214,9 @@ export default function RegisterPatientDialog({ open, onClose, onCreated }: Prop
 
         {/* ── Step 0: Patient details ── */}
         {step === 0 && (
-          <Stack gap={2}>
+          <Stack sx={{ gap: 2 }}>
             {/* Personnummer input + lookup button */}
-            <Stack direction="row" gap={1} alignItems="flex-start">
+            <Stack sx={{ gap: 1, alignItems: 'flex-start' }} direction="row">
               <TextField
                 label={t('patients.personalNumber')}
                 value={personalNumber}
@@ -299,7 +299,7 @@ export default function RegisterPatientDialog({ open, onClose, onCreated }: Prop
                   type="date"
                   fullWidth
                   required
-                  InputLabelProps={{ shrink: true }}
+                  slotProps={{ inputLabel: { shrink: true } }}
                 />
               )}
 
@@ -334,7 +334,11 @@ export default function RegisterPatientDialog({ open, onClose, onCreated }: Prop
 
               <Collapse in={hintOpen}>
                 <Box sx={{ px: 1.5, pb: 1 }}>
-                  <Typography variant="caption" color="text.secondary" display="block" mb={1}>
+                  <Typography
+                    sx={{ display: 'block', mb: 1 }}
+                    variant="caption"
+                    color="text.secondary"
+                  >
                     {t('patients.register.demoHintDescription')}
                   </Typography>
                   <Table size="small">
@@ -394,7 +398,7 @@ export default function RegisterPatientDialog({ open, onClose, onCreated }: Prop
 
         {/* ── Step 1: Journey assignment ── */}
         {step === 1 && (
-          <Stack gap={2}>
+          <Stack sx={{ gap: 2 }}>
             <FormControl size="small" fullWidth required>
               <InputLabel>{t('patients.register.selectTemplate')}</InputLabel>
               <Select
@@ -427,14 +431,14 @@ export default function RegisterPatientDialog({ open, onClose, onCreated }: Prop
               type="date"
               fullWidth
               required
-              InputLabelProps={{ shrink: true }}
+              slotProps={{ inputLabel: { shrink: true } }}
             />
           </Stack>
         )}
 
         {/* ── Step 2: Research modules ── */}
         {step === 2 && (
-          <Stack gap={2}>
+          <Stack sx={{ gap: 2 }}>
             <Typography variant="body2" color="text.secondary">
               {t('patients.register.studiesHint')}
             </Typography>
@@ -458,10 +462,10 @@ export default function RegisterPatientDialog({ open, onClose, onCreated }: Prop
                       />
                     }
                     label={
-                      <Stack gap={0}>
-                        <Stack direction="row" alignItems="center" gap={0.5}>
+                      <Stack sx={{ gap: 0 }}>
+                        <Stack sx={{ alignItems: 'center', gap: 0.5 }} direction="row">
                           <ScienceIcon fontSize="small" color="secondary" />
-                          <Typography variant="body2" fontWeight={600}>
+                          <Typography sx={{ fontWeight: 600 }} variant="body2">
                             {rm.studyName}
                           </Typography>
                         </Stack>
@@ -481,12 +485,12 @@ export default function RegisterPatientDialog({ open, onClose, onCreated }: Prop
 
         {/* ── Step 3: Review ── */}
         {step === 3 && (
-          <Stack gap={1.5}>
-            <Typography variant="subtitle2" fontWeight={600}>
+          <Stack sx={{ gap: 1.5 }}>
+            <Typography sx={{ fontWeight: 600 }} variant="subtitle2">
               {t('patients.register.reviewTitle')}
             </Typography>
             <Box sx={{ border: 1, borderColor: 'divider', borderRadius: 1, p: 1.5 }}>
-              <Stack gap={0.5}>
+              <Stack sx={{ gap: 0.5 }}>
                 <Typography variant="body2">
                   <strong>{t('patients.displayName')}:</strong> {effectiveName}
                 </Typography>
@@ -499,7 +503,7 @@ export default function RegisterPatientDialog({ open, onClose, onCreated }: Prop
               </Stack>
             </Box>
             <Box sx={{ border: 1, borderColor: 'divider', borderRadius: 1, p: 1.5 }}>
-              <Stack gap={0.5}>
+              <Stack sx={{ gap: 0.5 }}>
                 <Typography variant="body2">
                   <strong>{t('nav.journeys')}:</strong> {selectedTemplate?.name}
                 </Typography>
@@ -510,7 +514,7 @@ export default function RegisterPatientDialog({ open, onClose, onCreated }: Prop
               </Stack>
             </Box>
             <Box sx={{ border: 1, borderColor: 'divider', borderRadius: 1, p: 1.5 }}>
-              <Stack gap={0.5}>
+              <Stack sx={{ gap: 0.5 }}>
                 <Typography variant="body2">
                   <strong>{t('patients.register.reviewStudies')}</strong>{' '}
                   {selectedModuleIds.length === 0

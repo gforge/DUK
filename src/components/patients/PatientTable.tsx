@@ -86,7 +86,7 @@ export default function PatientTable({
                 onClick={() => navigate(`/patients/${patient.id}`)}
               >
                 <TableCell>
-                  <Typography variant="body2" fontWeight={600}>
+                  <Typography sx={{ fontWeight: 600 }} variant="body2">
                     {patient.displayName}
                   </Typography>
                 </TableCell>

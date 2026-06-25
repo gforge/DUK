@@ -39,8 +39,8 @@ export default function JournalDraftCard({
 
   return (
     <Paper variant="outlined" sx={{ p: 2, borderRadius: 2 }}>
-      <Stack direction="row" justifyContent="space-between" alignItems="center" mb={1}>
-        <Stack direction="row" gap={1} alignItems="center">
+      <Stack sx={{ justifyContent: 'space-between', alignItems: 'center', mb: 1 }} direction="row">
+        <Stack sx={{ gap: 1, alignItems: 'center' }} direction="row">
           <Chip
             label={draft.status === 'APPROVED' ? t('journal.approved') : t('journal.draft')}
             size="small"
@@ -52,7 +52,7 @@ export default function JournalDraftCard({
           </Typography>
         </Stack>
 
-        <Stack direction="row" gap={1}>
+        <Stack sx={{ gap: 1 }} direction="row">
           <Tooltip title={copied === draft.id ? t('journal.copied') : t('journal.copy')}>
             <IconButton
               size="small"
@@ -109,7 +109,7 @@ export default function JournalDraftCard({
       </Box>
 
       {draft.status === 'APPROVED' && (
-        <Typography variant="caption" color="text.secondary" display="block" mt={1}>
+        <Typography sx={{ display: 'block', mt: 1 }} variant="caption" color="text.secondary">
           {t('journal.approvedBy')}: {draft.approvedByUserId} ·{' '}
           {draft.approvedAt ? format(new Date(draft.approvedAt), 'dd MMM yyyy HH:mm') : ''}
         </Typography>

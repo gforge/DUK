@@ -637,7 +637,11 @@
     "NURSE": "Sjuksköterska",
     "PAL": "PAL (Patientansvarig läkare)",
     "PATIENT": "Patient",
-    "switchRole": "Byt roll"
+    "accountMenu": "Konto",
+    "loginHint": "Välj en demoanvändare för att fortsätta.",
+    "loginTitle": "Logga in",
+    "logout": "Logga ut",
+    "signedInAs": "Inloggad som"
   },
   "severity": {
     "HIGH": "Hög",
