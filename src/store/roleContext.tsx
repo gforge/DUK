@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useMemo, useState } from 'react'
+import React, { createContext, useCallback, useContext, useMemo, useState } from 'react'
 
 import type { User } from '@/api/schemas'
 import type { AuthSession, RoleContextValue } from '@/auth'
@@ -36,9 +36,19 @@ function getInitialSession(): AuthSession | null {
 }
 
 const RoleContext = createContext<RoleContextValue | null>(null)
+const LoginContext = createContext<(userId: string) => Promise<void>>(async () => {
+  throw new Error('useLogin must be used inside RoleProvider')
+})
 
 export function RoleProvider({ children }: Readonly<{ children: React.ReactNode }>) {
   const [session, setSession] = useState<AuthSession | null>(() => getInitialSession())
+
+  const loginAs = useCallback(
+    async (userId: string) => {
+      setSession(await authProvider.loginAs(userId))
+    },
+    [],
+  )
 
   const availableUsers = useMemo(
     () => authProvider.getLoginOptions().map((option) => option.user),
@@ -68,7 +78,11 @@ export function RoleProvider({ children }: Readonly<{ children: React.ReactNode 
     }
   }, [availableUsers, session])
 
-  return <RoleContext.Provider value={value}>{children}</RoleContext.Provider>
+  return (
+    <LoginContext.Provider value={loginAs}>
+      <RoleContext.Provider value={value}>{children}</RoleContext.Provider>
+    </LoginContext.Provider>
+  )
 }
 
 // eslint-disable-next-line react-refresh/only-export-components
@@ -81,4 +95,9 @@ export function useRole(): RoleContextValue {
 // eslint-disable-next-line react-refresh/only-export-components
 export function useOptionalRole(): RoleContextValue | null {
   return useContext(RoleContext)
+}
+
+// eslint-disable-next-line react-refresh/only-export-components
+export function useLogin(): (userId: string) => Promise<void> {
+  return useContext(LoginContext)
 }

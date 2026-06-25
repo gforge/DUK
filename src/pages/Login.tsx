@@ -12,14 +12,15 @@ import {
 } from '@mui/material'
 import React from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
+
 import { getAuthProvider } from '@/auth'
 import { useRoleLabel } from '@/hooks/labels'
-import { useOptionalRole } from '@/store/roleContext'
+import { useLogin } from '@/store/roleContext'
 const authProvider = getAuthProvider()
 export default function Login() {
   const navigate = useNavigate()
   const location = useLocation()
-  const roleCtx = useOptionalRole()
+  const login = useLogin()
   const getRoleLabel = useRoleLabel()
   const from =
     (
@@ -28,11 +29,7 @@ export default function Login() {
       } | null
     )?.from ?? '/dashboard'
   const handleLogin = async (userId: string) => {
-    if (roleCtx) {
-      await roleCtx.loginAs(userId)
-    } else {
-      await authProvider.loginAs(userId)
-    }
+    await login(userId)
     navigate(from, { replace: true })
   }
   return (
