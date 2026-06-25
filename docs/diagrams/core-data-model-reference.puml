@@ -1,0 +1,65 @@
+@startuml
+' Purpose: Core Data Model - Reference examples
+' Source of truth:
+'   src/api/schemas/journey.ts
+'   src/api/schemas/forms.ts
+'   src/api/schemas/case.ts
+'   src/api/service/researchConsents.ts
+
+title Core Data Model - Reference
+
+left to right direction
+skinparam shadowing false
+skinparam linetype ortho
+
+legend top
+  | Notation | Meaning |
+  | field? | Optional/nullable field |
+  | field[] | Array/list field |
+  | *Id | Identifier reference field |
+  | YYYY-MM-DD | Anchor date |
+  | ISO datetime | Persisted timestamp |
+endlegend
+
+note as JourneyTemplateRef
+JourneyTemplate
+- parentTemplateId?: lineage to parent template
+- derivedAt?: last parent sync timestamp
+- referenceDateLabel: visible assignment anchor label
+end note
+
+note as JourneyEntryRef
+JourneyTemplateEntry
+- offsetDays + windowDays drive due windows
+- scoreAliases maps raw score keys to stable policy aliases
+- recurrenceIntervalDays enables recurring occurrences
+end note
+
+note as FormResponseRef
+FormResponse
+- patientJourneyId?: runtime journey context
+- journeyTemplateEntryId?: originating template entry
+- occurrenceIndex?: recurring instance index
+end note
+
+note as ConsentRef
+Consent
+- grantedAt / grantedByUserId always set on grant
+- revokedAt / revokedByUserId set on revoke
+- one active consent per patient+module+journey
+- revoked records are retained for audit history
+end note
+
+note as InstructionRef
+Instruction
+- startDayOffset/endDayOffset stored from template
+- startAt/endAt persisted and shifted on journey resume
+- status: ACTIVE -> ACKNOWLEDGED -> COMPLETED or CANCELLED
+end note
+
+JourneyTemplateRef .. JourneyEntryRef
+JourneyEntryRef .. FormResponseRef
+FormResponseRef .. InstructionRef
+InstructionRef .. ConsentRef
+
+@enduml

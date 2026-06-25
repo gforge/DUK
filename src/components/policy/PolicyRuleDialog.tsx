@@ -1,4 +1,5 @@
-import React, { useRef } from 'react'
+/* eslint-disable react-refresh/only-export-components */
+import { zodResolver } from '@hookform/resolvers/zod'
 import {
   Box,
   Button,
@@ -15,18 +16,40 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material'
-import { useForm, Controller, useWatch } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
+import React, { useRef } from 'react'
+import { Controller,useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
-import type { PolicyVariable } from '../../api/service'
-import { validateExpression } from '../../api/policyParser'
-import { ruleSchema, SEVERITIES, type RuleForm } from './policyRuleForm'
+import { z } from 'zod'
+
+import { validateExpression } from '@/api/policyParser'
+import type { PolicyVariable } from '@/api/service'
+import { useSeverityLabel } from '@/hooks/labels'
+
+const SEVERITIES = ['LOW', 'MEDIUM', 'HIGH'] as const
+export { SEVERITIES }
 
 /** General variables not tied to a specific journey template. */
-const GENERAL_VARS: { name: string; labelKey: string }[] = [
+const GENERAL_VARS: {
+  name: string
+  labelKey: 'policy.varNumResponses' | 'policy.varDaysSinceTherapy'
+}[] = [
   { name: 'numResponsesTotal', labelKey: 'policy.varNumResponses' },
   { name: 'daysSinceTherapy', labelKey: 'policy.varDaysSinceTherapy' },
 ]
+
+export const ruleSchema = z.object({
+  name: z.string().min(1, 'Name is required'),
+  expression: z
+    .string()
+    .min(1, 'Expression is required')
+    .superRefine((val, ctx) => {
+      const err = validateExpression(val)
+      if (err) ctx.addIssue({ code: z.ZodIssueCode.custom, message: err })
+    }),
+  severity: z.enum(SEVERITIES),
+  description: z.string().optional(),
+})
+export type RuleForm = z.infer<typeof ruleSchema>
 
 interface Props {
   open: boolean
@@ -49,14 +72,16 @@ export default function PolicyRuleDialog({
   variables = [],
 }: Props) {
   const { t } = useTranslation()
+  const getSeverityLabel = useSeverityLabel()
   const exprRef = useRef<HTMLInputElement>(null)
 
-  const { control, handleSubmit, formState, setValue, getValues } = useForm<RuleForm>({
+  const { control, handleSubmit, watch, formState, setValue, getValues } = useForm<RuleForm>({
     resolver: zodResolver(ruleSchema),
     values: formValues,
   })
 
-  const watchedExpr = useWatch({ control, name: 'expression' })
+  // eslint-disable-next-line react-hooks/incompatible-library
+  const watchedExpr = watch('expression')
   const exprError = watchedExpr ? validateExpression(watchedExpr) : null
 
   /** Insert a variable name at the current cursor position in the expression field. */
@@ -83,7 +108,7 @@ export default function PolicyRuleDialog({
   const templateGroups = Object.entries(grouped)
 
   return (
-    <Dialog maxWidth="md" open={open} onClose={onClose} fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
         <DialogTitle>{editingId ? t('policy.editRule') : t('policy.addRule')}</DialogTitle>
         <DialogContent>
@@ -106,31 +131,28 @@ export default function PolicyRuleDialog({
 
             {/* ── Variable palette ──────────────────────────────────────── */}
             <Box>
-              <Typography
-                sx={{ display: 'block' }}
-                variant="caption"
-                color="text.secondary"
-                gutterBottom
-              >
+              <Typography variant="caption" color="text.secondary" display="block" gutterBottom>
                 {t('policy.clickVarToInsert')}
               </Typography>
 
               {templateGroups.length === 0 ? (
-                <Typography variant="caption" color="text.disabled" sx={{ fontStyle: 'italic' }}>
+                <Typography variant="caption" color="text.disabled" fontStyle="italic">
                   {t('policy.noVars')}
                 </Typography>
               ) : (
-                <Stack sx={{ gap: 1.5 }}>
+                <Stack gap={1.5}>
                   {templateGroups.map(([templateName, vars]) => (
                     <Box key={templateName}>
                       <Typography
-                        sx={{ display: 'block', lineHeight: 1.4, mb: 0.5, fontSize: 10 }}
                         variant="overline"
+                        fontSize={10}
                         color="text.disabled"
+                        display="block"
+                        sx={{ lineHeight: 1.4, mb: 0.5 }}
                       >
                         {templateName}
                       </Typography>
-                      <Stack sx={{ flexWrap: 'wrap', gap: 0.5 }} direction="row">
+                      <Stack direction="row" flexWrap="wrap" gap={0.5}>
                         {vars.map((v) => (
                           <Tooltip key={v.name} title={v.name} placement="top">
                             <Chip
@@ -152,13 +174,15 @@ export default function PolicyRuleDialog({
               <Divider sx={{ my: 1.5 }} />
 
               <Typography
-                sx={{ display: 'block', lineHeight: 1.4, mb: 0.5, fontSize: 10 }}
                 variant="overline"
+                fontSize={10}
                 color="text.disabled"
+                display="block"
+                sx={{ lineHeight: 1.4, mb: 0.5 }}
               >
                 {t('policy.generalVars')}
               </Typography>
-              <Stack sx={{ flexWrap: 'wrap', gap: 0.5 }} direction="row">
+              <Stack direction="row" flexWrap="wrap" gap={0.5}>
                 {GENERAL_VARS.map((v) => (
                   <Tooltip key={v.name} title={v.name} placement="top">
                     <Chip
@@ -188,7 +212,7 @@ export default function PolicyRuleDialog({
                   required
                   size="small"
                   inputRef={exprRef}
-                  slotProps={{ htmlInput: { style: { fontFamily: 'monospace', fontSize: 13 } } }}
+                  inputProps={{ style: { fontFamily: 'monospace', fontSize: 13 } }}
                 />
               )}
             />
@@ -207,7 +231,7 @@ export default function PolicyRuleDialog({
                 >
                   {SEVERITIES.map((s) => (
                     <MenuItem key={s} value={s}>
-                      {t(`severity.${s}`)}
+                      {getSeverityLabel(s)}
                     </MenuItem>
                   ))}
                 </TextField>

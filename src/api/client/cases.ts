@@ -1,6 +1,7 @@
-import * as service from '../service'
-import type { Case, CaseStatus, TriageInput, Role } from '../schemas'
+import type { BookingRole, Case, CaseStatus, Role, TriageInput } from '../schemas'
 import type { CaseWithActiveCategory } from '../service'
+import * as service from '../service'
+import { contactModeToWorkCategory } from '../service/triageDecision'
 import { withDelay } from './delay'
 
 export const getCases = (): Promise<Case[]> => withDelay(() => service.getCases())
@@ -10,6 +11,12 @@ export const getCasesByPatient = (patientId: string): Promise<Case[]> =>
 
 export const getCase = (id: string): Promise<Case | undefined> =>
   withDelay(() => service.getCase(id))
+
+export const getResponsiblePhysicianUserIdForCase = (caseId: string): Promise<string | null> =>
+  withDelay(() => service.resolveResponsiblePhysicianUserIdForCase(caseId))
+
+export const hasPalOwnerForCase = (caseId: string): Promise<boolean> =>
+  withDelay(() => service.hasPalOwnerForCase(caseId))
 
 export const triageCase = (
   caseId: string,
@@ -23,7 +30,7 @@ export const createBooking = (
   booking: {
     id: string
     type: string
-    role?: Role
+    role?: BookingRole
     scheduledAt: string
     note?: string
     createdByUserId: string
@@ -38,9 +45,13 @@ export const updateBooking = (
   bookingId: string,
   patch: {
     scheduledAt?: string
-    role?: Role | undefined
+    role?: BookingRole | undefined
     note?: string | undefined
-    status?: 'PENDING' | 'SCHEDULED' | 'CANCELLED'
+    status?: 'PENDING' | 'SCHEDULED' | 'COMPLETED' | 'CANCELLED'
+    completedAt?: string | null
+    completedByUserId?: string | null
+    followUpDate?: string | null
+    completionComment?: string | null
   },
   userId: string,
   userRole: Role,
@@ -61,6 +72,24 @@ export const advanceCaseStatus = (
   userRole: Role,
 ): Promise<Case> => withDelay(() => service.advanceCaseStatus(caseId, toStatus, userId, userRole))
 
+export const claimCaseAssignment = (
+  caseId: string,
+  userId: string,
+  userRole: Role,
+): Promise<Case> => withDelay(() => service.claimCaseAssignment(caseId, userId, userRole))
+
+export const completeWorklistCase = (
+  caseId: string,
+  userId: string,
+  userRole: Role,
+  options?: {
+    bookingId?: string
+    followUpDate?: string
+    completedAt?: string
+    completionComment?: string
+  },
+): Promise<Case> => withDelay(() => service.completeWorklistCase(caseId, userId, userRole, options))
+
 export const getCasesForDashboard = (): Promise<CaseWithActiveCategory[]> =>
   withDelay(() => service.getCasesForDashboard())
 
@@ -72,8 +101,9 @@ export const getWorklistCases = (): Promise<Case[]> =>
       .filter(
         (c) =>
           (c.status === 'TRIAGED' || c.status === 'FOLLOWING_UP') &&
-          c.nextStep !== undefined &&
-          c.nextStep !== 'NO_ACTION',
+          (c.triageDecision
+            ? contactModeToWorkCategory(c.triageDecision.contactMode) !== null
+            : c.nextStep !== undefined && c.nextStep !== 'NO_ACTION'),
       )
       .sort((a, b) => {
         if (!a.deadline && !b.deadline) return 0

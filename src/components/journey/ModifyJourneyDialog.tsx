@@ -1,4 +1,3 @@
-import React, { useState } from 'react'
 import {
   Alert,
   Box,
@@ -10,31 +9,28 @@ import {
   Tab,
   Tabs,
 } from '@mui/material'
+import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import type { EffectiveStep } from '../../api/service'
-import type { JourneyTemplate, QuestionnaireTemplate } from '../../api/schemas'
-import { AddStepForm, RemoveStepForm, SwitchTemplateForm } from './modify/ModifyForms'
+
+import type { QuestionnaireTemplate } from '@/api/schemas'
+import type { EffectiveStep } from '@/api/service'
+
+import { AddStepForm, RemoveStepForm } from './modify/ModifyForms'
 
 interface ModifyJourneyDialogProps {
   open: boolean
   onClose: () => void
   journeyId: string
-  currentTemplateId: string
   currentTemplateName: string
-  steps: EffectiveStep[]
-  journeyTemplates: JourneyTemplate[]
-  questionnaireTemplates: QuestionnaireTemplate[]
   currentStartDate: string
+  steps: EffectiveStep[]
+  questionnaireTemplates: QuestionnaireTemplate[]
   onModify: (
-    type: 'ADD_STEP' | 'REMOVE_STEP' | 'SWITCH_TEMPLATE',
+    type: 'ADD_STEP' | 'REMOVE_STEP' | 'CANCEL',
     payload: {
       reason: string
       entry?: { label: string; offsetDays: number; windowDays: number; templateId: string }
       stepId?: string
-      newTemplateId?: string
-      previousTemplateId?: string
-      previousStartDate?: string
-      newStartDate?: string
     },
   ) => Promise<void>
 }
@@ -42,11 +38,9 @@ interface ModifyJourneyDialogProps {
 export default function ModifyJourneyDialog({
   open,
   onClose,
-  currentTemplateId,
   currentTemplateName,
   currentStartDate,
   steps,
-  journeyTemplates,
   questionnaireTemplates,
   onModify,
 }: ModifyJourneyDialogProps) {
@@ -63,10 +57,6 @@ export default function ModifyJourneyDialog({
 
   const [removeStepId, setRemoveStepId] = useState('')
   const [removeReason, setRemoveReason] = useState('')
-
-  const [newTemplateId, setNewTemplateId] = useState('')
-  const [switchReason, setSwitchReason] = useState('')
-  const [newStartDate, setNewStartDate] = useState('')
 
   const handleClose = () => {
     setError(null)
@@ -97,17 +87,6 @@ export default function ModifyJourneyDialog({
           return
         }
         await onModify('REMOVE_STEP', { reason: removeReason, stepId: removeStepId })
-      } else {
-        if (!newTemplateId || !switchReason.trim()) {
-          setError(t('journey.modify.requiredFields'))
-          return
-        }
-        await onModify('SWITCH_TEMPLATE', {
-          reason: switchReason,
-          newTemplateId,
-          previousTemplateId: currentTemplateId,
-          ...(newStartDate ? { previousStartDate: currentStartDate, newStartDate } : {}),
-        })
       }
       handleClose()
     } catch (e) {
@@ -117,11 +96,11 @@ export default function ModifyJourneyDialog({
     }
   }
 
-  const otherTemplates = journeyTemplates.filter((jt) => jt.id !== currentTemplateId)
-
   return (
-    <Dialog maxWidth="sm" open={open} onClose={handleClose} fullWidth>
-      <DialogTitle>{t('journey.modify.title')}</DialogTitle>
+    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
+      <DialogTitle>
+        {t('journey.modify.title')} — {currentTemplateName}
+      </DialogTitle>
       <DialogContent sx={{ p: 0 }}>
         <Tabs
           value={tab}
@@ -133,7 +112,6 @@ export default function ModifyJourneyDialog({
         >
           <Tab label={t('journey.modify.addStep')} />
           <Tab label={t('journey.modify.removeStep')} />
-          <Tab label={t('journey.modify.switchTemplate')} />
         </Tabs>
         <Box sx={{ p: 2.5 }}>
           {error && (
@@ -154,6 +132,7 @@ export default function ModifyJourneyDialog({
               reason={addReason}
               setReason={setAddReason}
               questionnaireTemplates={questionnaireTemplates}
+              startDate={currentStartDate}
             />
           )}
           {tab === 1 && (
@@ -163,18 +142,6 @@ export default function ModifyJourneyDialog({
               onSelectStep={setRemoveStepId}
               reason={removeReason}
               setReason={setRemoveReason}
-            />
-          )}
-          {tab === 2 && (
-            <SwitchTemplateForm
-              currentTemplateName={currentTemplateName}
-              otherTemplates={otherTemplates}
-              selectedTemplateId={newTemplateId}
-              onSelectTemplate={setNewTemplateId}
-              reason={switchReason}
-              setReason={setSwitchReason}
-              newStartDate={newStartDate}
-              setNewStartDate={setNewStartDate}
             />
           )}
         </Box>

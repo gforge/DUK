@@ -1,6 +1,6 @@
-import * as service from '../service'
 import type { AppState } from '../schemas'
 import type { SeedVariant } from '../service'
+import * as service from '../service'
 import { withDelay } from './delay'
 
 export const exportState = (): Promise<AppState> => withDelay(() => service.exportState())

@@ -1,6 +1,6 @@
-import React, { useState } from 'react'
-import { IconButton, Menu, MenuItem, Tooltip } from '@mui/material'
 import LanguageIcon from '@mui/icons-material/Language'
+import { IconButton, Menu, MenuItem, Tooltip } from '@mui/material'
+import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 const LANGUAGES = [

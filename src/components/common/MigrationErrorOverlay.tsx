@@ -1,12 +1,14 @@
-import React from 'react'
-import { Box, Button, Chip, Divider, Paper, Stack, Typography } from '@mui/material'
-import ErrorOutlineIcon from '@mui/icons-material/ErrorOutlineOutlined'
-import DownloadIcon from '@mui/icons-material/Download'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
+import DownloadIcon from '@mui/icons-material/Download'
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline'
+import { Box, Button, Chip, Divider, Paper, Stack, Typography } from '@mui/material'
+import React from 'react'
 import { useTranslation } from 'react-i18next'
-import { clearState } from '../../api/storage'
-import { CURRENT_SCHEMA_VERSION } from '../../api/schemaVersion'
-import type { MigrationResultErr } from '../../api/migrations'
+
+import type { MigrationResultErr } from '@/api/migrations'
+import { CURRENT_SCHEMA_VERSION } from '@/api/schemaVersion'
+import { clearState } from '@/api/storage'
+import { useMigrationReason } from '@/hooks/labels/migration'
 
 interface Props {
   error: MigrationResultErr
@@ -21,7 +23,9 @@ interface Props {
  *  2. Clear immediately and start with fresh seed data.
  */
 export default function MigrationErrorOverlay({ error }: Props) {
+  const reasonText = useMigrationReason(error)
   const { t } = useTranslation()
+  const errorDetailsLabel = t('migration.errorDetails') as string
 
   function handleDownload() {
     const json = JSON.stringify(error.rawState, null, 2)
@@ -39,12 +43,8 @@ export default function MigrationErrorOverlay({ error }: Props) {
     window.location.reload()
   }
 
-  const reasonKey =
-    error.reason === 'downgrade'
-      ? 'migration.reasonDowngrade'
-      : error.reason === 'no-path'
-        ? 'migration.reasonNoPath'
-        : 'migration.reasonParseError'
+  const hasParseError = error.parseError != null
+  console.error('Migration error:', error)
 
   return (
     <Box
@@ -63,23 +63,23 @@ export default function MigrationErrorOverlay({ error }: Props) {
       <Paper elevation={8} sx={{ maxWidth: 520, width: '100%', p: 4, borderRadius: 3 }}>
         <Stack spacing={3}>
           {/* Header */}
-          <Stack sx={{ alignItems: 'center' }} direction="row" spacing={1.5}>
+          <Stack direction="row" spacing={1.5} alignItems="center">
             <ErrorOutlineIcon color="error" sx={{ fontSize: 32 }} />
-            <Typography sx={{ fontWeight: 700 }} variant="h6">
+            <Typography variant="h6" fontWeight={700}>
               {t('migration.title')}
             </Typography>
           </Stack>
 
           {/* Version info */}
-          <Stack sx={{ flexWrap: 'wrap' }} direction="row" spacing={2}>
+          <Stack direction="row" spacing={2} flexWrap="wrap">
             <Chip
-              label={`${t('migration.storedVersion')}: v${error.storedVersion}`}
+              label={t('migration.storedVersion', { version: error.storedVersion })}
               color="warning"
               size="small"
               variant="outlined"
             />
             <Chip
-              label={`${t('migration.currentVersion')}: v${CURRENT_SCHEMA_VERSION}`}
+              label={t('migration.currentVersion', { version: CURRENT_SCHEMA_VERSION })}
               color="primary"
               size="small"
               variant="outlined"
@@ -88,8 +88,23 @@ export default function MigrationErrorOverlay({ error }: Props) {
 
           {/* Reason */}
           <Typography variant="body2" color="text.secondary">
-            {t(reasonKey)}
+            {reasonText}
           </Typography>
+
+          {/* Detailed schema error for debugging */}
+          {hasParseError && (
+            <Box sx={{ mt: 1, p: 1, bgcolor: 'background.paper', borderRadius: 1 }}>
+              <Typography variant="caption" color="error">
+                {errorDetailsLabel}
+              </Typography>
+              <Box
+                component="pre"
+                sx={{ whiteSpace: 'pre-wrap', maxHeight: 200, overflow: 'auto' }}
+              >
+                {JSON.stringify(error.parseError, null, 2)}
+              </Box>
+            </Box>
+          )}
 
           <Divider />
 
@@ -103,7 +118,7 @@ export default function MigrationErrorOverlay({ error }: Props) {
             >
               {t('migration.downloadCta')}
             </Button>
-            <Typography variant="caption" color="text.secondary" sx={{ textAlign: 'center' }}>
+            <Typography variant="caption" color="text.secondary" textAlign="center">
               {t('migration.downloadHint')}
             </Typography>
           </Stack>
@@ -119,7 +134,7 @@ export default function MigrationErrorOverlay({ error }: Props) {
             >
               {t('migration.clearCta')}
             </Button>
-            <Typography variant="caption" color="text.secondary" sx={{ textAlign: 'center' }}>
+            <Typography variant="caption" color="text.secondary" textAlign="center">
               {t('migration.clearHint')}
             </Typography>
           </Stack>

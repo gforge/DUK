@@ -1,5 +1,5 @@
-import { iso, daysAgo, daysFromNow } from './shared'
 import type { Case } from '../schemas'
+import { daysAgo, daysFromNow, iso } from './shared'
 
 export const cases: Case[] = [
   // ── ACUTE ──────────────────────────────────────────────────────────────────
@@ -8,16 +8,10 @@ export const cases: Case[] = [
     patientId: 'p-1',
     category: 'ACUTE',
     status: 'NEEDS_REVIEW',
-    triggers: ['HIGH_PAIN', 'INFECTION_SUSPECTED'],
-    policyWarnings: [
-      {
-        ruleId: 'rule-1',
-        ruleName: 'Smärta minskar inte',
-        severity: 'HIGH',
-        triggeredValues: { PNRS_1: 8, PNRS_2: 8 },
-        expression: 'PNRS_1 - PNRS_2 <= 0',
-      },
-    ],
+    triggers: [], // cleared so the patient isn't alarmed
+    policyWarnings: [],
+    internalNote:
+      'Postop dag 14: kvarstående sårsekretion (rapporterat i formulär) trots normala CRP och Hb. Röntgen dag 14 utan komplikationer. Hög smärta NRS 8/10. Klinisk sårinspektion rekommenderas.',
     assignedRole: 'DOCTOR',
     assignedUserId: 'user-doc-1',
     createdByUserId: 'user-nurse-1',
@@ -25,6 +19,32 @@ export const cases: Case[] = [
     lastActivityAt: iso(daysAgo(1)),
     createdAt: iso(daysAgo(2)),
     formSeriesId: 'fs-1',
+    reviews: [
+      {
+        id: 'case-1-review-1',
+        type: 'LAB',
+        source: 'JOURNEY',
+        journeyStepLabel: 'Dag 10–14',
+        createdByUserId: 'user-doc-1',
+        createdByRole: 'DOCTOR',
+        createdAt: iso(daysAgo(14)),
+        reviewedAt: iso(daysAgo(7)),
+        outcome: 'OK',
+        note: 'Rutinmässiga blodprover: CRP och Hb normala.',
+      },
+      {
+        id: 'case-1-review-2',
+        type: 'XRAY',
+        source: 'JOURNEY',
+        journeyStepLabel: 'Dag 10–14',
+        createdByUserId: 'user-doc-1',
+        createdByRole: 'DOCTOR',
+        createdAt: iso(daysAgo(14)),
+        reviewedAt: iso(daysAgo(7)),
+        outcome: 'OK',
+        note: '2‑veckors postoperativ röntgen: inga komplikationer.',
+      },
+    ],
   },
   {
     id: 'case-2',
@@ -48,12 +68,15 @@ export const cases: Case[] = [
         expression: 'EQ5D.index < 0.5',
       },
     ],
+    internalNote:
+      'Smärtan ökade v1→v2 (NRS 7→8/10) trots att såret är läkt. Sömnstörning (nattsmärta NRS 6/10). Låg livskvalitet (EQ-5D 0.4). Analgetikaregim bör utvärderas — snar kontakt rekommenderas.',
     assignedRole: 'NURSE',
     createdByUserId: 'user-pal-1',
     scheduledAt: iso(daysAgo(3)),
     lastActivityAt: iso(daysAgo(1)),
     createdAt: iso(daysAgo(3)),
     formSeriesId: 'fs-1',
+    reviews: [],
   },
   {
     id: 'case-7',
@@ -62,11 +85,14 @@ export const cases: Case[] = [
     status: 'NEW',
     triggers: ['NOT_OPENED'],
     policyWarnings: [],
+    internalNote:
+      'Ny patient — opererad i går. Inbjudan skickad men formuläret ej öppnat ännu. Kontrollera att inloggningsuppgifterna fungerar.',
     createdByUserId: 'user-nurse-1',
     scheduledAt: iso(daysAgo(1)),
     lastActivityAt: iso(daysAgo(1)),
     createdAt: iso(daysAgo(1)),
     formSeriesId: 'fs-1',
+    reviews: [],
   },
   // ── SUBACUTE ───────────────────────────────────────────────────────────────
   {
@@ -80,13 +106,16 @@ export const cases: Case[] = [
     nextStep: 'DIGITAL_CONTROL',
     deadline: iso(daysFromNow(7)),
     internalNote:
-      'Digital kontroll planerad. Säkerställ att patienten fått instruktioner för formuläret.',
+      'V4-kontroll: OSS 36/48, NRS 3/10. God funktionsnivå för stadiet — förväntat förlopp. Digital uppföljning planeras om 1 vecka.',
+    patientMessage:
+      'Hej Karl, dina värden ser bra ut och axelfunktionen förbättras enligt förväntan. Vi skickar ett nytt uppföljningsformulär om en vecka. Hör gärna av dig om du har frågor.',
     createdByUserId: 'user-pal-1',
     triagedByUserId: 'user-pal-1',
     scheduledAt: iso(daysAgo(21)),
     lastActivityAt: iso(daysAgo(2)),
     createdAt: iso(daysAgo(21)),
     formSeriesId: 'fs-2',
+    reviews: [],
   },
   {
     id: 'case-4',
@@ -95,11 +124,14 @@ export const cases: Case[] = [
     status: 'NEEDS_REVIEW',
     triggers: ['NOT_OPENED', 'SEEK_CONTACT'],
     policyWarnings: [],
+    internalNote:
+      'Patienten har inte öppnat formuläret men kontaktat kliniken per telefon. Uppger oro kring sårläkning och frågar om gipset sitter rätt. Telefonkontakt bör prioriteras.',
     createdByUserId: 'user-nurse-2',
     scheduledAt: iso(daysAgo(25)),
     lastActivityAt: iso(daysAgo(5)),
     createdAt: iso(daysAgo(25)),
     formSeriesId: 'fs-2',
+    reviews: [],
   },
   {
     id: 'case-8',
@@ -118,7 +150,10 @@ export const cases: Case[] = [
     ],
     nextStep: 'NURSE_VISIT',
     deadline: iso(daysFromNow(3)),
-    internalNote: 'Patienten rapporterar kvarstående svullnad. Sjuksköterskebesök inbokat.',
+    internalNote:
+      'V4-kontroll: OSS 22/48, NRS 6/10. Kvarstående svullnad och rörlighetsinskränkning. Sjuksköterskebesök inbokat för klinisk bedömning. Troligt postoperativt ödem.',
+    patientMessage:
+      'Hej Britta, vi ser att du fortfarande har besvär med svullnad och smärta. Vi har bokat en sjukskötersketid för att bedöma detta — du får bekräftelse separat. Kontakta oss om besvären förvärras.',
     assignedRole: 'NURSE',
     assignedUserId: 'user-nurse-1',
     createdByUserId: 'user-pal-1',
@@ -127,6 +162,7 @@ export const cases: Case[] = [
     lastActivityAt: iso(daysAgo(1)),
     createdAt: iso(daysAgo(18)),
     formSeriesId: 'fs-2',
+    reviews: [],
   },
   // ── CONTROL ────────────────────────────────────────────────────────────────
   {
@@ -151,11 +187,14 @@ export const cases: Case[] = [
         expression: 'EQ5D.index < 0.5',
       },
     ],
+    internalNote:
+      '3-månaders kontroll: OSS 25/48, EQ-5D 0.45. Ung patient (38 år) med kvarstående funktionsnedsättning. Smärtan uppges förbättrad men sömnproblem kvarstår. Utvärderas för utökad rehabilitering.',
     createdByUserId: 'user-doc-1',
     scheduledAt: iso(daysAgo(63)),
     lastActivityAt: iso(daysAgo(3)),
     createdAt: iso(daysAgo(63)),
     formSeriesId: 'fs-3',
+    reviews: [],
   },
   {
     id: 'case-6',
@@ -169,11 +208,14 @@ export const cases: Case[] = [
     assignedRole: 'NURSE',
     createdByUserId: 'user-pal-1',
     triagedByUserId: 'user-pal-1',
-    internalNote: 'Allt bra vid 6-månaderskontrollen. Nästa kontroll om 3 månader.',
+    internalNote: 'Utmärkt utfall vid 6-månaders kontroll: OSS 38/48, EQ-5D 0.9. Smärtfri i vila. Ärendet avslutas.',
+    patientMessage:
+      'Hej Maria, din 6-månaderskontroll visar ett mycket bra tillfrisknande — smärta och funktion är på god nivå. Ärendet avslutas nu. Kontakta oss om du upplever försämring eller nya besvär.',
     scheduledAt: iso(daysAgo(90)),
     lastActivityAt: iso(daysAgo(7)),
     createdAt: iso(daysAgo(90)),
     formSeriesId: 'fs-3',
+    reviews: [],
   },
   {
     id: 'case-9',
@@ -182,11 +224,14 @@ export const cases: Case[] = [
     status: 'NEEDS_REVIEW',
     triggers: ['NO_RESPONSE'],
     policyWarnings: [],
+    internalNote:
+      'Patienten har inte svarat på 3-månaders enkäten trots två påminnelser. Okänt om patienten upplever problem eller är svårkontaktad. Telefonkontakt rekommenderas.',
     createdByUserId: 'user-doc-1',
     scheduledAt: iso(daysAgo(70)),
     lastActivityAt: iso(daysAgo(5)),
     createdAt: iso(daysAgo(70)),
     formSeriesId: 'fs-3',
+    reviews: [],
   },
   {
     id: 'case-10',
@@ -197,7 +242,10 @@ export const cases: Case[] = [
     policyWarnings: [],
     nextStep: 'PHYSIO_VISIT',
     deadline: iso(daysFromNow(14)),
-    internalNote: 'Boka fysiobesök inom 2 veckor — rörlighetsproblem kvarstår sedan operationen.',
+    internalNote:
+      '6-månaders kontroll: OSS 32/48, EQ-5D 0.72. Rörelseomfång begränsat (abduktion ca 120°). Remitteras till fysioterapeut för axelspecifik rehabilitering — god potential för förbättring.',
+    patientMessage:
+      'Hej Lena, vi bedömer att du har stor nytta av sjukgymnastik för att förbättra axelrörligheten. Du remitteras till fysioterapeut och mottagningen hör av sig med en tid inom 2 veckor.',
     assignedRole: 'NURSE',
     createdByUserId: 'user-pal-1',
     triagedByUserId: 'user-pal-1',
@@ -205,6 +253,7 @@ export const cases: Case[] = [
     lastActivityAt: iso(daysAgo(2)),
     createdAt: iso(daysAgo(100)),
     formSeriesId: 'fs-3',
+    reviews: [],
   },
   // ── Proximal humerus cases ─────────────────────────────────────────────
   {
@@ -214,12 +263,15 @@ export const cases: Case[] = [
     status: 'NEEDS_REVIEW',
     triggers: ['HIGH_PAIN', 'SEEK_CONTACT'],
     policyWarnings: [],
+    internalNote:
+      'Patienten ringer och uppger tilltagande smärta (NRS 9/10) sedan gårdagen samt domningskänsla i ringfingret. Misstänkt neurogen komponent. Snar läkarbedömning motiverad.',
     assignedRole: 'NURSE',
     createdByUserId: 'user-nurse-1',
     scheduledAt: iso(daysAgo(2)),
     lastActivityAt: iso(daysAgo(1)),
     createdAt: iso(daysAgo(2)),
     formSeriesId: 'fs-1',
+    reviews: [],
   },
   {
     id: 'case-12',
@@ -243,6 +295,8 @@ export const cases: Case[] = [
         expression: 'OSS_week4 < 25',
       },
     ],
+    internalNote:
+      'V4-kontroll: NRS 7/10, OSS 20/48. Avsevärt sämre funktion och kvarstående hög smärta jämfört med förväntat förlopp vid 4 veckor post-op. Läkarbedömning motiverad.',
     assignedRole: 'DOCTOR',
     assignedUserId: 'user-doc-1',
     createdByUserId: 'user-nurse-1',
@@ -250,6 +304,7 @@ export const cases: Case[] = [
     lastActivityAt: iso(daysAgo(2)),
     createdAt: iso(daysAgo(35)),
     formSeriesId: 'fs-2',
+    reviews: [],
   },
   // ── Distal radius cases ───────────────────────────────────────────────
   {
@@ -257,7 +312,7 @@ export const cases: Case[] = [
     patientId: 'p-13',
     category: 'ACUTE',
     status: 'NEEDS_REVIEW',
-    triggers: ['HIGH_PAIN', 'ABNORMAL_ANSWER'],
+    triggers: ['HIGH_PAIN', 'ABNORMAL_ANSWER', 'XRAY_PENDING'],
     policyWarnings: [
       {
         ruleId: 'rule-dr-1',
@@ -267,6 +322,8 @@ export const cases: Case[] = [
         expression: 'PNRS_1 - PNRS_2 <= 0',
       },
     ],
+    internalNote:
+      'Smärtan har ökat från v1 (NRS 6/10) till v2 (NRS 8/10). Sårsekretion kvarstår. Patienten uppger oro för felläkning. Röntgen beställd men ej granskad — prioritera.',
     assignedRole: 'DOCTOR',
     assignedUserId: 'user-doc-1',
     createdByUserId: 'user-nurse-1',
@@ -274,13 +331,27 @@ export const cases: Case[] = [
     lastActivityAt: iso(daysAgo(1)),
     createdAt: iso(daysAgo(14)),
     formSeriesId: 'fs-1',
+    reviews: [
+      {
+        id: 'rev-dr-1',
+        type: 'XRAY',
+        createdAt: iso(daysAgo(5)),
+        createdByUserId: 'user-nurse-1',
+        createdByRole: 'NURSE',
+        reviewedAt: null,
+        reviewedByUserId: undefined,
+        reviewedByRole: undefined,
+        note: null,
+        source: 'JOURNEY',
+      },
+    ],
   },
   {
     id: 'case-14',
     patientId: 'p-14',
     category: 'SUBACUTE',
     status: 'NEEDS_REVIEW',
-    triggers: ['LOW_FUNCTION', 'HIGH_PAIN'],
+    triggers: ['LOW_FUNCTION', 'HIGH_PAIN', 'LAB_PENDING'],
     policyWarnings: [
       {
         ruleId: 'rule-dr-2',
@@ -297,11 +368,273 @@ export const cases: Case[] = [
         expression: 'OSS_week8 < 26',
       },
     ],
+    internalNote:
+      'OSS-trend: V4 36/48 → V8 20/48. Smärta återkommer: NRS v4 4/10 → v8 6/10. Oväntat försämringsförlopp — ny läkarbedömning planeras. Laboratorieprover inväntas (CRP, SR).',
     assignedRole: 'NURSE',
     createdByUserId: 'user-nurse-1',
     scheduledAt: iso(daysAgo(52)),
     lastActivityAt: iso(daysAgo(3)),
     createdAt: iso(daysAgo(52)),
     formSeriesId: 'fs-2',
+    reviews: [
+      {
+        id: 'rev-dr-2',
+        type: 'LAB',
+        createdAt: iso(daysAgo(7)),
+        createdByUserId: 'user-nurse-1',
+        createdByRole: 'NURSE',
+        reviewedAt: null,
+        reviewedByUserId: undefined,
+        reviewedByRole: undefined,
+        note: 'Väntar på blodprover för inflammation-markörer',
+        source: 'MANUAL',
+      },
+    ],
+  },
+  // ── Knee OA case (p-15) ────────────────────────────────────────────────
+  {
+    id: 'case-15',
+    patientId: 'p-15',
+    category: 'CONTROL',
+    status: 'TRIAGED',
+    triggers: [],
+    policyWarnings: [],
+    nextStep: 'DIGITAL_CONTROL',
+    deadline: iso(daysFromNow(14)),
+    internalNote:
+      'Postoperativ knäkontroll v2. Sår läker utan tecken på infektion. Patienten har nattsmärta NRS 5–6/10 — förväntat förlopp. Digital kontroll räcker, ingen åtgärd krävs.',
+    assignedRole: 'NURSE',
+    createdByUserId: 'user-pal-1',
+    triagedByUserId: 'user-pal-1',
+    scheduledAt: iso(daysAgo(14)),
+    lastActivityAt: iso(daysAgo(1)),
+    createdAt: iso(daysAgo(14)),
+    reviews: [],
+  },
+  // ── Hindfoot elective surgery pathway ─────────────────────────────────
+  {
+    // case-19: Eva Lindqvist — post-op 6-month form just submitted, good recovery
+    id: 'case-19',
+    patientId: 'p-19',
+    episodeId: 'ep-19',
+    category: 'CONTROL',
+    status: 'NEEDS_REVIEW',
+    triggers: [],
+    policyWarnings: [],
+    internalNote:
+      '6-månaders uppföljning efter hindfoot fusion (subtalar fusion höger fot). OSS 34/48, EQ-5D 0.72 — god återhämtning. Patienten uppger förbättrad gångförmåga men fortfarande begränsad vid längre sträckor. Diabetes kontrollerat (Metformin). Inga komplikationer.',
+    assignedRole: 'NURSE',
+    createdByUserId: 'user-pal-1',
+    triagedByUserId: 'user-pal-1',
+    scheduledAt: iso(daysAgo(180)),
+    lastActivityAt: iso(daysAgo(0)),
+    createdAt: iso(daysAgo(180)),
+    reviews: [
+      {
+        id: 'rev-p19-xray',
+        type: 'XRAY',
+        source: 'JOURNEY',
+        journeyStepLabel: 'Vecka 2 — röntgenkontroll och stygntagning',
+        createdAt: iso(daysAgo(166)),
+        createdByUserId: 'user-nurse-1',
+        createdByRole: 'NURSE',
+        reviewedAt: iso(daysAgo(160)),
+        reviewedByUserId: 'user-doc-1',
+        reviewedByRole: 'DOCTOR',
+        outcome: 'OK',
+        note: 'Röntgen v2 hindfoot fusion: god osteosyntes, korrekta fixationsskruvar i subtalarleden, inga komplikationer.',
+      },
+    ],
+  },
+  {
+    // case-20: Margareta Pettersson — on WL 95 days, 3-month interest form pending
+    id: 'case-20',
+    patientId: 'p-20',
+    episodeId: 'ep-20',
+    category: 'CONTROL',
+    status: 'NEW',
+    triggers: ['NOT_OPENED'],
+    policyWarnings: [],
+    internalNote:
+      'Patient på väntelista för hindfoot fusion (planus-deformitet). 3-månaders intresseformulär skickat men ej öppnat. Vid 2-månaders check noterades ny medicinering (Lisinopril 5mg) — bör kontrolleras inför hälsodeklaration.',
+    createdByUserId: 'user-doc-1',
+    scheduledAt: iso(daysAgo(95)),
+    lastActivityAt: iso(daysAgo(5)),
+    createdAt: iso(daysAgo(95)),
+    reviews: [],
+  },
+  // ── Journey-switch demo ───────────────────────────────────────────────
+  {
+    // case-21: Axel Lindström — ankle fracture, switched standard→complex at day 3
+    id: 'case-21',
+    patientId: 'p-21',
+    episodeId: 'ep-21',
+    category: 'SUBACUTE',
+    status: 'NEEDS_REVIEW',
+    triggers: ['HIGH_PAIN', 'LOW_FUNCTION'],
+    policyWarnings: [
+      {
+        ruleId: 'rule-2',
+        ruleName: 'Låg funktion (OSS)',
+        severity: 'MEDIUM',
+        triggeredValues: { 'OSS.total': 18 },
+        expression: 'OSS.total < 30',
+      },
+      {
+        ruleId: 'rule-4',
+        ruleName: 'Hög smärta (PNRS)',
+        severity: 'HIGH',
+        triggeredValues: { PNRS_2: 8 },
+        expression: 'PNRS_2 >= 7',
+      },
+    ],
+    internalNote:
+      'Initialt klassificerad som enkel ankelfraktur (protokoll: standard). Röntgen dag 3–5 visade bimalleolär komponent — omklassificerad till komplex protokoll med tätare uppföljning. V4-kontroll: NRS 8/10, OSS 18/48. Avsevärt sämre funktion än förväntat.',
+    assignedRole: 'DOCTOR',
+    assignedUserId: 'user-doc-1',
+    createdByUserId: 'user-nurse-1',
+    triagedByUserId: 'user-doc-1',
+    scheduledAt: iso(daysAgo(42)),
+    lastActivityAt: iso(daysAgo(2)),
+    createdAt: iso(daysAgo(42)),
+    reviews: [],
+  },
+  // ── Two simultaneous fractures (Gunnar Eriksson, p-22) ───────────────
+  {
+    // case-22: Gunnar — right distal radius, reasonable recovery
+    id: 'case-22',
+    patientId: 'p-22',
+    episodeId: 'ep-22',
+    category: 'SUBACUTE',
+    status: 'TRIAGED',
+    triggers: [],
+    policyWarnings: [],
+    nextStep: 'DIGITAL_CONTROL',
+    deadline: iso(daysFromNow(7)),
+    internalNote:
+      'Distala radiusfraktur höger — V4: NRS 4/10, OSS 28/48. Rimligt förlopp trots kombinationstrauma. Digital kontroll planerad inför gipsborttagning v6. Patienten klarar sig relativt bra med kryckor.',
+    assignedRole: 'NURSE',
+    createdByUserId: 'user-doc-1',
+    triagedByUserId: 'user-doc-1',
+    scheduledAt: iso(daysAgo(35)),
+    lastActivityAt: iso(daysAgo(2)),
+    createdAt: iso(daysAgo(35)),
+    reviews: [
+      {
+        id: 'rev-p22-xray',
+        type: 'XRAY',
+        source: 'JOURNEY',
+        journeyStepLabel: 'Dag 10–14 – stygnborttagning',
+        createdAt: iso(daysAgo(23)),
+        createdByUserId: 'user-nurse-1',
+        createdByRole: 'NURSE',
+        reviewedAt: iso(daysAgo(20)),
+        reviewedByUserId: 'user-doc-1',
+        reviewedByRole: 'DOCTOR',
+        outcome: 'OK',
+        note: 'Röntgen dag 10-14 handled: god frakturläkning, korrekt gipsposition.',
+      },
+    ],
+  },
+  {
+    // case-23: Gunnar — left calcaneus, difficult recovery (same patient, different episode)
+    id: 'case-23',
+    patientId: 'p-22',
+    episodeId: 'ep-23',
+    category: 'SUBACUTE',
+    status: 'NEEDS_REVIEW',
+    triggers: ['HIGH_PAIN', 'LOW_FUNCTION'],
+    policyWarnings: [
+      {
+        ruleId: 'rule-2',
+        ruleName: 'Låg funktion (OSS)',
+        severity: 'MEDIUM',
+        triggeredValues: { 'OSS.total': 15 },
+        expression: 'OSS.total < 30',
+      },
+      {
+        ruleId: 'rule-4',
+        ruleName: 'Hög smärta (PNRS)',
+        severity: 'HIGH',
+        triggeredValues: { PNRS_2: 8 },
+        expression: 'PNRS_2 >= 7',
+      },
+    ],
+    internalNote:
+      'Calcaneusfraktur vänster — V4: NRS 8/10, OSS 15/48. Svår smärta och markant funktionsnedsättning. Kombinationen med handledsfrakturen gör rehabilitering extremt utmanande — patienten är helt beroende av hjälp för ADL. Läkarbedömning rekommenderas.',
+    assignedRole: 'DOCTOR',
+    assignedUserId: 'user-doc-1',
+    createdByUserId: 'user-nurse-1',
+    scheduledAt: iso(daysAgo(35)),
+    lastActivityAt: iso(daysAgo(1)),
+    createdAt: iso(daysAgo(35)),
+    reviews: [],
+  },
+  // ── Old fracture 1yr + new acute fracture (Birgit Magnusson, p-23) ───
+  {
+    // case-24: Birgit — femoral neck 1yr ago, now at 1-year control (LOW_FUNCTION + LOW_QOL)
+    id: 'case-24',
+    patientId: 'p-23',
+    episodeId: 'ep-24',
+    category: 'CONTROL',
+    status: 'NEEDS_REVIEW',
+    triggers: ['LOW_FUNCTION', 'LOW_QOL'],
+    policyWarnings: [
+      {
+        ruleId: 'rule-2',
+        ruleName: 'Låg funktion (OSS)',
+        severity: 'MEDIUM',
+        triggeredValues: { 'OSS.total': 26 },
+        expression: 'OSS.total < 30',
+      },
+      {
+        ruleId: 'rule-3',
+        ruleName: 'Låg livskvalitet (EQ-5D)',
+        severity: 'MEDIUM',
+        triggeredValues: { 'EQ5D.index': 0.45 },
+        expression: 'EQ5D.index < 0.5',
+      },
+    ],
+    internalNote:
+      '1-årsuppföljning proximal femurfraktur. OSS 26/48, EQ-5D 0.45 — kvarstående nedsättning. Patienten har dessutom ådragit sig ny distal radiusfraktur (se case-25) vilket försvårar rehabilitering och daglig funktion ytterligare.',
+    createdByUserId: 'user-pal-1',
+    scheduledAt: iso(daysAgo(365)),
+    lastActivityAt: iso(daysAgo(1)),
+    createdAt: iso(daysAgo(365)),
+    reviews: [],
+  },
+  {
+    // case-25: Birgit — new distal radius fracture 10 days ago (ACUTE), same patient
+    id: 'case-25',
+    patientId: 'p-23',
+    episodeId: 'ep-25',
+    category: 'ACUTE',
+    status: 'NEEDS_REVIEW',
+    triggers: ['HIGH_PAIN'],
+    policyWarnings: [],
+    internalNote:
+      'Ny distal radiusfraktur vänster — fall i hemmet för 10 dagar sedan. NRS 7/10. Patienten har kvarstående nedsatt funktion efter femurfraktur 1 år sedan — noggrann smärtlindring kritisk för mobilisering. Bör handläggas parallellt med 1-årskontrollen.',
+    assignedRole: 'NURSE',
+    createdByUserId: 'user-pal-1',
+    scheduledAt: iso(daysAgo(10)),
+    lastActivityAt: iso(daysAgo(1)),
+    createdAt: iso(daysAgo(10)),
+    reviews: [],
+  },
+  // ── Late-join demo case (p-16) ─────────────────────────────────────────
+  {
+    id: 'case-16',
+    patientId: 'p-16',
+    category: 'SUBACUTE',
+    status: 'NEW',
+    triggers: [],
+    policyWarnings: [],
+    internalNote:
+      'Fraktur inträffade för ~4 veckor sedan. Patienten registrerades ej i systemet initialt. Startar uppföljning direkt i subakut fas — vecka 4-enkät skickas nu.',
+    createdByUserId: 'user-doc-1',
+    scheduledAt: iso(daysAgo(0)),
+    lastActivityAt: iso(daysAgo(0)),
+    createdAt: iso(daysAgo(0)),
+    reviews: [],
   },
 ]

@@ -1,35 +1,43 @@
-import React, { useState } from 'react'
+import BadgeIcon from '@mui/icons-material/Badge'
+import ChevronRightIcon from '@mui/icons-material/ChevronRight'
 import {
+  Box,
   Button,
-  Chip,
   Table,
   TableBody,
   TableCell,
   TableHead,
-  TableRow,
   TablePagination,
+  TableRow,
+  Tooltip,
   Typography,
 } from '@mui/material'
-import RouteIcon from '@mui/icons-material/Route'
+import { differenceInYears, parseISO } from 'date-fns'
+import React, { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
-import type { Patient, PatientJourney, JourneyTemplate } from '../../api/schemas'
-import { formatPersonnummer } from '../../api/utils/personnummer'
+
+import type { EpisodeOfCare, JourneyTemplate, Patient, PatientJourney } from '@/api/schemas'
+import PersonalNumberCopy from '@/components/common/PersonalNumberCopy'
+
+import JourneyChips from './JourneyChips'
 
 interface Props {
-  patients: Patient[]
-  journeys: PatientJourney[]
-  journeyTemplates: JourneyTemplate[]
-  isClinician: boolean
-  onAssign: (target: { id: string; name: string }) => void
+  readonly patients: Patient[]
+  readonly journeys: PatientJourney[]
+  readonly episodes: EpisodeOfCare[]
+  readonly journeyTemplates: JourneyTemplate[]
+  readonly isClinician: boolean
+  readonly currentUserId?: string
 }
 
 export default function PatientTable({
   patients,
   journeys,
+  episodes,
   journeyTemplates,
   isClinician,
-  onAssign,
+  currentUserId,
 }: Props) {
   const { t } = useTranslation()
   const navigate = useNavigate()
@@ -42,16 +50,48 @@ export default function PatientTable({
   const safePage = Math.min(page, maxPage)
   const visible = patients.slice(safePage * rowsPerPage, (safePage + 1) * rowsPerPage)
 
-  const activeJourneyCount = (patientId: string) =>
-    journeys.filter((j) => j.patientId === patientId && j.status === 'ACTIVE').length
+  const episodesById = useMemo(
+    () => new Map(episodes.map((episode) => [episode.id, episode])),
+    [episodes],
+  )
 
-  const latestJourneyName = (patientId: string): string | null => {
-    const sorted = journeys
-      .filter((j) => j.patientId === patientId)
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-    if (!sorted.length) return null
-    return journeyTemplates.find((jt) => jt.id === sorted[0].journeyTemplateId)?.name ?? null
-  }
+  const journeysByPatientId = useMemo(() => {
+    const map = new Map<string, PatientJourney[]>()
+    for (const journey of journeys) {
+      const list = map.get(journey.patientId) ?? []
+      list.push(journey)
+      map.set(journey.patientId, list)
+    }
+    return map
+  }, [journeys])
+
+  const patientPalById = useMemo(
+    () => new Map(patients.map((patient) => [patient.id, patient.palId])),
+    [patients],
+  )
+
+  const hasActiveJourneyResponsibilityByPatientId = useMemo(() => {
+    const map = new Map<string, boolean>()
+    if (!currentUserId || !isClinician) return map
+
+    for (const journey of journeys) {
+      if (journey.status !== 'ACTIVE') continue
+      if (journey.responsiblePhysicianUserId === null) continue
+
+      const episodeOwner = journey.episodeId
+        ? episodesById.get(journey.episodeId)?.responsibleUserId
+        : undefined
+      const patientOwner = patientPalById.get(journey.patientId)
+      const responsiblePhysicianUserId =
+        journey.responsiblePhysicianUserId ?? episodeOwner ?? patientOwner
+
+      if (responsiblePhysicianUserId === currentUserId) {
+        map.set(journey.patientId, true)
+      }
+    }
+
+    return map
+  }, [currentUserId, episodesById, isClinician, journeys, patientPalById])
 
   return (
     <>
@@ -60,7 +100,7 @@ export default function PatientTable({
           <TableRow>
             <TableCell>{t('patients.displayName')}</TableCell>
             <TableCell>{t('patients.personalNumber')}</TableCell>
-            <TableCell>{t('patients.dateOfBirth')}</TableCell>
+            <TableCell>{t('patients.age')}</TableCell>
             <TableCell>{t('patients.activeJourney')}</TableCell>
             {isClinician && <TableCell />}
           </TableRow>
@@ -76,8 +116,12 @@ export default function PatientTable({
             </TableRow>
           )}
           {visible.map((patient) => {
-            const count = activeJourneyCount(patient.id)
-            const name = latestJourneyName(patient.id)
+            const patientJourneys = journeysByPatientId.get(patient.id) ?? []
+            const isResponsiblePhysician =
+              Boolean(currentUserId) &&
+              isClinician &&
+              (patient.palId === currentUserId ||
+                hasActiveJourneyResponsibilityByPatientId.get(patient.id) === true)
             return (
               <TableRow
                 key={patient.id}
@@ -86,40 +130,63 @@ export default function PatientTable({
                 onClick={() => navigate(`/patients/${patient.id}`)}
               >
                 <TableCell>
-                  <Typography sx={{ fontWeight: 600 }} variant="body2">
-                    {patient.displayName}
-                  </Typography>
-                </TableCell>
-                <TableCell>{formatPersonnummer(patient.personalNumber)}</TableCell>
-                <TableCell>{patient.dateOfBirth}</TableCell>
-                <TableCell>
-                  {name ? (
-                    <Chip
-                      size="small"
-                      icon={<RouteIcon />}
-                      label={`${name}${count > 1 ? ` +${count - 1}` : ''}`}
-                      color={count > 0 ? 'primary' : 'default'}
-                      variant="outlined"
-                      sx={{ fontSize: 11 }}
-                    />
-                  ) : (
-                    <Typography variant="caption" color="text.secondary">
-                      {t('patients.noJourney')}
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      gap: 1,
+                      width: '100%',
+                    }}
+                  >
+                    <Typography variant="body2" fontWeight={600} sx={{ lineHeight: 1.2 }}>
+                      {patient.displayName}
                     </Typography>
-                  )}
+
+                    <Box
+                      sx={{
+                        width: 18,
+                        minWidth: 18,
+                        display: 'inline-flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                      }}
+                    >
+                      {isResponsiblePhysician && (
+                        <Tooltip title={t('patients.myResponsiblePhysician')} arrow>
+                          <BadgeIcon fontSize="small" color="primary" />
+                        </Tooltip>
+                      )}
+                    </Box>
+                  </Box>
+                </TableCell>
+                <TableCell>
+                  <PersonalNumberCopy
+                    personalNumber={patient.personalNumber}
+                    labelFormat="short"
+                    color="text.primary"
+                  />
+                </TableCell>
+                <TableCell align="center">
+                  {patient.dateOfBirth
+                    ? differenceInYears(new Date(), parseISO(patient.dateOfBirth))
+                    : '—'}
+                </TableCell>
+                <TableCell>
+                  <JourneyChips journeys={patientJourneys} journeyTemplates={journeyTemplates} />
                 </TableCell>
                 {isClinician && (
                   <TableCell align="right">
                     <Button
                       size="small"
-                      variant="outlined"
-                      startIcon={<RouteIcon />}
+                      variant="text"
+                      endIcon={<ChevronRightIcon />}
                       onClick={(e) => {
                         e.stopPropagation()
-                        onAssign({ id: patient.id, name: patient.displayName })
+                        navigate(`/patients/${patient.id}`)
                       }}
                     >
-                      {t('patients.assignJourney')}
+                      {t('patients.openView')}
                     </Button>
                   </TableCell>
                 )}

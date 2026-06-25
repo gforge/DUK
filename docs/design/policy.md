@@ -1,45 +1,69 @@
-**Policy — Expression Language and Evaluation**
+# Policy Evaluation - Flow, Grammar, and Scope
 
-![Policy Grammar](../diagrams/policy-grammar.svg)
+This page documents policy evaluation behavior.
+It intentionally excludes broad architecture overview content.
 
-![Triage Policy Sequence](../diagrams/triage-policy-sequence.svg)
+## Evaluation Flow
 
-Overview
+![Policy Evaluation Sequence](../diagrams/policy-evaluation-sequence.svg)
 
-- Policies are user-editable rules that evaluate to boolean. They are safe: implemented by a tokenizer + recursive-descent parser. No eval.
-- Location: `src/api/policyParser/` and `src/api/service/policy.ts`.
+Policy warnings are produced during case policy re-evaluation.
 
-Grammar (summary)
+Primary flow:
 
-- Primary: numeric constants (e.g. 42, 3.14), identifiers (OSS.total, PNRS_1), parenthesis.
-- Operators: `*` `/` `+` `-` (arithmetic), comparisons `== != < <= > >=`, logical `&&` `||`.
-- Example rule: `(PNRS_1 + PNRS_2) / 2 > 5 && OSS.total < 30`
+1. Collect case form responses.
+2. Build policy scope with alias support.
+3. Evaluate enabled rules for the applicable journey template.
+4. Persist `Case.policyWarnings`.
 
-Scope & identifiers
+Source modules:
 
-- The evaluation scope is a flat map of identifier → number produced by `buildPolicyScope`.
-- Scores from journeys can be aliased via `scoreAliases` and are injected into the scope (see `journeyResolver.buildPolicyScopeWithAliases`).
-- Unknown identifiers evaluate to `NaN` and render the rule as non-matching (the parser never executes arbitrary code).
+- `src/api/service/policy.ts`
+- `src/api/service/journeyResolver.ts`
 
-Rule metadata
+## Grammar Model
 
-- Each rule has `id`, `name`, `expression`, `severity` (LOW, MEDIUM, HIGH), `enabled`.
+![Policy Grammar Model](../diagrams/policy-grammar-model.svg)
 
-Evaluation flow
+Parser is a handwritten recursive-descent parser.
+No `eval()` or dynamic execution is used.
 
-1. Gather latest relevant `FormResponse`s for the case.
-2. Compute scores via `computeScores` (scoring rules on questionnaire templates).
-3. Build the numeric scope including aliased names.
-4. For each enabled policy rule: `evaluateExpression(expression, scope)` → boolean + resolvedVars.
-5. If true, create a `PolicyWarning` entry attached to the `Case` with `resolvedVars` for explanation.
+Operator classes supported by parser/tokenizer:
 
-Authoring guidance
+- Arithmetic: `+ - * /`
+- Comparison: `== != < <= > >=`
+- Logical: `&& ||`
 
-- Prefer explicit aliasing to create stable identifiers: define `scoreAliases` in the JourneyTemplateEntry (e.g. `OSS.total` → `OSS_total`) and use that alias in rules.
-- Keep rules simple and test with sample cases in the Policy Editor UI.
+Source modules:
 
-Files of interest
+- `src/api/policyParser/tokens.ts`
+- `src/api/policyParser/parser.ts`
 
-- `src/api/policyParser/tokens.ts` — tokenizer
-- `src/api/policyParser/parser.ts` — parser + evaluator
-- `src/api/service/policy.ts` — CRUD + re-evaluation
+## Alias-Aware Scope Construction
+
+![Policy Score Aliasing Flow](../diagrams/policy-score-aliasing-flow.svg)
+
+Alias mapping allows policies to use stable keys even when raw score names differ.
+Resolver logic builds a scope from latest relevant responses and journey template aliases.
+
+Source module:
+
+- `src/api/service/journeyResolver.ts`
+
+## Input Coupling From Form Submission
+
+![Form Submission Flow](../diagrams/form-submission-flow.svg)
+
+Form submission is the runtime input path into policy evaluation.
+
+Source modules:
+
+- `src/api/service/forms.ts`
+- `src/api/service/policy.ts`
+
+## Authoring Guidance
+
+- Prefer aliases with clinical meaning over raw score keys.
+- Keep expressions short and composable.
+- Handle missing values as non-matching conditions.
+- Bind policy rules to relevant `journeyTemplateId`.

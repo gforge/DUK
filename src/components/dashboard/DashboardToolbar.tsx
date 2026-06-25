@@ -1,4 +1,8 @@
-import React from 'react'
+import AccessTimeIcon from '@mui/icons-material/AccessTime'
+import HourglassEmptyIcon from '@mui/icons-material/HourglassEmpty'
+import PriorityHighIcon from '@mui/icons-material/PriorityHigh'
+import SearchIcon from '@mui/icons-material/Search'
+import SortByAlphaIcon from '@mui/icons-material/SortByAlpha'
 import {
   Box,
   Chip,
@@ -9,12 +13,9 @@ import {
   ToggleButtonGroup,
   Tooltip,
 } from '@mui/material'
-import SearchIcon from '@mui/icons-material/Search'
-import HourglassEmptyIcon from '@mui/icons-material/HourglassEmpty'
-import AccessTimeIcon from '@mui/icons-material/AccessTime'
-import PriorityHighIcon from '@mui/icons-material/PriorityHigh'
-import SortByAlphaIcon from '@mui/icons-material/SortByAlpha'
+import React from 'react'
 import { useTranslation } from 'react-i18next'
+
 import type { SortMode } from './sortCases'
 
 type PalFilter = 'all' | 'mine' | 'created_by_me'

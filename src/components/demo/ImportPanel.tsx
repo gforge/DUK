@@ -1,6 +1,6 @@
-import React from 'react'
-import { Button, Paper, TextField, Typography } from '@mui/material'
 import UploadIcon from '@mui/icons-material/Upload'
+import { Button, Paper, TextField, Typography } from '@mui/material'
+import React from 'react'
 import { useTranslation } from 'react-i18next'
 
 interface Props {

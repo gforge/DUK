@@ -1,5 +1,5 @@
-import { tokenise } from './tokens'
 import { Parser } from './parser'
+import { tokenise } from './tokens'
 
 export interface ParseError {
   ok: false

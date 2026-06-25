@@ -25,12 +25,15 @@ Then open http://localhost:5173 in your browser.
 
 Switch role from the top bar to experience each perspective:
 
-| Role                             | Description                                                    |
-| -------------------------------- | -------------------------------------------------------------- |
-| **PAL** (Patientansvarig läkare) | Full access: dashboard, triage, journal approve, policy editor |
-| **Doctor**                       | Dashboard, triage, journal approve                             |
-| **Nurse**                        | Dashboard, triage, journal view                                |
-| **Patient**                      | Patient portal: view own cases, open app, seek contact         |
+| Role          | Description                                                 |
+| ------------- | ----------------------------------------------------------- |
+| **Doctor**    | Dashboard, triage, journal approve                          |
+| **Nurse**     | Dashboard, triage, journal view                             |
+| **Secretary** | Worklist coordination, contact logistics, booking follow-up |
+| **Patient**   | Patient portal: view own cases, open app, seek contact      |
+
+`PAL` (patient-responsible physician) is modeled as an ownership assignment, not as a separate user role.
+Ownership can be set on patient level and journey level (with episode fallback).
 
 ### Dashboard
 
@@ -39,12 +42,13 @@ Switch role from the top bar to experience each perspective:
 - Search patients by name
 - Keyboard shortcut `/` to focus search, `g d` to go to Dashboard
 
-### Case Detail (4 tabs)
+### Case Detail (5 tabs)
 
 1. **Forms** — View all submitted questionnaire responses with computed scores
-2. **Triage** — Clinician decision form (next step, deadline, role assignment, patient message)
-3. **Journal** — Generate draft journal entries from templates, preview, copy, approve
-4. **Audit Log** — Full activity history per case
+2. **Journey** — View and manage assigned journeys, effective steps, and timeline
+3. **Triage** — Clinician decision form (next step, deadline, role assignment, patient message)
+4. **Journal** — Generate draft journal entries from templates, preview, copy, approve
+5. **Audit Log** — Full activity history per case
 
 ### State Machine
 
@@ -84,6 +88,17 @@ Score: {{scores.PNRS_1}}
 - **Import** a previously exported JSON state
 - **Reset & Re-seed** back to the original demo data
 
+### Worklist (`/worklist`)
+
+- Structured queue for operational follow-up tasks
+- Filters for category, assigned role, responsible-physician and ownership views
+- Completion dialog with scheduling metadata and comments
+
+### Patient Detail (`/patients/:id`)
+
+- Clinician detail page for longitudinal patient context
+- Complements list view (`/patients`) and patient self-view (`/patient`)
+
 ---
 
 ## Architecture
@@ -101,8 +116,8 @@ src/
 ├── i18n/
 │   ├── index.ts            # i18next config (sv primary, en fallback)
 │   └── locales/
-│       ├── sv.json         # Swedish translations
-│       └── en.json         # English translations
+│       ├── sv/translation.json  # Swedish translations
+│       └── en/translation.json  # English translations
 ├── store/
 │   ├── roleContext.tsx     # Global role/user switching context
 │   └── snackContext.tsx    # Global MUI Snackbar notifications
@@ -112,7 +127,7 @@ src/
 │   ├── useHotkeys.ts       # Keyboard shortcuts
 │   └── useFocusRestore.ts  # Focus restoration on back navigation
 ├── router/
-│   └── index.tsx           # React Router v6 routes
+│   └── index.tsx           # React Router v7 routes
 ├── components/
 │   ├── layout/             # AppShell, TopBar, SideNav
 │   ├── common/             # RoleSwitcher, LanguageSwitcher, StatusChip
@@ -123,7 +138,11 @@ src/
     ├── Dashboard.tsx
     ├── CaseDetail.tsx
     ├── PatientView.tsx
+    ├── Patients.tsx
+    ├── PatientDetail.tsx
     ├── PolicyEditor.tsx
+    ├── JourneyEditor.tsx
+    ├── Worklist.tsx
     └── DemoTools.tsx
 ```
 
@@ -132,18 +151,28 @@ src/
 - The English design document and PlantUML sources are in `docs/design.md` and `docs/diagrams/`.
 - Diagrams include component, state, class (ERD) and sequence diagrams that map to implementation files.
 
+### Documentation map
+
+Use this reading order for architecture and flow understanding:
+
+1. `docs/design.md` — integrated narrative with inline diagrams.
+2. `docs/design/patient-journey.md` — journey lifecycle, pause/resume, parallel deduplication.
+3. `docs/design/policy.md` — policy grammar, scope aliasing, evaluation flow.
+4. `docs/diagrams/*.puml` — source diagrams (render with `npm run diagrams:render`).
+
 ---
 
 ## Available Scripts
 
-| Command              | Description                               |
-| -------------------- | ----------------------------------------- |
-| `npm run dev`        | Start dev server at http://localhost:5173 |
-| `npm run build`      | Type-check + build for production         |
-| `npm run preview`    | Preview production build                  |
-| `npm test`           | Run all tests once                        |
-| `npm run test:watch` | Run tests in watch mode                   |
-| `npm run format`     | Format source files with Prettier         |
+| Command                 | Description                                                                                                                                   |
+| ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `npm run dev`           | Start dev server at http://localhost:5173                                                                                                     |
+| `npm run build`         | Type-check + build for production                                                                                                             |
+| `npm run preview`       | Preview production build                                                                                                                      |
+| `npm test`              | Run all tests once                                                                                                                            |
+| `npm run test:watch`    | Run tests in watch mode                                                                                                                       |
+| `npm run format`        | Format source files with Prettier                                                                                                             |
+| `npm run generate:i18n` | Extract i18n keys into `src/i18n/locales/*/translation.json` — run after adding or changing UI text; updates both `sv` and `en` locale files. |
 
 ---
 
@@ -161,12 +190,12 @@ src/
 
 ## Technology Stack
 
-- **React 18** + **TypeScript**
-- **Vite 5** — build tool
-- **MUI v6** — UI components
+- **React 19** + **TypeScript**
+- **Vite 7** — build tool
+- **MUI v7** — UI components
 - **React Hook Form v7** + **Zod** — form validation
 - **i18next** — internationalisation (sv/en)
-- **React Router v6** — client-side routing
+- **React Router v7** — client-side routing
 - **date-fns v4** — date formatting
 - **Vitest** + **@testing-library/react** — tests
 

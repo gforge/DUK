@@ -1,8 +1,9 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import {
-  parseDeadlineInput,
   isDeadlineShorthand,
-} from '../components/case/triage/parseDeadlineInput'
+  parseDeadlineInput,
+} from '@/components/case/triage/parseDeadlineInput'
 
 // Fix "today" to 2026-02-25 (Wednesday) for deterministic output
 const FIXED_NOW = new Date('2026-02-25T12:00:00Z').getTime()

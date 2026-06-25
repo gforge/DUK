@@ -4,15 +4,17 @@
  * unaffected; only downloaded when the user requests the large seed.
  */
 
-import type { AppState, Case, Patient, PatientJourney, AuditEvent } from './schemas'
+import type { AppState, AuditEvent, Case, EpisodeOfCare, Patient, PatientJourney } from './schemas'
 import { SEED_STATE } from './seed'
+import type { Cohort } from './seed/seedHelpers'
 import {
-  TRIGGERS,
-  PAL_IDS,
+  categoryFromDaysAgo,
   isoDateOffset as isoDate,
   isoTsOffset as isoTs,
+  PAL_IDS,
+  TRIGGERS,
 } from './seed/seedHelpers'
-import type { Cohort } from './seed/seedHelpers'
+import { ensureAllUsers } from './utils/userGenerator'
 
 // Placement cohorts — same shape as seedRealistic, scaled up
 
@@ -51,6 +53,7 @@ export async function buildFakerSeed(): Promise<AppState> {
   const patients: Patient[] = []
   const cases: Case[] = []
   const journeys: PatientJourney[] = []
+  const episodes: EpisodeOfCare[] = []
   const auditEvents: AuditEvent[] = []
 
   let idx = 0
@@ -99,10 +102,71 @@ export async function buildFakerSeed(): Promise<AppState> {
         createdAt,
       })
 
+      // Decide a nextStep for cases that are TRIAGED or FOLLOWING_UP so they become worklist-eligible
+      let nextStep: Case['nextStep'] | undefined = undefined
+      if (status === 'TRIAGED' || status === 'FOLLOWING_UP') {
+        const STEPS: Case['nextStep'][] = [
+          'DOCTOR_VISIT',
+          'NURSE_VISIT',
+          'PHYSIO_VISIT',
+          'PHONE_CALL',
+          'DIGITAL_CONTROL',
+        ]
+        nextStep = faker.helpers.arrayElement(STEPS)
+      }
+
+      const triageDecision =
+        nextStep === 'DOCTOR_VISIT'
+          ? {
+              contactMode: 'VISIT' as const,
+              careRole: 'DOCTOR' as const,
+              assignmentMode: 'ANY' as const,
+              assignedUserId: null,
+              dueAt: null,
+              note: null,
+            }
+          : nextStep === 'NURSE_VISIT'
+            ? {
+                contactMode: 'VISIT' as const,
+                careRole: 'NURSE' as const,
+                assignmentMode: 'ANY' as const,
+                assignedUserId: null,
+                dueAt: null,
+                note: null,
+              }
+            : nextStep === 'PHYSIO_VISIT'
+              ? {
+                  contactMode: 'VISIT' as const,
+                  careRole: 'PHYSIO' as const,
+                  assignmentMode: 'ANY' as const,
+                  assignedUserId: null,
+                  dueAt: null,
+                  note: null,
+                }
+              : nextStep === 'PHONE_CALL'
+                ? {
+                    contactMode: 'PHONE' as const,
+                    careRole: 'NURSE' as const,
+                    assignmentMode: 'ANY' as const,
+                    assignedUserId: null,
+                    dueAt: null,
+                    note: null,
+                  }
+                : nextStep === 'DIGITAL_CONTROL'
+                  ? {
+                      contactMode: 'DIGITAL' as const,
+                      careRole: 'NURSE' as const,
+                      assignmentMode: 'ANY' as const,
+                      assignedUserId: null,
+                      dueAt: null,
+                      note: null,
+                    }
+                  : undefined
+
       cases.push({
         id: caseId,
         patientId: pid,
-        category: 'CONTROL', // static fallback; dashboard derives category via journey
+        category: categoryFromDaysAgo(cohort.startDaysAgo),
         status: status as Case['status'],
         triggers: triggers as Case['triggers'],
         policyWarnings: [],
@@ -110,12 +174,34 @@ export async function buildFakerSeed(): Promise<AppState> {
         createdAt,
         scheduledAt: createdAt,
         lastActivityAt: isoTs(-faker.number.int({ min: 0, max: 5 })),
+        reviews: [],
+        nextStep,
+        triageDecision,
+      })
+
+      const epId = `fe-${idx}`
+
+      episodes.push({
+        id: epId,
+        patientId: pid,
+        label: isComplex ? 'Komplex frakturuppföljning' : 'Standarduppföljning fraktur',
+        clinicalArea: 'Ortopedi',
+        status: 'OPEN',
+        openedAt: createdAt,
+        closedAt: null,
+        responsibleUserId: palId,
+        primaryCaseId: caseId,
+        createdAt,
+        updatedAt: createdAt,
       })
 
       journeys.push({
         id: jid,
+        episodeId: epId,
         patientId: pid,
         journeyTemplateId,
+        phaseType: 'FOLLOWUP',
+        joinedAt: startDate,
         startDate,
         status: 'ACTIVE',
         researchModuleIds: [],
@@ -139,13 +225,19 @@ export async function buildFakerSeed(): Promise<AppState> {
     }
   }
 
-  return {
+  const baseState = {
     ...SEED_STATE,
     patients,
     cases,
     formResponses: [],
     journalDrafts: [],
+    episodesOfCare: episodes,
     patientJourneys: journeys,
     auditEvents,
+  }
+
+  return {
+    ...baseState,
+    users: ensureAllUsers(baseState),
   }
 }

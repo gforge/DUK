@@ -1,8 +1,8 @@
-import React from 'react'
-import { Box, Button, Divider, Paper, Stack, Typography } from '@mui/material'
-import RestoreIcon from '@mui/icons-material/Restore'
-import PeopleIcon from '@mui/icons-material/People'
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome'
+import PeopleIcon from '@mui/icons-material/People'
+import RestoreIcon from '@mui/icons-material/Restore'
+import { Button, Divider, Paper, Stack, Typography } from '@mui/material'
+import React from 'react'
 import { useTranslation } from 'react-i18next'
 
 export type ConfirmAction =
@@ -18,31 +18,28 @@ interface Props {
   onSeedAction: (action: ConfirmAction) => void
 }
 
-export default function SeedPanel({ loading, onSeedAction }: Props) {
+export default function SeedPanel({ loading, onSeedAction }: Readonly<Props>) {
   const { t } = useTranslation()
 
   return (
     <Paper variant="outlined" sx={{ borderRadius: 2, p: 2.5, mb: 3 }}>
-      <Typography sx={{ fontWeight: 600 }} variant="subtitle1" gutterBottom>
+      <Typography variant="subtitle1" fontWeight={600} gutterBottom>
         {t('demoTools.resetTitle')}
       </Typography>
       <Typography variant="body2" color="text.secondary" gutterBottom>
         {t('demoTools.resetDescription')}
       </Typography>
 
-      <Typography
-        sx={{ display: 'block', mt: 2, mb: 0.5 }}
-        variant="caption"
-        color="text.secondary"
-      >
+      <Typography variant="caption" color="text.secondary" display="block" sx={{ mt: 2, mb: 0.5 }}>
         {t('demoTools.seedPresetsLabel')}
       </Typography>
-      <Stack sx={{ flexWrap: 'wrap', mb: 2 }} direction="row" spacing={1}>
+      <Stack direction="row" flexWrap="wrap" sx={{ mb: 2, rowGap: 1.5, columnGap: 1.5 }}>
         <Button
           variant="outlined"
           startIcon={<RestoreIcon />}
           onClick={() => onSeedAction('reseed-minimal')}
           disabled={loading}
+          sx={{ width: { xs: '100%', sm: 'auto' }, whiteSpace: 'normal', textTransform: 'none' }}
         >
           {t('demoTools.reseedMinimal')}
         </Button>
@@ -52,6 +49,7 @@ export default function SeedPanel({ loading, onSeedAction }: Props) {
           startIcon={<PeopleIcon />}
           onClick={() => onSeedAction('reseed-realistic')}
           disabled={loading}
+          sx={{ width: { xs: '100%', sm: 'auto' }, whiteSpace: 'normal', textTransform: 'none' }}
         >
           {t('demoTools.reseedRealistic')}
         </Button>
@@ -61,6 +59,7 @@ export default function SeedPanel({ loading, onSeedAction }: Props) {
           startIcon={<AutoAwesomeIcon />}
           onClick={() => onSeedAction('reseed-faker')}
           disabled={loading}
+          sx={{ width: { xs: '100%', sm: 'auto' }, whiteSpace: 'normal', textTransform: 'none' }}
         >
           {t('demoTools.reseedFaker')}
         </Button>
@@ -68,7 +67,7 @@ export default function SeedPanel({ loading, onSeedAction }: Props) {
 
       <Divider sx={{ my: 1.5 }} />
 
-      <Typography sx={{ display: 'block', mb: 0.5 }} variant="caption" color="text.secondary">
+      <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 0.5 }}>
         {t('demoTools.clearDataLabel')}
       </Typography>
       <Button
@@ -76,6 +75,7 @@ export default function SeedPanel({ loading, onSeedAction }: Props) {
         color="error"
         onClick={() => onSeedAction('reset')}
         disabled={loading}
+        sx={{ mt: 2 }}
       >
         {t('demoTools.reset')}
       </Button>

@@ -1,5 +1,6 @@
-import { describe, it, expect } from 'vitest'
-import { evaluateExpression, validateExpression } from '../api/policyParser'
+import { describe, expect,it } from 'vitest'
+
+import { evaluateExpression, validateExpression } from '@/api/policyParser'
 
 describe('validateExpression', () => {
   it('accepts valid simple comparison', () => {

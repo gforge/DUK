@@ -1,5 +1,13 @@
-import React from 'react'
+import AssignmentIcon from '@mui/icons-material/Assignment'
+import BuildIcon from '@mui/icons-material/Build'
+import DashboardIcon from '@mui/icons-material/Dashboard'
+import PolicyIcon from '@mui/icons-material/GppMaybe'
+import PeopleIcon from '@mui/icons-material/People'
+import PersonIcon from '@mui/icons-material/Person'
+import RouteIcon from '@mui/icons-material/Route'
 import {
+  Box,
+  Divider,
   Drawer,
   List,
   ListItem,
@@ -7,19 +15,16 @@ import {
   ListItemIcon,
   ListItemText,
   Toolbar,
-  Divider,
-  Box,
+  Typography,
 } from '@mui/material'
-import DashboardIcon from '@mui/icons-material/Dashboard'
-import PolicyIcon from '@mui/icons-material/GppMaybe'
-import BuildIcon from '@mui/icons-material/Build'
-import PersonIcon from '@mui/icons-material/Person'
-import PeopleIcon from '@mui/icons-material/People'
-import RouteIcon from '@mui/icons-material/Route'
-import AssignmentIcon from '@mui/icons-material/Assignment'
-import { useNavigate, useLocation } from 'react-router-dom'
+import React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useRole } from '../../store/roleContext'
+import { useLocation, useNavigate } from 'react-router-dom'
+
+import { useNavItems } from '@/hooks/useNavItems'
+import { useRole } from '@/store/roleContext'
+
+import { version } from '../../../package.json'
 
 interface SideNavProps {
   drawerWidth: number
@@ -28,56 +33,27 @@ interface SideNavProps {
   isMobile: boolean
 }
 
-export default function SideNav({ drawerWidth, mobileOpen, onClose, isMobile }: SideNavProps) {
+export default function SideNav({
+  drawerWidth,
+  mobileOpen,
+  onClose,
+  isMobile,
+}: Readonly<SideNavProps>) {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const location = useLocation()
   const { isRole } = useRole()
+  const { navItems } = useNavItems()
 
-  const navItems = [
-    {
-      label: t('nav.dashboard'),
-      icon: <DashboardIcon />,
-      path: '/dashboard',
-      roles: ['NURSE', 'DOCTOR', 'PAL'] as const,
-    },
-    {
-      label: t('patient.title'),
-      icon: <PersonIcon />,
-      path: '/patient',
-      roles: ['PATIENT'] as const,
-    },
-    {
-      label: t('nav.worklist'),
-      icon: <AssignmentIcon />,
-      path: '/worklist',
-      roles: ['NURSE', 'DOCTOR', 'PAL'] as const,
-    },
-    {
-      label: t('nav.policy'),
-      icon: <PolicyIcon />,
-      path: '/policy',
-      roles: ['NURSE', 'DOCTOR', 'PAL'] as const,
-    },
-    {
-      label: t('nav.patients'),
-      icon: <PeopleIcon />,
-      path: '/patients',
-      roles: ['NURSE', 'DOCTOR', 'PAL'] as const,
-    },
-    {
-      label: t('nav.journeys'),
-      icon: <RouteIcon />,
-      path: '/journeys',
-      roles: ['NURSE', 'DOCTOR', 'PAL'] as const,
-    },
-    {
-      label: t('nav.demoTools'),
-      icon: <BuildIcon />,
-      path: '/demo-tools',
-      roles: ['NURSE', 'DOCTOR', 'PAL', 'PATIENT'] as const,
-    },
-  ]
+  const pathIcons: Record<string, React.ReactNode> = {
+    '/dashboard': <DashboardIcon />,
+    '/patient': <PersonIcon />,
+    '/worklist': <AssignmentIcon />,
+    '/policy': <PolicyIcon />,
+    '/patients': <PeopleIcon />,
+    '/journeys': <RouteIcon />,
+    '/demo-tools': <BuildIcon />,
+  }
 
   const handleNav = (path: string) => {
     navigate(path)
@@ -85,7 +61,7 @@ export default function SideNav({ drawerWidth, mobileOpen, onClose, isMobile }: 
   }
 
   const drawerContent = (
-    <Box>
+    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <Toolbar sx={{ minHeight: 56 }} />
       <Divider />
       <List component="nav" aria-label={t('common.mainNavigation')}>
@@ -101,7 +77,7 @@ export default function SideNav({ drawerWidth, mobileOpen, onClose, isMobile }: 
                 aria-current={active ? 'page' : undefined}
               >
                 <ListItemIcon sx={{ minWidth: 36, color: active ? 'primary.main' : 'inherit' }}>
-                  {item.icon}
+                  {pathIcons[item.path]}
                 </ListItemIcon>
                 <ListItemText
                   primary={item.label}
@@ -112,6 +88,11 @@ export default function SideNav({ drawerWidth, mobileOpen, onClose, isMobile }: 
           )
         })}
       </List>
+      <Box sx={{ mt: 'auto', px: 2, py: 1.5 }}>
+        <Typography variant="caption" sx={{ color: 'text.disabled' }}>
+          v{version}
+        </Typography>
+      </Box>
     </Box>
   )
 

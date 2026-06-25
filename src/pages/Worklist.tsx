@@ -1,432 +1,140 @@
-import React, { useMemo, useCallback } from 'react'
-import {
-  Box,
-  Typography,
-  Stack,
-  Chip,
-  Paper,
-  Divider,
-  Button,
-  Tooltip,
-  IconButton,
-  Alert,
-  Skeleton,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-} from '@mui/material'
-import OpenInNewIcon from '@mui/icons-material/OpenInNew'
-import PlayArrowIcon from '@mui/icons-material/PlayArrow'
-import CalendarMonthIcon from '@mui/icons-material/CalendarMonth'
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutlineOutlined'
-import ContentCopyIcon from '@mui/icons-material/ContentCopy'
+import { Alert, Box, Skeleton, Stack } from '@mui/material'
+import React, { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useNavigate } from 'react-router-dom'
-import { useApi } from '../hooks/useApi'
-import { useRole } from '../store/roleContext'
-import { useSnack } from '../store/snackContext'
-import * as client from '../api/client'
-import StatusChip from '../components/common/StatusChip'
-import DeadlineLabel from '../components/common/DeadlineLabel'
-import type { Case, Patient, Role, NextStep } from '../api/schemas'
-import { formatPersonnummer } from '../api/utils/personnummer'
 
-/** Roles that can be used to filter assignments */
-const FILTER_ROLES: Role[] = ['NURSE', 'DOCTOR', 'PAL']
+import * as client from '@/api/client'
+import type { CareRole, WorkCategory } from '@/api/schemas'
+import {
+  CompletedSection,
+  GroupSection,
+  WorklistFilters,
+  WorklistHeader,
+} from '@/components/worklist'
+import { useApi } from '@/hooks/useApi'
+import { useWorklistQueue, WORKLIST_CATEGORY_ORDER } from '@/hooks/useWorklistQueue'
+import { useRole } from '@/store/roleContext'
+import { useSnack } from '@/store/snackContext'
 
-/** Next-step values that appear in the worklist */
-const NEXT_STEP_ORDER: NextStep[] = [
-  'DOCTOR_VISIT',
-  'NURSE_VISIT',
-  'PHYSIO_VISIT',
-  'PHONE_CALL',
-  'DIGITAL_CONTROL',
-]
+type CategoryFilter = 'ALL' | WorkCategory
+type CareRoleFilter = 'ALL' | Exclude<CareRole, null>
 
-/** Steps that require scheduling an appointment */
-const BOOKABLE_STEPS: NextStep[] = ['DOCTOR_VISIT', 'NURSE_VISIT', 'PHYSIO_VISIT', 'PHONE_CALL']
-
-interface WorklistRowProps {
-  caseData: Case
-  patient: Patient | undefined
-  onBook: (caseId: string, scheduledAt?: string) => void
-  onMarkInProgress: (caseId: string) => void
-  onMarkDone: (caseId: string) => void
-}
-
-function WorklistRow({
-  caseData,
-  patient,
-  onBook,
-  onMarkInProgress,
-  onMarkDone,
-}: WorklistRowProps) {
+export function Worklist() {
   const { t } = useTranslation()
-  const navigate = useNavigate()
-  const [dialogOpen, setDialogOpen] = React.useState(false)
-  const [scheduledAt, setScheduledAt] = React.useState('')
-  const [copied, setCopied] = React.useState(false)
-
-  const isBookable = caseData.nextStep ? BOOKABLE_STEPS.includes(caseData.nextStep) : false
-  const isTriaged = caseData.status === 'TRIAGED'
-  const isFollowingUp = caseData.status === 'FOLLOWING_UP'
-
-  function handleCopyPnr() {
-    if (patient?.personalNumber) {
-      navigator.clipboard.writeText(patient.personalNumber)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
-    }
-  }
-
-  function handleConfirmBooking() {
-    const iso = scheduledAt ? new Date(scheduledAt).toISOString() : undefined
-    onBook(caseData.id, iso)
-    setDialogOpen(false)
-    setScheduledAt('')
-  }
-
-  return (
-    <Box
-      sx={{
-        px: 2,
-        py: 1.5,
-        display: 'grid',
-        gridTemplateColumns: { xs: '1fr', sm: '2fr 1.5fr 1fr auto' },
-        gap: 1,
-        alignItems: 'center',
-        '&:hover': { bgcolor: 'action.hover' },
-      }}
-    >
-      {/* Patient + status */}
-      <Stack sx={{ gap: 0.25 }}>
-        <Typography sx={{ fontWeight: 600 }} variant="body2">
-          {patient?.displayName ?? caseData.patientId}
-        </Typography>
-        <Stack sx={{ gap: 1, alignItems: 'center', flexWrap: 'wrap' }} direction="row">
-          <StatusChip status={caseData.status} size="small" />
-          {caseData.assignedRole && (
-            <Chip
-              label={t(`role.${caseData.assignedRole}`)}
-              size="small"
-              variant="outlined"
-              sx={{ height: 20, fontSize: 11 }}
-            />
-          )}
-        </Stack>
-      </Stack>
-
-      {/* Deadline */}
-      <Box>
-        {caseData.deadline ? (
-          <DeadlineLabel deadline={caseData.deadline} />
-        ) : (
-          <Typography variant="caption" color="text.disabled">
-            {t('worklist.noDeadline')}
-          </Typography>
-        )}
-      </Box>
-
-      {/* Internal note excerpt */}
-      <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
-        {caseData.internalNote ? (
-          <Typography
-            variant="caption"
-            color="text.secondary"
-            sx={{
-              display: '-webkit-box',
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: 'vertical',
-              overflow: 'hidden',
-            }}
-          >
-            {caseData.internalNote}
-          </Typography>
-        ) : null}
-      </Box>
-
-      {/* Actions */}
-      <Stack sx={{ gap: 0.5, justifyContent: 'flex-end', alignItems: 'center' }} direction="row">
-        {/* TRIAGED + bookable → Boka dialog */}
-        {isTriaged && isBookable && (
-          <Button
-            size="small"
-            variant="contained"
-            startIcon={<CalendarMonthIcon />}
-            onClick={() => setDialogOpen(true)}
-            sx={{ fontSize: 12, whiteSpace: 'nowrap' }}
-          >
-            {t('worklist.book')}
-          </Button>
-        )}
-
-        {/* TRIAGED + non-bookable (DIGITAL_CONTROL) → Påbörja → FOLLOWING_UP */}
-        {isTriaged && !isBookable && (
-          <Button
-            size="small"
-            variant="outlined"
-            startIcon={<PlayArrowIcon />}
-            onClick={() => onMarkInProgress(caseData.id)}
-            sx={{ fontSize: 12, whiteSpace: 'nowrap' }}
-          >
-            {t('worklist.markInProgress')}
-          </Button>
-        )}
-
-        {/* FOLLOWING_UP → Avklarad → CLOSED */}
-        {isFollowingUp && (
-          <Button
-            size="small"
-            variant="contained"
-            color="success"
-            startIcon={<CheckCircleOutlineIcon />}
-            onClick={() => onMarkDone(caseData.id)}
-            sx={{ fontSize: 12, whiteSpace: 'nowrap' }}
-          >
-            {t('worklist.markDone')}
-          </Button>
-        )}
-
-        <Tooltip title={t('worklist.openCase')}>
-          <IconButton size="small" onClick={() => navigate(`/cases/${caseData.id}`)}>
-            <OpenInNewIcon fontSize="small" />
-          </IconButton>
-        </Tooltip>
-      </Stack>
-
-      {/* Booking dialog */}
-      <Dialog
-        maxWidth="xs"
-        open={dialogOpen}
-        onClose={() => setDialogOpen(false)}
-        fullWidth
-      >
-        <DialogTitle>
-          {t('worklist.bookDialogTitle', { name: patient?.displayName ?? caseData.patientId })}
-        </DialogTitle>
-        <DialogContent>
-          <Stack sx={{ gap: 2, pt: 1 }}>
-            {patient?.personalNumber && (
-              <Stack sx={{ alignItems: 'center', gap: 1 }} direction="row">
-                <Typography variant="body2" color="text.secondary" sx={{ minWidth: 110 }}>
-                  {t('worklist.pnr')}
-                </Typography>
-                <Typography sx={{ fontWeight: 600, fontFamily: 'monospace' }} variant="body2">
-                  {formatPersonnummer(patient.personalNumber)}
-                </Typography>
-                <Tooltip title={copied ? t('worklist.copiedPnr') : t('worklist.copyPnr')}>
-                  <IconButton size="small" onClick={handleCopyPnr}>
-                    <ContentCopyIcon fontSize="small" color={copied ? 'success' : 'inherit'} />
-                  </IconButton>
-                </Tooltip>
-              </Stack>
-            )}
-            {caseData.internalNote && (
-              <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
-                {caseData.internalNote}
-              </Typography>
-            )}
-            <TextField
-              label={t('worklist.scheduledAt')}
-              type="datetime-local"
-              size="small"
-              value={scheduledAt}
-              onChange={(e) => setScheduledAt(e.target.value)}
-              slotProps={{ inputLabel: { shrink: true } }}
-            />
-          </Stack>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDialogOpen(false)}>{t('common.cancel')}</Button>
-          <Button variant="contained" onClick={handleConfirmBooking} disabled={!scheduledAt}>
-            {t('worklist.confirmBooking')}
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </Box>
-  )
-}
-
-interface GroupSectionProps {
-  nextStep: NextStep
-  cases: Case[]
-  patientMap: Map<string, Patient>
-  onBook: (caseId: string, scheduledAt?: string) => void
-  onMarkInProgress: (caseId: string) => void
-  onMarkDone: (caseId: string) => void
-}
-
-function GroupSection({
-  nextStep,
-  cases,
-  patientMap,
-  onBook,
-  onMarkInProgress,
-  onMarkDone,
-}: GroupSectionProps) {
-  const { t } = useTranslation()
-
-  return (
-    <Paper variant="outlined" sx={{ borderRadius: 2, overflow: 'hidden', mb: 2 }}>
-      {/* Group header */}
-      <Stack
-        sx={{ alignItems: 'center', gap: 1, px: 2, py: 1, bgcolor: 'action.selected' }}
-        direction="row"
-      >
-        <Typography sx={{ fontWeight: 700 }} variant="subtitle2">
-          {t(`nextStep.${nextStep}`)}
-        </Typography>
-        <Chip label={cases.length} size="small" color="default" />
-      </Stack>
-
-      {cases.length === 0 ? (
-        <Box sx={{ px: 2, py: 1.5 }}>
-          <Typography variant="body2" color="text.secondary">
-            {t('worklist.emptyGroup')}
-          </Typography>
-        </Box>
-      ) : (
-        cases.map((c, idx) => (
-          <React.Fragment key={c.id}>
-            <WorklistRow
-              caseData={c}
-              patient={patientMap.get(c.patientId)}
-              onBook={onBook}
-              onMarkInProgress={onMarkInProgress}
-              onMarkDone={onMarkDone}
-            />
-            {idx < cases.length - 1 && <Divider />}
-          </React.Fragment>
-        ))
-      )}
-    </Paper>
-  )
-}
-
-export default function Worklist() {
-  const { t } = useTranslation()
-  const { currentUser, isRole } = useRole()
+  const { currentUser } = useRole()
   const { showSnack } = useSnack()
 
-  const [roleFilter, setRoleFilter] = React.useState<Role | null>(
-    !isRole('PATIENT') ? (currentUser.role as Role) : null,
-  )
+  const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>('ALL')
+  const [careRoleFilter, setCareRoleFilter] = useState<CareRoleFilter>('ALL')
+  const [palOnly, setPalOnly] = useState(false)
+  const [claimedByMe, setClaimedByMe] = useState(false)
+  const [myPatientsOnly, setMyPatientsOnly] = useState(false)
+  const [completedExpanded, setCompletedExpanded] = useState(false)
 
   const {
     data: cases,
     loading: casesLoading,
     error: casesError,
     refetch: refetchCases,
-  } = useApi(() => client.getWorklistCases(), [])
+  } = useApi(() => client.getCases(), [])
 
   const { data: patients, loading: patientsLoading } = useApi(() => client.getPatients(), [])
+  const { data: users, loading: usersLoading } = useApi(() => client.getUsers(), [])
 
-  const patientMap = useMemo<Map<string, Patient>>(() => {
-    if (!patients) return new Map()
-    return new Map(patients.map((p) => [p.id, p]))
-  }, [patients])
+  const userMap = React.useMemo(() => new Map((users ?? []).map((u) => [u.id, u.name])), [users])
 
-  const filteredCases = useMemo(() => {
-    if (!cases) return []
-    if (!roleFilter) return cases
-    return cases.filter((c) => c.assignedRole === roleFilter)
-  }, [cases, roleFilter])
-
-  const groupedCases = useMemo(() => {
-    return NEXT_STEP_ORDER.map((nextStep) => ({
-      nextStep,
-      cases: filteredCases.filter((c) => c.nextStep === nextStep),
-    })).filter((g) => g.cases.length > 0)
-  }, [filteredCases])
-
-  const handleBook = useCallback(
-    async (caseId: string, scheduledAt?: string) => {
-      try {
-        if (scheduledAt) {
-          const c = cases?.find((x) => x.id === caseId)
-          await client.createBooking(
-            caseId,
-            {
-              id: `${caseId}-${Date.now()}`,
-              type: c?.nextStep ?? 'NURSE_VISIT',
-              scheduledAt,
-              createdByUserId: currentUser.id,
-              createdAt: new Date().toISOString(),
-            },
-            currentUser.id,
-            currentUser.role,
-          )
-        }
-        await client.advanceCaseStatus(caseId, 'FOLLOWING_UP', currentUser.id, currentUser.role)
-        showSnack(t('worklist.bookSuccess'), 'success')
-        refetchCases()
-      } catch (err) {
-        showSnack(t('common.error') + ': ' + String(err), 'error')
-      }
+  const {
+    patientMap,
+    activeGroupedCases,
+    monitoringGroupedCases,
+    completedGroupedCases,
+    activeCount,
+    monitoringCount,
+    completedCount,
+    highlightedCaseIds,
+    pulseCount,
+    pulseCompletedCount,
+  } = useWorklistQueue({
+    cases: cases ?? [],
+    patients: patients ?? [],
+    currentUserId: currentUser.id,
+    filters: {
+      categoryFilter,
+      careRoleFilter,
+      palOnly,
+      claimedByMe,
+      myPatientsOnly,
     },
-    [cases, currentUser, showSnack, t, refetchCases],
-  )
+  })
 
-  const handleMarkInProgress = useCallback(
+  const loading = casesLoading || patientsLoading || usersLoading
+  const isInitialLoading = loading && (!cases || !patients || !users)
+
+  const handleClaim = useCallback(
     async (caseId: string) => {
       try {
-        await client.advanceCaseStatus(caseId, 'FOLLOWING_UP', currentUser.id, currentUser.role)
-        showSnack(t('triage.followUp'), 'success')
+        await client.claimCaseAssignment(caseId, currentUser.id, currentUser.role)
+        showSnack(t('worklist.claimSuccess'), 'success')
         refetchCases()
       } catch (err) {
         showSnack(t('common.error') + ': ' + String(err), 'error')
       }
     },
-    [currentUser, showSnack, t, refetchCases],
+    [currentUser, refetchCases, showSnack, t],
   )
 
   const handleMarkDone = useCallback(
-    async (caseId: string) => {
+    async (
+      caseId: string,
+      options?: {
+        bookingId?: string
+        followUpDate?: string
+        completionComment?: string
+      },
+    ) => {
       try {
-        await client.advanceCaseStatus(caseId, 'CLOSED', currentUser.id, currentUser.role)
+        const worklistCase = cases?.find((c) => c.id === caseId)
+        if (!worklistCase) throw new Error(`Case ${caseId} not found`)
+
+        if (worklistCase.status === 'TRIAGED') {
+          await client.advanceCaseStatus(caseId, 'FOLLOWING_UP', currentUser.id, currentUser.role)
+        }
+
+        await client.completeWorklistCase(caseId, currentUser.id, currentUser.role, options)
         showSnack(t('worklist.doneSuccess'), 'success')
         refetchCases()
       } catch (err) {
         showSnack(t('common.error') + ': ' + String(err), 'error')
       }
     },
-    [currentUser, showSnack, t, refetchCases],
+    [cases, currentUser, refetchCases, showSnack, t],
   )
 
-  const loading = casesLoading || patientsLoading
-
   return (
-    <Box>
-      <Typography sx={{ fontWeight: 700, mb: 0.5 }} variant="h5">
-        {t('worklist.title')}
-      </Typography>
-      <Typography sx={{ mb: 2 }} variant="body2" color="text.secondary">
-        {t('worklist.subtitle')}
-      </Typography>
+    <Box sx={{ bgcolor: 'background.default' }}>
+      <WorklistHeader
+        activeCount={activeCount}
+        monitoringCount={monitoringCount}
+        completedCount={completedCount}
+        pulseCount={pulseCount}
+        pulseCompletedCount={pulseCompletedCount}
+      />
 
-      {/* Role filter chips */}
-      <Stack sx={{ gap: 1, mb: 3, flexWrap: 'wrap' }} direction="row">
-        <Chip
-          label={t('worklist.filterAll')}
-          variant={roleFilter === null ? 'filled' : 'outlined'}
-          color={roleFilter === null ? 'primary' : 'default'}
-          onClick={() => setRoleFilter(null)}
-        />
-        {FILTER_ROLES.map((r) => (
-          <Chip
-            key={r}
-            label={t(`role.${r}`)}
-            variant={roleFilter === r ? 'filled' : 'outlined'}
-            color={roleFilter === r ? 'primary' : 'default'}
-            onClick={() => setRoleFilter(r)}
-          />
-        ))}
-      </Stack>
+      <WorklistFilters
+        categoryOrder={WORKLIST_CATEGORY_ORDER}
+        categoryFilter={categoryFilter}
+        careRoleFilter={careRoleFilter}
+        palOnly={palOnly}
+        claimedByMe={claimedByMe}
+        myPatientsOnly={myPatientsOnly}
+        onCategoryFilterChange={setCategoryFilter}
+        onCareRoleFilterChange={setCareRoleFilter}
+        onPalOnlyToggle={() => setPalOnly((v) => !v)}
+        onClaimedByMeToggle={() => setClaimedByMe((v) => !v)}
+        onMyPatientsOnlyToggle={() => setMyPatientsOnly((v) => !v)}
+      />
 
-      {loading && (
-        <Stack sx={{ gap: 2 }}>
+      {isInitialLoading && (
+        <Stack gap={2}>
           {[1, 2, 3].map((i) => (
             <Skeleton key={i} variant="rectangular" height={80} sx={{ borderRadius: 2 }} />
           ))}
@@ -439,23 +147,73 @@ export default function Worklist() {
         </Alert>
       )}
 
-      {!loading && !casesError && groupedCases.length === 0 && (
+      {!isInitialLoading && !casesError && activeGroupedCases.length === 0 && (
         <Alert severity="info">{t('worklist.empty')}</Alert>
       )}
 
-      {!loading &&
+      {!isInitialLoading &&
         !casesError &&
-        groupedCases.map((g) => (
+        activeGroupedCases.map((g) => (
           <GroupSection
-            key={g.nextStep}
-            nextStep={g.nextStep}
+            key={g.workCategory}
+            workCategory={g.workCategory}
             cases={g.cases}
             patientMap={patientMap}
-            onBook={handleBook}
-            onMarkInProgress={handleMarkInProgress}
+            userMap={userMap}
+            highlightedCaseIds={highlightedCaseIds}
+            defaultExpanded={g.cases.length <= 6}
+            onClaim={handleClaim}
             onMarkDone={handleMarkDone}
           />
         ))}
+
+      {!isInitialLoading && !casesError && monitoringCount > 0 && (
+        <Box sx={{ mt: 2.5 }}>
+          <Stack direction="row" alignItems="center" gap={1} mb={0.5}>
+            <Alert severity="warning" icon={false} sx={{ py: 0, px: 1 }}>
+              {t('worklist.monitoringSectionTitle')} ({monitoringCount})
+            </Alert>
+          </Stack>
+          <Alert severity="info" sx={{ mb: 1.5 }}>
+            {t('worklist.monitoringSectionHint')}
+          </Alert>
+          {monitoringGroupedCases.map((g) => (
+            <GroupSection
+              key={`monitoring-${g.workCategory}`}
+              workCategory={g.workCategory}
+              cases={g.cases}
+              patientMap={patientMap}
+              userMap={userMap}
+              highlightedCaseIds={highlightedCaseIds}
+              defaultExpanded={false}
+              onClaim={handleClaim}
+              onMarkDone={handleMarkDone}
+            />
+          ))}
+        </Box>
+      )}
+
+      {!isInitialLoading && !casesError && completedCount > 0 && (
+        <CompletedSection
+          expanded={completedExpanded}
+          onToggle={setCompletedExpanded}
+          count={completedCount}
+        >
+          {completedGroupedCases.map((g) => (
+            <GroupSection
+              key={`completed-${g.workCategory}`}
+              workCategory={g.workCategory}
+              cases={g.cases}
+              patientMap={patientMap}
+              userMap={userMap}
+              highlightedCaseIds={highlightedCaseIds}
+              defaultExpanded={false}
+              onClaim={handleClaim}
+              onMarkDone={handleMarkDone}
+            />
+          ))}
+        </CompletedSection>
+      )}
     </Box>
   )
 }

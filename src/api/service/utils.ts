@@ -1,13 +1,12 @@
-import { getStore } from '../storage'
 import { evaluateExpression } from '../policyParser'
 import type {
   AppState,
   AuditEvent,
-  Role,
-  QuestionnaireTemplate,
+  FormResponse,
   PolicyRule,
   PolicyWarning,
-  FormResponse,
+  QuestionnaireTemplate,
+  Role,
 } from '../schemas'
 
 export function uuid(): string {
@@ -65,6 +64,14 @@ export function evaluatePolicyRules(
     }
   }
   return warnings
+}
+
+export function normalizeIsoDateTime(value: unknown): string | null {
+  if (typeof value !== 'string' || !value) return null
+  if (value.includes('T')) return value
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return null
+  return date.toISOString()
 }
 
 export function addAuditEvent(

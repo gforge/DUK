@@ -1,10 +1,9 @@
+import { Box, Chip, Stack, Typography } from '@mui/material'
 import React from 'react'
-import { Box, Chip, Stack, Typography, Divider } from '@mui/material'
 import { useTranslation } from 'react-i18next'
-import type { Case } from '../../../api/schemas'
-import StatusChip from '../../common/StatusChip'
-import TriggerChips from '../../common/TriggerChips'
-import AutoWarningsBadge from '../../common/AutoWarningsBadge'
+
+import type { Case } from '@/api/schemas'
+import { AutoWarningsBadge, StatusChip, TriggerChips } from '@/components/common'
 
 interface Props {
   caseData: Case

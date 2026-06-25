@@ -1,5 +1,6 @@
 import { defineConfig } from 'i18next-cli'
 
+// eslint-disable-next-line import/no-default-export
 export default defineConfig({
   locales: ['sv', 'en'],
 
@@ -8,7 +9,6 @@ export default defineConfig({
     output: 'src/i18n/locales/{{language}}/{{namespace}}.json',
 
     defaultNS: 'translation',
-    namespaceSeparator: false,
     keySeparator: '.',
     contextSeparator: '_',
 
@@ -20,17 +20,14 @@ export default defineConfig({
 
     primaryLanguage: 'sv',
 
-    // Preserve keys constructed via template literals at runtime
+    // Keep dynamic keys whose values are data-driven and not statically analyzable.
     preservePatterns: [
-      'role.*',
-      'status.*',
-      'category.*',
-      'severity.*',
-      'nextStep.*',
-      'trigger.*',
-      'audit.actions.*',
-      'questionnaire.*',
-      'eq.*',
+      'contactActions.suggestion.*', // runtime suggestion strings
+      'audit.actions.*', // action label strings from event data
+      'questionnaire.*', // questionnaire IDs from seed/runtime data
+      'eq.*', // EQ-5D scoring dimension keys
+      'policy.syntaxExample*', // number-indexed examples: syntaxExample1/2/3
+      'policy.var*', // general variable label keys in policy editor
     ],
   },
 })

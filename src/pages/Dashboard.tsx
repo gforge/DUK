@@ -1,17 +1,17 @@
-import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react'
 import { Alert, Box, Skeleton, Stack, Typography } from '@mui/material'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
-import { useApi } from '../hooks/useApi'
-import { useRole } from '../store/roleContext'
-import { useHotkeys } from '../hooks/useHotkeys'
-import { useFocusRestore } from '../hooks/useFocusRestore'
-import * as client from '../api/client'
-import type { CaseCategory, Patient } from '../api/schemas'
-import QueueColumn from '../components/dashboard/QueueColumn'
-import DashboardToolbar from '../components/dashboard/DashboardToolbar'
-import { sortCases } from '../components/dashboard/sortCases'
-import type { SortMode } from '../components/dashboard/sortCases'
+
+import * as client from '@/api/client'
+import type { CaseCategory, Patient } from '@/api/schemas'
+import type { SortMode } from '@/components/dashboard'
+import { DashboardToolbar, QueueColumn, sortCases } from '@/components/dashboard'
+import { useApi } from '@/hooks/useApi'
+import { useExpandedCategories } from '@/hooks/useExpandedCategories'
+import { useFocusRestore } from '@/hooks/useFocusRestore'
+import { useHotkeys } from '@/hooks/useHotkeys'
+import { useRole } from '@/store/roleContext'
 
 type PalFilter = 'all' | 'mine' | 'created_by_me'
 
@@ -26,16 +26,9 @@ export default function Dashboard() {
   const [palFilter, setPalFilter] = useState<PalFilter>('all')
   const [showWaiting, setShowWaiting] = useState(false)
   const [sortMode, setSortMode] = useState<SortMode>('time')
-  const [expanded, setExpanded] = useState<Set<CaseCategory>>(new Set())
 
-  const toggleExpanded = useCallback((cat: CaseCategory) => {
-    setExpanded((prev) => {
-      const next = new Set(prev)
-      if (next.has(cat)) next.delete(cat)
-      else next.add(cat)
-      return next
-    })
-  }, [])
+  // manage persistent accordion state via custom hook
+  const { expanded, toggleExpanded } = useExpandedCategories()
 
   useEffect(() => {
     restore()
@@ -86,10 +79,18 @@ export default function Dashboard() {
     })
   }, [cases, palFilter, currentUser.id, search, patientMap])
 
-  const { activeCases, waitingCases } = useMemo(() => {
-    const active = filteredCases.filter((c) => c.activeCategory !== null)
-    const waiting = filteredCases.filter((c) => c.activeCategory === null)
-    return { activeCases: active, waitingCases: waiting }
+  const { activeCases, waitingCases, closedCases } = useMemo(() => {
+    const sevenDaysAgo = new Date()
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
+    const sevenDaysAgoMs = sevenDaysAgo.getTime()
+    const active = filteredCases.filter((c) => c.status !== 'CLOSED' && c.activeCategory !== null)
+    const waiting = filteredCases.filter((c) => c.status !== 'CLOSED' && c.activeCategory === null)
+    const closed = filteredCases.filter((c) => {
+      if (c.status !== 'CLOSED') return false
+      const ts = c.closedAt ?? c.lastActivityAt
+      return new Date(ts).getTime() >= sevenDaysAgoMs
+    })
+    return { activeCases: active, waitingCases: waiting, closedCases: closed }
   }, [filteredCases])
 
   const effectiveShowWaiting = showWaiting || search.trim().length > 0
@@ -111,6 +112,10 @@ export default function Dashboard() {
       effectiveShowWaiting ? sortedWaitingCases.filter((c) => c.category === cat) : [],
     [sortedWaitingCases, effectiveShowWaiting],
   )
+  const closedByCategory = useCallback(
+    (cat: CaseCategory) => closedCases.filter((c) => c.category === cat),
+    [closedCases],
+  )
 
   return (
     <Box>
@@ -129,8 +134,8 @@ export default function Dashboard() {
         showWaiting={showWaiting}
         onToggleWaiting={() => setShowWaiting((v) => !v)}
         waitingCount={waitingCases.length}
-        showPalFilter={isRole('PAL', 'DOCTOR', 'NURSE')}
-        showMineFilter={isRole('PAL')}
+        showPalFilter={isRole('DOCTOR', 'NURSE')}
+        showMineFilter={isRole('DOCTOR', 'NURSE')}
       />
 
       {casesError && (
@@ -153,6 +158,7 @@ export default function Dashboard() {
               category={cat}
               cases={byCategory(cat)}
               waitingCases={waitingByCategory(cat)}
+              closedCases={closedByCategory(cat)}
               patients={patientMap}
               onRefresh={refetch}
               expanded={expanded.has(cat)}

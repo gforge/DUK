@@ -8,7 +8,7 @@ This document captures the key user stories for the Duk demo application. The li
 
 **As a** Patient‑Responsible Physician (PAL) **I want** to drill into queues and highlight the work that matters most to me:
 
-- see only patients for whom I am the PAL
+- see only patients for whom I am responsible physician (patient level or active journey ownership)
 - see cases that I myself have created/triaged
 - easily switch back to the full queue when needed
 
@@ -16,7 +16,7 @@ This document captures the key user stories for the Duk demo application. The li
 
 1. Dashboard has filter/toggles: **My patients (PAL)**, **Reported by me**, **All**.
 2. When a clinician triages a case, `createdBy`/`triagedBy` fields are set so that the “Reported by me” filter works.
-3. Patient cards show a PAL badge when appropriate and the filtering logic matches the badge.
+3. Patient cards show a PAL badge when appropriate and the filtering logic matches the badge for both patient-level and active-journey ownership.
 
 > _Related code_: `src/api/service/cases.ts` (state transitions), `src/store/roleContext.tsx` (role switch), `components/dashboard`.
 
@@ -29,32 +29,35 @@ This document captures the key user stories for the Duk demo application. The li
 - open a case from the dashboard
 - view a summary (category, triggers, recent scores, policy warnings)
 - perform triage and either
-  - close the checkpoint immediately (TRIAGED → CLOSED) or
-  - schedule follow‑up with a deadline then close (TRIAGED → FOLLOWING_UP → CLOSED)
+  - close the checkpoint immediately (`contactMode = CLOSE` → status `CLOSED`) or
+  - assign a follow‑up task (status `TRIAGED`), which appears in the Worklist for a nurse/secretary to action (`TRIAGED → FOLLOWING_UP → CLOSED`)
 
 **Acceptance criteria**
 
-1. UI clearly exposes allowed state transitions (see state machine in `design.md`).
-2. Choosing “no action” with no deadline still allows the flow to go directly to CLOSED.
+1. After triage the TriageTab shows a read-only summary of the triage decision (contact mode, care role, assignment, due date, note) — no further action buttons.
+2. Choosing `contactMode = CLOSE` still allows the flow to go directly to CLOSED.
 3. An audit event is emitted for every state change.
+4. CLOSED cases are hidden from the main dashboard queue; cases closed within the last 7 days are accessible via a collapsible "Visa stängda" section at the bottom of each category column.
 
 ---
 
-## US3 – Nurse handling “no response / unopened”
+## US3 – Staff contact workflow for unresponsive patients
 
-**As a** Nurse (SSK) **I want** to see patients needing contact and record what I did:
+**As a** clinician or secretary **I want** to see patients needing outreach and record what I did:
 
 - both “no response” and “not opened” are managed as the same kind of workflow but shown with different icons/text
 - the case detail suggests an action (“Call the patient…”) based on the trigger that raised the alert
-- I can mark a demo action such as **Contacted** or **Reminder sent** and it is logged in the audit trail
+- I can mark an action such as **Contacted**, **Reminder sent** or **Attempted call (not reached)** and it is logged in the audit trail
+- the panel shows the date of the most recent reminder so it’s easy to know when we last tried
 
 **Acceptance criteria**
 
 1. Iconography and text differentiate the two triggers while reusing the same workflow code.
-2. Case detail page renders the suggested action dynamically.
-3. Audit log captures these contact events.
+2. Case detail page renders the suggested action dynamically and surface the latest reminder timestamp.
+3. Audit log captures full history of contact events, including call attempts.
+4. The outreach panel is accessible to NURSE, DOCTOR or SECRETARY roles.
 
-> _Related code_: `src/components/case/NurseContactActions.tsx`, `src/api/service/audit.ts` (`logContactEvent`), audit i18n keys `audit.actions.CONTACTED` / `audit.actions.REMINDER_SENT`.
+> _Related code_: `src/components/case/ContactActions.tsx`, `src/api/service/audit.ts` (`logContactEvent`), audit i18n keys `audit.actions.CONTACTED` / `audit.actions.REMINDER_SENT` / `audit.actions.CALL_ATTEMPT`.
 
 ---
 
@@ -75,7 +78,7 @@ This document captures the key user stories for the Duk demo application. The li
 4. Due questionnaire steps are listed with template name, scheduled date, and overdue indicator.
 5. The questionnaire form renders all five question types (SCALE, BOOLEAN, TEXT, SELECT, NUMBER) and validates required fields before submission.
 
-> _Related code_: `src/pages/PatientView.tsx`, `src/components/patientView/PatientDueForms.tsx`, `src/components/patientView/PatientQuestionnaireForm.tsx`, `src/components/patientView/PatientActions.tsx`.
+> _Related code_: `src/pages/PatientView.tsx`, `src/components/patientView/PatientDueForms/index.tsx`, `src/components/patientView/PatientQuestionnaireForm/index.tsx`, `src/components/patientView/PatientActions/index.tsx`.
 
 ## US5 – Configurable triage policy without eval
 
@@ -102,7 +105,7 @@ This document captures the key user stories for the Duk demo application. The li
 - no executable code and no user‑defined helpers are permitted
 - preview page offers copy‑to‑clipboard
 - approving sets status `APPROVED` and emits an audit event
-- (optional) nurses can author drafts but only doctors/PALs may approve
+- (optional) nurses can author drafts but only doctors may approve
 
 **Acceptance criteria**
 
@@ -148,28 +151,28 @@ These stories map directly to the workflows and components described in the desi
 
 ---
 
-## US9 – Journey switching with date reset
+## US9 – Journey phase transitions within an episode
 
-**As a** clinician **I want** to switch a patient's journey template (e.g., from non‑op to post‑surgery protocol) and optionally reset the start date to a clinically relevant anchor (e.g. surgery date):
+**As a** clinician **I want** to transition a patient from one clinical phase to the next (for example referral -> intake -> follow-up) while preserving episode continuity:
 
-- the modification dialog shows a "New start date" field when switching templates
-- all subsequent steps recalculate relative to the new anchor date
-- the modification history clearly shows both the template switch and the date change
+- the previous journey phase is completed when the next phase starts
+- the new phase keeps the same `episodeId` and records transition metadata
+- the transition stores trigger type, actor, and optional note for auditability
 
 **Acceptance criteria**
 
-1. `SWITCH_TEMPLATE` modification accepts optional `newStartDate` and `previousStartDate`.
-2. After switching, `PatientJourney.startDate` reflects the new date and `getEffectiveSteps` returns dates relative to it.
-3. The modification history panel shows a date reset banner when applicable.
-4. Unit tests cover SWITCH_TEMPLATE with date reset.
+1. `startNextPhase(...)` marks `fromJourneyId` as `COMPLETED`.
+2. A new `PatientJourney` is created with the same `episodeId`, requested `phaseType`, and transition metadata.
+3. New phase assignment instantiates instruction records from the selected template.
+4. Unit tests cover phase transition state updates and episode continuity.
 
-> _Related code_: `src/api/service/patientJourneys.ts`, `src/components/journey/modify/ModifyForms.tsx`, `src/tests/journey.test.ts`.
+> _Related code_: `src/api/service/patientJourneys.ts`, `src/api/schemas/journey.ts`, `src/tests/journey.test.ts`.
 
 ---
 
 ## US10 – Patient registration & journey assignment
 
-**As a** clinician (nurse/doctor/PAL) **I want** to register new patients and assign them to a clinical journey with a configurable reference date:
+**As a** clinician (nurse/doctor) **I want** to register new patients and assign them to a clinical journey with a configurable reference date:
 
 - a dedicated `/patients` page lists all patients with search/filter
 - clicking "Register Patient" opens a 3-step wizard: patient details → journey assignment → review & confirm
@@ -178,7 +181,7 @@ These stories map directly to the workflows and components described in the desi
 
 **Acceptance criteria**
 
-1. `/patients` route exists and is accessible to NURSE, DOCTOR, PAL roles via the sidebar.
+1. `/patients` route exists and is accessible to NURSE and DOCTOR roles via the sidebar.
 2. `createPatient` service function creates a new patient record.
 3. `assignPatientJourney` assigns a journey template with the selected start date.
 4. The patients table shows active journey status per patient.
@@ -189,22 +192,23 @@ These stories map directly to the workflows and components described in the desi
 
 ## US11 – Physio & patient instructions on the timeline
 
-**As a** clinician **I want** to attach physio protocols or care instructions to specific journey steps so patients and staff see relevant guidance at each checkpoint:
+**As a** clinician **I want** to schedule patient instructions separately from follow-up steps so guidance can be managed independently:
 
-- journey template entries can have inline `instructionText` or reference a reusable `InstructionTemplate`
-- the timeline renders instructions as collapsible panels with an info icon toggle
+- journey templates include dedicated `instructions[]` schedules referencing reusable `InstructionTemplate`
+- patient journeys instantiate persisted `Instruction` records with status lifecycle (ACTIVE/ACKNOWLEDGED/COMPLETED/CANCELLED)
+- the UI renders follow-up timeline and instruction timeline as separate sections
 - instruction templates are managed in the Journey Editor under an "Instructions" tab with full CRUD
 
 **Acceptance criteria**
 
-1. `JourneyTemplateEntry` supports `instructionText` and `instructionTemplateId` fields.
+1. `JourneyTemplate.instructions` stores `JourneyTemplateInstruction` schedule records.
 2. `InstructionTemplate` entity exists with CRUD operations.
-3. `getEffectiveSteps` returns `resolvedInstruction` hydrated from the template or inline text.
-4. The `JourneyTimeline` component renders collapsible instruction panels.
-5. The Journey Editor has an "Instructions" tab for managing reusable templates.
-6. Unit tests verify instruction hydration from both template references and inline text.
+3. `assignPatientJourney` instantiates patient-level `Instruction` records from template schedules.
+4. The case/patient journey views render instructions in a dedicated instruction timeline.
+5. The Journey Editor supports editing template-level instruction schedules.
+6. Unit tests verify instruction lifecycle and resolved instruction rendering via instruction APIs.
 
-> _Related code_: `src/api/schemas/journey.ts`, `src/api/service/instructionTemplates.ts`, `src/components/journey/JourneyTimeline.tsx`, `src/components/journey/editor/InstructionTemplatesTab.tsx`.
+> _Related code_: `src/api/schemas/journey.ts`, `src/api/service/instructions.ts`, `src/components/journey/InstructionTimeline.tsx`, `src/components/journey/editor/JourneyTemplatesTab/TemplateInstructionsDialog.tsx`.
 
 ---
 
@@ -234,17 +238,17 @@ These stories map directly to the workflows and components described in the desi
 
 **As a** patient **I want** to see my clinical journey timeline with instructions so I know what to expect at each checkpoint:
 
-- the patient view shows a "My Care Plan" section with the journey timeline
-- each step shows its scheduled date, status, and any resolved instructions
-- instructions are displayed as collapsible panels identical to the clinician view
+- the patient view shows a "My Care Plan" section with separate follow-up and instruction sections
+- follow-up steps are rendered in a read-only `JourneyTimeline`
+- instructions are rendered in a dedicated `InstructionTimeline` with status and active-range information
 
 **Acceptance criteria**
 
 1. Patient view (`/patient`) fetches the active journey and effective steps.
-2. A "My Care Plan" `Paper` section renders a read-only `JourneyTimeline`.
-3. Resolved instructions are visible and expandable.
+2. A "My Care Plan" `Paper` section renders a read-only `JourneyTimeline` for follow-up steps.
+3. Patient instructions are fetched via instruction APIs and rendered separately using `InstructionTimeline`.
 
-> _Related code_: `src/pages/PatientView.tsx`, `src/components/journey/JourneyTimeline.tsx`.
+> _Related code_: `src/pages/PatientView.tsx`, `src/components/patientView/PatientCareplan/main.tsx`, `src/components/journey/InstructionTimeline.tsx`, `src/components/journey/JourneyTimeline/main.tsx`.
 
 ---
 
@@ -266,7 +270,7 @@ These stories map directly to the workflows and components described in the desi
 5. Pausing a non-ACTIVE journey and resuming a non-SUSPENDED journey both throw with a descriptive error.
 6. Unit tests verify status transitions, `totalPausedDays` accumulation, and the step-date shift.
 
-> _Related code_: `src/api/service/patientJourneys.ts`, `src/api/service/journeyResolver.ts`, `src/components/case/JourneyTab.tsx`, `src/tests/journey.test.ts`.
+> _Related code_: `src/api/service/patientJourneys.ts`, `src/api/service/journeyResolver.ts`, `src/components/case/JourneyTab/index.tsx`, `src/tests/journey.test.ts`.
 
 ---
 
@@ -283,10 +287,10 @@ These stories map directly to the workflows and components described in the desi
 1. `assignPatientJourney` creates a new `PatientJourney` record regardless of existing journeys; there is no single-journey-per-patient constraint.
 2. `JourneyTab` (CaseDetail) renders all journeys for the patient as MUI `Tabs` sorted by status (ACTIVE first), newest first within each group.
 3. `PatientCareplan` (PatientView) renders the same multi-tab layout for the patient self-view.
-4. `getMergedDueStepsForPatient(patientId, date)` deduplicates due steps across all ACTIVE journeys by `templateEntryId`.
+4. `getMergedDueStepsForPatient(patientId, date)` deduplicates due steps across ACTIVE/SUSPENDED journeys by questionnaire `templateId`.
 5. Unit tests verify that `getMergedDueStepsForPatient` deduplicates correctly when two journeys share the same questionnaire.
 
-> _Related code_: `src/api/service/journeyResolver.ts`, `src/components/case/JourneyTab.tsx`, `src/components/patientView/PatientCareplan.tsx`, `src/tests/journey.test.ts`.
+> _Related code_: `src/api/service/journeyResolver.ts`, `src/components/case/JourneyTab/index.tsx`, `src/components/patientView/PatientCareplan/main.tsx`, `src/tests/journey.test.ts`.
 
 ---
 
@@ -325,7 +329,7 @@ These stories map directly to the workflows and components described in the desi
 
 **Acceptance criteria**
 
-1. `GlobalSearch` button is shown in the TopBar for NURSE, DOCTOR, and PAL roles only.
+1. `GlobalSearch` button is shown in the TopBar for NURSE and DOCTOR roles only.
 2. Patients are fetched once on first open; subsequent opens reuse the cached list without a network round-trip.
 3. Up to 10 matching results are shown; filtering is case-insensitive and matches against `displayName` and `personalNumber`.
 4. Selecting a result navigates to `/patients/:id`.

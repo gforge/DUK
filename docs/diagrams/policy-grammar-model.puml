@@ -1,0 +1,57 @@
+@startuml
+' Purpose: Policy expression grammar and precedence model
+' Source of truth:
+'   src/api/policyParser/tokens.ts
+'   src/api/policyParser/parser.ts
+
+title Policy Expression Language - Grammar Diagram
+
+class "Expression" as Expression
+class "LogicalOr" as LogicalOr
+class "LogicalAnd" as LogicalAnd
+class "Comparison" as Comparison
+class "Arithmetic" as Arithmetic
+class "Term" as Term
+class "Factor" as Factor
+class "Primary" as Primary
+
+Expression --> LogicalOr
+LogicalOr --> LogicalAnd
+LogicalAnd --> Comparison
+Comparison --> Arithmetic
+Arithmetic --> Term
+Term --> Factor
+Factor --> Primary
+
+note right of LogicalOr
+  Logical operators (lowest precedence):
+  ||, &&
+end note
+
+note right of Comparison
+  Comparison operators:
+  == != < <= > >=
+end note
+
+note right of Arithmetic
+  Additive:
+  + -
+end note
+
+note right of Term
+  Multiplicative (highest among operators):
+  * /
+end note
+
+note bottom of Primary
+  Primary tokens:
+  - Number literals
+  - Identifiers (e.g. score.PNRS, OSS.total)
+  - Parenthesized expressions
+
+  Implemented in:
+  src/api/policyParser/tokens.ts
+  src/api/policyParser/parser.ts
+end note
+
+@enduml

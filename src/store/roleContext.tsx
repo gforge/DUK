@@ -1,72 +1,72 @@
 import React, { createContext, useContext, useMemo, useState } from 'react'
-import type { Role, User } from '../api/schemas'
 
-const CURRENT_USER_STORAGE_KEY = 'duk_current_user_id'
+import type { User } from '@/api/schemas'
+import type { AuthSession, RoleContextValue } from '@/auth'
+import { getAuthProvider } from '@/auth'
 
-const DEMO_USERS: User[] = [
-  { id: 'user-pal-1', name: 'Dr. Sara Lindqvist (PAL)', role: 'PAL' },
-  { id: 'user-doc-1', name: 'Dr. Erik Bergström', role: 'DOCTOR' },
-  { id: 'user-nurse-1', name: 'SSK Anna Holmberg', role: 'NURSE' },
-  { id: 'user-nurse-2', name: 'SSK Jonas Ekström', role: 'NURSE' },
-  { id: 'user-patient-1', name: 'Anders Andersson', role: 'PATIENT' },
-]
+const authProvider = getAuthProvider()
 
-interface RoleContextValue {
-  currentUser: User
-  setCurrentUser: (user: User) => void
-  logout: () => void
-  availableUsers: User[]
-  isLoggedIn: boolean
-  isRole: (...roles: Role[]) => boolean
+function getInitialSession(): AuthSession | null {
+  const existing = authProvider.getSession()
+  if (existing) return existing
+
+  if (import.meta.env.MODE === 'test') {
+    const first = authProvider.getLoginOptions()[0]
+    if (!first) return null
+    return {
+      id: 'test-fake-session',
+      user: first.user,
+      issuedAt: new Date().toISOString(),
+      expiresAt: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
+    }
+  }
+
+  if (globalThis.window === undefined) {
+    const first = authProvider.getLoginOptions()[0]
+    if (!first) return null
+    return {
+      id: 'server-render-fake-session',
+      user: first.user,
+      issuedAt: new Date().toISOString(),
+      expiresAt: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
+    }
+  }
+
+  return null
 }
 
 const RoleContext = createContext<RoleContextValue | null>(null)
 
-function getInitialUser(): User {
-  try {
-    const savedUserId = localStorage.getItem(CURRENT_USER_STORAGE_KEY)
-    return DEMO_USERS.find((user) => user.id === savedUserId) ?? DEMO_USERS[0]
-  } catch {
-    return DEMO_USERS[0]
-  }
-}
+export function RoleProvider({ children }: Readonly<{ children: React.ReactNode }>) {
+  const [session, setSession] = useState<AuthSession | null>(() => getInitialSession())
 
-export function RoleProvider({ children }: { children: React.ReactNode }) {
-  const [currentUser, setCurrentUserState] = useState<User>(getInitialUser)
-  const [isLoggedIn, setIsLoggedIn] = useState(() => {
-    try {
-      return localStorage.getItem(CURRENT_USER_STORAGE_KEY) !== null
-    } catch {
-      return false
-    }
-  })
-
-  const value: RoleContextValue = useMemo(
-    () => ({
-      currentUser,
-      setCurrentUser: (user: User) => {
-        setCurrentUserState(user)
-        setIsLoggedIn(true)
-        try {
-          localStorage.setItem(CURRENT_USER_STORAGE_KEY, user.id)
-        } catch {
-          // Ignore storage failures; the in-memory role still changes for this session.
-        }
-      },
-      logout: () => {
-        setIsLoggedIn(false)
-        try {
-          localStorage.removeItem(CURRENT_USER_STORAGE_KEY)
-        } catch {
-          // Ignore storage failures; logout still clears the in-memory session.
-        }
-      },
-      availableUsers: DEMO_USERS,
-      isLoggedIn,
-      isRole: (...roles) => isLoggedIn && roles.includes(currentUser.role),
-    }),
-    [currentUser, isLoggedIn],
+  const availableUsers = useMemo(
+    () => authProvider.getLoginOptions().map((option) => option.user),
+    [],
   )
+
+  const value: RoleContextValue | null = useMemo(() => {
+    if (!session) return null
+
+    return {
+      currentUser: session.user,
+      setCurrentUser: (user: User) => {
+        void authProvider.loginAs(user.id).then(setSession)
+      },
+      availableUsers,
+      isRole: (...roles) => roles.includes(session.user.role),
+      currentPatientId: session.user.patientId,
+      session,
+      authProviderName: authProvider.name,
+      loginAs: async (userId: string) => {
+        setSession(await authProvider.loginAs(userId))
+      },
+      logout: async () => {
+        await authProvider.logout()
+        setSession(null)
+      },
+    }
+  }, [availableUsers, session])
 
   return <RoleContext.Provider value={value}>{children}</RoleContext.Provider>
 }
@@ -74,6 +74,11 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
 // eslint-disable-next-line react-refresh/only-export-components
 export function useRole(): RoleContextValue {
   const ctx = useContext(RoleContext)
-  if (!ctx) throw new Error('useRole must be used within RoleProvider')
+  if (!ctx) throw new Error('useRole must be used within an authenticated RoleProvider')
   return ctx
+}
+
+// eslint-disable-next-line react-refresh/only-export-components
+export function useOptionalRole(): RoleContextValue | null {
+  return useContext(RoleContext)
 }

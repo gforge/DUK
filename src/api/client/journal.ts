@@ -1,5 +1,5 @@
-import * as service from '../service'
 import type { JournalDraft, JournalTemplate, Role } from '../schemas'
+import * as service from '../service'
 import { withDelay } from './delay'
 
 export const getJournalDrafts = (caseId: string): Promise<JournalDraft[]> =>
@@ -25,3 +25,9 @@ export const approveJournalDraft = (
   userId: string,
   userRole: Role,
 ): Promise<JournalDraft> => withDelay(() => service.approveJournalDraft(draftId, userId, userRole))
+
+export const deleteJournalDraft = (
+  draftId: string,
+  userId: string,
+  userRole: Role,
+): Promise<JournalDraft> => withDelay(() => service.deleteJournalDraft(draftId, userId, userRole))

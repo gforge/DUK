@@ -1,0 +1,46 @@
+@startuml
+' Purpose: Template and configuration model
+' Source of truth:
+'   src/api/schemas/questionnaire.ts
+'   src/api/schemas/journey.ts
+'   src/api/schemas/journal.ts
+'   src/api/schemas/policy.ts
+
+title Template Model
+
+left to right direction
+skinparam linetype ortho
+skinparam shadowing false
+skinparam classBackgroundColor white
+hide methods
+hide stereotypes
+
+package "Journey Templates" #FFF8E1 {
+  class JourneyTemplate
+  class JourneyTemplateEntry
+  class JourneyTemplateInstruction
+}
+
+package "Reusable Templates" #FFF3E0 {
+  class QuestionnaireTemplate
+  class InstructionTemplate
+  class JournalTemplate
+}
+
+package "Rules" #EDE7F6 {
+  class PolicyRule
+}
+
+package "Research Config" #F3E5F5 {
+  class ResearchModule
+}
+
+JourneyTemplate "1" -- "*" JourneyTemplateEntry
+JourneyTemplate "1" -- "*" JourneyTemplateInstruction
+JourneyTemplate "0..1" -- "*" JourneyTemplate : parentTemplateId
+JourneyTemplateEntry "*" -- "0..1" QuestionnaireTemplate : templateId
+JourneyTemplateInstruction "*" -- "1" InstructionTemplate
+PolicyRule "*" -- "1" JourneyTemplate : journeyTemplateId
+ResearchModule "*" -- "*" QuestionnaireTemplate : entries[].templateId
+
+@enduml

@@ -1,14 +1,44 @@
-import type { AppState, Case, Patient, PatientJourney, AuditEvent } from '../schemas'
+import type { AppState, AuditEvent, Case, EpisodeOfCare, Patient, PatientJourney } from '../schemas'
 import { SEED_STATE } from '../seed'
 import {
-  TRIGGERS,
-  PAL_IDS,
+  categoryFromDaysAgo,
   isoDateOffset as isoDate,
   isoTsOffset as isoTs,
+  PAL_IDS,
+  TRIGGERS,
 } from '../seed/seedHelpers'
-import { makePrng } from './prng'
-import { FIRST_NAMES, LAST_NAMES, personalNumber } from './namePools'
+import { ensureAllUsers } from '../utils/userGenerator'
 import { COHORTS } from './cohorts'
+import { FIRST_NAMES, LAST_NAMES, personalNumber } from './namePools'
+import { makePrng } from './prng'
+
+function generateReviews(
+  rng: ReturnType<typeof makePrng>,
+  caseId: string,
+  createdAt: string,
+  palId: string,
+) {
+  const reviews = []
+  const reviewProb = 0.15 // ~15% of cases have pending reviews
+
+  if (rng.bool(reviewProb)) {
+    const type: 'LAB' | 'XRAY' = rng.bool(0.5) ? 'LAB' : 'XRAY'
+    reviews.push({
+      id: `${caseId}-rev-${rng.int(0, 9999)}`,
+      type,
+      createdAt,
+      createdByUserId: palId,
+      createdByRole: 'NURSE' as const,
+      source: 'MANUAL' as const,
+      reviewedAt: null,
+      reviewedByUserId: undefined,
+      reviewedByRole: undefined,
+      note: null,
+    })
+  }
+
+  return reviews
+}
 
 export function buildRealisticSeed(): AppState {
   const rng = makePrng(0xdeadbeef)
@@ -16,6 +46,7 @@ export function buildRealisticSeed(): AppState {
   const patients: Patient[] = []
   const cases: Case[] = []
   const journeys: PatientJourney[] = []
+  const episodes: EpisodeOfCare[] = []
   const auditEvents: AuditEvent[] = []
 
   let idx = 0
@@ -33,21 +64,35 @@ export function buildRealisticSeed(): AppState {
 
       const palId = PAL_IDS[idx % PAL_IDS.length]
       const hasTriggers = rng.bool(cohort.triggerProb)
-      const triggers = hasTriggers ? [TRIGGERS[rng.int(0, TRIGGERS.length - 1)]] : []
+      const baseTriggers = hasTriggers ? [TRIGGERS[rng.int(0, TRIGGERS.length - 1)]] : []
       const isComplex = rng.bool(cohort.complexProb)
       const journeyTemplateId = isComplex ? 'jt-complex' : 'jt-standard'
 
-      const status =
-        triggers.length > 0
-          ? 'NEEDS_REVIEW'
-          : rng.bool(0.3)
-            ? 'TRIAGED'
-            : rng.bool(0.5)
-              ? 'FOLLOWING_UP'
-              : 'NEW'
-
       const startDate = isoDate(-cohort.startDaysAgo)
       const createdAt = isoTs(-cohort.startDaysAgo)
+
+      // Generate reviews for this case
+      const reviews = generateReviews(rng, caseId, createdAt, palId)
+
+      // Add review triggers if there are pending reviews
+      const triggers = [...baseTriggers]
+      if (reviews.length > 0) {
+        const pendingReviews = reviews.filter((r) => r.reviewedAt === null)
+        const reviewTypes = new Set(pendingReviews.map((r) => r.type))
+        if (reviewTypes.has('LAB')) triggers.push('LAB_PENDING' as any)
+        if (reviewTypes.has('XRAY')) triggers.push('XRAY_PENDING' as any)
+      }
+
+      let status: Case['status']
+      if (triggers.length > 0) {
+        status = 'NEEDS_REVIEW'
+      } else if (rng.bool(0.3)) {
+        status = 'TRIAGED'
+      } else if (rng.bool(0.5)) {
+        status = 'FOLLOWING_UP'
+      } else {
+        status = 'NEW'
+      }
 
       patients.push({
         id: pid,
@@ -59,23 +104,106 @@ export function buildRealisticSeed(): AppState {
         createdAt,
       })
 
+      // Determine a sensible nextStep for worklist eligibility when appropriate
+      let nextStep: Case['nextStep'] | undefined = undefined
+      if (status === 'TRIAGED' || status === 'FOLLOWING_UP') {
+        const STEPS: Case['nextStep'][] = [
+          'DOCTOR_VISIT',
+          'NURSE_VISIT',
+          'PHYSIO_VISIT',
+          'PHONE_CALL',
+          'DIGITAL_CONTROL',
+        ]
+        nextStep = STEPS[rng.int(0, STEPS.length - 1)]
+      }
+
+      const triageDecision =
+        nextStep === 'DOCTOR_VISIT'
+          ? {
+              contactMode: 'VISIT' as const,
+              careRole: 'DOCTOR' as const,
+              assignmentMode: 'ANY' as const,
+              assignedUserId: null,
+              dueAt: null,
+              note: null,
+            }
+          : nextStep === 'NURSE_VISIT'
+            ? {
+                contactMode: 'VISIT' as const,
+                careRole: 'NURSE' as const,
+                assignmentMode: 'ANY' as const,
+                assignedUserId: null,
+                dueAt: null,
+                note: null,
+              }
+            : nextStep === 'PHYSIO_VISIT'
+              ? {
+                  contactMode: 'VISIT' as const,
+                  careRole: 'PHYSIO' as const,
+                  assignmentMode: 'ANY' as const,
+                  assignedUserId: null,
+                  dueAt: null,
+                  note: null,
+                }
+              : nextStep === 'PHONE_CALL'
+                ? {
+                    contactMode: 'PHONE' as const,
+                    careRole: 'NURSE' as const,
+                    assignmentMode: 'ANY' as const,
+                    assignedUserId: null,
+                    dueAt: null,
+                    note: null,
+                  }
+                : nextStep === 'DIGITAL_CONTROL'
+                  ? {
+                      contactMode: 'DIGITAL' as const,
+                      careRole: 'NURSE' as const,
+                      assignmentMode: 'ANY' as const,
+                      assignedUserId: null,
+                      dueAt: null,
+                      note: null,
+                    }
+                  : undefined
+
       cases.push({
         id: caseId,
         patientId: pid,
-        category: 'CONTROL',
-        status: status as Case['status'],
+        category: categoryFromDaysAgo(cohort.startDaysAgo),
+        status,
         triggers: triggers as Case['triggers'],
         policyWarnings: [],
         createdByUserId: palId,
         createdAt,
         scheduledAt: createdAt,
         lastActivityAt: isoTs(-rng.int(0, 3)),
+        reviews,
+        nextStep,
+        triageDecision,
+      })
+
+      const epId = `re-${idx}`
+
+      episodes.push({
+        id: epId,
+        patientId: pid,
+        label: isComplex ? 'Komplex frakturuppföljning' : 'Standarduppföljning fraktur',
+        clinicalArea: 'Ortopedi',
+        status: 'OPEN',
+        openedAt: createdAt,
+        closedAt: null,
+        responsibleUserId: palId,
+        primaryCaseId: caseId,
+        createdAt,
+        updatedAt: createdAt,
       })
 
       journeys.push({
         id: jid,
+        episodeId: epId,
         patientId: pid,
         journeyTemplateId,
+        phaseType: 'FOLLOWUP',
+        joinedAt: startDate,
         startDate,
         status: 'ACTIVE',
         researchModuleIds: [],
@@ -99,13 +227,19 @@ export function buildRealisticSeed(): AppState {
     }
   }
 
-  return {
+  const baseState = {
     ...SEED_STATE,
     patients,
     cases,
     formResponses: [],
     journalDrafts: [],
+    episodesOfCare: episodes,
     patientJourneys: journeys,
     auditEvents,
+  }
+
+  return {
+    ...baseState,
+    users: ensureAllUsers(baseState),
   }
 }

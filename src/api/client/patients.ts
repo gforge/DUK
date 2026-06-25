@@ -1,7 +1,7 @@
-import * as service from '../service'
 import type { Patient } from '../schemas'
-import { withDelay } from './delay'
+import * as service from '../service'
 import { formatPersonnummer } from '../utils/personnummer'
+import { withDelay } from './delay'
 
 export const getPatients = (): Promise<Patient[]> => withDelay(() => service.getPatients())
 
@@ -14,6 +14,14 @@ export const createPatient = (
 
 export const patientOpenedApp = (patientId: string): Promise<Patient> =>
   withDelay(() => service.patientOpenedApp(patientId))
+
+export const updatePatientResponsiblePhysicianUser = (
+  patientId: string,
+  responsiblePhysicianUserId?: string,
+): Promise<Patient> =>
+  withDelay(() =>
+    service.updatePatientResponsiblePhysicianUser(patientId, responsiblePhysicianUserId),
+  )
 
 // ─── Fake "befolkningsregistret" lookup ───────────────────────────────────────
 // In a real system this would call an external API. Here we simulate it with a

@@ -1,39 +1,41 @@
-import React, { useState, useMemo, useCallback } from 'react'
+import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import {
+  Alert,
   Badge,
   Box,
-  Typography,
-  Tabs,
-  Tab,
-  Button,
-  Stack,
-  Paper,
-  Alert,
-  Skeleton,
-  Chip,
   Breadcrumbs,
+  Chip,
   Link,
+  Paper,
+  Skeleton,
+  Stack,
+  Tab,
+  Tabs,
+  Typography,
 } from '@mui/material'
-import ArrowBackIcon from '@mui/icons-material/ArrowBack'
-import { useParams, useNavigate } from 'react-router-dom'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useApi } from '../hooks/useApi'
-import { useHotkeys } from '../hooks/useHotkeys'
-import * as client from '../api/client'
-import PatientCard from '../components/case/PatientCard'
-import FormResponsesTab from '../components/case/FormResponsesTab'
-import TriageTab from '../components/case/TriageTab'
-import JournalTab from '../components/case/JournalTab'
-import AuditLogTab from '../components/case/AuditLogTab'
-import JourneyTab from '../components/case/JourneyTab'
-import StatusChip from '../components/common/StatusChip'
-import AutoWarningsBadge from '../components/common/AutoWarningsBadge'
-import NurseContactActions from '../components/case/NurseContactActions'
+import { useNavigate, useParams } from 'react-router-dom'
+
+import * as client from '@/api/client'
+import {
+  AuditLogTab,
+  ContactActions,
+  FormResponsesTab,
+  JournalTab,
+  JourneyTab,
+  PatientCard,
+  TriageTab,
+} from '@/components/case'
+import { routeSegmentToContactMode } from '@/components/case/triage/routeContactMode'
+import { AutoWarningsBadge, StatusChip } from '@/components/common'
+import { useApi } from '@/hooks/useApi'
+import { useHotkeys } from '@/hooks/useHotkeys'
 
 interface TabPanelProps {
-  children: React.ReactNode
-  value: number
-  index: number
+  readonly children: React.ReactNode
+  readonly value: number
+  readonly index: number
 }
 
 function TabPanel({ children, value, index }: TabPanelProps) {
@@ -50,10 +52,13 @@ function TabPanel({ children, value, index }: TabPanelProps) {
 }
 
 export default function CaseDetail() {
-  const { id } = useParams<{ id: string }>()
+  const { id, triageMode } = useParams<{ id: string; triageMode?: string }>()
   const navigate = useNavigate()
   const { t } = useTranslation()
-  const [selectedTab, setSelectedTab] = useState<{ caseId: string; tab: number } | null>(null)
+  const [activeTab, setActiveTab] = useState(0)
+  const didAutoSelectTab = useRef(false)
+  const routeContactMode = routeSegmentToContactMode(triageMode)
+  const tabValue = routeContactMode ? 2 : activeTab
 
   const {
     data: caseData,
@@ -67,6 +72,21 @@ export default function CaseDetail() {
     [caseData?.patientId],
   )
 
+  useEffect(() => {
+    if (!didAutoSelectTab.current && caseData) {
+      didAutoSelectTab.current = true
+      if (['NEW', 'NEEDS_REVIEW'].includes(caseData.status)) {
+        setActiveTab(2) // eslint-disable-line react-hooks/set-state-in-effect
+      }
+    }
+  }, [caseData])
+
+  useEffect(() => {
+    if (triageMode && !routeContactMode && id) {
+      navigate(`/cases/${id}`, { replace: true })
+    }
+  }, [triageMode, routeContactMode, navigate, id])
+
   useHotkeys(
     useMemo(
       () => ({
@@ -77,7 +97,10 @@ export default function CaseDetail() {
     ),
   )
 
-  const handleBack = useCallback(() => navigate('/dashboard'), [navigate])
+  const handlePatientBack = useCallback(
+    () => navigate(caseData ? `/patients/${caseData.patientId}` : '/patients'),
+    [navigate, caseData],
+  )
 
   const loading = caseLoading || patientLoading
 
@@ -99,9 +122,6 @@ export default function CaseDetail() {
     )
   }
 
-  const defaultTab = ['NEW', 'NEEDS_REVIEW'].includes(caseData.status) ? 2 : 0
-  const activeTab = selectedTab?.caseId === caseData.id ? selectedTab.tab : defaultTab
-
   return (
     <Box>
       {/* Breadcrumbs */}
@@ -109,21 +129,24 @@ export default function CaseDetail() {
         <Link
           component="button"
           variant="body2"
-          onClick={handleBack}
+          onClick={() => navigate('/dashboard')}
           underline="hover"
           sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
         >
           <ArrowBackIcon fontSize="inherit" />
           {t('nav.dashboard')}
         </Link>
-        <Typography variant="body2" color="text.primary">
+        <Link component="button" variant="body2" onClick={handlePatientBack} underline="hover">
           {patient?.displayName ?? caseData.patientId}
+        </Link>
+        <Typography variant="body2" color="text.primary">
+          {t('case.title')}
         </Typography>
       </Breadcrumbs>
 
       {/* Header */}
-      <Stack sx={{ alignItems: 'center', gap: 2, mb: 2, flexWrap: 'wrap' }} direction="row">
-        <Typography sx={{ fontWeight: 700 }} variant="h5">
+      <Stack direction="row" alignItems="center" gap={2} mb={2} flexWrap="wrap">
+        <Typography variant="h5" fontWeight={700}>
           {t('case.title')}
         </Typography>
         <StatusChip status={caseData.status} size="medium" />
@@ -139,14 +162,19 @@ export default function CaseDetail() {
       {/* Patient card */}
       {patient && <PatientCard patient={patient} caseData={caseData} />}
 
-      {/* Nurse contact action panel — shown when SEEK_CONTACT / NOT_OPENED triggers are active */}
-      <NurseContactActions caseData={caseData} onRefetch={refetchCase} />
+      {/* Contact action panel — shown when SEEK_CONTACT / NOT_OPENED triggers are active */}
+      <ContactActions caseData={caseData} onRefetch={refetchCase} />
 
       {/* Tabs */}
       <Paper variant="outlined" sx={{ mt: 2, borderRadius: 2 }}>
         <Tabs
-          value={activeTab}
-          onChange={(_, v) => setSelectedTab({ caseId: caseData.id, tab: v })}
+          value={tabValue}
+          onChange={(_, v) => {
+            setActiveTab(v)
+            if (v !== 2 && id && triageMode) {
+              navigate(`/cases/${id}`, { replace: true })
+            }
+          }}
           aria-label="case detail tabs"
           variant="scrollable"
           scrollButtons="auto"
@@ -173,19 +201,23 @@ export default function CaseDetail() {
         </Tabs>
 
         <Box sx={{ p: 2 }}>
-          <TabPanel value={activeTab} index={0}>
+          <TabPanel value={tabValue} index={0}>
             <FormResponsesTab caseId={caseData.id} />
           </TabPanel>
 
-          <TabPanel value={activeTab} index={1}>
+          <TabPanel value={tabValue} index={1}>
             <JourneyTab caseData={caseData} />
           </TabPanel>
 
-          <TabPanel value={activeTab} index={2}>
-            <TriageTab caseData={caseData} onTriaged={refetchCase} />
+          <TabPanel value={tabValue} index={2}>
+            <TriageTab
+              caseData={caseData}
+              onTriaged={refetchCase}
+              routeContactMode={routeContactMode}
+            />
           </TabPanel>
 
-          <TabPanel value={activeTab} index={3}>
+          <TabPanel value={tabValue} index={3}>
             <JournalTab
               caseData={caseData}
               patient={patient ?? undefined}
@@ -193,18 +225,11 @@ export default function CaseDetail() {
             />
           </TabPanel>
 
-          <TabPanel value={activeTab} index={4}>
+          <TabPanel value={tabValue} index={4}>
             <AuditLogTab caseId={caseData.id} />
           </TabPanel>
         </Box>
       </Paper>
-
-      {/* Back button */}
-      <Box sx={{ mt: 2 }}>
-        <Button startIcon={<ArrowBackIcon />} onClick={handleBack} variant="outlined">
-          {t('common.back')}
-        </Button>
-      </Box>
     </Box>
   )
 }

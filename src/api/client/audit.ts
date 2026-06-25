@@ -1,7 +1,7 @@
-import * as service from '../service'
 import type { AuditEvent, Role } from '../schemas'
-import { withDelay } from './delay'
+import * as service from '../service'
 import type { ContactAction } from '../service/audit'
+import { withDelay } from './delay'
 
 export type { ContactAction }
 

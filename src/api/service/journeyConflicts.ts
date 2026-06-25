@@ -1,6 +1,6 @@
 import { getStore } from '../storage'
-import { getEffectiveSteps, getEffectiveStepsForTemplate } from './journeyResolver'
 import type { EffectiveStep } from './journeyResolver'
+import { getEffectiveSteps, getEffectiveStepsForTemplate } from './journeyResolver'
 
 /**
  * A detected scheduling overlap between a step in an existing patient journey

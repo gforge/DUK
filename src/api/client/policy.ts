@@ -1,5 +1,5 @@
+import type { Case,PolicyRule } from '../schemas'
 import * as service from '../service'
-import type { PolicyRule, Case } from '../schemas'
 import { withDelay } from './delay'
 
 export const getPolicyRules = (journeyTemplateId: string): Promise<PolicyRule[]> =>

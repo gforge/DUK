@@ -1,6 +1,6 @@
-import { CURRENT_SCHEMA_VERSION } from './schemaVersion'
-import { AppStateSchema } from './schemas'
 import type { AppState } from './schemas'
+import { AppStateSchema } from './schemas'
+import { CURRENT_SCHEMA_VERSION } from './schemaVersion'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -19,8 +19,9 @@ export type MigrationResultErr = {
   ok: false
   /** 'downgrade'  – stored version is newer than the app
    *  'no-path'    – no migration chain exists between stored and current version
-   *  'parse-error'– migration ran but the result failed Zod validation */
-  reason: 'downgrade' | 'no-path' | 'parse-error'
+   *  'parse-error'– migration ran but the result failed Zod validation
+   *  'invalid'    – data already at current version but failed schema validation */
+  reason: 'downgrade' | 'no-path' | 'parse-error' | 'invalid'
   storedVersion: number
   rawState: unknown
   parseError?: unknown
@@ -166,6 +167,422 @@ const MIGRATIONS: Migration[] = [
       researchConsents: s['researchConsents'] ?? [],
     }),
   },
+  {
+    from: 5,
+    to: 6,
+    up: (s) => ({
+      ...s,
+      schemaVersion: 6,
+      // Backfill withdrawalReason on all existing consent records.
+      researchConsents: Array.isArray(s['researchConsents'])
+        ? (s['researchConsents'] as Record<string, unknown>[]).map((c) => ({
+            ...c,
+            withdrawalReason: c['withdrawalReason'] ?? null,
+          }))
+        : [],
+    }),
+  },
+  {
+    from: 6,
+    to: 7,
+    up: (s) => ({
+      ...s,
+      schemaVersion: 7,
+      // Backfill reviews array on all existing cases.
+      cases: Array.isArray(s['cases'])
+        ? (s['cases'] as Record<string, unknown>[]).map((c) => ({
+            ...c,
+            reviews: c['reviews'] ?? [],
+          }))
+        : [],
+    }),
+  },
+  {
+    from: 7,
+    to: 8,
+    up: (s) => ({
+      ...s,
+      schemaVersion: 8,
+      // `outcome` is optional on ClinicalReviewSchema — no backfill needed.
+    }),
+  },
+  {
+    from: 8,
+    to: 9,
+    up: (s) => ({
+      ...s,
+      schemaVersion: 9,
+      // `journeyStepLabel` is optional on ClinicalReviewSchema — no backfill needed.
+    }),
+  },
+  {
+    from: 9,
+    to: 10,
+    up: (s) => {
+      const nowIso = new Date().toISOString()
+
+      const toIsoFromYmd = (ymd: unknown): string => {
+        const text = typeof ymd === 'string' ? ymd : nowIso.slice(0, 10)
+        const parsed = new Date(`${text}T00:00:00.000Z`)
+        return Number.isNaN(parsed.getTime()) ? nowIso : parsed.toISOString()
+      }
+
+      const computePauseShift = (journey: Record<string, unknown>): number => {
+        const total =
+          typeof journey['totalPausedDays'] === 'number' ? Number(journey['totalPausedDays']) : 0
+        const isSuspended = journey['status'] === 'SUSPENDED'
+        const pausedAt = journey['pausedAt']
+        if (!isSuspended || typeof pausedAt !== 'string') return total
+        const currentPause = Math.floor((Date.now() - new Date(pausedAt).getTime()) / 86_400_000)
+        return total + (Number.isNaN(currentPause) ? 0 : currentPause)
+      }
+
+      const journeyTemplates: Record<string, unknown>[] = Array.isArray(s['journeyTemplates'])
+        ? (s['journeyTemplates'] as Record<string, unknown>[]).map((jt) => {
+            const existing = Array.isArray(jt['instructions'])
+              ? (jt['instructions'] as Record<string, unknown>[])
+              : []
+
+            return {
+              ...jt,
+              instructions: existing,
+            } as Record<string, unknown>
+          })
+        : []
+
+      const patientJourneys = Array.isArray(s['patientJourneys'])
+        ? (s['patientJourneys'] as Record<string, unknown>[])
+        : []
+
+      const templateById = new Map<string, Record<string, unknown>>()
+      for (const jt of journeyTemplates) {
+        if (typeof jt['id'] === 'string') templateById.set(jt['id'], jt)
+      }
+
+      const instructions = patientJourneys.flatMap((journey) => {
+        const journeyId = String(journey['id'] ?? '')
+        const templateId = String(journey['journeyTemplateId'] ?? '')
+        const template = templateById.get(templateId)
+        const templateInstructions =
+          template && Array.isArray(template['instructions'])
+            ? (template['instructions'] as Record<string, unknown>[])
+            : []
+
+        const startDateIso = toIsoFromYmd(journey['startDate'])
+        const startDateMs = new Date(startDateIso).getTime()
+        const pauseShift = computePauseShift(journey)
+
+        return templateInstructions.map((ti, idx) => {
+          const startOffset =
+            typeof ti['startDayOffset'] === 'number' ? Number(ti['startDayOffset']) : 0
+          const endOffset =
+            typeof ti['endDayOffset'] === 'number' ? Number(ti['endDayOffset']) : null
+          const startAt = new Date(
+            startDateMs + (startOffset + pauseShift) * 86_400_000,
+          ).toISOString()
+          const endAt =
+            endOffset === null
+              ? null
+              : new Date(startDateMs + (endOffset + pauseShift) * 86_400_000).toISOString()
+
+          return {
+            id: `ins-migrated-${journeyId}-${idx}`,
+            patientJourneyId: journeyId,
+            journeyTemplateInstructionId:
+              typeof ti['id'] === 'string' ? String(ti['id']) : undefined,
+            instructionTemplateId: String(ti['instructionTemplateId'] ?? ''),
+            label: typeof ti['label'] === 'string' ? ti['label'] : undefined,
+            startDayOffset: startOffset,
+            endDayOffset: endOffset === null ? undefined : endOffset,
+            startAt,
+            endAt,
+            status: 'ACTIVE',
+            tags: Array.isArray(ti['tags']) ? ti['tags'] : [],
+            acknowledgedAt: null,
+            acknowledgedByUserId: null,
+            completedAt: null,
+            completedByUserId: null,
+            createdAt: nowIso,
+            updatedAt: nowIso,
+          }
+        })
+      })
+
+      const formResponses = Array.isArray(s['formResponses'])
+        ? (s['formResponses'] as Record<string, unknown>[]).map((fr) => ({
+            ...fr,
+            journeyTemplateEntryId: fr['journeyTemplateEntryId'] ?? undefined,
+          }))
+        : []
+
+      return {
+        ...s,
+        schemaVersion: 10,
+        journeyTemplates,
+        patientJourneys,
+        instructions,
+        formResponses,
+      }
+    },
+  },
+  {
+    from: 10,
+    to: 11,
+    up: (s) => {
+      const nowIso = new Date().toISOString()
+
+      // Group existing patient journeys by patientId so we can create one
+      // synthetic EpisodeOfCare per patient (all phases lumped into a single episode).
+      const journeys = Array.isArray(s['patientJourneys'])
+        ? (s['patientJourneys'] as Record<string, unknown>[])
+        : []
+
+      // Build a map: patientId → first journey for that patient (chronological)
+      const patientFirstJourney = new Map<string, Record<string, unknown>>()
+      for (const j of journeys) {
+        const pid = String(j['patientId'] ?? '')
+        if (!patientFirstJourney.has(pid)) patientFirstJourney.set(pid, j)
+      }
+
+      // Create one episode per patient
+      const episodesOfCare: Record<string, unknown>[] = []
+      const episodeByPatient = new Map<string, string>() // patientId → episodeId
+      let epIdx = 0
+      for (const [pid, firstJourney] of patientFirstJourney) {
+        const epId = `ep-migrated-${epIdx++}`
+        const openedAt =
+          typeof firstJourney['createdAt'] === 'string' ? firstJourney['createdAt'] : nowIso
+        episodesOfCare.push({
+          id: epId,
+          patientId: pid,
+          label: 'Uppföljning',
+          status: 'OPEN',
+          openedAt,
+          closedAt: null,
+          createdAt: openedAt,
+          updatedAt: nowIso,
+        })
+        episodeByPatient.set(pid, epId)
+      }
+
+      // Backfill episodeId, phaseType, joinedAt on all existing patient journeys.
+      // Strip any SWITCH_TEMPLATE modifications (replaced by new-journey-per-phase model).
+      const updatedJourneys = journeys.map((j) => {
+        const pid = String(j['patientId'] ?? '')
+        const epId = episodeByPatient.get(pid) ?? ''
+        const mods = Array.isArray(j['modifications'])
+          ? (j['modifications'] as Record<string, unknown>[]).filter(
+              (m) => m['type'] !== 'SWITCH_TEMPLATE',
+            )
+          : []
+        return {
+          ...j,
+          episodeId: j['episodeId'] ?? epId,
+          phaseType: j['phaseType'] ?? 'FOLLOWUP',
+          joinedAt: j['joinedAt'] ?? '',
+          modifications: mods,
+        }
+      })
+
+      return {
+        ...s,
+        schemaVersion: 11,
+        episodesOfCare:
+          (s['episodesOfCare'] as Record<string, unknown>[] | undefined) ?? episodesOfCare,
+        patientJourneys: updatedJourneys,
+      }
+    },
+  },
+  {
+    from: 11,
+    to: 12,
+    up: (s) => {
+      const mapLegacyToDecision = (c: Record<string, unknown>) => {
+        const nextStep = c['nextStep']
+        const assignedRole = c['assignedRole']
+        const assignedUserId = c['assignedUserId']
+        const deadline = c['deadline']
+        const note = c['internalNote']
+
+        if (typeof c['triageDecision'] === 'object' && c['triageDecision'] !== null) {
+          return c['triageDecision']
+        }
+
+        if (nextStep === 'NO_ACTION') {
+          return {
+            contactMode: 'CLOSE',
+            careRole: null,
+            assignmentMode: null,
+            assignedUserId: null,
+            dueAt: null,
+            note: typeof note === 'string' ? note : null,
+          }
+        }
+
+        if (nextStep === 'PHONE_CALL') {
+          return {
+            contactMode: 'PHONE',
+            careRole: assignedRole === 'DOCTOR' || assignedRole === 'PAL' ? 'DOCTOR' : 'NURSE',
+            assignmentMode: assignedRole === 'PAL' ? 'PAL' : assignedUserId ? 'NAMED' : 'ANY',
+            assignedUserId: typeof assignedUserId === 'string' ? assignedUserId : null,
+            dueAt: typeof deadline === 'string' ? deadline : null,
+            note: typeof note === 'string' ? note : null,
+          }
+        }
+
+        if (nextStep === 'DIGITAL_CONTROL') {
+          return {
+            contactMode: 'DIGITAL',
+            careRole: assignedRole === 'DOCTOR' || assignedRole === 'PAL' ? 'DOCTOR' : 'NURSE',
+            assignmentMode: assignedRole === 'PAL' ? 'PAL' : assignedUserId ? 'NAMED' : 'ANY',
+            assignedUserId: typeof assignedUserId === 'string' ? assignedUserId : null,
+            dueAt: typeof deadline === 'string' ? deadline : null,
+            note: typeof note === 'string' ? note : null,
+          }
+        }
+
+        if (nextStep === 'PHYSIO_VISIT') {
+          return {
+            contactMode: 'VISIT',
+            careRole: 'PHYSIO',
+            assignmentMode: assignedUserId ? 'NAMED' : 'ANY',
+            assignedUserId: typeof assignedUserId === 'string' ? assignedUserId : null,
+            dueAt: typeof deadline === 'string' ? deadline : null,
+            note: typeof note === 'string' ? note : null,
+          }
+        }
+
+        const defaultCareRole =
+          assignedRole === 'DOCTOR' || assignedRole === 'PAL'
+            ? 'DOCTOR'
+            : assignedRole === 'NURSE'
+              ? 'NURSE'
+              : 'DOCTOR'
+
+        return {
+          contactMode: 'VISIT',
+          careRole: defaultCareRole,
+          assignmentMode: assignedRole === 'PAL' ? 'PAL' : assignedUserId ? 'NAMED' : 'ANY',
+          assignedUserId: typeof assignedUserId === 'string' ? assignedUserId : null,
+          dueAt: typeof deadline === 'string' ? deadline : null,
+          note: typeof note === 'string' ? note : null,
+        }
+      }
+
+      return {
+        ...s,
+        schemaVersion: 12,
+        cases: Array.isArray(s['cases'])
+          ? (s['cases'] as Record<string, unknown>[]).map((c) => ({
+              ...c,
+              triageDecision: mapLegacyToDecision(c),
+            }))
+          : [],
+      }
+    },
+  },
+  {
+    from: 12,
+    to: 13,
+    up: (s) => ({
+      ...s,
+      schemaVersion: 13,
+      cases: Array.isArray(s['cases'])
+        ? (s['cases'] as Record<string, unknown>[]).map((c) => ({
+            ...c,
+            closedAt: c['closedAt'] ?? null,
+            bookings: Array.isArray(c['bookings'])
+              ? (c['bookings'] as Record<string, unknown>[]).map((b) => ({
+                  ...b,
+                  completedAt: b['completedAt'] ?? null,
+                  completedByUserId: b['completedByUserId'] ?? null,
+                  followUpDate: b['followUpDate'] ?? null,
+                  completionComment: b['completionComment'] ?? null,
+                }))
+              : c['bookings'],
+          }))
+        : [],
+    }),
+  },
+  {
+    from: 13,
+    to: 14,
+    up: (s) => {
+      const normalizeRole = (value: unknown): unknown => (value === 'PAL' ? 'DOCTOR' : value)
+
+      return {
+        ...s,
+        schemaVersion: 14,
+        users: Array.isArray(s['users'])
+          ? (s['users'] as Record<string, unknown>[]).map((u) => ({
+              ...u,
+              role: normalizeRole(u['role']),
+            }))
+          : [],
+        auditEvents: Array.isArray(s['auditEvents'])
+          ? (s['auditEvents'] as Record<string, unknown>[]).map((e) => ({
+              ...e,
+              userRole: normalizeRole(e['userRole']),
+            }))
+          : [],
+        cases: Array.isArray(s['cases'])
+          ? (s['cases'] as Record<string, unknown>[]).map((c) => ({
+              ...c,
+              assignedRole: normalizeRole(c['assignedRole']),
+              reviews: Array.isArray(c['reviews'])
+                ? (c['reviews'] as Record<string, unknown>[]).map((r) => ({
+                    ...r,
+                    createdByRole: normalizeRole(r['createdByRole']),
+                    reviewedByRole: normalizeRole(r['reviewedByRole']),
+                  }))
+                : c['reviews'],
+              triageDecision:
+                c['triageDecision'] && typeof c['triageDecision'] === 'object'
+                  ? {
+                      ...(c['triageDecision'] as Record<string, unknown>),
+                      assignmentMode:
+                        (c['triageDecision'] as Record<string, unknown>)['assignmentMode'] === 'PAL'
+                          ? 'PAL'
+                          : (c['triageDecision'] as Record<string, unknown>)['assignmentMode'],
+                    }
+                  : c['triageDecision'],
+            }))
+          : [],
+      }
+    },
+  },
+  {
+    from: 14,
+    to: 15,
+    up: (s) => {
+      // Ensure any date-only or otherwise malformed dueAt values are converted
+      // to full ISO timestamps, since the schema requires datetime format.
+      const normalize = (val: unknown): string | null => {
+        if (typeof val !== 'string' || !val) return null
+        const d = new Date(val)
+        if (Number.isNaN(d.getTime())) return null
+        return d.toISOString()
+      }
+
+      return {
+        ...s,
+        schemaVersion: 15,
+        cases: Array.isArray(s['cases'])
+          ? (s['cases'] as Record<string, unknown>[]).map((c) => {
+              if (c['triageDecision'] && typeof c['triageDecision'] === 'object') {
+                const td = { ...(c['triageDecision'] as Record<string, unknown>) }
+                if (typeof td['dueAt'] === 'string') {
+                  const iso = normalize(td['dueAt'])
+                  if (iso) td['dueAt'] = iso
+                }
+                return { ...c, triageDecision: td }
+              }
+              return c
+            })
+          : s['cases'],
+      }
+    },
+  },
 ]
 
 // ---------------------------------------------------------------------------
@@ -194,9 +611,18 @@ export function runMigrations(raw: unknown): MigrationResult {
   if (storedVersion === CURRENT_SCHEMA_VERSION) {
     const parsed = AppStateSchema.safeParse(raw)
     if (parsed.success) return { ok: true, state: parsed.data }
+    // Data is already at the current version but doesn't match the schema.
+    // This can happen if the stored JSON has been corrupted or manually
+    // edited.  We treat it specially so that the UI can show a clearer
+    // message than the generic "after migration" text.
+    console.error(
+      'runMigrations: stored state is at current version but invalid',
+      parsed.error,
+      raw,
+    )
     return {
       ok: false,
-      reason: 'parse-error',
+      reason: 'invalid',
       storedVersion,
       rawState: raw,
       parseError: parsed.error,
@@ -218,6 +644,7 @@ export function runMigrations(raw: unknown): MigrationResult {
 
   const parsed = AppStateSchema.safeParse(current)
   if (!parsed.success) {
+    console.error('runMigrations: migration result failed validation', parsed.error, current)
     return {
       ok: false,
       reason: 'parse-error',

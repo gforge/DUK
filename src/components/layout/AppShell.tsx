@@ -1,7 +1,8 @@
-import React, { useState } from 'react'
 import { Box, Toolbar, useMediaQuery, useTheme } from '@mui/material'
-import TopBar from './TopBar'
+import React, { useState } from 'react'
+
 import SideNav from './SideNav'
+import TopBar from './TopBar'
 
 const DRAWER_WIDTH = 220
 
@@ -12,7 +13,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh' }}>
-      <TopBar drawerWidth={DRAWER_WIDTH} onMenuClick={() => setMobileOpen((o) => !o)} />
+      <TopBar onMenuClick={() => setMobileOpen((o) => !o)} />
       <SideNav
         drawerWidth={DRAWER_WIDTH}
         mobileOpen={mobileOpen}

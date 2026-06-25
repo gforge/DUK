@@ -22,6 +22,8 @@ export const TRIGGERS = [
   'INFECTION_SUSPECTED',
   'LOW_FUNCTION',
   'LOW_QOL',
+  'SEEK_CONTACT',
+  'ABNORMAL_ANSWER',
 ] as const
 
 export type TriggerValue = (typeof TRIGGERS)[number]
@@ -48,4 +50,11 @@ export function isoDateOffset(daysOffset: number): string {
 /** Full ISO timestamp, offset days from today (negative = past). */
 export function isoTsOffset(daysOffset: number): string {
   return new Date(todayMs + daysOffset * MS_PER_DAY).toISOString()
+}
+
+/** Derive clinical case category from days elapsed since surgery. */
+export function categoryFromDaysAgo(startDaysAgo: number): 'ACUTE' | 'SUBACUTE' | 'CONTROL' {
+  if (startDaysAgo <= 21) return 'ACUTE'
+  if (startDaysAgo <= 90) return 'SUBACUTE'
+  return 'CONTROL'
 }

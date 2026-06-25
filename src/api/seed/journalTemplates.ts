@@ -1,5 +1,5 @@
-import { iso, daysAgo } from './shared'
 import type { JournalTemplate } from '../schemas'
+import { daysAgo,iso } from './shared'
 
 const STANDARD_BODY_SV = `## Ortopedisk journal – standardmall
 

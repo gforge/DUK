@@ -1,7 +1,7 @@
-import React, { useRef } from 'react'
-import { Box, Button, Paper, Stack, Typography } from '@mui/material'
-import DownloadIcon from '@mui/icons-material/Download'
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
+import DownloadIcon from '@mui/icons-material/Download'
+import { Box, Button, Paper, Stack, Typography } from '@mui/material'
+import React, { useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 
 interface Props {

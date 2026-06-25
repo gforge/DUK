@@ -1,8 +1,8 @@
-import { iso, isoDate, daysAgo } from './shared'
-import type { User, Patient } from '../schemas'
+import type { Patient, User } from '../schemas'
+import { daysAgo, iso } from './shared'
 
 export const users: User[] = [
-  { id: 'user-pal-1', name: 'Dr. Sara Lindqvist (PAL)', role: 'PAL' },
+  { id: 'user-pal-1', name: 'Dr. Sara Lindqvist', role: 'DOCTOR' },
   { id: 'user-doc-1', name: 'Dr. Erik Bergström', role: 'DOCTOR' },
   { id: 'user-nurse-1', name: 'SSK Anna Holmberg', role: 'NURSE' },
   { id: 'user-nurse-2', name: 'SSK Jonas Ekström', role: 'NURSE' },
@@ -21,7 +21,7 @@ export const patients: Patient[] = [
   },
   {
     id: 'p-2',
-    displayName: 'Elin Elinsson',
+    displayName: 'Elin Söderberg',
     personalNumber: '196503152222',
     dateOfBirth: '1965-03-15',
     palId: 'user-pal-1',
@@ -47,7 +47,7 @@ export const patients: Patient[] = [
   },
   {
     id: 'p-5',
-    displayName: 'Torkel Torkelson',
+    displayName: 'Torkel Håkansson',
     personalNumber: '198804086666',
     dateOfBirth: '1988-04-08',
     palId: 'user-doc-1',
@@ -101,7 +101,7 @@ export const patients: Patient[] = [
   // ── Proximal Humerus patients ────────────────────────────────────────────
   {
     id: 'p-11',
-    displayName: 'Ingrid Ingvarsson',
+    displayName: 'Ingrid Persson',
     personalNumber: '195206144321',
     dateOfBirth: '1952-06-14',
     palId: 'user-pal-1',
@@ -135,5 +135,97 @@ export const patients: Patient[] = [
     palId: 'user-doc-1',
     lastOpenedAt: iso(daysAgo(3)),
     createdAt: iso(daysAgo(52)),
+  },
+  // ── Knee OA patient (3-phase journey) ────────────────────────────────────
+  {
+    id: 'p-15',
+    displayName: 'Karin Karlberg',
+    personalNumber: '195904241234',
+    dateOfBirth: '1959-04-24',
+    palId: 'user-pal-1',
+    lastOpenedAt: iso(daysAgo(2)),
+    createdAt: iso(daysAgo(120)),
+  },
+  // ── Late-join demo patient (fracture 4 weeks ago, registered today) ───────
+  {
+    id: 'p-16',
+    displayName: 'Lars Larsson',
+    personalNumber: '197003151234',
+    dateOfBirth: '1970-03-15',
+    palId: 'user-doc-1',
+    lastOpenedAt: iso(daysAgo(0)),
+    createdAt: iso(daysAgo(0)),
+  },
+  // ── Extra PAL ownership demo patients ───────────────────────────────────
+  {
+    id: 'p-17',
+    displayName: 'Helena Holm',
+    personalNumber: '198909016543',
+    dateOfBirth: '1989-09-01',
+    palId: 'user-pal-1',
+    lastOpenedAt: iso(daysAgo(1)),
+    createdAt: iso(daysAgo(4)),
+  },
+  {
+    id: 'p-18',
+    displayName: 'Olof Olsson',
+    personalNumber: '196102102468',
+    dateOfBirth: '1961-02-10',
+    palId: 'user-doc-1',
+    lastOpenedAt: iso(daysAgo(2)),
+    createdAt: iso(daysAgo(6)),
+  },
+  // ── Hindfoot elective surgery pathway ────────────────────────────────────
+  {
+    // p-19: Full 3-phase hindfoot journey — now at 6-month post-op followup
+    id: 'p-19',
+    displayName: 'Eva Lindqvist',
+    personalNumber: '196809034321',
+    dateOfBirth: '1968-09-03',
+    palId: 'user-pal-1',
+    lastOpenedAt: iso(daysAgo(0)),
+    createdAt: iso(daysAgo(540)),
+  },
+  {
+    // p-20: Mid-waiting-list — 3-month surgery interest form pending (NOT_OPENED)
+    id: 'p-20',
+    displayName: 'Margareta Pettersson',
+    personalNumber: '196205145678',
+    dateOfBirth: '1962-05-14',
+    palId: 'user-doc-1',
+    createdAt: iso(daysAgo(300)),
+  },
+  // ── Journey-switch demo ───────────────────────────────────────────────────
+  {
+    // p-21: Ankle fracture initially classified simple → switched to complex at day 3
+    id: 'p-21',
+    displayName: 'Axel Lindström',
+    personalNumber: '198302189876',
+    dateOfBirth: '1983-02-18',
+    palId: 'user-pal-1',
+    lastOpenedAt: iso(daysAgo(2)),
+    createdAt: iso(daysAgo(42)),
+  },
+  // ── Two simultaneous fractures (same trauma event) ────────────────────────
+  {
+    // p-22: Fall on ice → right distal radius + left calcaneus simultaneously
+    id: 'p-22',
+    displayName: 'Gunnar Eriksson',
+    personalNumber: '195111031357',
+    dateOfBirth: '1951-11-03',
+    palId: 'user-doc-1',
+    lastOpenedAt: iso(daysAgo(1)),
+    createdAt: iso(daysAgo(35)),
+  },
+  // ── Old fracture 1yr + new acute fracture ────────────────────────────────
+  {
+    // p-23: Femoral neck fracture 1 year ago (CONTROL) + new distal radius 10 days ago (ACUTE)
+    id: 'p-23',
+    displayName: 'Birgit Magnusson',
+    personalNumber: '195407222468',
+    dateOfBirth: '1954-07-22',
+    palId: 'user-pal-1',
+    lastOpenedAt: iso(daysAgo(1)),
+    createdAt: iso(daysAgo(365)),
   },
 ]

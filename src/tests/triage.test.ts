@@ -1,7 +1,8 @@
-import { describe, it, expect, beforeEach } from 'vitest'
-import { initStore } from '../api/storage'
-import { SEED_STATE } from '../api/seed'
-import * as service from '../api/service'
+import { beforeEach, describe, expect, it } from 'vitest'
+
+import { SEED_STATE } from '@/api/seed'
+import * as service from '@/api/service'
+import { initStore } from '@/api/storage'
 
 beforeEach(() => {
   initStore(structuredClone(SEED_STATE))
@@ -15,21 +16,64 @@ describe('triageCase', () => {
     const result = service.triageCase(
       reviewCase.id,
       {
-        nextStep: 'PHONE_CALL',
-        deadline: new Date().toISOString(),
-        assignedRole: 'NURSE',
-        internalNote: 'Test note',
+        triageDecision: {
+          contactMode: 'PHONE',
+          careRole: 'NURSE',
+          assignmentMode: 'ANY',
+          dueAt: new Date().toISOString(),
+          note: 'Test note',
+        },
         patientMessage: 'Test msg',
-        closeImmediately: false,
       },
       'user-pal-1',
-      'PAL',
+      'DOCTOR',
     )
 
     expect(result.status).toBe('TRIAGED')
     expect(result.nextStep).toBe('PHONE_CALL')
+    expect(result.triageDecision?.contactMode).toBe('PHONE')
     expect(result.internalNote).toBe('Test note')
     expect(result.patientMessage).toBe('Test msg')
+  })
+
+  it('blocks triage when pending reviews exist and allows once completed', () => {
+    // pick a NEEDS_REVIEW case and create a pending review
+    const reviewCase = SEED_STATE.cases.find((c) => c.status === 'NEEDS_REVIEW')
+    if (!reviewCase) throw new Error('No NEEDS_REVIEW case in seed data')
+
+    const newReview = service.createReview(reviewCase.id, 'LAB', 'user-doc-1', 'DOCTOR')
+    expect(service.getPendingReviews(reviewCase.id)).toHaveLength(1)
+
+    expect(() =>
+      service.triageCase(
+        reviewCase.id,
+        {
+          triageDecision: {
+            contactMode: 'PHONE',
+            careRole: 'NURSE',
+            assignmentMode: 'ANY',
+          },
+        },
+        'user-doc-1',
+        'DOCTOR',
+      ),
+    ).toThrow(/pending/i)
+
+    // complete the review then triage should succeed
+    service.completeReview(newReview.id, reviewCase.id, 'user-doc-1', 'DOCTOR', 'OK')
+    const result2 = service.triageCase(
+      reviewCase.id,
+      {
+        triageDecision: {
+          contactMode: 'PHONE',
+          careRole: 'NURSE',
+          assignmentMode: 'ANY',
+        },
+      },
+      'user-doc-1',
+      'DOCTOR',
+    )
+    expect(result2.status).toBe('TRIAGED')
   })
 
   it('sets status to CLOSED when closeImmediately is true', () => {
@@ -39,12 +83,11 @@ describe('triageCase', () => {
     const result = service.triageCase(
       triagedCase.id,
       {
-        nextStep: 'NO_ACTION',
-        deadline: new Date().toISOString(),
-        assignedRole: 'DOCTOR',
-        internalNote: '',
-        patientMessage: '',
-        closeImmediately: true,
+        triageDecision: {
+          contactMode: 'CLOSE',
+          careRole: null,
+          assignmentMode: null,
+        },
       },
       'user-doc-1',
       'DOCTOR',
@@ -53,25 +96,23 @@ describe('triageCase', () => {
     expect(result.status).toBe('CLOSED')
   })
 
-  it('throws when trying to triage a NEW case directly to TRIAGED', () => {
+  it('allows triaging a NEW case directly to TRIAGED (patient not yet active)', () => {
     const newCase = SEED_STATE.cases.find((c) => c.status === 'NEW')
     if (!newCase) throw new Error('No NEW case in seed data')
 
-    expect(() =>
-      service.triageCase(
-        newCase.id,
-        {
-          nextStep: 'PHONE_CALL',
-          deadline: new Date().toISOString(),
-          assignedRole: 'NURSE',
-          internalNote: '',
-          patientMessage: '',
-          closeImmediately: false,
+    const result = service.triageCase(
+      newCase.id,
+      {
+        triageDecision: {
+          contactMode: 'PHONE',
+          careRole: 'NURSE',
+          assignmentMode: 'ANY',
         },
-        'user-doc-1',
-        'DOCTOR',
-      ),
-    ).toThrow()
+      },
+      'user-doc-1',
+      'DOCTOR',
+    )
+    expect(result.status).toBe('TRIAGED')
   })
 })
 
@@ -90,11 +131,22 @@ describe('advanceCaseStatus', () => {
     expect(result.status).toBe('FOLLOWING_UP')
   })
 
-  it('throws on invalid transition', () => {
+  it('allows advancing NEW directly to CLOSED', () => {
     const newCase = SEED_STATE.cases.find((c) => c.status === 'NEW')
     if (!newCase) throw new Error('No NEW case in seed data')
 
-    expect(() => service.advanceCaseStatus(newCase.id, 'CLOSED', 'user-doc-1', 'DOCTOR')).toThrow()
+    const result = service.advanceCaseStatus(newCase.id, 'CLOSED', 'user-doc-1', 'DOCTOR')
+    expect(result.status).toBe('CLOSED')
+  })
+
+  it('throws on genuinely invalid transition (CLOSED → TRIAGED)', () => {
+    // Ensure transitions that are semantically impossible still throw
+    const closedCase = SEED_STATE.cases.find((c) => c.status === 'CLOSED')
+    if (!closedCase) throw new Error('No CLOSED case in seed data')
+
+    expect(() =>
+      service.advanceCaseStatus(closedCase.id, 'TRIAGED', 'user-doc-1', 'DOCTOR'),
+    ).toThrow()
   })
 
   it('advances FOLLOWING_UP → CLOSED', () => {
