@@ -11,12 +11,9 @@ import {
 } from '@mui/material'
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-
 import type { QuestionnaireTemplate } from '@/api/schemas'
 import type { EffectiveStep } from '@/api/service'
-
 import { AddStepForm, RemoveStepForm } from './modify/ModifyForms'
-
 interface ModifyJourneyDialogProps {
   open: boolean
   onClose: () => void
@@ -29,12 +26,16 @@ interface ModifyJourneyDialogProps {
     type: 'ADD_STEP' | 'REMOVE_STEP' | 'CANCEL',
     payload: {
       reason: string
-      entry?: { label: string; offsetDays: number; windowDays: number; templateId: string }
+      entry?: {
+        label: string
+        offsetDays: number
+        windowDays: number
+        templateId: string
+      }
       stepId?: string
     },
   ) => Promise<void>
 }
-
 export default function ModifyJourneyDialog({
   open,
   onClose,
@@ -48,21 +49,17 @@ export default function ModifyJourneyDialog({
   const [tab, setTab] = useState(0)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
-
   const [addLabel, setAddLabel] = useState('')
   const [addOffset, setAddOffset] = useState('')
   const [addWindow, setAddWindow] = useState('2')
   const [addTemplateId, setAddTemplateId] = useState('')
   const [addReason, setAddReason] = useState('')
-
   const [removeStepId, setRemoveStepId] = useState('')
   const [removeReason, setRemoveReason] = useState('')
-
   const handleClose = () => {
     setError(null)
     onClose()
   }
-
   const handleSubmit = async () => {
     setError(null)
     setSaving(true)
@@ -95,9 +92,8 @@ export default function ModifyJourneyDialog({
       setSaving(false)
     }
   }
-
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
+    <Dialog open={open} onClose={handleClose} fullWidth sx={{ maxWidth: 'sm' }}>
       <DialogTitle>
         {t('journey.modify.title')} — {currentTemplateName}
       </DialogTitle>

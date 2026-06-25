@@ -1,20 +1,10 @@
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
-import {
-  Box,
-  IconButton,
-  Snackbar,
-  Stack,
-  Tooltip,
-  Typography,
-  TypographyProps,
-} from '@mui/material'
+import { Box, IconButton, Snackbar, Stack, Tooltip, Typography } from '@mui/material'
+import type { TypographyProps } from '@mui/material'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-
 import { formatPersonnummer } from '@/api/utils/personnummer'
-
 type LabelFormat = 'long' | 'short' | 'none'
-
 interface PersonalNumberCopyProps extends Pick<TypographyProps, 'color' | 'sx' | 'aria-label'> {
   personalNumber?: string | null
   labelFormat?: LabelFormat
@@ -22,7 +12,6 @@ interface PersonalNumberCopyProps extends Pick<TypographyProps, 'color' | 'sx' |
   copyAsRaw?: boolean
   onCopy?: (copied: string) => void
 }
-
 export default function PersonalNumberCopy({
   personalNumber,
   labelFormat = 'short',
@@ -34,9 +23,7 @@ export default function PersonalNumberCopy({
   sx,
 }: PersonalNumberCopyProps) {
   const { t } = useTranslation()
-
   const formatted = personalNumber ? formatPersonnummer(personalNumber) : '—'
-
   async function handleCopy() {
     if (!personalNumber) return
     const normalized = personalNumber.replace(/[-+\s]/g, '')
@@ -52,13 +39,15 @@ export default function PersonalNumberCopy({
       setCopiedOpen(true)
     }
   }
-
   const showLabel = labelFormat === 'long'
   const [copiedOpen, setCopiedOpen] = React.useState(false)
-
   return (
     <>
-      <Stack direction="row" alignItems="center" spacing={1} sx={sx}>
+      <Stack
+        direction="row"
+        spacing={1}
+        sx={[...(Array.isArray(sx) ? sx : sx ? [sx] : []), { alignItems: 'center' }]}
+      >
         {showLabel ? (
           <Typography variant="body2" color={color}>
             {t('patient.personalNumber')}:

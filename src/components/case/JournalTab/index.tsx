@@ -1,232 +1,159 @@
-import PrintIcon from '@mui/icons-material/Print'
-import {
-  Box,
-  Button,
-  CircularProgress,
-  FormControl,
-  IconButton,
-  InputLabel,
-  MenuItem,
-  Paper,
-  Select,
-  Stack,
-  Tooltip,
-  Typography,
-} from '@mui/material'
-import React, { useEffect, useMemo, useState } from 'react'
-import { useTranslation } from 'react-i18next'
-
-import * as client from '@/api/client'
-import type { Case, Patient } from '@/api/schemas'
-import BookingsList from '@/components/case/BookingsList'
-import JournalDraftCard from '@/components/case/JournalDraftCard'
-import { useApi } from '@/hooks/useApi'
-import { useRole } from '@/store/roleContext'
-import { useSnack } from '@/store/snackContext'
-
+import PrintIcon from '@mui/icons-material/Print';
+import { Box, Button, CircularProgress, FormControl, IconButton, InputLabel, MenuItem, Paper, Select, Stack, Tooltip, Typography, } from '@mui/material';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import * as client from '@/api/client';
+import type { Case, Patient } from '@/api/schemas';
+import BookingsList from '@/components/case/BookingsList';
+import JournalDraftCard from '@/components/case/JournalDraftCard';
+import { useApi } from '@/hooks/useApi';
+import { useRole } from '@/store/roleContext';
+import { useSnack } from '@/store/snackContext';
 interface JournalTabProps {
-  readonly caseData: Case
-  readonly patient?: Patient
-  readonly onCaseChange?: () => void
+    readonly caseData: Case;
+    readonly patient?: Patient;
+    readonly onCaseChange?: () => void;
 }
-
 export default function JournalTab({ caseData, patient: _patient, onCaseChange }: JournalTabProps) {
-  const { t, i18n } = useTranslation()
-  const { currentUser, isRole } = useRole()
-  const { showSnack } = useSnack()
-
-  const [selectedTemplates, setSelectedTemplates] = useState<string[]>([])
-  const [templateDraftIds, setTemplateDraftIds] = useState<Record<string, string>>({})
-  const [loadingIds, setLoadingIds] = useState<Record<string, boolean>>({})
-  const [approving, setApproving] = useState<string | null>(null)
-  const [copied, setCopied] = useState<string | null>(null)
-
-  const { data: allTemplates } = useApi(() => client.getJournalTemplates(), [])
-  const {
-    data: drafts,
-    loading,
-    refetch: refetchDrafts,
-  } = useApi(() => client.getJournalDrafts(caseData.id), [caseData.id])
-
-  const canApprove = isRole('DOCTOR')
-
-  const currentLangTemplates = useMemo(() => {
-    const all = allTemplates ?? []
-    return all.filter((t) => (t.language ?? 'sv') === i18n.language)
-  }, [allTemplates, i18n.language])
-
-  // sync selectedTemplates and mapping when drafts change
-  useEffect(() => {
-    if (drafts) {
-      setSelectedTemplates(drafts.map((d) => d.templateId).filter((id): id is string => !!id))
-      const mapping: Record<string, string> = {}
-      drafts.forEach((d) => {
-        if (d.templateId) mapping[d.templateId] = d.id
-      })
-      setTemplateDraftIds(mapping)
-    }
-  }, [drafts])
-
-  async function toggleTemplate(templateId: string) {
-    const has = selectedTemplates.includes(templateId)
-    // optimistic UI update
-    setSelectedTemplates((prev) =>
-      has ? prev.filter((id) => id !== templateId) : [...prev, templateId],
-    )
-    setLoadingIds((prev) => ({ ...prev, [templateId]: true }))
-    try {
-      if (has) {
-        // get draft id from mapping or fallback to storage
-        let draftId: string | undefined = templateDraftIds[templateId]
-        if (!draftId) {
-          const { getStore } = await import('@/api/storage')
-          const state = getStore()
-          const draft = state.journalDrafts.find(
-            (d) => d.caseId === caseData.id && d.templateId === templateId,
-          )
-          draftId = draft?.id
+    const { t, i18n } = useTranslation();
+    const { currentUser, isRole } = useRole();
+    const { showSnack } = useSnack();
+    const [selectedTemplates, setSelectedTemplates] = useState<string[]>([]);
+    const [templateDraftIds, setTemplateDraftIds] = useState<Record<string, string>>({});
+    const [loadingIds, setLoadingIds] = useState<Record<string, boolean>>({});
+    const [approving, setApproving] = useState<string | null>(null);
+    const [copied, setCopied] = useState<string | null>(null);
+    const { data: allTemplates } = useApi(() => client.getJournalTemplates(), []);
+    const { data: drafts, loading, refetch: refetchDrafts, } = useApi(() => client.getJournalDrafts(caseData.id), [caseData.id]);
+    const canApprove = isRole('DOCTOR');
+    const currentLangTemplates = useMemo(() => {
+        const all = allTemplates ?? [];
+        return all.filter((t) => (t.language ?? 'sv') === i18n.language);
+    }, [allTemplates, i18n.language]);
+    // sync selectedTemplates and mapping when drafts change
+    useEffect(() => {
+        if (drafts) {
+            setSelectedTemplates(drafts.map((d) => d.templateId).filter((id): id is string => !!id));
+            const mapping: Record<string, string> = {};
+            drafts.forEach((d) => {
+                if (d.templateId)
+                    mapping[d.templateId] = d.id;
+            });
+            setTemplateDraftIds(mapping);
         }
-        if (draftId) {
-          await client.deleteJournalDraft(draftId, currentUser.id, currentUser.role)
-          showSnack(t('journal.deleted') as string, 'success')
-          setTemplateDraftIds((prev) => {
-            const copy = { ...prev }
-            delete copy[templateId]
-            return copy
-          })
+    }, [drafts]);
+    async function toggleTemplate(templateId: string) {
+        const has = selectedTemplates.includes(templateId);
+        // optimistic UI update
+        setSelectedTemplates((prev) => has ? prev.filter((id) => id !== templateId) : [...prev, templateId]);
+        setLoadingIds((prev) => ({ ...prev, [templateId]: true }));
+        try {
+            if (has) {
+                // get draft id from mapping or fallback to storage
+                let draftId: string | undefined = templateDraftIds[templateId];
+                if (!draftId) {
+                    const { getStore } = await import('@/api/storage');
+                    const state = getStore();
+                    const draft = state.journalDrafts.find((d) => d.caseId === caseData.id && d.templateId === templateId);
+                    draftId = draft?.id;
+                }
+                if (draftId) {
+                    await client.deleteJournalDraft(draftId, currentUser.id, currentUser.role);
+                    showSnack(t('journal.deleted') as string, 'success');
+                    setTemplateDraftIds((prev) => {
+                        const copy = { ...prev };
+                        delete copy[templateId];
+                        return copy;
+                    });
+                }
+            }
+            else {
+                const draft = await client.generateJournalDraft(caseData.id, templateId, currentUser.id, currentUser.role, i18n.language);
+                showSnack(t('journal.generate'), 'success');
+                setTemplateDraftIds((prev) => ({ ...prev, [templateId]: draft.id }));
+            }
+            refetchDrafts();
         }
-      } else {
-        const draft = await client.generateJournalDraft(
-          caseData.id,
-          templateId,
-          currentUser.id,
-          currentUser.role,
-          i18n.language,
-        )
-        showSnack(t('journal.generate'), 'success')
-        setTemplateDraftIds((prev) => ({ ...prev, [templateId]: draft.id }))
-      }
-      refetchDrafts()
-    } catch (err) {
-      showSnack(String(err), 'error')
-    } finally {
-      setLoadingIds((prev) => ({ ...prev, [templateId]: false }))
+        catch (err) {
+            showSnack(String(err), 'error');
+        }
+        finally {
+            setLoadingIds((prev) => ({ ...prev, [templateId]: false }));
+        }
     }
-  }
-
-  async function handleApprove(draftId: string) {
-    setApproving(draftId)
-    try {
-      await client.approveJournalDraft(draftId, currentUser.id, currentUser.role)
-      showSnack(t('journal.approved'), 'success')
-      refetchDrafts()
-    } catch (err) {
-      showSnack(String(err), 'error')
-    } finally {
-      setApproving(null)
+    async function handleApprove(draftId: string) {
+        setApproving(draftId);
+        try {
+            await client.approveJournalDraft(draftId, currentUser.id, currentUser.role);
+            showSnack(t('journal.approved'), 'success');
+            refetchDrafts();
+        }
+        catch (err) {
+            showSnack(String(err), 'error');
+        }
+        finally {
+            setApproving(null);
+        }
     }
-  }
-
-  async function handleCopy(content: string, draftId: string) {
-    await navigator.clipboard.writeText(content)
-    setCopied(draftId)
-    showSnack(t('journal.copied'), 'success')
-    setTimeout(() => setCopied(null), 2000)
-  }
-
-  return (
-    <Box>
-      <Stack direction="row" justifyContent="flex-end" sx={{ mb: 1, displayPrint: 'none' }}>
+    async function handleCopy(content: string, draftId: string) {
+        await navigator.clipboard.writeText(content);
+        setCopied(draftId);
+        showSnack(t('journal.copied'), 'success');
+        setTimeout(() => setCopied(null), 2000);
+    }
+    return (<Box>
+      <Stack direction="row" sx={{ mb: 1, displayPrint: 'none', justifyContent: 'flex-end' }}>
         <Tooltip title={t('common.print')}>
-          <IconButton
-            size="small"
-            onClick={() => globalThis.print()}
-            aria-label={t('common.print')}
-          >
+          <IconButton size="small" onClick={() => globalThis.print()} aria-label={t('common.print')}>
             <PrintIcon fontSize="small" />
           </IconButton>
         </Tooltip>
       </Stack>
       <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
-        <BookingsList
-          caseData={caseData}
-          onChange={() => {
-            onCaseChange?.()
-          }}
-        />
+        <BookingsList caseData={caseData} onChange={() => {
+            onCaseChange?.();
+        }}/>
       </Paper>
       <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
-        <Typography variant="subtitle2" fontWeight={600} gutterBottom>
+        <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 600 }}>
           {t('journal.generate')}
         </Typography>
-        <Stack direction="row" gap={2} flexWrap="wrap" alignItems="flex-end">
+        <Stack direction="row" sx={{ gap: 2, flexWrap: 'wrap', alignItems: 'flex-end' }}>
           {currentLangTemplates.length < 4 ? (
-            // small set, render one button per template
-            <Stack direction="row" gap={1} aria-label={t('journal.selectTemplate')}>
-              {currentLangTemplates.map((tmpl) => (
-                <Button
-                  key={tmpl.id}
-                  variant={selectedTemplates.includes(tmpl.id) ? 'contained' : 'outlined'}
-                  onClick={() => toggleTemplate(tmpl.id)}
-                  disabled={!!loadingIds[tmpl.id]}
-                  startIcon={loadingIds[tmpl.id] ? <CircularProgress size={16} /> : undefined}
-                >
+        // small set, render one button per template
+        <Stack direction="row" aria-label={t('journal.selectTemplate')} sx={{ gap: 1 }}>
+              {currentLangTemplates.map((tmpl) => (<Button key={tmpl.id} variant={selectedTemplates.includes(tmpl.id) ? 'contained' : 'outlined'} onClick={() => toggleTemplate(tmpl.id)} disabled={!!loadingIds[tmpl.id]} startIcon={loadingIds[tmpl.id] ? <CircularProgress size={16}/> : undefined}>
                   {tmpl.name}
-                </Button>
-              ))}
-            </Stack>
-          ) : (
-            <>
+                </Button>))}
+            </Stack>) : (<>
               // four or more templates, fall back to a select dropdown
               <FormControl size="small" sx={{ minWidth: 260 }}>
                 <InputLabel id="journal-template-label">{t('journal.selectTemplate')}</InputLabel>
-                <Select
-                  labelId="journal-template-label"
-                  multiple
-                  value={selectedTemplates}
-                  onChange={(e) => {
-                    const newValues = e.target.value as string[]
-                    const added = newValues.filter((id) => !selectedTemplates.includes(id))
-                    const removed = selectedTemplates.filter((id) => !newValues.includes(id))
-                    // handle additions/removals sequentially but non-blocking
-                    added.forEach((id) => toggleTemplate(id))
-                    removed.forEach((id) => toggleTemplate(id))
-                  }}
-                  label={t('journal.selectTemplate')}
-                >
-                  {currentLangTemplates.map((tmpl) => (
-                    <MenuItem key={tmpl.id} value={tmpl.id}>
+                <Select labelId="journal-template-label" multiple value={selectedTemplates} onChange={(e) => {
+                const newValues = e.target.value as string[];
+                const added = newValues.filter((id) => !selectedTemplates.includes(id));
+                const removed = selectedTemplates.filter((id) => !newValues.includes(id));
+                // handle additions/removals sequentially but non-blocking
+                added.forEach((id) => toggleTemplate(id));
+                removed.forEach((id) => toggleTemplate(id));
+            }} label={t('journal.selectTemplate')}>
+                  {currentLangTemplates.map((tmpl) => (<MenuItem key={tmpl.id} value={tmpl.id}>
                       {tmpl.name}
-                    </MenuItem>
-                  ))}
+                    </MenuItem>))}
                 </Select>
               </FormControl>
               {/* no separate generate button needed anymore */}
-            </>
-          )}
+            </>)}
         </Stack>
       </Paper>
 
       {loading && <CircularProgress />}
-      {!loading && (!drafts || drafts.length === 0) && (
-        <Typography color="text.secondary" variant="body2">
+      {!loading && (!drafts || drafts.length === 0) && (<Typography color="text.secondary" variant="body2">
           {t('journal.noDrafts')}
-        </Typography>
-      )}
+        </Typography>)}
 
-      <Stack gap={2}>
-        {drafts?.map((draft) => (
-          <JournalDraftCard
-            key={draft.id}
-            draft={draft}
-            canApprove={canApprove}
-            approving={approving}
-            copied={copied}
-            onApprove={handleApprove}
-            onCopy={handleCopy}
-          />
-        ))}
+      <Stack sx={{ gap: 2 }}>
+        {drafts?.map((draft) => (<JournalDraftCard key={draft.id} draft={draft} canApprove={canApprove} approving={approving} copied={copied} onApprove={handleApprove} onCopy={handleCopy}/>))}
       </Stack>
-    </Box>
-  )
+    </Box>);
 }

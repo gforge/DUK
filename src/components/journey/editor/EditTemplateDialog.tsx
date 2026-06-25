@@ -9,17 +9,14 @@ import {
 } from '@mui/material'
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-
 import * as client from '@/api/client'
 import type { JourneyTemplate } from '@/api/schemas'
 import { useSnack } from '@/store/snackContext'
-
 interface Props {
   template?: JourneyTemplate
   onClose: () => void
   onSaved: () => void
 }
-
 export default function EditTemplateDialog({ template, onClose, onSaved }: Props) {
   const { t } = useTranslation()
   const { showSnack } = useSnack()
@@ -29,7 +26,6 @@ export default function EditTemplateDialog({ template, onClose, onSaved }: Props
     template?.referenceDateLabel ?? t('journey.referenceDateDefault'),
   )
   const [saving, setSaving] = useState(false)
-
   const handleSave = async () => {
     if (!name.trim()) return
     setSaving(true)
@@ -57,14 +53,13 @@ export default function EditTemplateDialog({ template, onClose, onSaved }: Props
       setSaving(false)
     }
   }
-
   return (
-    <Dialog open onClose={onClose} maxWidth="xs" fullWidth>
+    <Dialog open onClose={onClose} fullWidth sx={{ maxWidth: 'xs' }}>
       <DialogTitle>
         {template ? t('journey.editor.editTemplate') : t('journey.editor.createTemplate')}
       </DialogTitle>
       <DialogContent>
-        <Stack gap={2} sx={{ mt: 1 }}>
+        <Stack sx={{ mt: 1, gap: 2 }}>
           <TextField
             label={t('journey.template.name')}
             value={name}

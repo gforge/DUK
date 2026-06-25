@@ -7,7 +7,6 @@ import UndoIcon from '@mui/icons-material/Undo'
 import { Alert, Box, Button, Paper, Stack, Tab, Tabs, Tooltip, Typography } from '@mui/material'
 import React, { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-
 import * as client from '@/api/client'
 import { ConfirmDialog, TabPanel } from '@/components/common'
 import {
@@ -20,7 +19,6 @@ import {
 import { useApi } from '@/hooks/useApi'
 import { useEditorUndo } from '@/hooks/useEditorUndo'
 import { useSnack } from '@/store/snackContext'
-
 export default function JourneyEditor() {
   const { t } = useTranslation()
   const { showSnack } = useSnack()
@@ -30,7 +28,6 @@ export default function JourneyEditor() {
     message: string
     onConfirm: () => void
   } | null>(null)
-
   const {
     data: journeyTemplates,
     loading: jLoading,
@@ -56,14 +53,12 @@ export default function JourneyEditor() {
     loading: qtLoading,
     refetch: refetchQT,
   } = useApi(() => client.getQuestionnaireTemplates(), [])
-
   const refetchAll = useCallback(() => {
     refetchJT()
     refetchRM()
     refetchIT()
     refetchQT()
   }, [refetchJT, refetchRM, refetchIT, refetchQT])
-
   const {
     canUndo,
     undoDescription,
@@ -73,9 +68,7 @@ export default function JourneyEditor() {
   } = useEditorUndo({
     onAfterUndo: refetchAll,
   })
-
   // ── Journey template handlers ──────────────────────────────────────────────
-
   const handleDeleteTemplate = async (templateId: string, name: string) => {
     setConfirmAction({
       title: t('common.delete'),
@@ -89,9 +82,7 @@ export default function JourneyEditor() {
       },
     })
   }
-
   // ── Research module handlers ───────────────────────────────────────────────
-
   const handleDeleteModule = async (moduleId: string, name: string) => {
     setConfirmAction({
       title: t('common.delete'),
@@ -105,16 +96,13 @@ export default function JourneyEditor() {
       },
     })
   }
-
   const handleSaveModule = async (module: Parameters<typeof client.saveResearchModule>[0]) => {
     pushUndo(t('journey.editor.undoSave', { name: module.name }))
     await client.saveResearchModule(module)
     showSnack(t('journey.research.moduleSaved'), 'success')
     refetchRM()
   }
-
   // ── Instruction template handlers ─────────────────────────────────────────
-
   const handleDeleteInstruction = async (id: string, name: string) => {
     setConfirmAction({
       title: t('common.delete'),
@@ -128,7 +116,6 @@ export default function JourneyEditor() {
       },
     })
   }
-
   const handleSaveInstruction = async (data: {
     id?: string
     name: string
@@ -140,9 +127,7 @@ export default function JourneyEditor() {
     showSnack(t('journey.editor.instructionSaved'), 'success')
     refetchIT()
   }
-
   // ── Questionnaire template handlers ──────────────────────────────────────
-
   const handleDeleteQuestionnaire = async (id: string, name: string) => {
     setConfirmAction({
       title: t('common.delete'),
@@ -156,7 +141,6 @@ export default function JourneyEditor() {
       },
     })
   }
-
   const handleSaveQuestionnaire = async (
     data: Parameters<typeof client.saveQuestionnaireTemplate>[0],
   ) => {
@@ -165,13 +149,10 @@ export default function JourneyEditor() {
     showSnack(t('journey.editor.instructionSaved'), 'success')
     refetchQT()
   }
-
   // ── Undo timestamp display ─────────────────────────────────────────────────
-
   const undoTime = undoTimestamp
     ? new Date(undoTimestamp).toLocaleTimeString('sv-SE', { hour: '2-digit', minute: '2-digit' })
     : null
-
   return (
     <Box>
       <Stack sx={{ alignItems: 'center', gap: 1.5, mb: 2 }} direction="row">
@@ -182,7 +163,10 @@ export default function JourneyEditor() {
         <Tooltip
           title={
             canUndo
-              ? t('journey.editor.undoTooltip', { description: undoDescription, time: undoTime })
+              ? t('journey.editor.undoTooltip', {
+                  description: undoDescription ?? '',
+                  time: undoTime ?? '',
+                })
               : t('journey.editor.nothingToUndo')
           }
         >

@@ -4,7 +4,7 @@ import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
 import tseslint from 'typescript-eslint'
 import unusedImports from 'eslint-plugin-unused-imports'
-import importPlugin from 'eslint-plugin-import'
+import importPlugin from 'eslint-plugin-import-x'
 import simpleImportSort from 'eslint-plugin-simple-import-sort'
 
 export default tseslint.config(
@@ -16,16 +16,11 @@ export default tseslint.config(
       ecmaVersion: 2020,
       globals: globals.browser,
     },
-    settings: {
-      'import/resolver': {
-        typescript: {},
-      },
-    },
     plugins: {
       'react-hooks': reactHooks,
       'react-refresh': reactRefresh,
       'unused-imports': unusedImports,
-      import: importPlugin,
+      'import-x': importPlugin,
       'simple-import-sort': simpleImportSort,
     },
     rules: {
@@ -39,7 +34,7 @@ export default tseslint.config(
 
       // keep this if you still want import correctness rules,
       // but avoid mixing with other ordering rules
-      'import/no-default-export': 'error',
+      'import-x/no-default-export': 'error',
 
       '@typescript-eslint/no-unused-vars': 'off',
       'unused-imports/no-unused-imports': 'error',
@@ -66,7 +61,7 @@ export default tseslint.config(
       'src/i18n/**',
     ],
     rules: {
-      'import/no-default-export': 'off',
+      'import-x/no-default-export': 'off',
     },
   },
   {

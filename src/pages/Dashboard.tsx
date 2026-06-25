@@ -2,7 +2,6 @@ import { Alert, Box, Skeleton, Stack, Typography } from '@mui/material'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
-
 import * as client from '@/api/client'
 import type { CaseCategory, Patient } from '@/api/schemas'
 import type { SortMode } from '@/components/dashboard'
@@ -12,28 +11,22 @@ import { useExpandedCategories } from '@/hooks/useExpandedCategories'
 import { useFocusRestore } from '@/hooks/useFocusRestore'
 import { useHotkeys } from '@/hooks/useHotkeys'
 import { useRole } from '@/store/roleContext'
-
 type PalFilter = 'all' | 'mine' | 'created_by_me'
-
 export default function Dashboard() {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const { currentUser, isRole } = useRole()
   const { restore } = useFocusRestore()
   const searchRef = useRef<HTMLInputElement>(null)
-
   const [search, setSearch] = useState('')
   const [palFilter, setPalFilter] = useState<PalFilter>('all')
   const [showWaiting, setShowWaiting] = useState(false)
   const [sortMode, setSortMode] = useState<SortMode>('time')
-
   // manage persistent accordion state via custom hook
   const { expanded, toggleExpanded } = useExpandedCategories()
-
   useEffect(() => {
     restore()
   }, [restore])
-
   const {
     data: cases,
     loading: casesLoading,
@@ -41,20 +34,17 @@ export default function Dashboard() {
     refetch,
   } = useApi(() => client.getCasesForDashboard(), [])
   const { data: patients, loading: patientsLoading } = useApi(() => client.getPatients(), [])
-
   useHotkeys(
     useMemo(
       () => ({ '/': () => searchRef.current?.focus(), 'g d': () => navigate('/dashboard') }),
       [navigate],
     ),
   )
-
   const patientMap = useMemo(() => {
     const m = new Map<string, Patient>()
     patients?.forEach((p) => m.set(p.id, p))
     return m
   }, [patients])
-
   const filteredCases = useMemo(() => {
     if (!cases) return []
     return cases.filter((c) => {
@@ -78,7 +68,6 @@ export default function Dashboard() {
       return true
     })
   }, [cases, palFilter, currentUser.id, search, patientMap])
-
   const { activeCases, waitingCases, closedCases } = useMemo(() => {
     const sevenDaysAgo = new Date()
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
@@ -92,7 +81,6 @@ export default function Dashboard() {
     })
     return { activeCases: active, waitingCases: waiting, closedCases: closed }
   }, [filteredCases])
-
   const effectiveShowWaiting = showWaiting || search.trim().length > 0
   const sortedActiveCases = useMemo(
     () => sortCases(activeCases, sortMode, patientMap),
@@ -102,7 +90,6 @@ export default function Dashboard() {
     () => sortCases(waitingCases, sortMode, patientMap),
     [waitingCases, sortMode, patientMap],
   )
-
   const byCategory = useCallback(
     (cat: CaseCategory) => sortedActiveCases.filter((c) => c.activeCategory === cat),
     [sortedActiveCases],
@@ -116,7 +103,6 @@ export default function Dashboard() {
     (cat: CaseCategory) => closedCases.filter((c) => c.category === cat),
     [closedCases],
   )
-
   return (
     <Box>
       <Typography sx={{ fontWeight: 700 }} variant="h5" gutterBottom>
@@ -147,7 +133,7 @@ export default function Dashboard() {
       {casesLoading || patientsLoading ? (
         <Stack sx={{ gap: 1.5 }}>
           {[0, 1, 2].map((i) => (
-            <Skeleton key={i} variant="rectangular" height={64} sx={{ borderRadius: 2 }} />
+            <Skeleton key={i} variant="rectangular" sx={{ borderRadius: 2, height: 64 }} />
           ))}
         </Stack>
       ) : (

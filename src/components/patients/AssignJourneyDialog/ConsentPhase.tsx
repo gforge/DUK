@@ -14,9 +14,7 @@ import {
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import ReactMarkdown from 'react-markdown'
-
 import type { ResearchModule } from '@/api/schemas'
-
 interface Props {
   readonly module: ResearchModule
   readonly current: number
@@ -26,7 +24,6 @@ interface Props {
   readonly onGrant: () => void
   readonly onSkip: () => void
 }
-
 export default function ConsentPhase({
   module,
   current,
@@ -37,11 +34,10 @@ export default function ConsentPhase({
   onSkip,
 }: Props) {
   const { t } = useTranslation()
-
   return (
     <>
       <DialogTitle>
-        <Stack direction="row" alignItems="center" gap={1}>
+        <Stack direction="row" sx={{ alignItems: 'center', gap: 1 }}>
           <ScienceIcon color="secondary" />
           {t('patients.research.consentStep', { current, total })} — {module.studyName}
         </Stack>
@@ -61,7 +57,11 @@ export default function ConsentPhase({
               '& h3': { typography: 'subtitle2', fontWeight: 600 },
             }}
           >
-            <Typography variant="overline" color="text.secondary" display="block" mb={0.5}>
+            <Typography
+              variant="overline"
+              color="text.secondary"
+              sx={{ display: 'block', mb: 0.5 }}
+            >
               {t('journey.research.consent.infoLabel')}
             </Typography>
             <ReactMarkdown>{module.studyInfoMarkdown}</ReactMarkdown>

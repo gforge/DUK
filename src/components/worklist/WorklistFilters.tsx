@@ -1,11 +1,9 @@
 import { Chip, Stack } from '@mui/material'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-
 import type { CareRole, WorkCategory } from '@/api/schemas'
 import { CareRoleIcon } from '@/components/common'
 import { useAssignmentModeLabel, useCareRoleLabel, useWorkCategoryLabel } from '@/hooks/labels'
-
 interface WorklistFiltersProps {
   categoryOrder: WorkCategory[]
   categoryFilter: 'ALL' | WorkCategory
@@ -19,7 +17,6 @@ interface WorklistFiltersProps {
   onClaimedByMeToggle: () => void
   onMyPatientsOnlyToggle: () => void
 }
-
 export default function WorklistFilters({
   categoryOrder,
   categoryFilter,
@@ -37,10 +34,9 @@ export default function WorklistFilters({
   const getWorkCategoryLabel = useWorkCategoryLabel()
   const getCareRoleLabel = useCareRoleLabel()
   const getAssignmentModeLabel = useAssignmentModeLabel()
-
   return (
     <>
-      <Stack direction="row" gap={0.75} mb={1} flexWrap="wrap">
+      <Stack direction="row" sx={{ gap: 0.75, mb: 1, flexWrap: 'wrap' }}>
         <Chip
           label={t('worklist.filterAll')}
           variant={categoryFilter === 'ALL' ? 'filled' : 'outlined'}
@@ -58,7 +54,7 @@ export default function WorklistFilters({
         ))}
       </Stack>
 
-      <Stack direction="row" gap={0.75} mb={2} flexWrap="wrap">
+      <Stack direction="row" sx={{ gap: 0.75, mb: 2, flexWrap: 'wrap' }}>
         {(['DOCTOR', 'NURSE', 'PHYSIO'] as const).map((role) => (
           <Chip
             key={role}

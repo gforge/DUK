@@ -1,49 +1,31 @@
-import AssignmentIcon from '@mui/icons-material/Assignment'
-import {
-  Chip,
-  Paper,
-  Stack,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  Typography,
-} from '@mui/material'
-import { format } from 'date-fns'
-import React from 'react'
-import { useTranslation } from 'react-i18next'
-
-import type { Case } from '@/api/schemas'
-import { StatusChip } from '@/components/common'
-import { useCategoryLabel, useTriggerLabel } from '@/hooks/labels'
-
+import AssignmentIcon from '@mui/icons-material/Assignment';
+import { Chip, Paper, Stack, Table, TableBody, TableCell, TableHead, TableRow, Typography, } from '@mui/material';
+import { format } from 'date-fns';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import type { Case } from '@/api/schemas';
+import { StatusChip } from '@/components/common';
+import { useCategoryLabel, useTriggerLabel } from '@/hooks/labels';
 interface CasesSectionProps {
-  cases: Case[]
-  onRowClick: (caseId: string) => void
+    cases: Case[];
+    onRowClick: (caseId: string) => void;
 }
-
 export default function CasesSection({ cases, onRowClick }: CasesSectionProps) {
-  const { t } = useTranslation()
-  const getCategoryLabel = useCategoryLabel()
-  const getTriggerLabel = useTriggerLabel()
-
-  return (
-    <Paper variant="outlined" sx={{ p: 2.5, borderRadius: 2, mb: 3 }}>
-      <Stack direction="row" alignItems="center" gap={1} mb={1.5}>
+    const { t } = useTranslation();
+    const getCategoryLabel = useCategoryLabel();
+    const getTriggerLabel = useTriggerLabel();
+    return (<Paper variant="outlined" sx={{ p: 2.5, borderRadius: 2, mb: 3 }}>
+      <Stack direction="row" sx={{ alignItems: 'center', gap: 1, mb: 1.5 }}>
         <AssignmentIcon color="primary" fontSize="small" />
-        <Typography variant="subtitle1" fontWeight={600}>
+        <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
           {t('patientDetail.cases')}
         </Typography>
-        <Chip label={cases.length} size="small" variant="outlined" />
+        <Chip label={cases.length} size="small" variant="outlined"/>
       </Stack>
 
-      {cases.length === 0 ? (
-        <Typography variant="body2" color="text.secondary">
+      {cases.length === 0 ? (<Typography variant="body2" color="text.secondary">
           {t('patientDetail.noCases')}
-        </Typography>
-      ) : (
-        <Table size="small">
+        </Typography>) : (<Table size="small">
           <TableHead>
             <TableRow>
               <TableCell>{t('case.status')}</TableCell>
@@ -54,38 +36,19 @@ export default function CasesSection({ cases, onRowClick }: CasesSectionProps) {
             </TableRow>
           </TableHead>
           <TableBody>
-            {cases.map((c) => (
-              <TableRow
-                key={c.id}
-                hover
-                sx={{ cursor: 'pointer' }}
-                onClick={() => onRowClick(c.id)}
-              >
+            {cases.map((c) => (<TableRow key={c.id} hover sx={{ cursor: 'pointer' }} onClick={() => onRowClick(c.id)}>
                 <TableCell>
-                  <StatusChip status={c.status} />
+                  <StatusChip status={c.status}/>
                 </TableCell>
                 <TableCell>
-                  <Chip label={getCategoryLabel(c.category)} size="small" variant="outlined" />
+                  <Chip label={getCategoryLabel(c.category)} size="small" variant="outlined"/>
                 </TableCell>
                 <TableCell>
-                  {c.triggers.length > 0 ? (
-                    <Stack direction="row" gap={0.5} flexWrap="wrap">
-                      {c.triggers.map((tr) => (
-                        <Chip
-                          key={tr}
-                          label={getTriggerLabel(tr)}
-                          size="small"
-                          color="error"
-                          variant="outlined"
-                          sx={{ height: 20, fontSize: 10 }}
-                        />
-                      ))}
-                    </Stack>
-                  ) : (
-                    <Typography variant="caption" color="text.secondary">
+                  {c.triggers.length > 0 ? (<Stack direction="row" sx={{ gap: 0.5, flexWrap: 'wrap' }}>
+                      {c.triggers.map((tr) => (<Chip key={tr} label={getTriggerLabel(tr)} size="small" color="error" variant="outlined" sx={{ height: 20, fontSize: 10 }}/>))}
+                    </Stack>) : (<Typography variant="caption" color="text.secondary">
                       —
-                    </Typography>
-                  )}
+                    </Typography>)}
                 </TableCell>
                 <TableCell>
                   <Typography variant="caption">
@@ -97,11 +60,8 @@ export default function CasesSection({ cases, onRowClick }: CasesSectionProps) {
                     {format(new Date(c.lastActivityAt), 'dd MMM yyyy HH:mm')}
                   </Typography>
                 </TableCell>
-              </TableRow>
-            ))}
+              </TableRow>))}
           </TableBody>
-        </Table>
-      )}
-    </Paper>
-  )
+        </Table>)}
+    </Paper>);
 }

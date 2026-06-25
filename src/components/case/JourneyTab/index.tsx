@@ -1,7 +1,6 @@
 import { Alert, Box, Paper, Skeleton, Stack } from '@mui/material'
 import React, { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-
 import * as client from '@/api/client'
 import type { Case } from '@/api/schemas'
 import type { ResolvedInstruction } from '@/api/service'
@@ -13,37 +12,30 @@ import { InstructionModifyDialog } from '@/components/journey/InstructionModifyD
 import { PatientJourneyResearchCard } from '@/components/patients'
 import { useApi } from '@/hooks/useApi'
 import { useRole } from '@/store/roleContext'
-
 import CancelJourneyDialog from './CancelJourneyDialog'
 import EpisodeHeader from './EpisodeHeader'
 import JourneyHeader from './JourneyHeader'
 import JourneySelectorTabs from './JourneySelectorTabs'
 import PauseConfirmDialog from './PauseConfirmDialog'
 import { useJourneyActions } from './useJourneyActions'
-
 const STATUS_ORDER: Record<string, number> = { ACTIVE: 0, SUSPENDED: 1, COMPLETED: 2 }
-
 interface JourneyTabProps {
   readonly caseData: Case
 }
-
 export default function JourneyTab({ caseData }: JourneyTabProps) {
   const { t } = useTranslation()
   const { currentUser } = useRole()
-
   const [modifyOpen, setModifyOpen] = useState(false)
   const [selectedJourneyId, setSelectedJourneyId] = useState<string | null>(null)
   const [startNextPhaseOpen, setStartNextPhaseOpen] = useState(false)
   const [instructionTarget, setInstructionTarget] = useState<ResolvedInstruction | null>(null)
   const [instructionDialogOpen, setInstructionDialogOpen] = useState(false)
   const [instructionInitialTab, setInstructionInitialTab] = useState(0)
-
   const {
     data: journeys,
     loading: journeysLoading,
     refetch: refetchJourneys,
   } = useApi(() => client.getPatientJourneys(caseData.patientId), [caseData.patientId])
-
   const { data: formResponses } = useApi(() => client.getFormResponses(caseData.id), [caseData.id])
   const { data: journeyTemplates } = useApi(() => client.getJourneyTemplates(), [])
   const { data: researchModules } = useApi(() => client.getResearchModules(), [])
@@ -52,7 +44,6 @@ export default function JourneyTab({ caseData }: JourneyTabProps) {
     () => client.getResearchConsents(caseData.patientId),
     [caseData.patientId],
   )
-
   const sortedJourneys = useMemo(() => {
     if (!journeys) return []
     return [...journeys].sort(
@@ -61,10 +52,8 @@ export default function JourneyTab({ caseData }: JourneyTabProps) {
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
     )
   }, [journeys])
-
   const selectedJourney =
     sortedJourneys.find((j) => j.id === selectedJourneyId) ?? sortedJourneys[0] ?? null
-
   const { data: episode, loading: episodeLoading } = useApi(
     () =>
       selectedJourney?.episodeId
@@ -72,7 +61,6 @@ export default function JourneyTab({ caseData }: JourneyTabProps) {
         : Promise.resolve(undefined),
     [selectedJourney?.episodeId],
   )
-
   const { data: resolvedInstructions, refetch: refetchInstructions } = useApi(
     () =>
       selectedJourney
@@ -80,16 +68,13 @@ export default function JourneyTab({ caseData }: JourneyTabProps) {
         : Promise.resolve([]),
     [selectedJourney?.id],
   )
-
   const { data: effectiveSteps, refetch: refetchSteps } = useApi(
     () => (selectedJourney ? client.getEffectiveSteps(selectedJourney.id) : Promise.resolve([])),
     [selectedJourney?.id],
   )
-
   const currentTemplate = journeyTemplates?.find(
     (jt) => jt.id === selectedJourney?.journeyTemplateId,
   )
-
   const {
     pauseLoading,
     pauseConfirmOpen,
@@ -103,10 +88,8 @@ export default function JourneyTab({ caseData }: JourneyTabProps) {
     hasJourneyData,
     handleCancel,
   } = useJourneyActions({ selectedJourney, formResponses, refetchJourneys, refetchSteps })
-
   // Capture mount time once via lazy initializer — avoids calling Date.now() during render
   const [mountedAt] = useState(Date.now)
-
   const handleAddReview = async (
     stepId: string,
     reviewType: string,
@@ -124,26 +107,20 @@ export default function JourneyTab({ caseData }: JourneyTabProps) {
     )
     return review.id
   }
-
   const handleRemoveReview = async (reviewId: string): Promise<void> => {
     await client.deleteReview(reviewId, caseData.id)
   }
   const pausedDays = selectedJourney?.pausedAt
-    ? Math.max(
-        0,
-        Math.floor((mountedAt - new Date(selectedJourney.pausedAt).getTime()) / 86_400_000),
-      )
+    ? Math.max(0, Math.floor((mountedAt - new Date(selectedJourney.pausedAt).getTime()) / 86400000))
     : 0
-
   if (journeysLoading) {
     return (
-      <Stack gap={1}>
-        <Skeleton variant="text" width={200} />
-        <Skeleton variant="rectangular" height={200} sx={{ borderRadius: 1 }} />
+      <Stack sx={{ gap: 1 }}>
+        <Skeleton variant="text" sx={{ width: 200 }} />
+        <Skeleton variant="rectangular" sx={{ borderRadius: 1, height: 200 }} />
       </Stack>
     )
   }
-
   if (sortedJourneys.length === 0) {
     return (
       <Alert severity="info" sx={{ mt: 1 }}>
@@ -151,7 +128,6 @@ export default function JourneyTab({ caseData }: JourneyTabProps) {
       </Alert>
     )
   }
-
   return (
     <Box>
       <EpisodeHeader episode={episode} loading={episodeLoading && !!selectedJourney?.episodeId} />

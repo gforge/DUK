@@ -1,4 +1,4 @@
-import { describe, expect,it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
 import { AppStateSchema } from '@/api/schemas'
 import { SEED_STATE } from '@/api/seed'

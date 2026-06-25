@@ -16,7 +16,6 @@ import { DatePicker } from '@mui/x-date-pickers'
 import { format } from 'date-fns'
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-
 import * as client from '@/api/client'
 import type {
   JourneyTemplate,
@@ -27,7 +26,6 @@ import type {
 import { usePhaseTypeLabel, useTransitionTriggerLabel } from '@/hooks/labels'
 import { useRole } from '@/store/roleContext'
 import { useSnack } from '@/store/snackContext'
-
 const PHASE_TYPES: PhaseType[] = [
   'REFERRAL',
   'INTAKE',
@@ -37,7 +35,6 @@ const PHASE_TYPES: PhaseType[] = [
   'MONITORING',
   'DISCHARGE',
 ]
-
 const TRIGGER_TYPES: TransitionTriggerType[] = [
   'REFERRAL_RECEIVED',
   'TRIAGE_DECISION',
@@ -48,7 +45,6 @@ const TRIGGER_TYPES: TransitionTriggerType[] = [
   'MILESTONE',
   'MANUAL',
 ]
-
 interface Props {
   readonly open: boolean
   readonly onClose: () => void
@@ -56,7 +52,6 @@ interface Props {
   readonly journeyTemplates: JourneyTemplate[]
   readonly onCompleted: () => void
 }
-
 export default function StartNextPhaseDialog({
   open,
   onClose,
@@ -69,14 +64,12 @@ export default function StartNextPhaseDialog({
   const { currentUser } = useRole()
   const phaseTypeLabel = usePhaseTypeLabel()
   const transitionTriggerLabel = useTransitionTriggerLabel()
-
   const [templateId, setTemplateId] = useState(journey.journeyTemplateId)
   const [phaseType, setPhaseType] = useState<PhaseType>('FOLLOWUP')
   const [startDate, setStartDate] = useState<Date | null>(new Date())
   const [triggerType, setTriggerType] = useState<TransitionTriggerType>('MANUAL')
   const [note, setNote] = useState('')
   const [loading, setLoading] = useState(false)
-
   const handleConfirm = async () => {
     if (!startDate) return
     setLoading(true)
@@ -100,12 +93,11 @@ export default function StartNextPhaseDialog({
       setLoading(false)
     }
   }
-
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog open={open} onClose={onClose} fullWidth sx={{ maxWidth: 'sm' }}>
       <DialogTitle>{t('journey.nextPhase.title')}</DialogTitle>
       <DialogContent>
-        <Stack gap={2.5} mt={1}>
+        <Stack sx={{ gap: 2.5, mt: 1 }}>
           <FormControl fullWidth size="small">
             <InputLabel>{t('journey.nextPhase.template')}</InputLabel>
             <Select

@@ -18,12 +18,10 @@ import {
 import React, { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
-
 import * as client from '@/api/client'
 import { PatientTable, RegisterPatientDialog } from '@/components/patients'
 import { useApi } from '@/hooks/useApi'
 import { useRole } from '@/store/roleContext'
-
 export default function Patients() {
   const { t } = useTranslation()
   const { isRole, currentUser } = useRole()
@@ -32,15 +30,12 @@ export default function Patients() {
   const [showFilters, setShowFilters] = useState(false)
   const [palOnly, setPalOnly] = useState(false)
   const [selectedJourneyTemplateIds, setSelectedJourneyTemplateIds] = useState<string[]>([])
-
   const navigate = useNavigate()
   const { data: patients, loading, error } = useApi(() => client.getPatients(), [])
   const { data: allJourneys } = useApi(() => client.getPatientJourneys(), [])
   const { data: allEpisodes } = useApi(() => client.getEpisodesOfCare(), [])
   const { data: journeyTemplates } = useApi(() => client.getJourneyTemplates(), [])
-
   const isClinician = isRole('NURSE') || isRole('DOCTOR')
-
   const journeyTemplateOptions = useMemo(
     () =>
       (journeyTemplates ?? []).map((jt) => ({
@@ -49,12 +44,10 @@ export default function Patients() {
       })),
     [journeyTemplates],
   )
-
   const selectedJourneyTemplateOptions = useMemo(
     () => journeyTemplateOptions.filter((opt) => selectedJourneyTemplateIds.includes(opt.id)),
     [journeyTemplateOptions, selectedJourneyTemplateIds],
   )
-
   const patientJourneyTemplateIds = useMemo(() => {
     const map = new Map<string, Set<string>>()
     for (const journey of allJourneys ?? []) {
@@ -64,7 +57,6 @@ export default function Patients() {
     }
     return map
   }, [allJourneys])
-
   const filtered = useMemo(
     () =>
       (patients ?? []).filter(
@@ -87,9 +79,7 @@ export default function Patients() {
       patientJourneyTemplateIds,
     ],
   )
-
   const activeFilterCount = Number(palOnly) + Number(selectedJourneyTemplateIds.length > 0)
-
   return (
     <Box>
       <Stack sx={{ alignItems: 'center', justifyContent: 'space-between', mb: 2 }} direction="row">
@@ -99,7 +89,7 @@ export default function Patients() {
             {t('patients.title')}
           </Typography>
         </Stack>
-        <Stack direction="row" alignItems="center" gap={1}>
+        <Stack direction="row" sx={{ alignItems: 'center', gap: 1 }}>
           {isClinician && (
             <Button
               variant="contained"
@@ -113,7 +103,7 @@ export default function Patients() {
         </Stack>
       </Stack>
 
-      <Stack direction="row" alignItems="center" gap={1} sx={{ mb: 2 }}>
+      <Stack direction="row" sx={{ mb: 2, alignItems: 'center', gap: 1 }}>
         <TextField
           size="small"
           placeholder={t('patients.searchPlaceholder')}
@@ -138,9 +128,7 @@ export default function Patients() {
         <Collapse in={showFilters}>
           <Stack
             direction={{ xs: 'column', md: 'row' }}
-            alignItems={{ xs: 'stretch', md: 'center' }}
-            gap={1.5}
-            sx={{ mb: 2 }}
+            sx={{ mb: 2, alignItems: { xs: 'stretch', md: 'center' }, gap: 1.5 }}
           >
             <Button
               variant={palOnly ? 'contained' : 'outlined'}
@@ -157,10 +145,10 @@ export default function Patients() {
               onChange={(_, values) => setSelectedJourneyTemplateIds(values.map((v) => v.id))}
               getOptionLabel={(option) => option.name}
               sx={{ minWidth: 320, maxWidth: 520 }}
-              renderTags={(value, getTagProps) =>
+              renderValue={(value, getItemProps) =>
                 value.map((option, index) => (
                   <Chip
-                    {...getTagProps({ index })}
+                    {...getItemProps({ index })}
                     key={option.id}
                     label={option.name}
                     size="small"

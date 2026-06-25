@@ -1,4 +1,4 @@
-import { createTheme, CssBaseline,ThemeProvider } from '@mui/material'
+import { createTheme, CssBaseline, ThemeProvider } from '@mui/material'
 import React from 'react'
 
 import type { MigrationResultErr } from './api/migrations'

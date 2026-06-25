@@ -1,4 +1,4 @@
-import { describe, expect,it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
 import { normalizeIsoDateTime } from '@/api/service/utils'
 import { computeDueAtFromInput } from '@/components/case/triage/utils'

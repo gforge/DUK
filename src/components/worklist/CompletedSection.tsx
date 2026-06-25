@@ -12,23 +12,23 @@ import {
 } from '@mui/material'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-
 interface Props {
   expanded: boolean
   count: number
   onToggle: (expanded: boolean) => void
   children: React.ReactNode
 }
-
 export default function CompletedSection({ expanded, count, onToggle, children }: Props) {
   const { t } = useTranslation()
-
   if (!expanded) {
     return (
       <Paper variant="outlined" sx={{ mt: 2, borderRadius: 2, p: 1.25 }}>
-        <Stack direction="row" alignItems="center" justifyContent="space-between" gap={1}>
-          <Stack direction="row" alignItems="center" gap={1}>
-            <Typography variant="subtitle2" fontWeight={700}>
+        <Stack
+          direction="row"
+          sx={{ alignItems: 'center', justifyContent: 'space-between', gap: 1 }}
+        >
+          <Stack direction="row" sx={{ alignItems: 'center', gap: 1 }}>
+            <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
               {t('worklist.completedSectionTitle')}
             </Typography>
             <Chip label={count} size="small" />
@@ -40,7 +40,6 @@ export default function CompletedSection({ expanded, count, onToggle, children }
       </Paper>
     )
   }
-
   return (
     <Accordion
       expanded
@@ -55,8 +54,8 @@ export default function CompletedSection({ expanded, count, onToggle, children }
       }}
     >
       <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-        <Stack direction="row" alignItems="center" gap={1}>
-          <Typography variant="subtitle2" fontWeight={700}>
+        <Stack direction="row" sx={{ alignItems: 'center', gap: 1 }}>
+          <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
             {t('worklist.completedSectionTitle')}
           </Typography>
           <Chip label={count} size="small" />

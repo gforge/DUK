@@ -1,5 +1,5 @@
 import type { PolicyRule } from '../schemas'
-import { daysAgo,iso } from './shared'
+import { daysAgo, iso } from './shared'
 
 export const policyRules: PolicyRule[] = [
   {

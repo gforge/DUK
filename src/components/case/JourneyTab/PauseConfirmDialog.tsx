@@ -10,14 +10,12 @@ import {
 } from '@mui/material'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-
 interface PauseConfirmDialogProps {
   readonly open: boolean
   readonly loading: boolean
   readonly onClose: () => void
   readonly onConfirm: () => void
 }
-
 export default function PauseConfirmDialog({
   open,
   loading,
@@ -25,9 +23,8 @@ export default function PauseConfirmDialog({
   onConfirm,
 }: PauseConfirmDialogProps) {
   const { t } = useTranslation()
-
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="xs">
+    <Dialog open={open} onClose={onClose} sx={{ maxWidth: 'xs' }}>
       <DialogTitle>{t('journey.pauseConfirmTitle')}</DialogTitle>
       <DialogContent>
         <Typography variant="body2">{t('journey.pauseConfirmBody')}</Typography>

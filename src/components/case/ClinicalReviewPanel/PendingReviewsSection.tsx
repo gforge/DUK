@@ -12,11 +12,9 @@ import {
 } from '@mui/material'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-
 import type { ClinicalReview, User } from '@/api/schemas'
 import { RoleIcon } from '@/components/common'
 import { useReviewTypeLabel } from '@/hooks/labels'
-
 interface Props {
   reviews: ClinicalReview[]
   userMap: Map<string, User>
@@ -26,7 +24,6 @@ interface Props {
   onMarkReviewed: (id: string) => void
   onDelete: (id: string) => void
 }
-
 export function PendingReviewsSection({
   reviews,
   userMap,
@@ -38,17 +35,15 @@ export function PendingReviewsSection({
 }: Props) {
   const { t } = useTranslation()
   const getReviewTypeLabel = useReviewTypeLabel()
-
   if (reviews.length === 0) return null
-
   return (
     <Box sx={{ mb: 2 }}>
       <Alert severity="info" sx={{ mb: 2 }} icon={<PendingIcon />}>
-        <Stack gap={1.5}>
-          <Typography variant="body2" fontWeight={600}>
+        <Stack sx={{ gap: 1.5 }}>
+          <Typography variant="body2" sx={{ fontWeight: 600 }}>
             {t('review.pending')} ({reviews.length})
           </Typography>
-          <Stack gap={1}>
+          <Stack sx={{ gap: 1 }}>
             {reviews.map((review) => (
               <Box
                 key={review.id}
@@ -60,7 +55,10 @@ export function PendingReviewsSection({
                   borderColor: 'divider',
                 }}
               >
-                <Stack direction="row" justifyContent="space-between" alignItems="start" gap={1}>
+                <Stack
+                  direction="row"
+                  sx={{ justifyContent: 'space-between', alignItems: 'start', gap: 1 }}
+                >
                   <Box>
                     <Chip
                       label={getReviewTypeLabel(review.type)}
@@ -77,7 +75,7 @@ export function PendingReviewsSection({
                         {t('review.visit')}: <strong>{review.journeyStepLabel}</strong>
                       </Typography>
                     )}
-                    <Stack direction="row" alignItems="center" gap={0.5}>
+                    <Stack direction="row" sx={{ alignItems: 'center', gap: 0.5 }}>
                       <RoleIcon role={review.createdByRole} sx={{ fontSize: 16 }} />
                       <Typography variant="caption" color="text.secondary">
                         {userMap.get(review.createdByUserId)?.name ?? review.createdByUserId}
@@ -85,7 +83,7 @@ export function PendingReviewsSection({
                     </Stack>
                   </Box>
                   {isClinician && (
-                    <Stack direction="row" gap={0.5} alignItems="center">
+                    <Stack direction="row" sx={{ gap: 0.5, alignItems: 'center' }}>
                       <Button
                         size="small"
                         variant="outlined"

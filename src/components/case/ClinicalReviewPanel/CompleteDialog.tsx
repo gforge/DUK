@@ -1,5 +1,5 @@
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline'
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutlineOutlined'
+import HelpOutlineIcon from '@mui/icons-material/HelpOutlineOutlined'
 import ReportProblemIcon from '@mui/icons-material/ReportProblem'
 import {
   Button,
@@ -14,10 +14,8 @@ import {
   ToggleButtonGroup,
 } from '@mui/material'
 import { useTranslation } from 'react-i18next'
-
 import type { ReviewOutcome, ReviewType } from '@/api/schemas'
 import PersonalNumberCopy from '@/components/common/PersonalNumberCopy'
-
 interface Props {
   open: boolean
   outcome: ReviewOutcome
@@ -31,22 +29,17 @@ interface Props {
   personalNumber?: string | null
   reviewType?: ReviewType | null
 }
-
 const useReviewTypeTitle = (reviewType: ReviewType | null | undefined) => {
   const { t } = useTranslation()
   if (!reviewType) return t('review.markReviewed')
-
   if (reviewType === 'LAB') {
     return t('review.reviewTypeTitle.Lab', 'Review Lab Result')
   }
-
   if (reviewType === 'XRAY') {
     return t('review.reviewTypeTitle.XRAY', 'Review X-Ray Result')
   }
-
   return t('review.markReviewed')
 }
-
 export function CompleteReviewDialog({
   open,
   outcome,
@@ -61,9 +54,7 @@ export function CompleteReviewDialog({
   reviewType,
 }: Props) {
   const { t } = useTranslation()
-
   const title = useReviewTypeTitle(reviewType)
-
   return (
     <Dialog open={open} onClose={onClose}>
       <DialogTitle>{title}</DialogTitle>
@@ -76,7 +67,7 @@ export function CompleteReviewDialog({
             ) : null}
           </Stack>
         ) : null}
-        <Stack gap={2.5}>
+        <Stack sx={{ gap: 2.5 }}>
           <ToggleButtonGroup
             value={outcome}
             exclusive

@@ -13,19 +13,20 @@ import {
 } from '@mui/material'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-
 import type { ReviewTypeKey } from './JourneyTimeline/types'
-
 export interface AddReviewDialogProps {
   open: boolean
-  reviewDialog: { stepId: string; stepLabel: string; reviewType: ReviewTypeKey } | null
+  reviewDialog: {
+    stepId: string
+    stepLabel: string
+    reviewType: ReviewTypeKey
+  } | null
   description: string
   setDescription: (d: string) => void
   submitting: boolean
   onConfirm: () => void
   onClose: () => void
 }
-
 export default function AddReviewDialog({
   open,
   reviewDialog,
@@ -36,12 +37,11 @@ export default function AddReviewDialog({
   onClose,
 }: AddReviewDialogProps) {
   const { t } = useTranslation()
-
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
+    <Dialog open={open} onClose={onClose} fullWidth sx={{ maxWidth: 'xs' }}>
       <DialogTitle>{t('review.addReview')}</DialogTitle>
       <DialogContent>
-        <Stack gap={2} sx={{ pt: 1 }}>
+        <Stack sx={{ pt: 1, gap: 2 }}>
           {reviewDialog && (
             <Chip
               icon={reviewDialog.reviewType === 'LAB' ? <BiotechIcon /> : <ImageIcon />}

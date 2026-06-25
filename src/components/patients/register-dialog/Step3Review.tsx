@@ -1,9 +1,7 @@
 import { Box, Stack, Typography } from '@mui/material'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-
 import type { JourneyTemplate } from '@/api/schemas'
-
 interface Props {
   effectiveName: string
   personalNumber: string
@@ -11,9 +9,11 @@ interface Props {
   selectedTemplate: JourneyTemplate | undefined | null
   startDate: string
   selectedModuleIds: string[]
-  researchModules: Array<{ id: string; studyName: string }> | null
+  researchModules: Array<{
+    id: string
+    studyName: string
+  }> | null
 }
-
 export function Step3Review({
   effectiveName,
   personalNumber,
@@ -25,12 +25,12 @@ export function Step3Review({
 }: Props) {
   const { t } = useTranslation()
   return (
-    <Stack gap={1.5}>
-      <Typography variant="subtitle2" fontWeight={600}>
+    <Stack sx={{ gap: 1.5 }}>
+      <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
         {t('patients.register.reviewTitle')}
       </Typography>
       <Box sx={{ border: 1, borderColor: 'divider', borderRadius: 1, p: 1.5 }}>
-        <Stack gap={0.5}>
+        <Stack sx={{ gap: 0.5 }}>
           <Typography variant="body2">
             <strong>{t('patients.displayName')}:</strong> {effectiveName}
           </Typography>
@@ -43,7 +43,7 @@ export function Step3Review({
         </Stack>
       </Box>
       <Box sx={{ border: 1, borderColor: 'divider', borderRadius: 1, p: 1.5 }}>
-        <Stack gap={0.5}>
+        <Stack sx={{ gap: 0.5 }}>
           <Typography variant="body2">
             <strong>{t('nav.journeys')}:</strong> {selectedTemplate?.name}
           </Typography>
@@ -54,7 +54,7 @@ export function Step3Review({
         </Stack>
       </Box>
       <Box sx={{ border: 1, borderColor: 'divider', borderRadius: 1, p: 1.5 }}>
-        <Stack gap={0.5}>
+        <Stack sx={{ gap: 0.5 }}>
           <Typography variant="body2">
             <strong>{t('patients.register.reviewStudies')}</strong>{' '}
             {selectedModuleIds.length === 0

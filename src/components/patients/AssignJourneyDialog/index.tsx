@@ -13,18 +13,15 @@ import {
 } from '@mui/material'
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-
 import * as client from '@/api/client'
 import type { ResearchModule } from '@/api/schemas'
 import type { JourneyStepConflict } from '@/api/service'
 import { useApi } from '@/hooks/useApi'
 import { useRole } from '@/store/roleContext'
 import { useSnack } from '@/store/snackContext'
-
 import ConsentPhase from './ConsentPhase'
 import WizardStep0 from './WizardStep0'
 import WizardStep1 from './WizardStep1'
-
 interface Props {
   readonly open: boolean
   readonly onClose: () => void
@@ -32,7 +29,6 @@ interface Props {
   readonly patientName: string
   readonly onAssigned: () => void
 }
-
 export default function AssignJourneyDialog({
   open,
   onClose,
@@ -43,33 +39,30 @@ export default function AssignJourneyDialog({
   const { t } = useTranslation()
   const { showSnack } = useSnack()
   const { currentUser } = useRole()
-
   // Step 0 — template / date / research modules
   const [wizardStep, setWizardStep] = useState(0)
   const [journeyTemplateId, setJourneyTemplateId] = useState('')
   const [startDate, setStartDate] = useState(new Date().toISOString().slice(0, 10))
   const [selectedModuleIds, setSelectedModuleIds] = useState<string[]>([])
-
   // Step 1 — conflict resolution
   const [conflicts, setConflicts] = useState<JourneyStepConflict[]>([])
   const [loadingConflicts, setLoadingConflicts] = useState(false)
-  const [mergedStepIds, setMergedStepIds] = useState<{ stepId: string; fromJourneyId: string }[]>(
-    [],
-  )
-
+  const [mergedStepIds, setMergedStepIds] = useState<
+    {
+      stepId: string
+      fromJourneyId: string
+    }[]
+  >([])
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
-
   // Consent phase (after journey is assigned)
   const [phase, setPhase] = useState<'wizard' | 'consent'>('wizard')
   const [assignedJourneyId, setAssignedJourneyId] = useState('')
   const [consentQueue, setConsentQueue] = useState<ResearchModule[]>([])
   const [consentIndex, setConsentIndex] = useState(0)
   const [consentChecked, setConsentChecked] = useState(false)
-
   const { data: journeyTemplates } = useApi(() => client.getJourneyTemplates(), [])
   const { data: researchModules } = useApi(() => client.getResearchModules(), [])
-
   const handleClose = () => {
     setWizardStep(0)
     setJourneyTemplateId('')
@@ -85,7 +78,6 @@ export default function AssignJourneyDialog({
     setConsentChecked(false)
     onClose()
   }
-
   const handleNext = async () => {
     if (!journeyTemplateId || !startDate) {
       setError(t('patients.register.journeyRequired'))
@@ -106,7 +98,6 @@ export default function AssignJourneyDialog({
       setLoadingConflicts(false)
     }
   }
-
   const handleSubmit = async () => {
     setSaving(true)
     setError(null)
@@ -138,7 +129,6 @@ export default function AssignJourneyDialog({
       setSaving(false)
     }
   }
-
   const advanceConsent = () => {
     const nextIndex = consentIndex + 1
     if (nextIndex < consentQueue.length) {
@@ -150,7 +140,6 @@ export default function AssignJourneyDialog({
       handleClose()
     }
   }
-
   const handleGrantConsent = async () => {
     if (!consentChecked) return
     const module = consentQueue[consentIndex]
@@ -163,7 +152,6 @@ export default function AssignJourneyDialog({
     }
     advanceConsent()
   }
-
   const toggleMerge = (stepId: string, fromJourneyId: string, checked: boolean) => {
     setMergedStepIds((prev) =>
       checked
@@ -171,14 +159,12 @@ export default function AssignJourneyDialog({
         : prev.filter((m) => m.stepId !== stepId),
     )
   }
-
   const wizardStepLabels = [t('patients.register.stepJourney'), t('patients.conflicts.step')]
-
   if (phase === 'consent') {
     const currentModule = consentQueue[consentIndex]
     if (!currentModule) return null
     return (
-      <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
+      <Dialog open={open} onClose={handleClose} fullWidth sx={{ maxWidth: 'sm' }}>
         <ConsentPhase
           module={currentModule}
           current={consentIndex + 1}
@@ -191,11 +177,10 @@ export default function AssignJourneyDialog({
       </Dialog>
     )
   }
-
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
+    <Dialog open={open} onClose={handleClose} fullWidth sx={{ maxWidth: 'sm' }}>
       <DialogTitle>
-        <Stack direction="row" alignItems="center" gap={1}>
+        <Stack direction="row" sx={{ alignItems: 'center', gap: 1 }}>
           <RouteIcon color="primary" />
           {t('patients.assignJourney')} — {patientName}
         </Stack>

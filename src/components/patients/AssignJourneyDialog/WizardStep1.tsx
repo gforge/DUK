@@ -11,21 +11,17 @@ import {
 } from '@mui/material'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-
 import type { JourneyStepConflict } from '@/api/service'
-
 interface MergedStepRef {
   readonly stepId: string
   readonly fromJourneyId: string
 }
-
 interface Props {
   readonly loadingConflicts: boolean
   readonly conflicts: JourneyStepConflict[]
   readonly mergedStepIds: MergedStepRef[]
   readonly onToggleMerge: (stepId: string, fromJourneyId: string, checked: boolean) => void
 }
-
 export default function WizardStep1({
   loadingConflicts,
   conflicts,
@@ -33,7 +29,6 @@ export default function WizardStep1({
   onToggleMerge,
 }: Props) {
   const { t } = useTranslation()
-
   if (loadingConflicts) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', py: 3 }}>
@@ -41,7 +36,6 @@ export default function WizardStep1({
       </Box>
     )
   }
-
   if (conflicts.length === 0) {
     return (
       <Alert severity="success" icon={<MergeIcon />}>
@@ -49,9 +43,8 @@ export default function WizardStep1({
       </Alert>
     )
   }
-
   return (
-    <Stack gap={2}>
+    <Stack sx={{ gap: 2 }}>
       <Alert severity="info" icon={<MergeIcon />}>
         {t('patients.conflicts.hint')}
       </Alert>
@@ -82,8 +75,8 @@ export default function WizardStep1({
                 />
               }
               label={
-                <Stack gap={0}>
-                  <Typography variant="body2" fontWeight={600}>
+                <Stack sx={{ gap: 0 }}>
+                  <Typography variant="body2" sx={{ fontWeight: 600 }}>
                     {c.newStep.label}
                   </Typography>
                   <Typography variant="caption" color="text.secondary">

@@ -208,7 +208,8 @@ export const cases: Case[] = [
     assignedRole: 'NURSE',
     createdByUserId: 'user-pal-1',
     triagedByUserId: 'user-pal-1',
-    internalNote: 'Utmärkt utfall vid 6-månaders kontroll: OSS 38/48, EQ-5D 0.9. Smärtfri i vila. Ärendet avslutas.',
+    internalNote:
+      'Utmärkt utfall vid 6-månaders kontroll: OSS 38/48, EQ-5D 0.9. Smärtfri i vila. Ärendet avslutas.',
     patientMessage:
       'Hej Maria, din 6-månaderskontroll visar ett mycket bra tillfrisknande — smärta och funktion är på god nivå. Ärendet avslutas nu. Kontakta oss om du upplever försämring eller nya besvär.',
     scheduledAt: iso(daysAgo(90)),

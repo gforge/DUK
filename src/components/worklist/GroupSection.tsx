@@ -3,13 +3,10 @@ import { Box, Chip, Divider, Paper, Stack, Typography } from '@mui/material'
 import { Accordion, AccordionDetails, AccordionSummary } from '@mui/material'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-
 import type { Case, Patient, WorkCategory } from '@/api/schemas'
 import { CONTACT_MODE_UI } from '@/components/case/triage/Step1/actions'
 import { useWorkCategoryLabel } from '@/hooks/labels'
-
 import WorklistRow from './WorklistRow'
-
 interface GroupSectionProps {
   workCategory: WorkCategory
   cases: Case[]
@@ -27,7 +24,6 @@ interface GroupSectionProps {
     },
   ) => Promise<void> | void
 }
-
 export default function GroupSection({
   workCategory,
   cases,
@@ -48,7 +44,6 @@ export default function GroupSection({
       : workCategory === 'PHONE'
         ? 'warning.main'
         : 'success.main'
-
   return (
     <Paper
       variant="outlined"
@@ -76,7 +71,7 @@ export default function GroupSection({
             borderLeftColor: accentColor,
           }}
         >
-          <Stack direction="row" alignItems="center" gap={1}>
+          <Stack direction="row" sx={{ alignItems: 'center', gap: 1 }}>
             <Box
               sx={{
                 width: 24,
@@ -93,7 +88,7 @@ export default function GroupSection({
             >
               <GroupIcon sx={{ fontSize: 16 }} />
             </Box>
-            <Typography variant="subtitle2" fontWeight={700}>
+            <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
               {getWorkCategoryLabel(workCategory)}
             </Typography>
             <Chip label={cases.length} size="small" color="default" />
@@ -101,7 +96,7 @@ export default function GroupSection({
         </AccordionSummary>
         <AccordionDetails sx={{ p: 0, bgcolor: 'background.paper' }}>
           {cases.length === 0 ? (
-            <Box px={2} py={1.5}>
+            <Box sx={{ px: 2, py: 1.5 }}>
               <Typography variant="body2" color="text.secondary">
                 {t('worklist.emptyGroup')}
               </Typography>

@@ -11,24 +11,20 @@ import {
 } from '@mui/material'
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-
 import * as client from '@/api/client'
 import type { JourneyTemplate, JourneyTemplateEntry } from '@/api/schemas'
 import { EntryEditorDialog } from '@/components/journey/editor'
 import { useApi } from '@/hooks/useApi'
 import { useSnack } from '@/store/snackContext'
-
 import { JourneyTemplatesTabDialogs } from './JourneyTemplatesTabDialogs'
 import { JourneyTemplatesTabList } from './JourneyTemplatesTabList'
 import { TemplateInstructionsDialog } from './TemplateInstructionsDialog'
-
 interface Props {
   journeyTemplates: JourneyTemplate[] | null
   loading: boolean
   onDelete: (id: string, name: string) => void
   onRefresh?: () => void
 }
-
 export function JourneyTemplatesTab({ journeyTemplates, loading, onDelete, onRefresh }: Props) {
   const { t } = useTranslation()
   const { showSnack } = useSnack()
@@ -38,18 +34,15 @@ export function JourneyTemplatesTab({ journeyTemplates, loading, onDelete, onRef
     useState<JourneyTemplate | null>(null)
   // null = closed, undefined = create new, JourneyTemplate = edit existing
   const [editTarget, setEditTarget] = useState<JourneyTemplate | null | undefined>(null)
-
   // Entry editing state: { templateId, entry? } — entry=undefined means create new
   const [entryEditState, setEntryEditState] = useState<{
     template: JourneyTemplate
     entry?: JourneyTemplateEntry
   } | null>(null)
-
   const [entryDeleteConfirm, setEntryDeleteConfirm] = useState<{
     template: JourneyTemplate
     entryId: string
   } | null>(null)
-
   const { data: questionnaires } = useApi(() => client.getQuestionnaireTemplates(), [])
   const { data: instructionTemplates } = useApi(() => client.getInstructionTemplates(), [])
   const executeDeleteEntry = async () => {
@@ -65,7 +58,6 @@ export function JourneyTemplatesTab({ journeyTemplates, loading, onDelete, onRef
       showSnack(t('common.error'), 'error')
     }
   }
-
   const handleSaveEntry = async (template: JourneyTemplate, saved: JourneyTemplateEntry) => {
     const existing = template.entries.find((e) => e.id === saved.id)
     const entries = existing
@@ -80,11 +72,9 @@ export function JourneyTemplatesTab({ journeyTemplates, loading, onDelete, onRef
     }
     setEntryEditState(null)
   }
-
   const handleDeleteEntry = async (template: JourneyTemplate, entryId: string) => {
     setEntryDeleteConfirm({ template, entryId })
   }
-
   const handleDeleteInstruction = async (template: JourneyTemplate, instrId: string) => {
     const instructions = template.instructions.filter((i) => i.id !== instrId)
     try {
@@ -95,19 +85,15 @@ export function JourneyTemplatesTab({ journeyTemplates, loading, onDelete, onRef
       showSnack(t('common.error'), 'error')
     }
   }
-
   // Close entry editor and optionally focus
   const handleCloseEntryEditor = () => setEntryEditState(null)
-
   if (loading && !journeyTemplates)
-    return <Skeleton variant="rectangular" height={200} sx={{ borderRadius: 1 }} />
-
+    return <Skeleton variant="rectangular" sx={{ borderRadius: 1, height: 200 }} />
   const parentName = (id: string | undefined) =>
     id ? journeyTemplates?.find((jt) => jt.id === id)?.name : undefined
-
   return (
     <>
-      <Stack direction="row" justifyContent="flex-end" sx={{ mb: 1.5 }}>
+      <Stack direction="row" sx={{ mb: 1.5, justifyContent: 'flex-end' }}>
         <Button
           size="small"
           variant="outlined"

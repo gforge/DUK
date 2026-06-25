@@ -10,22 +10,17 @@ import React from 'react'
 import type { Control, FieldError, UseFormSetValue } from 'react-hook-form'
 import { Controller } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
-
 import type { AssignmentMode, CareRole } from '@/api/schemas'
 import { CareRoleIcon } from '@/components/common'
-
 import type { TriageForm } from '../schema'
-
 interface Props {
   control: Control<TriageForm>
   error?: FieldError
   assignmentMode: AssignmentMode
   setValue: UseFormSetValue<TriageForm>
 }
-
 export function CareRoleField({ control, error, assignmentMode, setValue }: Props) {
   const { t } = useTranslation()
-
   return (
     <Controller
       name="careRole"
@@ -48,13 +43,10 @@ export function CareRoleField({ control, error, assignmentMode, setValue }: Prop
             value={field.value}
             onChange={(_, nextCareRole: CareRole) => {
               if (!nextCareRole) return
-
               field.onChange(nextCareRole)
-
               if (assignmentMode === 'PAL' && nextCareRole !== 'DOCTOR') {
                 setValue('assignmentMode', 'ANY')
               }
-
               if (assignmentMode === 'NAMED') {
                 setValue('assignedUserId', '')
               }
@@ -64,21 +56,21 @@ export function CareRoleField({ control, error, assignmentMode, setValue }: Prop
             color="primary"
           >
             <ToggleButton value="DOCTOR" aria-label={t('triage.careRoleOption.DOCTOR')}>
-              <Stack direction="row" alignItems="center" gap={0.75}>
+              <Stack direction="row" sx={{ alignItems: 'center', gap: 0.75 }}>
                 <CareRoleIcon role="DOCTOR" />
                 <span>{t('triage.careRoleOption.DOCTOR')}</span>
               </Stack>
             </ToggleButton>
 
             <ToggleButton value="NURSE" aria-label={t('triage.careRoleOption.NURSE')}>
-              <Stack direction="row" alignItems="center" gap={0.75}>
+              <Stack direction="row" sx={{ alignItems: 'center', gap: 0.75 }}>
                 <CareRoleIcon role="NURSE" />
                 <span>{t('triage.careRoleOption.NURSE')}</span>
               </Stack>
             </ToggleButton>
 
             <ToggleButton value="PHYSIO" aria-label={t('triage.careRoleOption.PHYSIO')}>
-              <Stack direction="row" alignItems="center" gap={0.75}>
+              <Stack direction="row" sx={{ alignItems: 'center', gap: 0.75 }}>
                 <CareRoleIcon role="PHYSIO" />
                 <span>{t('triage.careRoleOption.PHYSIO')}</span>
               </Stack>

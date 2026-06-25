@@ -1,115 +1,68 @@
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
-import EditIcon from '@mui/icons-material/Edit'
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import {
-  Box,
-  Chip,
-  Collapse,
-  IconButton,
-  Stack,
-  TableCell,
-  TableRow,
-  Tooltip,
-  Typography,
-} from '@mui/material'
-import React, { useState } from 'react'
-import { useTranslation } from 'react-i18next'
-import ReactMarkdown from 'react-markdown'
-
-import type { JourneyTemplate, JourneyTemplateInstruction } from '@/api/schemas'
-import { useOffsetFormat } from '@/hooks/useOffsetFormat'
-import { JourneyIcon } from '@/utils'
-
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlineOutlined';
+import EditIcon from '@mui/icons-material/Edit';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { Box, Chip, Collapse, IconButton, Stack, TableCell, TableRow, Tooltip, Typography, } from '@mui/material';
+import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import ReactMarkdown from 'react-markdown';
+import type { JourneyTemplate, JourneyTemplateInstruction } from '@/api/schemas';
+import { useOffsetFormat } from '@/hooks/useOffsetFormat';
+import { JourneyIcon } from '@/utils';
 interface Props {
-  jt: JourneyTemplate
-  instr: JourneyTemplateInstruction
-  instrName: string
-  instrContent: string
-  setTemplateInstructionsTarget: (jt: JourneyTemplate) => void
-  handleDeleteInstruction: (template: JourneyTemplate, instrId: string) => void
+    jt: JourneyTemplate;
+    instr: JourneyTemplateInstruction;
+    instrName: string;
+    instrContent: string;
+    setTemplateInstructionsTarget: (jt: JourneyTemplate) => void;
+    handleDeleteInstruction: (template: JourneyTemplate, instrId: string) => void;
 }
-
-export function InstructionRow({
-  jt,
-  instr,
-  instrName,
-  instrContent,
-  setTemplateInstructionsTarget,
-  handleDeleteInstruction,
-}: Props) {
-  const { t } = useTranslation()
-  const formatOffset = useOffsetFormat()
-  const [isExpanded, setIsExpanded] = useState(false)
-
-  const instrLabel = instr.label ?? instrName
-  const startF = formatOffset(instr.startDayOffset)
-  const endF = instr.endDayOffset !== undefined ? formatOffset(instr.endDayOffset) : null
-
-  return (
-    <React.Fragment>
-      <TableRow
-        hover
-        sx={{ bgcolor: 'action.hover', cursor: 'pointer' }}
-        onClick={() => setIsExpanded((v) => !v)}
-      >
+export function InstructionRow({ jt, instr, instrName, instrContent, setTemplateInstructionsTarget, handleDeleteInstruction, }: Props) {
+    const { t } = useTranslation();
+    const formatOffset = useOffsetFormat();
+    const [isExpanded, setIsExpanded] = useState(false);
+    const instrLabel = instr.label ?? instrName;
+    const startF = formatOffset(instr.startDayOffset);
+    const endF = instr.endDayOffset !== undefined ? formatOffset(instr.endDayOffset) : null;
+    return (<React.Fragment>
+      <TableRow hover sx={{ bgcolor: 'action.hover', cursor: 'pointer' }} onClick={() => setIsExpanded((v) => !v)}>
         <TableCell sx={{ minWidth: 120 }}>
-          <Stack direction="row" alignItems="center" gap={0.5}>
-            <ExpandMoreIcon
-              fontSize="small"
-              color="action"
-              sx={{
-                transform: isExpanded ? 'rotate(180deg)' : 'rotate(-90deg)',
-                transition: 'transform 0.15s',
-                flexShrink: 0,
-              }}
-            />
-            <JourneyIcon icon={instr.icon} fontSize="small" color="action" />
-            <Typography variant="body2" fontWeight={600} color="text.secondary">
+          <Stack direction="row" sx={{ alignItems: 'center', gap: 0.5 }}>
+            <ExpandMoreIcon color="action" sx={{
+        transform: isExpanded ? 'rotate(180deg)' : 'rotate(-90deg)',
+        transition: 'transform 0.15s',
+        flexShrink: 0,
+        fontSize: "small"
+    }}/>
+            <JourneyIcon icon={instr.icon} color="action" fontSize="small" />
+            <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 600 }}>
               {instrLabel}
             </Typography>
           </Stack>
-          <Chip
-            label={t('journey.editor.tabInstructions').replace(/s$/, '')}
-            size="small"
-            variant="outlined"
-            color="info"
-            sx={{ fontSize: 10, height: 18, mt: 0.5, ml: 3 }}
-          />
+          <Chip label={t('journey.editor.tabInstructions').replace(/s$/, '')} size="small" variant="outlined" color="info" sx={{ fontSize: 10, height: 18, mt: 0.5, ml: 3 }}/>
         </TableCell>
         <TableCell sx={{ whiteSpace: 'nowrap', minWidth: 160 }}>
           <Stack>
             <Tooltip title={startF.tooltip || ''}>
-              <Typography variant="body2" fontWeight={600}>
+              <Typography variant="body2" sx={{ fontWeight: 600 }}>
                 {startF.label}
               </Typography>
             </Tooltip>
-            {endF && (
-              <Typography variant="caption" color="text.secondary">
+            {endF && (<Typography variant="caption" color="text.secondary">
                 → {endF.label}
-              </Typography>
-            )}
+              </Typography>)}
           </Stack>
         </TableCell>
         <TableCell />
         <TableCell />
         <TableCell sx={{ width: 80 }}>
-          <Stack
-            direction="row"
-            gap={0.5}
-            justifyContent="flex-end"
-            onClick={(e) => e.stopPropagation()}
-          >
+          <Stack direction="row" onClick={(e) => e.stopPropagation()} sx={{ gap: 0.5, justifyContent: 'flex-end' }}>
             <Tooltip title={t('common.edit')}>
               <IconButton size="small" onClick={() => setTemplateInstructionsTarget(jt)}>
                 <EditIcon fontSize="small" />
               </IconButton>
             </Tooltip>
             <Tooltip title={t('common.delete')}>
-              <IconButton
-                size="small"
-                color="error"
-                onClick={() => handleDeleteInstruction(jt, instr.id)}
-              >
+              <IconButton size="small" color="error" onClick={() => handleDeleteInstruction(jt, instr.id)}>
                 <DeleteOutlineIcon fontSize="small" />
               </IconButton>
             </Tooltip>
@@ -119,29 +72,22 @@ export function InstructionRow({
       <TableRow>
         <TableCell colSpan={5} sx={{ py: 0, border: 0 }}>
           <Collapse in={isExpanded} unmountOnExit>
-            <Box
-              sx={{
-                py: 1.5,
-                px: 2,
-                ml: 3,
-                borderLeft: 2,
-                borderColor: 'info.light',
-                '& p': { my: 0.5, typography: 'body2' },
-                '& ul, & ol': { my: 0.5, pl: 2.5 },
-                '& li': { my: 0.25 },
-              }}
-            >
-              {instrContent ? (
-                <ReactMarkdown>{instrContent}</ReactMarkdown>
-              ) : (
-                <Typography variant="body2" color="text.disabled">
+            <Box sx={{
+            py: 1.5,
+            px: 2,
+            ml: 3,
+            borderLeft: 2,
+            borderColor: 'info.light',
+            '& p': { my: 0.5, typography: 'body2' },
+            '& ul, & ol': { my: 0.5, pl: 2.5 },
+            '& li': { my: 0.25 },
+        }}>
+              {instrContent ? (<ReactMarkdown>{instrContent}</ReactMarkdown>) : (<Typography variant="body2" color="text.disabled">
                   {t('journey.instructionFallback')}
-                </Typography>
-              )}
+                </Typography>)}
             </Box>
           </Collapse>
         </TableCell>
       </TableRow>
-    </React.Fragment>
-  )
+    </React.Fragment>);
 }

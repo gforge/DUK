@@ -4,7 +4,7 @@ import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked'
 import { useTheme } from '@mui/material'
 import React from 'react'
 
-import { StepStatus } from './types'
+import type { StepStatus } from './types'
 
 export const StatusIcon = ({ status }: { status: StepStatus }) => {
   const theme = useTheme()

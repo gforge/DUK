@@ -1,5 +1,5 @@
 import AddIcon from '@mui/icons-material/Add'
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline'
+import HelpOutlineIcon from '@mui/icons-material/HelpOutlineOutlined'
 import RouteIcon from '@mui/icons-material/Route'
 import {
   Alert,
@@ -15,7 +15,6 @@ import {
 } from '@mui/material'
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-
 import * as client from '@/api/client'
 import type { PolicyRule } from '@/api/schemas'
 import type { RuleForm } from '@/components/policy'
@@ -28,22 +27,16 @@ import {
 } from '@/components/policy'
 import { useApi } from '@/hooks/useApi'
 import { useSnack } from '@/store/snackContext'
-
 const EMPTY_FORM: RuleForm = { severity: 'MEDIUM', name: '', expression: '', description: '' }
-
 // suppress unused imports
 void ruleSchema
 void SEVERITIES
-
 export function PolicyEditor() {
   const { t } = useTranslation()
   const { showSnack } = useSnack()
-
   const { data: templates } = useApi(() => client.getJourneyTemplates(), [])
   const { data: allVariables } = useApi(() => client.getAvailablePolicyVariables(), [])
-
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>('')
-
   // Reload rules whenever the selected template changes
   const {
     data: rules,
@@ -54,25 +47,21 @@ export function PolicyEditor() {
     () => (selectedTemplateId ? client.getPolicyRules(selectedTemplateId) : Promise.resolve(null)),
     [selectedTemplateId],
   )
-
   const [open, setOpen] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [formValues, setFormValues] = useState<RuleForm>(EMPTY_FORM)
   const [deleting, setDeleting] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
   const [helpOpen, setHelpOpen] = useState(false)
-
   // Variables scoped to the currently selected template
   const selectedTemplate = templates?.find((t) => t.id === selectedTemplateId)
   const templateVariables =
     allVariables?.filter((v) => v.templateName === selectedTemplate?.name) ?? []
-
   function openCreate() {
     setEditingId(null)
     setFormValues(EMPTY_FORM)
     setOpen(true)
   }
-
   function openEdit(rule: PolicyRule) {
     setEditingId(rule.id)
     setFormValues({
@@ -83,7 +72,6 @@ export function PolicyEditor() {
     })
     setOpen(true)
   }
-
   async function onSubmit(data: RuleForm) {
     if (!selectedTemplateId) return
     setSaving(true)
@@ -104,7 +92,6 @@ export function PolicyEditor() {
       setSaving(false)
     }
   }
-
   async function handleToggle(rule: PolicyRule) {
     try {
       await client.savePolicyRule({ ...rule, enabled: !rule.enabled })
@@ -113,7 +100,6 @@ export function PolicyEditor() {
       showSnack(t('common.error'), 'error')
     }
   }
-
   async function handleDelete(id: string) {
     setDeleting(id)
     try {
@@ -126,11 +112,10 @@ export function PolicyEditor() {
       setDeleting(null)
     }
   }
-
   return (
     <Box sx={{ p: 3 }}>
-      <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 3 }}>
-        <Typography variant="h5" fontWeight={700} flex={1}>
+      <Stack direction="row" spacing={1} sx={{ mb: 3, alignItems: 'center' }}>
+        <Typography variant="h5" sx={{ fontWeight: 700, flex: 1 }}>
           {t('policy.title')}
         </Typography>
         <Tooltip title={t('policy.help')}>
@@ -141,7 +126,7 @@ export function PolicyEditor() {
       </Stack>
 
       {/* Template selector */}
-      <Stack direction="row" alignItems="center" gap={2} sx={{ mb: 3 }}>
+      <Stack direction="row" sx={{ mb: 3, alignItems: 'center', gap: 2 }}>
         <RouteIcon color="primary" />
         <TextField
           select

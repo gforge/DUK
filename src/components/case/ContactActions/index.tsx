@@ -4,7 +4,6 @@ import PhoneDisabledIcon from '@mui/icons-material/PhoneDisabled'
 import { Alert, Button, Stack, Typography } from '@mui/material'
 import React, { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-
 import * as client from '@/api/client'
 import type { ContactAction } from '@/api/client/audit'
 import type { Case } from '@/api/schemas'
@@ -12,19 +11,15 @@ import { useContactActionText } from '@/hooks/labels'
 import { useApi } from '@/hooks/useApi'
 import { useRole } from '@/store/roleContext'
 import { useSnack } from '@/store/snackContext'
-
 /** Triggers that surface the contact action panel */
 const CONTACT_TRIGGERS = new Set(['SEEK_CONTACT', 'NOT_OPENED'] as const)
-
 type ContactTrigger = 'SEEK_CONTACT' | 'NOT_OPENED'
 type ContactPanelAction = Extract<ContactAction, 'CONTACTED' | 'REMINDER_SENT' | 'CALL_ATTEMPT'>
-
 interface Props {
   caseData: Case
   /** Called after logging an event so AuditLogTab can refetch */
   onRefetch: () => void
 }
-
 export default function ContactActions({ caseData, onRefetch }: Props) {
   const { t } = useTranslation()
   const { currentUser, isRole } = useRole()
@@ -35,39 +30,31 @@ export default function ContactActions({ caseData, onRefetch }: Props) {
   )
   const { formatRelativeContactDate, successMessage } = useContactActionText()
   const [loading, setLoading] = useState<ContactPanelAction | null>(null)
-
   const canContact = isRole('NURSE', 'DOCTOR', 'SECRETARY')
-
   const primaryTrigger = caseData.triggers.find((trigger): trigger is ContactTrigger =>
     CONTACT_TRIGGERS.has(trigger as ContactTrigger),
   )
-
   const { lastReminder, lastCallAttempt, lastContacted } = useMemo(() => {
     if (!events) {
       return { lastReminder: null, lastCallAttempt: null, lastContacted: null }
     }
-
     let lastReminder: string | null = null
     let lastCallAttempt: string | null = null
     let lastContacted: string | null = null
-
     for (const event of events) {
       if (event.action === 'REMINDER_SENT' && (!lastReminder || event.timestamp > lastReminder)) {
         lastReminder = event.timestamp
       }
-
       if (
         event.action === 'CALL_ATTEMPT' &&
         (!lastCallAttempt || event.timestamp > lastCallAttempt)
       ) {
         lastCallAttempt = event.timestamp
       }
-
       if (event.action === 'CONTACTED' && (!lastContacted || event.timestamp > lastContacted)) {
         lastContacted = event.timestamp
       }
     }
-
     // forget a CONTACTED event if it happened more than two days ago so the panel
     // can show contact buttons again. this matches the "no data for 2 days" rule.
     if (lastContacted) {
@@ -77,17 +64,13 @@ export default function ContactActions({ caseData, onRefetch }: Props) {
         lastContacted = null
       }
     }
-
     return { lastReminder, lastCallAttempt, lastContacted }
   }, [events])
-
   if (!canContact || !primaryTrigger || caseData.status === 'CLOSED') {
     return null
   }
-
   async function handle(action: ContactPanelAction) {
     setLoading(action)
-
     try {
       await client.logContactEvent(caseData.id, currentUser.id, currentUser.role, action)
       showSnack(successMessage(action), 'success')
@@ -100,12 +83,10 @@ export default function ContactActions({ caseData, onRefetch }: Props) {
       setLoading(null)
     }
   }
-
   const isSubmitting = loading !== null
-
   return (
     <Alert severity="warning" sx={{ mt: 2 }} icon={false}>
-      <Stack gap={1.5}>
+      <Stack sx={{ gap: 1.5 }}>
         <Typography variant="body2">
           {(() => {
             // when contact has been logged, show that timestamp instead of the
@@ -140,7 +121,7 @@ export default function ContactActions({ caseData, onRefetch }: Props) {
           </Typography>
         )}
 
-        <Stack direction="row" gap={1} flexWrap="wrap">
+        <Stack direction="row" sx={{ gap: 1, flexWrap: 'wrap' }}>
           {!lastContacted && (
             <>
               <Button

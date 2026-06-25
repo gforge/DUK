@@ -11,16 +11,14 @@ import {
 } from '@mui/material'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-
 interface Props {
   open: boolean
   onClose: () => void
 }
-
 export default function PolicyHelpDialog({ open, onClose }: Props) {
   const { t } = useTranslation()
   return (
-    <Dialog maxWidth="sm" open={open} onClose={onClose} fullWidth>
+    <Dialog open={open} onClose={onClose} fullWidth sx={{ maxWidth: 'sm' }}>
       <DialogTitle>{t('policy.syntaxTitle')}</DialogTitle>
       <DialogContent>
         <Typography variant="body2" color="text.secondary" gutterBottom>

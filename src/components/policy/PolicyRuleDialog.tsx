@@ -17,17 +17,14 @@ import {
   Typography,
 } from '@mui/material'
 import React, { useRef } from 'react'
-import { Controller,useForm } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { z } from 'zod'
-
 import { validateExpression } from '@/api/policyParser'
 import type { PolicyVariable } from '@/api/service'
 import { useSeverityLabel } from '@/hooks/labels'
-
 const SEVERITIES = ['LOW', 'MEDIUM', 'HIGH'] as const
 export { SEVERITIES }
-
 /** General variables not tied to a specific journey template. */
 const GENERAL_VARS: {
   name: string
@@ -36,7 +33,6 @@ const GENERAL_VARS: {
   { name: 'numResponsesTotal', labelKey: 'policy.varNumResponses' },
   { name: 'daysSinceTherapy', labelKey: 'policy.varDaysSinceTherapy' },
 ]
-
 export const ruleSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   expression: z
@@ -50,7 +46,6 @@ export const ruleSchema = z.object({
   description: z.string().optional(),
 })
 export type RuleForm = z.infer<typeof ruleSchema>
-
 interface Props {
   open: boolean
   editingId: string | null
@@ -61,7 +56,6 @@ interface Props {
   /** Available policy variables derived from journey template score aliases. */
   variables?: PolicyVariable[]
 }
-
 export default function PolicyRuleDialog({
   open,
   editingId,
@@ -74,16 +68,13 @@ export default function PolicyRuleDialog({
   const { t } = useTranslation()
   const getSeverityLabel = useSeverityLabel()
   const exprRef = useRef<HTMLInputElement>(null)
-
   const { control, handleSubmit, watch, formState, setValue, getValues } = useForm<RuleForm>({
     resolver: zodResolver(ruleSchema),
     values: formValues,
   })
-
   // eslint-disable-next-line react-hooks/incompatible-library
   const watchedExpr = watch('expression')
   const exprError = watchedExpr ? validateExpression(watchedExpr) : null
-
   /** Insert a variable name at the current cursor position in the expression field. */
   const insertVar = (varName: string) => {
     const currentVal = getValues('expression') ?? ''
@@ -98,7 +89,6 @@ export default function PolicyRuleDialog({
       }
     }, 0)
   }
-
   // Group journey variables by template name
   const grouped = variables.reduce<Record<string, PolicyVariable[]>>((acc, v) => {
     if (!acc[v.templateName]) acc[v.templateName] = []
@@ -106,9 +96,8 @@ export default function PolicyRuleDialog({
     return acc
   }, {})
   const templateGroups = Object.entries(grouped)
-
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
+    <Dialog open={open} onClose={onClose} fullWidth sx={{ maxWidth: 'md' }}>
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
         <DialogTitle>{editingId ? t('policy.editRule') : t('policy.addRule')}</DialogTitle>
         <DialogContent>
@@ -131,28 +120,31 @@ export default function PolicyRuleDialog({
 
             {/* ── Variable palette ──────────────────────────────────────── */}
             <Box>
-              <Typography variant="caption" color="text.secondary" display="block" gutterBottom>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                gutterBottom
+                sx={{ display: 'block' }}
+              >
                 {t('policy.clickVarToInsert')}
               </Typography>
 
               {templateGroups.length === 0 ? (
-                <Typography variant="caption" color="text.disabled" fontStyle="italic">
+                <Typography variant="caption" color="text.disabled" sx={{ fontStyle: 'italic' }}>
                   {t('policy.noVars')}
                 </Typography>
               ) : (
-                <Stack gap={1.5}>
+                <Stack sx={{ gap: 1.5 }}>
                   {templateGroups.map(([templateName, vars]) => (
                     <Box key={templateName}>
                       <Typography
                         variant="overline"
-                        fontSize={10}
                         color="text.disabled"
-                        display="block"
-                        sx={{ lineHeight: 1.4, mb: 0.5 }}
+                        sx={{ lineHeight: 1.4, mb: 0.5, display: 'block', fontSize: 10 }}
                       >
                         {templateName}
                       </Typography>
-                      <Stack direction="row" flexWrap="wrap" gap={0.5}>
+                      <Stack direction="row" sx={{ flexWrap: 'wrap', gap: 0.5 }}>
                         {vars.map((v) => (
                           <Tooltip key={v.name} title={v.name} placement="top">
                             <Chip
@@ -175,14 +167,12 @@ export default function PolicyRuleDialog({
 
               <Typography
                 variant="overline"
-                fontSize={10}
                 color="text.disabled"
-                display="block"
-                sx={{ lineHeight: 1.4, mb: 0.5 }}
+                sx={{ lineHeight: 1.4, mb: 0.5, display: 'block', fontSize: 10 }}
               >
                 {t('policy.generalVars')}
               </Typography>
-              <Stack direction="row" flexWrap="wrap" gap={0.5}>
+              <Stack direction="row" sx={{ flexWrap: 'wrap', gap: 0.5 }}>
                 {GENERAL_VARS.map((v) => (
                   <Tooltip key={v.name} title={v.name} placement="top">
                     <Chip
@@ -212,7 +202,7 @@ export default function PolicyRuleDialog({
                   required
                   size="small"
                   inputRef={exprRef}
-                  inputProps={{ style: { fontFamily: 'monospace', fontSize: 13 } }}
+                  slotProps={{ htmlInput: { style: { fontFamily: 'monospace', fontSize: 13 } } }}
                 />
               )}
             />

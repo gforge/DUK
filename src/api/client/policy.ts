@@ -1,4 +1,4 @@
-import type { Case,PolicyRule } from '../schemas'
+import type { Case, PolicyRule } from '../schemas'
 import * as service from '../service'
 import { withDelay } from './delay'
 

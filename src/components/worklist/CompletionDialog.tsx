@@ -14,10 +14,8 @@ import { setHours, setMinutes } from 'date-fns'
 import { enUS, sv } from 'date-fns/locale'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-
 // formatPersonnummer is used by PersonalNumberCopy component
 import PersonalNumberCopy from '@/components/common/PersonalNumberCopy'
-
 interface CompletionDialogProps {
   open: boolean
   patientLabel: string
@@ -30,7 +28,6 @@ interface CompletionDialogProps {
   onCompletionCommentChange: (value: string) => void
   onConfirm: () => void
 }
-
 export default function CompletionDialog({
   open,
   patientLabel,
@@ -50,10 +47,10 @@ export default function CompletionDialog({
   const maxTime = setMinutes(setHours(new Date(), 17), 0)
   const defaultReference = setMinutes(setHours(new Date(), 12), 30)
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
+    <Dialog open={open} onClose={onClose} fullWidth sx={{ maxWidth: 'xs' }}>
       <DialogTitle>{t('worklist.completeDialogTitle', { name: patientLabel })}</DialogTitle>
       <DialogContent>
-        <Stack gap={2} sx={{ pt: 1 }}>
+        <Stack sx={{ pt: 1, gap: 2 }}>
           <PersonalNumberCopy
             personalNumber={personalNumber ?? undefined}
             labelFormat="long"

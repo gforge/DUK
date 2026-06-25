@@ -1,4 +1,4 @@
-import type { FormSeries,QuestionnaireTemplate } from '../schemas'
+import type { FormSeries, QuestionnaireTemplate } from '../schemas'
 import * as service from '../service'
 import { withDelay } from './delay'
 

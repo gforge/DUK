@@ -8,7 +8,6 @@ import {
 } from '@mui/material'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-
 interface Props {
   open: boolean
   title: string
@@ -18,7 +17,6 @@ interface Props {
   onCancel: () => void
   confirmColor?: 'error' | 'primary' | 'warning'
 }
-
 export default function ConfirmDialog({
   open,
   title,
@@ -30,7 +28,7 @@ export default function ConfirmDialog({
 }: Props) {
   const { t } = useTranslation()
   return (
-    <Dialog maxWidth="xs" open={open} onClose={onCancel} fullWidth>
+    <Dialog open={open} onClose={onCancel} fullWidth sx={{ maxWidth: 'xs' }}>
       <DialogTitle>{title}</DialogTitle>
       <DialogContent>
         <DialogContentText>{message}</DialogContentText>

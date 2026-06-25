@@ -12,25 +12,21 @@ import {
 } from '@mui/material'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-
 import type { ClinicalReview } from '@/api/schemas'
-
 export interface ReviewDetailsDialogProps {
   reviewDetails: ClinicalReview | null
   onClose: () => void
 }
-
 export function ReviewDetailsDialog({ reviewDetails, onClose }: ReviewDetailsDialogProps) {
   const { t } = useTranslation()
-
   return (
-    <Dialog open={!!reviewDetails} onClose={onClose} maxWidth="xs" fullWidth>
+    <Dialog open={!!reviewDetails} onClose={onClose} fullWidth sx={{ maxWidth: 'xs' }}>
       <DialogTitle>
         {reviewDetails ? t(`reviewType.${reviewDetails.type}`) : t('review.type')}
       </DialogTitle>
       <DialogContent>
         {reviewDetails && (
-          <Stack gap={1.25} sx={{ pt: 1 }}>
+          <Stack sx={{ pt: 1, gap: 1.25 }}>
             <Chip
               size="small"
               icon={reviewDetails.type === 'LAB' ? <BiotechIcon /> : <ImageIcon />}

@@ -10,11 +10,9 @@ import {
 } from '@mui/material'
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-
 import * as client from '@/api/client'
 import { useRole } from '@/store/roleContext'
 import { useSnack } from '@/store/snackContext'
-
 interface DeclineConsentDialogProps {
   open: boolean
   onClose: () => void
@@ -28,7 +26,6 @@ interface DeclineConsentDialogProps {
   consentId?: string
   onDone: () => void
 }
-
 export function DeclineConsentDialog({
   open,
   onClose,
@@ -45,7 +42,6 @@ export function DeclineConsentDialog({
   const { currentUser } = useRole()
   const [reason, setReason] = useState('')
   const [saving, setSaving] = useState(false)
-
   const handleConfirm = async () => {
     setSaving(true)
     try {
@@ -71,11 +67,9 @@ export function DeclineConsentDialog({
       setSaving(false)
     }
   }
-
   const isWithdraw = mode === 'withdraw'
-
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog open={open} onClose={onClose} fullWidth sx={{ maxWidth: 'sm' }}>
       <DialogTitle>
         {t(
           isWithdraw

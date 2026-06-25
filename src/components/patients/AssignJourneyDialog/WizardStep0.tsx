@@ -14,9 +14,7 @@ import {
 } from '@mui/material'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-
 import type { JourneyTemplate, ResearchModule } from '@/api/schemas'
-
 interface Props {
   readonly journeyTemplateId: string
   readonly startDate: string
@@ -27,7 +25,6 @@ interface Props {
   readonly onDateChange: (date: string) => void
   readonly onModulesChange: (ids: string[]) => void
 }
-
 export default function WizardStep0({
   journeyTemplateId,
   startDate,
@@ -39,15 +36,13 @@ export default function WizardStep0({
   onModulesChange,
 }: Props) {
   const { t } = useTranslation()
-
   const handleModuleToggle = (id: string, checked: boolean) => {
     onModulesChange(
       checked ? [...selectedModuleIds, id] : selectedModuleIds.filter((m) => m !== id),
     )
   }
-
   return (
-    <Stack gap={2}>
+    <Stack sx={{ gap: 2 }}>
       <FormControl size="small" fullWidth required>
         <InputLabel>{t('patients.register.selectTemplate')}</InputLabel>
         <Select
@@ -71,12 +66,12 @@ export default function WizardStep0({
         type="date"
         fullWidth
         required
-        InputLabelProps={{ shrink: true }}
+        slotProps={{ inputLabel: { shrink: true } }}
       />
       {researchModules && researchModules.length > 0 && (
         <>
           <Divider />
-          <Typography variant="body2" fontWeight={600}>
+          <Typography variant="body2" sx={{ fontWeight: 600 }}>
             {t('patients.register.stepStudies')}
           </Typography>
           <FormGroup>
@@ -91,8 +86,8 @@ export default function WizardStep0({
                   />
                 }
                 label={
-                  <Stack direction="row" alignItems="center" gap={0.5}>
-                    <ScienceIcon fontSize="small" color="secondary" />
+                  <Stack direction="row" sx={{ alignItems: 'center', gap: 0.5 }}>
+                    <ScienceIcon color="secondary" fontSize="small" />
                     <Typography variant="body2">{rm.studyName}</Typography>
                   </Stack>
                 }

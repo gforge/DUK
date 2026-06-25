@@ -1,10 +1,8 @@
 import { Box, CircularProgress } from '@mui/material'
 import React, { lazy, Suspense } from 'react'
 import { HashRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom'
-
 import AppShell from '@/components/layout/AppShell'
 import { useOptionalRole } from '@/store/roleContext'
-
 const Dashboard = lazy(() => import('../pages/Dashboard'))
 const CaseDetail = lazy(() => import('../pages/CaseDetail'))
 const PatientView = lazy(() => import('../pages/PatientView'))
@@ -18,23 +16,19 @@ const JourneyEditor = lazy(() => import('../pages/JourneyEditor'))
 const Worklist = lazy(() => import('../pages/Worklist').then((m) => ({ default: m.Worklist })))
 const NotFound = lazy(() => import('../pages/NotFound'))
 const Login = lazy(() => import('../pages/Login'))
-
 function Loader() {
   return (
-    <Box display="flex" justifyContent="center" alignItems="center" height="60vh">
+    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh' }}>
       <CircularProgress />
     </Box>
   )
 }
-
 function ProtectedApp() {
   const roleCtx = useOptionalRole()
   const location = useLocation()
-
   if (!roleCtx) {
     return <Navigate to="/login" replace state={{ from: location.pathname }} />
   }
-
   return (
     <AppShell>
       <Suspense fallback={<Loader />}>
@@ -56,7 +50,6 @@ function ProtectedApp() {
     </AppShell>
   )
 }
-
 export function AppRouter() {
   return (
     <HashRouter>

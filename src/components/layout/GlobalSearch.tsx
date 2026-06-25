@@ -17,26 +17,20 @@ import {
 import React, { useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
-
 import * as client from '@/api/client'
 import type { Patient } from '@/api/schemas'
 import { formatPersonnummer } from '@/api/utils/personnummer'
 import { useRole } from '@/store/roleContext'
-
 const MAX_RESULTS = 10
-
 export default function GlobalSearch() {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const { isRole } = useRole()
-
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
   const [patients, setPatients] = useState<Patient[]>([])
   const hasFetched = useRef(false)
-
   const isClinician = isRole('NURSE', 'DOCTOR')
-
   function handleOpen() {
     setOpen(true)
     if (!hasFetched.current) {
@@ -47,17 +41,14 @@ export default function GlobalSearch() {
         .catch(() => {})
     }
   }
-
   function handleClose() {
     setOpen(false)
     setQuery('')
   }
-
   function handleSelect(patient: Patient) {
     handleClose()
     navigate(`/patients/${patient.id}`)
   }
-
   const filtered = useMemo(() => {
     const q = query.toLowerCase().trim()
     if (!q) return patients.slice(0, MAX_RESULTS)
@@ -65,9 +56,7 @@ export default function GlobalSearch() {
       .filter((p) => p.displayName.toLowerCase().includes(q) || p.personalNumber.includes(q))
       .slice(0, MAX_RESULTS)
   }, [patients, query])
-
   if (!isClinician) return null
-
   return (
     <>
       <Tooltip title={t('common.search')}>
@@ -76,7 +65,7 @@ export default function GlobalSearch() {
         </IconButton>
       </Tooltip>
 
-      <Dialog maxWidth="sm" open={open} onClose={handleClose} fullWidth>
+      <Dialog open={open} onClose={handleClose} fullWidth sx={{ maxWidth: 'sm' }}>
         <DialogContent sx={{ p: 0 }}>
           <TextField
             autoFocus
@@ -109,7 +98,7 @@ export default function GlobalSearch() {
             <List dense disablePadding>
               {filtered.map((patient) => (
                 <ListItemButton key={patient.id} onClick={() => handleSelect(patient)} divider>
-                  <PersonIcon fontSize="small" sx={{ mr: 1.5, color: 'text.secondary' }} />
+                  <PersonIcon sx={{ mr: 1.5, color: 'text.secondary', fontSize: 'small' }} />
                   <ListItemText
                     primary={patient.displayName}
                     secondary={formatPersonnummer(patient.personalNumber)}

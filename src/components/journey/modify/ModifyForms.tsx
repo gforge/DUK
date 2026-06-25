@@ -1,4 +1,4 @@
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlineOutlined'
 import {
   Button,
   FormControl,
@@ -12,12 +12,9 @@ import {
 import { addDays, format, parseISO } from 'date-fns'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-
 import type { QuestionnaireTemplate } from '@/api/schemas'
 import type { EffectiveStep } from '@/api/service'
-
 // ─── Add Step ─────────────────────────────────────────────────────────────────
-
 interface AddStepProps {
   label: string
   setLabel: (v: string) => void
@@ -32,7 +29,6 @@ interface AddStepProps {
   questionnaireTemplates: QuestionnaireTemplate[]
   startDate: string
 }
-
 export function AddStepForm({
   label,
   setLabel,
@@ -54,7 +50,7 @@ export function AddStepForm({
       ? format(addDays(parseISO(startDate), offsetNum), 'dd MMM yyyy')
       : null
   return (
-    <Stack gap={2}>
+    <Stack sx={{ gap: 2 }}>
       <TextField
         label={t('journey.modify.stepLabel')}
         value={label}
@@ -63,7 +59,7 @@ export function AddStepForm({
         fullWidth
         placeholder={t('journey.modify.stepLabelPlaceholder')}
       />
-      <Stack direction="row" gap={1}>
+      <Stack direction="row" sx={{ gap: 1 }}>
         <TextField
           label={t('journey.modify.offsetDays')}
           value={offset}
@@ -71,7 +67,7 @@ export function AddStepForm({
           size="small"
           type="number"
           sx={{ flex: 1 }}
-          inputProps={{ min: 0 }}
+          slotProps={{ htmlInput: { min: 0 } }}
           helperText={
             scheduledDate ? t('journey.modify.scheduledOn', { date: scheduledDate }) : ' '
           }
@@ -83,7 +79,7 @@ export function AddStepForm({
           size="small"
           type="number"
           sx={{ width: 120 }}
-          inputProps={{ min: 0 }}
+          slotProps={{ htmlInput: { min: 0 } }}
         />
       </Stack>
       <FormControl size="small" fullWidth>
@@ -114,9 +110,7 @@ export function AddStepForm({
     </Stack>
   )
 }
-
 // ─── Remove Step ──────────────────────────────────────────────────────────────
-
 interface RemoveStepProps {
   steps: EffectiveStep[]
   selectedStepId: string
@@ -124,7 +118,6 @@ interface RemoveStepProps {
   reason: string
   setReason: (v: string) => void
 }
-
 export function RemoveStepForm({
   steps,
   selectedStepId,
@@ -134,21 +127,28 @@ export function RemoveStepForm({
 }: RemoveStepProps) {
   const { t } = useTranslation()
   return (
-    <Stack gap={2}>
+    <Stack sx={{ gap: 2 }}>
       <Typography variant="body2" color="text.secondary">
         {t('journey.modify.removeStepHint')}
       </Typography>
-      <Stack gap={0}>
+      <Stack sx={{ gap: 0 }}>
         {steps.map((step) => (
           <Stack
             key={step.id}
             direction="row"
-            alignItems="center"
-            justifyContent="space-between"
-            sx={{ px: 1, py: 0.75, border: 1, borderColor: 'divider', borderRadius: 1, mb: 0.5 }}
+            sx={{
+              px: 1,
+              py: 0.75,
+              border: 1,
+              borderColor: 'divider',
+              borderRadius: 1,
+              mb: 0.5,
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}
           >
             <Stack>
-              <Typography variant="body2" fontWeight={600}>
+              <Typography variant="body2" sx={{ fontWeight: 600 }}>
                 {step.label}
               </Typography>
               <Typography variant="caption" color="text.secondary">
@@ -182,12 +182,14 @@ export function RemoveStepForm({
     </Stack>
   )
 }
-
 // ─── Switch Template ──────────────────────────────────────────────────────────
-
 interface SwitchTemplateProps {
   currentTemplateName: string
-  otherTemplates: Array<{ id: string; name: string; description?: string }>
+  otherTemplates: Array<{
+    id: string
+    name: string
+    description?: string
+  }>
   selectedTemplateId: string
   onSelectTemplate: (id: string) => void
   reason: string
@@ -196,7 +198,6 @@ interface SwitchTemplateProps {
   newStartDate: string
   setNewStartDate: (v: string) => void
 }
-
 export function SwitchTemplateForm({
   currentTemplateName,
   otherTemplates,
@@ -209,7 +210,7 @@ export function SwitchTemplateForm({
 }: SwitchTemplateProps) {
   const { t } = useTranslation()
   return (
-    <Stack gap={2}>
+    <Stack sx={{ gap: 2 }}>
       <Typography variant="body2">
         {t('journey.modify.currentTemplate')}: <strong>{currentTemplateName}</strong>
       </Typography>
@@ -240,7 +241,7 @@ export function SwitchTemplateForm({
         size="small"
         type="date"
         fullWidth
-        InputLabelProps={{ shrink: true }}
+        slotProps={{ inputLabel: { shrink: true } }}
       />
       <TextField
         label={t('journey.modify.reason')}

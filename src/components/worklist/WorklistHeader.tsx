@@ -1,7 +1,6 @@
 import { Chip, Stack, Typography } from '@mui/material'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-
 interface WorklistHeaderProps {
   activeCount: number
   monitoringCount: number
@@ -9,7 +8,6 @@ interface WorklistHeaderProps {
   pulseCount: boolean
   pulseCompletedCount: boolean
 }
-
 export default function WorklistHeader({
   activeCount,
   monitoringCount,
@@ -18,11 +16,10 @@ export default function WorklistHeader({
   pulseCompletedCount,
 }: WorklistHeaderProps) {
   const { t } = useTranslation()
-
   return (
     <>
-      <Stack direction="row" alignItems="center" gap={1} mb={0.5}>
-        <Typography variant="h5" fontWeight={700}>
+      <Stack direction="row" sx={{ alignItems: 'center', gap: 1, mb: 0.5 }}>
+        <Typography variant="h5" sx={{ fontWeight: 700 }}>
           {t('worklist.title')}
         </Typography>
         <Chip
@@ -42,7 +39,7 @@ export default function WorklistHeader({
           }
         />
       </Stack>
-      <Stack direction="row" gap={1} mb={0.75} flexWrap="wrap">
+      <Stack direction="row" sx={{ gap: 1, mb: 0.75, flexWrap: 'wrap' }}>
         <Chip
           label={`${t('worklist.activeLabel')} (${activeCount})`}
           size="small"
@@ -63,7 +60,7 @@ export default function WorklistHeader({
           }
         />
       </Stack>
-      <Typography variant="body2" color="text.secondary" mb={2}>
+      <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
         {t('worklist.subtitle')}
       </Typography>
     </>

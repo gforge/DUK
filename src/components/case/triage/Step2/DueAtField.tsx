@@ -12,49 +12,38 @@ import React from 'react'
 import type { Control, FieldError } from 'react-hook-form'
 import { Controller } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
-
 import { parseDeadlineInput } from '../parseDeadlineInput'
 import type { TriageForm } from '../schema'
-
 export type DueAtPreset = '1w' | '2w' | '1m' | 'custom'
-
 interface Props {
   control: Control<TriageForm>
   error?: FieldError
   dueAtPreset: DueAtPreset | null
   setDueAtPreset: React.Dispatch<React.SetStateAction<DueAtPreset | null>>
 }
-
 function duePresetToIso(preset: Exclude<DueAtPreset, 'custom'>): string {
   const now = new Date()
   const target = new Date(now)
-
   if (preset === '1w') target.setDate(target.getDate() + 7)
   if (preset === '2w') target.setDate(target.getDate() + 14)
   if (preset === '1m') target.setMonth(target.getMonth() + 1)
-
   return target.toISOString().slice(0, 10)
 }
-
 function normalizeDeadlineInput(input: string): string {
   const compact = input.trim().replace(/\s+/g, '')
   const match = compact.match(/^(\d+)(vecka|veckor|week|weeks|v|w|dag|dagar|day|days|d)$/i)
-
   if (!match) return input.trim()
-
   return `${match[1]}${match[2].toLowerCase()}`
 }
-
 export function DueAtField({ control, error, dueAtPreset, setDueAtPreset }: Props) {
   const { t } = useTranslation()
   const dueDatePickerRef = React.useRef<HTMLInputElement>(null)
-
   return (
     <Controller
       name="dueAtInput"
       control={control}
       render={({ field }) => (
-        <Stack gap={1}>
+        <Stack sx={{ gap: 1 }}>
           <Typography variant="body2" color="text.default">
             {t('triage.dueAt')}
           </Typography>
@@ -65,9 +54,7 @@ export function DueAtField({ control, error, dueAtPreset, setDueAtPreset }: Prop
             value={dueAtPreset}
             onChange={(_, nextPreset: DueAtPreset | null) => {
               if (!nextPreset) return
-
               setDueAtPreset(nextPreset)
-
               if (nextPreset !== 'custom') {
                 field.onChange(duePresetToIso(nextPreset))
               }
@@ -90,7 +77,7 @@ export function DueAtField({ control, error, dueAtPreset, setDueAtPreset }: Prop
           </ToggleButtonGroup>
 
           {dueAtPreset === 'custom' && (
-            <Stack direction="row" gap={1} alignItems="flex-start">
+            <Stack direction="row" sx={{ gap: 1, alignItems: 'flex-start' }}>
               <TextField
                 fullWidth
                 label={t('triage.dueAt')}
@@ -100,7 +87,6 @@ export function DueAtField({ control, error, dueAtPreset, setDueAtPreset }: Prop
                   const raw = e.target.value
                   const parsed =
                     parseDeadlineInput(raw) ?? parseDeadlineInput(normalizeDeadlineInput(raw))
-
                   if (parsed) {
                     field.onChange(parsed)
                   }

@@ -9,9 +9,7 @@ import {
 } from '@mui/material'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-
 import type { JourneyTemplate } from '@/api/schemas'
-
 interface Props {
   journeyTemplateId: string
   setJourneyTemplateId: (v: string) => void
@@ -21,7 +19,6 @@ interface Props {
   setJoinedAt: (v: string) => void
   journeyTemplates: JourneyTemplate[] | null
 }
-
 export function Step1JourneyAssignment({
   journeyTemplateId,
   setJourneyTemplateId,
@@ -33,9 +30,8 @@ export function Step1JourneyAssignment({
 }: Props) {
   const { t } = useTranslation()
   const selectedTemplate = journeyTemplates?.find((jt) => jt.id === journeyTemplateId)
-
   return (
-    <Stack gap={2}>
+    <Stack sx={{ gap: 2 }}>
       <FormControl size="small" fullWidth required>
         <InputLabel>{t('patients.register.selectTemplate')}</InputLabel>
         <Select
@@ -68,7 +64,7 @@ export function Step1JourneyAssignment({
         type="date"
         fullWidth
         required
-        InputLabelProps={{ shrink: true }}
+        slotProps={{ inputLabel: { shrink: true } }}
       />
       <TextField
         label={t('journey.joinedAt')}
@@ -78,8 +74,10 @@ export function Step1JourneyAssignment({
         size="small"
         type="date"
         fullWidth
-        InputLabelProps={{ shrink: true }}
-        inputProps={{ max: new Date().toISOString().slice(0, 10) }}
+        slotProps={{
+          inputLabel: { shrink: true },
+          htmlInput: { max: new Date().toISOString().slice(0, 10) },
+        }}
       />
     </Stack>
   )

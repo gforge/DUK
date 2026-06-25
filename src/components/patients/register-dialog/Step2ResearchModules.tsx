@@ -2,15 +2,12 @@ import ScienceIcon from '@mui/icons-material/Science'
 import { Checkbox, FormControlLabel, FormGroup, Stack, Typography } from '@mui/material'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-
 import type { ResearchModule } from '@/api/schemas'
-
 interface Props {
   selectedModuleIds: string[]
   setSelectedModuleIds: (ids: string[]) => void
   researchModules: ResearchModule[] | null
 }
-
 export function Step2ResearchModules({
   selectedModuleIds,
   setSelectedModuleIds,
@@ -18,7 +15,7 @@ export function Step2ResearchModules({
 }: Props) {
   const { t } = useTranslation()
   return (
-    <Stack gap={2}>
+    <Stack sx={{ gap: 2 }}>
       <Typography variant="body2" color="text.secondary">
         {t('patients.register.studiesHint')}
       </Typography>
@@ -43,10 +40,10 @@ export function Step2ResearchModules({
                 />
               }
               label={
-                <Stack gap={0}>
-                  <Stack direction="row" alignItems="center" gap={0.5}>
-                    <ScienceIcon fontSize="small" color="secondary" />
-                    <Typography variant="body2" fontWeight={600}>
+                <Stack sx={{ gap: 0 }}>
+                  <Stack direction="row" sx={{ alignItems: 'center', gap: 0.5 }}>
+                    <ScienceIcon color="secondary" fontSize="small" />
+                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
                       {rm.studyName}
                     </Typography>
                   </Stack>

@@ -1,5 +1,5 @@
 import AddIcon from '@mui/icons-material/Add'
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlineOutlined'
 import {
   Box,
   Button,
@@ -24,19 +24,20 @@ import {
 } from '@mui/material'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-
 import type { QuestionnaireTemplate } from '@/api/schemas'
 import QuestionnaireEditorQuestionsTab from '@/components/journey/editor/QuestionnaireEditorQuestionsTab'
 import QuestionnaireEditorScoringTab from '@/components/journey/editor/QuestionnaireEditorScoringTab'
-import { ScoringRowDraft } from '@/components/journey/editor/questionnaireUtils'
+import type { ScoringRowDraft } from '@/components/journey/editor/questionnaireUtils'
 import { useQuestionnaireEditor } from '@/components/journey/editor/useQuestionnaireEditor'
-
 interface Props {
   template?: QuestionnaireTemplate
-  onSave: (t: Omit<QuestionnaireTemplate, 'id' | 'createdAt'> & { id?: string }) => void
+  onSave: (
+    t: Omit<QuestionnaireTemplate, 'id' | 'createdAt'> & {
+      id?: string
+    },
+  ) => void
   onClose: () => void
 }
-
 export function QuestionnaireEditorDialog({ template, onSave, onClose }: Props) {
   const { t } = useTranslation()
   const isCreate = !template
@@ -57,22 +58,19 @@ export function QuestionnaireEditorDialog({ template, onSave, onClose }: Props) 
     isValid,
     getSavePayload,
   } = useQuestionnaireEditor(template)
-
   // ── Validation & save ────────────────────────────────────────────────────────
-
   const handleSave = () => {
     if (!isValid) return
     onSave({ id: template?.id, ...getSavePayload() })
   }
-
   return (
-    <Dialog open onClose={onClose} maxWidth="lg" fullWidth>
+    <Dialog open onClose={onClose} fullWidth sx={{ maxWidth: 'lg' }}>
       <DialogTitle>
         {isCreate ? t('journey.editor.createQuestionnaire') : t('journey.editor.editQuestionnaire')}
       </DialogTitle>
 
       <DialogContent sx={{ pb: 0 }}>
-        <Stack gap={2} sx={{ mt: 0.5 }}>
+        <Stack sx={{ mt: 0.5, gap: 2 }}>
           <TextField
             label={t('journey.qTemplate.name')}
             value={name}
@@ -113,7 +111,10 @@ export function QuestionnaireEditorDialog({ template, onSave, onClose }: Props) 
           {/* ── Scoring rules tab ──────────────────────────────────────────── */}
           {tab === 1 && (
             <Box>
-              <Stack direction="row" justifyContent="space-between" alignItems="center" mb={1}>
+              <Stack
+                direction="row"
+                sx={{ justifyContent: 'space-between', alignItems: 'center', mb: 1 }}
+              >
                 <Typography variant="caption" color="text.secondary">
                   {t('journey.qTemplate.scoringHint', { keys: questionKeys.join(', ') || '—' })}
                 </Typography>

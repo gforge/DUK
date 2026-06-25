@@ -1,7 +1,6 @@
 import { Alert, Box, Skeleton, Stack } from '@mui/material'
 import React, { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-
 import * as client from '@/api/client'
 import type { CareRole, WorkCategory } from '@/api/schemas'
 import {
@@ -14,34 +13,27 @@ import { useApi } from '@/hooks/useApi'
 import { useWorklistQueue, WORKLIST_CATEGORY_ORDER } from '@/hooks/useWorklistQueue'
 import { useRole } from '@/store/roleContext'
 import { useSnack } from '@/store/snackContext'
-
 type CategoryFilter = 'ALL' | WorkCategory
 type CareRoleFilter = 'ALL' | Exclude<CareRole, null>
-
 export function Worklist() {
   const { t } = useTranslation()
   const { currentUser } = useRole()
   const { showSnack } = useSnack()
-
   const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>('ALL')
   const [careRoleFilter, setCareRoleFilter] = useState<CareRoleFilter>('ALL')
   const [palOnly, setPalOnly] = useState(false)
   const [claimedByMe, setClaimedByMe] = useState(false)
   const [myPatientsOnly, setMyPatientsOnly] = useState(false)
   const [completedExpanded, setCompletedExpanded] = useState(false)
-
   const {
     data: cases,
     loading: casesLoading,
     error: casesError,
     refetch: refetchCases,
   } = useApi(() => client.getCases(), [])
-
   const { data: patients, loading: patientsLoading } = useApi(() => client.getPatients(), [])
   const { data: users, loading: usersLoading } = useApi(() => client.getUsers(), [])
-
   const userMap = React.useMemo(() => new Map((users ?? []).map((u) => [u.id, u.name])), [users])
-
   const {
     patientMap,
     activeGroupedCases,
@@ -65,10 +57,8 @@ export function Worklist() {
       myPatientsOnly,
     },
   })
-
   const loading = casesLoading || patientsLoading || usersLoading
   const isInitialLoading = loading && (!cases || !patients || !users)
-
   const handleClaim = useCallback(
     async (caseId: string) => {
       try {
@@ -81,7 +71,6 @@ export function Worklist() {
     },
     [currentUser, refetchCases, showSnack, t],
   )
-
   const handleMarkDone = useCallback(
     async (
       caseId: string,
@@ -94,11 +83,9 @@ export function Worklist() {
       try {
         const worklistCase = cases?.find((c) => c.id === caseId)
         if (!worklistCase) throw new Error(`Case ${caseId} not found`)
-
         if (worklistCase.status === 'TRIAGED') {
           await client.advanceCaseStatus(caseId, 'FOLLOWING_UP', currentUser.id, currentUser.role)
         }
-
         await client.completeWorklistCase(caseId, currentUser.id, currentUser.role, options)
         showSnack(t('worklist.doneSuccess'), 'success')
         refetchCases()
@@ -108,7 +95,6 @@ export function Worklist() {
     },
     [cases, currentUser, refetchCases, showSnack, t],
   )
-
   return (
     <Box sx={{ bgcolor: 'background.default' }}>
       <WorklistHeader
@@ -134,9 +120,9 @@ export function Worklist() {
       />
 
       {isInitialLoading && (
-        <Stack gap={2}>
+        <Stack sx={{ gap: 2 }}>
           {[1, 2, 3].map((i) => (
-            <Skeleton key={i} variant="rectangular" height={80} sx={{ borderRadius: 2 }} />
+            <Skeleton key={i} variant="rectangular" sx={{ borderRadius: 2, height: 80 }} />
           ))}
         </Stack>
       )}
@@ -169,7 +155,7 @@ export function Worklist() {
 
       {!isInitialLoading && !casesError && monitoringCount > 0 && (
         <Box sx={{ mt: 2.5 }}>
-          <Stack direction="row" alignItems="center" gap={1} mb={0.5}>
+          <Stack direction="row" sx={{ alignItems: 'center', gap: 1, mb: 0.5 }}>
             <Alert severity="warning" icon={false} sx={{ py: 0, px: 1 }}>
               {t('worklist.monitoringSectionTitle')} ({monitoringCount})
             </Alert>

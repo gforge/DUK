@@ -1,46 +1,33 @@
-import AssignmentIcon from '@mui/icons-material/Assignment'
-import ScheduleIcon from '@mui/icons-material/Schedule'
-import { Alert, Button, Chip, CircularProgress, Paper, Stack, Typography } from '@mui/material'
-import React from 'react'
-import { useTranslation } from 'react-i18next'
-
-import * as client from '@/api/client'
-import type { QuestionnaireTemplate } from '@/api/schemas'
-import type { MergedDueStep } from '@/api/service'
-import { useApi } from '@/hooks/useApi'
-
+import AssignmentIcon from '@mui/icons-material/Assignment';
+import ScheduleIcon from '@mui/icons-material/Schedule';
+import { Alert, Button, Chip, CircularProgress, Paper, Stack, Typography } from '@mui/material';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import * as client from '@/api/client';
+import type { QuestionnaireTemplate } from '@/api/schemas';
+import type { MergedDueStep } from '@/api/service';
+import { useApi } from '@/hooks/useApi';
 interface Props {
-  patientId: string
-  refreshKey?: number
-  onSelectForm: (step: MergedDueStep, template: QuestionnaireTemplate) => void
+    patientId: string;
+    refreshKey?: number;
+    onSelectForm: (step: MergedDueStep, template: QuestionnaireTemplate) => void;
 }
-
 export default function PatientDueForms({ patientId, refreshKey, onSelectForm }: Readonly<Props>) {
-  const { t } = useTranslation()
-  const today = new Date().toISOString().slice(0, 10)
-
-  const {
-    data: dueSteps,
-    loading,
-    error,
-  } = useApi(() => client.getMergedDueStepsForPatient(patientId, today), [patientId, refreshKey])
-
-  const { data: templates } = useApi(() => client.getQuestionnaireTemplates(), [])
-
-  if (loading) return <CircularProgress size={24} />
-  if (error) return <Alert severity="error">{error}</Alert>
-  if (!dueSteps?.length) {
-    return (
-      <Alert severity="info" icon={<AssignmentIcon />}>
+    const { t } = useTranslation();
+    const today = new Date().toISOString().slice(0, 10);
+    const { data: dueSteps, loading, error, } = useApi(() => client.getMergedDueStepsForPatient(patientId, today), [patientId, refreshKey]);
+    const { data: templates } = useApi(() => client.getQuestionnaireTemplates(), []);
+    if (loading)
+        return <CircularProgress size={24}/>;
+    if (error)
+        return <Alert severity="error">{error}</Alert>;
+    if (!dueSteps?.length) {
+        return (<Alert severity="info" icon={<AssignmentIcon />}>
         {t('patient.form.noFormsDue')}
-      </Alert>
-    )
-  }
-
-  const templateMap = new Map(templates?.map((tmpl) => [tmpl.id, tmpl]) ?? [])
-
-  return (
-    <Paper variant="outlined" sx={{ borderRadius: 2, p: 2, mb: 3 }}>
+      </Alert>);
+    }
+    const templateMap = new Map(templates?.map((tmpl) => [tmpl.id, tmpl]) ?? []);
+    return (<Paper variant="outlined" sx={{ borderRadius: 2, p: 2, mb: 3 }}>
       <Stack sx={{ alignItems: 'center', gap: 1, mb: 1.5 }} direction="row">
         <AssignmentIcon color="primary" fontSize="small" />
         <Typography sx={{ fontWeight: 600 }} variant="subtitle1">
@@ -50,59 +37,37 @@ export default function PatientDueForms({ patientId, refreshKey, onSelectForm }:
 
       <Stack spacing={1.5}>
         {dueSteps.map((step) => {
-          const template = step.templateId ? templateMap.get(step.templateId) : undefined
-          if (!template) return null
-
-          const isOverdue = step.scheduledDate < today
-
-          return (
-            <Stack
-              sx={{
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                border: 1,
-                borderColor: isOverdue ? 'error.light' : 'divider',
-                borderRadius: 1,
-                px: 2,
-                py: 1.5,
-                bgcolor: isOverdue ? 'error.50' : undefined,
-              }}
-              key={step.id}
-              direction="row"
-            >
+            const template = step.templateId ? templateMap.get(step.templateId) : undefined;
+            if (!template)
+                return null;
+            const isOverdue = step.scheduledDate < today;
+            return (<Stack sx={{
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    border: 1,
+                    borderColor: isOverdue ? 'error.light' : 'divider',
+                    borderRadius: 1,
+                    px: 2,
+                    py: 1.5,
+                    bgcolor: isOverdue ? 'error.50' : undefined,
+                }} key={step.id} direction="row">
               <Stack sx={{ gap: 0.25 }}>
                 <Typography sx={{ fontWeight: 600 }} variant="body2">
                   {template.name}
                 </Typography>
                 <Stack sx={{ gap: 1, alignItems: 'center' }} direction="row">
-                  <ScheduleIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
+                  <ScheduleIcon sx={{ fontSize: 14, color: 'text.secondary' }}/>
                   <Typography variant="caption" color="text.secondary">
                     {step.scheduledDate}
                   </Typography>
-                  {isOverdue && (
-                    <Chip
-                      label={t('patient.form.overdue')}
-                      size="small"
-                      color="error"
-                      variant="outlined"
-                      sx={{ height: 18, fontSize: 10 }}
-                    />
-                  )}
+                  {isOverdue && (<Chip label={t('patient.form.overdue')} size="small" color="error" variant="outlined" sx={{ height: 18, fontSize: 10 }}/>)}
                 </Stack>
               </Stack>
-              <Button
-                variant="contained"
-                size="small"
-                disableElevation
-                onClick={() => onSelectForm(step, template)}
-                aria-label={t('patient.form.fillIn_name', { name: template.name })}
-              >
+              <Button variant="contained" size="small" disableElevation onClick={() => onSelectForm(step, template)} aria-label={t('patient.form.fillIn_name', { name: template.name })}>
                 {t('patient.form.fillIn')}
               </Button>
-            </Stack>
-          )
+            </Stack>);
         })}
       </Stack>
-    </Paper>
-  )
+    </Paper>);
 }

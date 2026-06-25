@@ -14,14 +14,11 @@ import {
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import ReactMarkdown from 'react-markdown'
-
 import * as client from '@/api/client'
 import type { ResearchModule } from '@/api/schemas'
 import { useRole } from '@/store/roleContext'
 import { useSnack } from '@/store/snackContext'
-
 import { DeclineConsentDialog } from './Decline'
-
 interface ConsentDialogProps {
   readonly open: boolean
   readonly onClose: () => void
@@ -30,7 +27,6 @@ interface ConsentDialogProps {
   readonly journeyId: string
   readonly onGranted: () => void
 }
-
 export function GrantConsentDialog({
   open,
   onClose,
@@ -45,7 +41,6 @@ export function GrantConsentDialog({
   const [checked, setChecked] = useState(false)
   const [saving, setSaving] = useState(false)
   const [declineOpen, setDeclineOpen] = useState(false)
-
   const handleGrant = async () => {
     if (!checked || saving) return
     setSaving(true)
@@ -60,10 +55,9 @@ export function GrantConsentDialog({
       setSaving(false)
     }
   }
-
   return (
     <>
-      <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+      <Dialog open={open} onClose={onClose} fullWidth sx={{ maxWidth: 'sm' }}>
         <DialogTitle>
           {t('journey.research.consent.dialogTitle', { studyName: module.studyName })}
         </DialogTitle>
@@ -82,7 +76,11 @@ export function GrantConsentDialog({
                 '& h3': { typography: 'subtitle2', fontWeight: 600 },
               }}
             >
-              <Typography variant="overline" color="text.secondary" display="block" mb={0.5}>
+              <Typography
+                variant="overline"
+                color="text.secondary"
+                sx={{ display: 'block', mb: 0.5 }}
+              >
                 {t('journey.research.consent.infoLabel')}
               </Typography>
               <ReactMarkdown>{module.studyInfoMarkdown}</ReactMarkdown>

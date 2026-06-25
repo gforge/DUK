@@ -1,21 +1,15 @@
 import { Box, Card, CardActionArea, CardContent, Typography } from '@mui/material'
 import { useTranslation } from 'react-i18next'
-
 import type { ContactMode } from '@/api/schemas'
-
 import { CONTACT_MODE_UI } from './actions'
-
 interface Props {
   selectedMode: ContactMode | null
   onSelect: (mode: ContactMode) => void
 }
-
 const CONTACT_MODES: ContactMode[] = ['DIGITAL', 'PHONE', 'VISIT', 'CLOSE']
-
 export function Step1({ selectedMode, onSelect }: Props) {
   const { t } = useTranslation()
   const tr = (key: string) => t(key as never)
-
   return (
     <Box>
       <Typography variant="h6" sx={{ mb: 1.5 }}>
@@ -33,7 +27,6 @@ export function Step1({ selectedMode, onSelect }: Props) {
           const ui = CONTACT_MODE_UI[mode]
           const Icon = ui.icon
           const isSelected = selectedMode === mode
-
           return (
             <Card
               key={mode}
@@ -93,9 +86,8 @@ export function Step1({ selectedMode, onSelect }: Props) {
                     <Box sx={{ minWidth: 0 }}>
                       <Typography
                         variant="body1"
-                        fontWeight={700}
                         color="text.primary"
-                        sx={{ lineHeight: 1.2 }}
+                        sx={{ lineHeight: 1.2, fontWeight: 700 }}
                       >
                         {tr(`triage.contactMode.${mode}`)}
                       </Typography>

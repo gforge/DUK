@@ -1,6 +1,6 @@
 import AddIcon from '@mui/icons-material/Add'
 import AssignmentIcon from '@mui/icons-material/Assignment'
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlineOutlined'
 import EditIcon from '@mui/icons-material/Edit'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import {
@@ -23,29 +23,28 @@ import {
 } from '@mui/material'
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-
 import type { QuestionnaireTemplate } from '@/api/schemas'
 import { QuestionnaireEditorDialog } from '@/components/journey/editor'
 import { useQuestionTypeLabel } from '@/hooks/labels'
-
 interface Props {
   questionnaires: QuestionnaireTemplate[] | null
   loading: boolean
   onDelete: (id: string, name: string) => void
-  onSave: (t: Omit<QuestionnaireTemplate, 'id' | 'createdAt'> & { id?: string }) => void
+  onSave: (
+    t: Omit<QuestionnaireTemplate, 'id' | 'createdAt'> & {
+      id?: string
+    },
+  ) => void
 }
-
 export function QuestionnaireTemplatesTab({ questionnaires, loading, onDelete, onSave }: Props) {
   const { t } = useTranslation()
   const getQuestionTypeLabel = useQuestionTypeLabel()
   // null = closed, undefined = create new, QuestionnaireTemplate = edit existing
   const [editTarget, setEditTarget] = useState<QuestionnaireTemplate | null | undefined>(null)
-
-  if (loading) return <Skeleton variant="rectangular" height={200} sx={{ borderRadius: 1 }} />
-
+  if (loading) return <Skeleton variant="rectangular" sx={{ borderRadius: 1, height: 200 }} />
   return (
     <>
-      <Stack direction="row" justifyContent="flex-end" sx={{ mb: 1.5 }}>
+      <Stack direction="row" sx={{ mb: 1.5, justifyContent: 'flex-end' }}>
         <Button
           size="small"
           variant="outlined"
@@ -59,14 +58,14 @@ export function QuestionnaireTemplatesTab({ questionnaires, loading, onDelete, o
       {!questionnaires?.length ? (
         <Typography color="text.secondary">{t('journey.editor.noQuestionnaires')}</Typography>
       ) : (
-        <Stack gap={1.5}>
+        <Stack sx={{ gap: 1.5 }}>
           {questionnaires.map((qt) => (
             <Accordion key={qt.id} variant="outlined" sx={{ borderRadius: '8px !important' }}>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Stack direction="row" alignItems="center" gap={1.5} sx={{ flex: 1, pr: 1 }}>
+                <Stack direction="row" sx={{ flex: 1, pr: 1, alignItems: 'center', gap: 1.5 }}>
                   <AssignmentIcon color="action" fontSize="small" />
                   <Box sx={{ flex: 1 }}>
-                    <Typography variant="subtitle2" fontWeight={700}>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
                       {qt.name}
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
@@ -110,7 +109,7 @@ export function QuestionnaireTemplatesTab({ questionnaires, loading, onDelete, o
                 </Stack>
               </AccordionSummary>
               <AccordionDetails sx={{ pt: 0 }}>
-                <Stack gap={2}>
+                <Stack sx={{ gap: 2 }}>
                   {/* Questions table */}
                   <Box>
                     <Typography variant="overline" color="text.secondary">
@@ -129,7 +128,7 @@ export function QuestionnaireTemplatesTab({ questionnaires, loading, onDelete, o
                         {qt.questions.map((q) => (
                           <TableRow key={q.id} hover>
                             <TableCell>
-                              <Typography variant="caption" fontFamily="monospace">
+                              <Typography variant="caption" sx={{ fontFamily: 'monospace' }}>
                                 {q.key}
                               </Typography>
                             </TableCell>
@@ -159,7 +158,7 @@ export function QuestionnaireTemplatesTab({ questionnaires, loading, onDelete, o
                       <Typography variant="overline" color="text.secondary">
                         {t('journey.qTemplate.scoringRules')}
                       </Typography>
-                      <Stack direction="row" flexWrap="wrap" gap={0.75} mt={0.5}>
+                      <Stack direction="row" sx={{ flexWrap: 'wrap', gap: 0.75, mt: 0.5 }}>
                         {qt.scoringRules.map((r, i) => (
                           <Chip
                             key={i}

@@ -11,21 +11,16 @@ import React from 'react'
 import type { Control, FieldError, UseFormSetValue } from 'react-hook-form'
 import { Controller } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
-
 import type { AssignmentMode, CareRole } from '@/api/schemas'
-
 import type { TriageForm } from '../schema'
-
 interface Props {
   control: Control<TriageForm>
   error?: FieldError
   careRole: CareRole
   setValue: UseFormSetValue<TriageForm>
 }
-
 export function AssignmentModeField({ control, error, careRole, setValue }: Props) {
   const { t } = useTranslation()
-
   return (
     <Controller
       name="assignmentMode"
@@ -59,7 +54,7 @@ export function AssignmentModeField({ control, error, careRole, setValue }: Prop
           >
             <Tooltip title={t('triage.assignmentModeHelp.ANY')}>
               <ToggleButton value="ANY" aria-label={t('triage.assignmentModeOption.ANY')}>
-                <Stack direction="row" alignItems="center" gap={0.5}>
+                <Stack direction="row" sx={{ alignItems: 'center', gap: 0.5 }}>
                   <span>{t('triage.assignmentModeOption.ANY')}</span>
                 </Stack>
               </ToggleButton>
@@ -68,7 +63,7 @@ export function AssignmentModeField({ control, error, careRole, setValue }: Prop
             {careRole === 'DOCTOR' && (
               <Tooltip title={t('triage.assignmentModeHelp.PAL')}>
                 <ToggleButton value="PAL" aria-label={t('triage.assignmentModeOption.PAL')}>
-                  <Stack direction="row" alignItems="center" gap={0.5}>
+                  <Stack direction="row" sx={{ alignItems: 'center', gap: 0.5 }}>
                     <span>{t('triage.assignmentModeOption.PAL')}</span>
                   </Stack>
                 </ToggleButton>
@@ -77,7 +72,7 @@ export function AssignmentModeField({ control, error, careRole, setValue }: Prop
 
             <Tooltip title={t('triage.assignmentModeHelp.NAMED')}>
               <ToggleButton value="NAMED" aria-label={t('triage.assignmentModeOption.NAMED')}>
-                <Stack direction="row" alignItems="center" gap={0.5}>
+                <Stack direction="row" sx={{ alignItems: 'center', gap: 0.5 }}>
                   <span>{t('triage.assignmentModeOption.NAMED')}</span>
                 </Stack>
               </ToggleButton>

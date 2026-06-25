@@ -14,15 +14,12 @@ import React from 'react'
 import type { Control, FieldErrors, UseFormHandleSubmit, UseFormSetValue } from 'react-hook-form'
 import { Controller } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
-
 import type { AssignmentMode, CareRole, ContactMode, User } from '@/api/schemas'
 import { useStep2TitleLabel } from '@/hooks/labels'
-
 import type { TriageForm } from '../schema'
 import { AssignmentModeField } from './AssignmentModeField'
 import { CareRoleField } from './CareRoleField'
 import { DueAtField, type DueAtPreset } from './DueAtField'
-
 interface Props {
   control: Control<TriageForm>
   errors: FieldErrors<TriageForm>
@@ -37,7 +34,6 @@ interface Props {
   onSubmit: ReturnType<UseFormHandleSubmit<TriageForm>>
   isSubmitting: boolean
 }
-
 export function Step2({
   control,
   errors,
@@ -54,11 +50,10 @@ export function Step2({
 }: Props) {
   const { t } = useTranslation()
   const getStep2Title = useStep2TitleLabel()
-
   return (
     <Box component="form" onSubmit={onSubmit} noValidate>
-      <Stack direction="row" alignItems="center" gap={1} sx={{ mb: 1.5 }}>
-        <Typography variant="h6" fontWeight={700}>
+      <Stack direction="row" sx={{ mb: 1.5, alignItems: 'center', gap: 1 }}>
+        <Typography variant="h6" sx={{ fontWeight: 700 }}>
           {getStep2Title(contactMode)}
         </Typography>
 
@@ -74,7 +69,7 @@ export function Step2({
           {t('triage.closeNoWorklist')}
         </Alert>
       ) : (
-        <Stack gap={1.5} sx={{ mb: 2 }}>
+        <Stack sx={{ mb: 2, gap: 1.5 }}>
           <CareRoleField
             control={control}
             error={errors.careRole}
@@ -166,7 +161,7 @@ export function Step2({
         )}
       />
 
-      <Stack direction="row" gap={1} justifyContent="flex-end">
+      <Stack direction="row" sx={{ gap: 1, justifyContent: 'flex-end' }}>
         <Button
           type="submit"
           variant="contained"

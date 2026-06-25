@@ -15,11 +15,8 @@ import {
 } from '@mui/material'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-
 import type { SortMode } from './sortCases'
-
 type PalFilter = 'all' | 'mine' | 'created_by_me'
-
 interface Props {
   searchRef: React.RefObject<HTMLInputElement | null>
   search: string
@@ -34,7 +31,6 @@ interface Props {
   showPalFilter: boolean
   showMineFilter: boolean
 }
-
 export default function DashboardToolbar({
   searchRef,
   search,
@@ -50,7 +46,6 @@ export default function DashboardToolbar({
   showMineFilter,
 }: Props) {
   const { t } = useTranslation()
-
   return (
     <Box
       sx={{
@@ -116,19 +111,19 @@ export default function DashboardToolbar({
         >
           <Tooltip title={t('dashboard.sortTime')} arrow>
             <ToggleButton value="time" aria-label={t('dashboard.sortTime')}>
-              <AccessTimeIcon fontSize="small" sx={{ mr: 0.5 }} />
+              <AccessTimeIcon sx={{ mr: 0.5, fontSize: 'small' }} />
               {t('dashboard.sortTime')}
             </ToggleButton>
           </Tooltip>
           <Tooltip title={t('dashboard.sortFlags')} arrow>
             <ToggleButton value="flags" aria-label={t('dashboard.sortFlags')}>
-              <PriorityHighIcon fontSize="small" sx={{ mr: 0.5 }} />
+              <PriorityHighIcon sx={{ mr: 0.5, fontSize: 'small' }} />
               {t('dashboard.sortFlags')}
             </ToggleButton>
           </Tooltip>
           <Tooltip title={t('dashboard.sortName')} arrow>
             <ToggleButton value="name" aria-label={t('dashboard.sortName')}>
-              <SortByAlphaIcon fontSize="small" sx={{ mr: 0.5 }} />
+              <SortByAlphaIcon sx={{ mr: 0.5, fontSize: 'small' }} />
               {t('dashboard.sortName')}
             </ToggleButton>
           </Tooltip>

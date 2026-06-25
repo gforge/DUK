@@ -1,43 +1,22 @@
-import DeleteIcon from '@mui/icons-material/Delete'
-import EditIcon from '@mui/icons-material/Edit'
-import {
-  Box,
-  Chip,
-  CircularProgress,
-  IconButton,
-  Paper,
-  Stack,
-  Switch,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  Typography,
-} from '@mui/material'
-import React from 'react'
-import { useTranslation } from 'react-i18next'
-
-import type { PolicyRule } from '@/api/schemas'
-import { useSeverityLabel } from '@/hooks/labels'
-
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
+import { Box, Chip, CircularProgress, IconButton, Paper, Stack, Switch, Table, TableBody, TableCell, TableHead, TableRow, Typography, } from '@mui/material';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import type { PolicyRule } from '@/api/schemas';
+import { useSeverityLabel } from '@/hooks/labels';
 interface Props {
-  rules: PolicyRule[]
-  deleting: string | null
-  onToggle: (rule: PolicyRule) => void
-  onEdit: (rule: PolicyRule) => void
-  onDelete: (id: string) => void
+    rules: PolicyRule[];
+    deleting: string | null;
+    onToggle: (rule: PolicyRule) => void;
+    onEdit: (rule: PolicyRule) => void;
+    onDelete: (id: string) => void;
 }
-
-const severityColor = (s: string) =>
-  s === 'HIGH' ? 'error' : s === 'MEDIUM' ? 'warning' : 'success'
-
+const severityColor = (s: string) => s === 'HIGH' ? 'error' : s === 'MEDIUM' ? 'warning' : 'success';
 export default function PolicyRulesTable({ rules, deleting, onToggle, onEdit, onDelete }: Props) {
-  const { t } = useTranslation()
-  const getSeverityLabel = useSeverityLabel()
-
-  return (
-    <Paper variant="outlined" sx={{ borderRadius: 2, overflow: 'hidden' }}>
+    const { t } = useTranslation();
+    const getSeverityLabel = useSeverityLabel();
+    return (<Paper variant="outlined" sx={{ borderRadius: 2, overflow: 'hidden' }}>
       <Table size="small">
         <TableHead>
           <TableRow sx={{ bgcolor: 'action.hover' }}>
@@ -50,17 +29,11 @@ export default function PolicyRulesTable({ rules, deleting, onToggle, onEdit, on
           </TableRow>
         </TableHead>
         <TableBody>
-          {rules.map((rule) => (
-            <TableRow key={rule.id} hover>
+          {rules.map((rule) => (<TableRow key={rule.id} hover>
               <TableCell>
-                <Switch
-                  size="small"
-                  checked={rule.enabled}
-                  onChange={() => onToggle(rule)}
-                  slotProps={{
-                    input: { 'aria-label': t('policy.toggleEnabled', { name: rule.name }) },
-                  }}
-                />
+                <Switch size="small" checked={rule.enabled} onChange={() => onToggle(rule)} slotProps={{
+                input: { 'aria-label': t('policy.toggleEnabled', { name: rule.name }) },
+            }}/>
               </TableCell>
               <TableCell>
                 <Typography sx={{ fontWeight: 500 }} variant="body2">
@@ -68,26 +41,19 @@ export default function PolicyRulesTable({ rules, deleting, onToggle, onEdit, on
                 </Typography>
               </TableCell>
               <TableCell>
-                <Box
-                  component="code"
-                  sx={{
-                    fontSize: '0.72rem',
-                    bgcolor: 'background.default',
-                    px: 0.75,
-                    py: 0.25,
-                    borderRadius: 0.5,
-                    fontFamily: 'monospace',
-                  }}
-                >
+                <Box component="code" sx={{
+                fontSize: '0.72rem',
+                bgcolor: 'background.default',
+                px: 0.75,
+                py: 0.25,
+                borderRadius: 0.5,
+                fontFamily: 'monospace',
+            }}>
                   {rule.expression}
                 </Box>
               </TableCell>
               <TableCell>
-                <Chip
-                  label={getSeverityLabel(rule.severity)}
-                  size="small"
-                  color={severityColor(rule.severity) as 'error' | 'warning' | 'success'}
-                />
+                <Chip label={getSeverityLabel(rule.severity)} size="small" color={severityColor(rule.severity) as 'error' | 'warning' | 'success'}/>
               </TableCell>
               <TableCell>
                 <Typography variant="body2" color="text.secondary">
@@ -96,41 +62,23 @@ export default function PolicyRulesTable({ rules, deleting, onToggle, onEdit, on
               </TableCell>
               <TableCell align="right">
                 <Stack sx={{ justifyContent: 'flex-end' }} direction="row" spacing={0.5}>
-                  <IconButton
-                    size="small"
-                    aria-label={t('common.edit')}
-                    onClick={() => onEdit(rule)}
-                  >
+                  <IconButton size="small" aria-label={t('common.edit')} onClick={() => onEdit(rule)}>
                     <EditIcon fontSize="small" />
                   </IconButton>
-                  <IconButton
-                    size="small"
-                    aria-label={t('common.delete')}
-                    color="error"
-                    onClick={() => onDelete(rule.id)}
-                    disabled={deleting === rule.id}
-                  >
-                    {deleting === rule.id ? (
-                      <CircularProgress size={14} />
-                    ) : (
-                      <DeleteIcon fontSize="small" />
-                    )}
+                  <IconButton size="small" aria-label={t('common.delete')} color="error" onClick={() => onDelete(rule.id)} disabled={deleting === rule.id}>
+                    {deleting === rule.id ? (<CircularProgress size={14}/>) : (<DeleteIcon fontSize="small" />)}
                   </IconButton>
                 </Stack>
               </TableCell>
-            </TableRow>
-          ))}
-          {rules.length === 0 && (
-            <TableRow>
+            </TableRow>))}
+          {rules.length === 0 && (<TableRow>
               <TableCell colSpan={6}>
                 <Typography color="text.secondary" variant="body2" align="center">
                   {t('policy.noRules')}
                 </Typography>
               </TableCell>
-            </TableRow>
-          )}
+            </TableRow>)}
         </TableBody>
       </Table>
-    </Paper>
-  )
+    </Paper>);
 }
