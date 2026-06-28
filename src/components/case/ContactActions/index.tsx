@@ -4,6 +4,7 @@ import PhoneDisabledIcon from '@mui/icons-material/PhoneDisabled'
 import { Alert, Button, Stack, Typography } from '@mui/material'
 import React, { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+
 import * as client from '@/api/client'
 import type { ContactAction } from '@/api/client/audit'
 import type { Case } from '@/api/schemas'
@@ -28,6 +29,7 @@ export default function ContactActions({ caseData, onRefetch }: Props) {
     () => client.getAuditEvents(caseData.id),
     [caseData.id],
   )
+  const [now] = useState(() => Date.now())
   const { formatRelativeContactDate, successMessage } = useContactActionText()
   const [loading, setLoading] = useState<ContactPanelAction | null>(null)
   const canContact = isRole('NURSE', 'DOCTOR', 'SECRETARY')
@@ -58,14 +60,14 @@ export default function ContactActions({ caseData, onRefetch }: Props) {
     // forget a CONTACTED event if it happened more than two days ago so the panel
     // can show contact buttons again. this matches the "no data for 2 days" rule.
     if (lastContacted) {
-      const age = Date.now() - new Date(lastContacted).getTime()
+      const age = now - new Date(lastContacted).getTime()
       const TWO_DAYS = 2 * 24 * 60 * 60 * 1000
       if (age > TWO_DAYS) {
         lastContacted = null
       }
     }
     return { lastReminder, lastCallAttempt, lastContacted }
-  }, [events])
+  }, [events, now])
   if (!canContact || !primaryTrigger || caseData.status === 'CLOSED') {
     return null
   }

@@ -3,6 +3,7 @@ import { Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, D
 import { format, parseISO } from 'date-fns';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import type { PolicyWarning } from '@/api/schemas';
 import { useSeverityLabel } from '@/hooks/labels';
 interface AutoWarningsBadgeProps {

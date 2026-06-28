@@ -14,6 +14,7 @@ import {
   ToggleButtonGroup,
 } from '@mui/material'
 import { useTranslation } from 'react-i18next'
+
 import type { ReviewOutcome, ReviewType } from '@/api/schemas'
 import PersonalNumberCopy from '@/components/common/PersonalNumberCopy'
 interface Props {

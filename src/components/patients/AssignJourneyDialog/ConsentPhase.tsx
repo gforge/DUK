@@ -14,6 +14,7 @@ import {
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import ReactMarkdown from 'react-markdown'
+
 import type { ResearchModule } from '@/api/schemas'
 interface Props {
   readonly module: ResearchModule

@@ -1,6 +1,8 @@
 import { Box, Card, CardActionArea, CardContent, Typography } from '@mui/material'
 import { useTranslation } from 'react-i18next'
+
 import type { ContactMode } from '@/api/schemas'
+
 import { CONTACT_MODE_UI } from './actions'
 interface Props {
   selectedMode: ContactMode | null

@@ -1,6 +1,7 @@
 import { Alert, Box, Divider, Stack, Typography } from '@mui/material'
 import React, { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+
 import * as client from '@/api/client'
 import type { JourneyTemplate, PatientJourney, QuestionnaireTemplate } from '@/api/schemas'
 import type { ResolvedInstruction } from '@/api/service'
@@ -10,6 +11,7 @@ import { useJourneyActions } from '@/components/case/JourneyTab/useJourneyAction
 import { InstructionTimeline, JourneyTimeline, ModifyJourneyDialog } from '@/components/journey'
 import { InstructionModifyDialog } from '@/components/journey/InstructionModifyDialog'
 import { useApi } from '@/hooks/useApi'
+
 import { JourneyPanelActions } from './JourneyPanelActions'
 interface Props {
   readonly journey: PatientJourney

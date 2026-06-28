@@ -1,6 +1,7 @@
 import { Chip, Stack } from '@mui/material'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
+
 import type { CareRole, WorkCategory } from '@/api/schemas'
 import { CareRoleIcon } from '@/components/common'
 import { useAssignmentModeLabel, useCareRoleLabel, useWorkCategoryLabel } from '@/hooks/labels'

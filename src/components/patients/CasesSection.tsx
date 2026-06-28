@@ -3,6 +3,7 @@ import { Chip, Paper, Stack, Table, TableBody, TableCell, TableHead, TableRow, T
 import { format } from 'date-fns';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+
 import type { Case } from '@/api/schemas';
 import { StatusChip } from '@/components/common';
 import { useCategoryLabel, useTriggerLabel } from '@/hooks/labels';

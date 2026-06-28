@@ -1,6 +1,8 @@
 import { Stack } from '@mui/material'
 import React from 'react'
+
 import type { InstructionTemplate, JourneyTemplate, JourneyTemplateEntry } from '@/api/schemas'
+
 import { TemplateAccordion } from './TemplateAccordion'
 interface Props {
   journeyTemplates: JourneyTemplate[]

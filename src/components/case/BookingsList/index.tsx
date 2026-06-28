@@ -5,6 +5,7 @@ import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, IconButton, InputLabel, MenuItem, Paper, Select, Stack, TextField, Tooltip, Typography, } from '@mui/material';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import * as client from '@/api/client';
 import type { Case } from '@/api/schemas';
 import { ConfirmDialog } from '@/components/common';

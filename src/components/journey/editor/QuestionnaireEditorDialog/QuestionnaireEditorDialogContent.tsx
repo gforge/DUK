@@ -24,6 +24,7 @@ import {
 } from '@mui/material'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
+
 import type { QuestionnaireTemplate } from '@/api/schemas'
 import QuestionnaireEditorQuestionsTab from '@/components/journey/editor/QuestionnaireEditorQuestionsTab'
 import QuestionnaireEditorScoringTab from '@/components/journey/editor/QuestionnaireEditorScoringTab'

@@ -12,6 +12,7 @@ import {
 } from '@mui/material'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
+
 import type { ClinicalReview } from '@/api/schemas'
 export interface ReviewDetailsDialogProps {
   reviewDetails: ClinicalReview | null

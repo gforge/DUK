@@ -6,6 +6,7 @@ import ScienceIcon from '@mui/icons-material/Science';
 import { Accordion, AccordionDetails, AccordionSummary, Box, Button, Chip, IconButton, Skeleton, Stack, Table, TableBody, TableCell, TableHead, TableRow, Tooltip, Typography, } from '@mui/material';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import type { QuestionnaireTemplate, ResearchModule } from '@/api/schemas';
 import ModuleEditorDialog from '@/components/journey/editor/ModuleEditorDialog';
 // dialog implementation moved to ModuleEditorDialog.tsx

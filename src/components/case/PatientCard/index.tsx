@@ -4,6 +4,7 @@ import { format } from 'date-fns';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+
 import type { Case, Patient } from '@/api/schemas';
 import { formatPersonnummer } from '@/api/utils/personnummer';
 import { AutoWarningsBadge, DeadlineLabel, TriggerChips } from '@/components/common';

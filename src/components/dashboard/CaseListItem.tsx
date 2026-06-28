@@ -82,18 +82,7 @@ export default function CaseListItem({
     : '—'
 
   const deadline = caseData.deadline ?? null
-  const [isRecentlyTriaged, setIsRecentlyTriaged] = React.useState(false)
-
-  React.useEffect(() => {
-    if (caseData.status !== 'TRIAGED') {
-      setIsRecentlyTriaged(false)
-      return
-    }
-
-    setIsRecentlyTriaged(true)
-    const timer = setTimeout(() => setIsRecentlyTriaged(false), 5000)
-    return () => clearTimeout(timer)
-  }, [caseData.status, caseData.lastActivityAt])
+  const isRecentlyTriaged = caseData.status === 'TRIAGED'
 
   return (
     <>
@@ -106,8 +95,13 @@ export default function CaseListItem({
           py: 1.25,
           cursor: 'pointer',
           borderLeft: `4px solid ${STATUS_BORDER[caseData.status]}`,
-          bgcolor: isRecentlyTriaged ? '#e3f2fd' : 'transparent',
+          bgcolor: 'transparent',
           transition: 'box-shadow 0.15s, background-color 0.35s ease',
+          animation: isRecentlyTriaged ? 'recentlyTriaged 5s ease forwards' : undefined,
+          '@keyframes recentlyTriaged': {
+            '0%, 80%': { backgroundColor: '#e3f2fd' },
+            '100%': { backgroundColor: 'transparent' },
+          },
           '&:hover': {
             bgcolor: isRecentlyTriaged ? '#bbdefb' : 'action.hover',
             boxShadow: '0 1px 4px rgba(0,0,0,0.08)',

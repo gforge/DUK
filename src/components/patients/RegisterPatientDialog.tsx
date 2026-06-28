@@ -13,10 +13,12 @@ import {
 } from '@mui/material'
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+
 import * as client from '@/api/client'
 import { parsePersonnummer } from '@/api/utils/personnummer'
 import { useApi } from '@/hooks/useApi'
 import { useSnack } from '@/store/snackContext'
+
 // split steps to reduce component length
 import { Step0PatientDetails } from './register-dialog/Step0PatientDetails'
 import { Step1JourneyAssignment } from './register-dialog/Step1JourneyAssignment'

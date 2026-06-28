@@ -2,6 +2,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { Box, Chip, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, } from '@mui/material';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+
 import type { ClinicalReview, User } from '@/api/schemas';
 import { RoleIcon } from '@/components/common';
 import { useReviewOutcomeLabel, useReviewTypeLabel } from '@/hooks/labels';

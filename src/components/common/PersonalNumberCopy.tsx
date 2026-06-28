@@ -1,8 +1,9 @@
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
-import { Box, IconButton, Snackbar, Stack, Tooltip, Typography } from '@mui/material'
 import type { TypographyProps } from '@mui/material'
+import { Box, IconButton, Snackbar, Stack, Tooltip, Typography } from '@mui/material'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
+
 import { formatPersonnummer } from '@/api/utils/personnummer'
 type LabelFormat = 'long' | 'short' | 'none'
 interface PersonalNumberCopyProps extends Pick<TypographyProps, 'color' | 'sx' | 'aria-label'> {

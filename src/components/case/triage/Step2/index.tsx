@@ -14,8 +14,10 @@ import React from 'react'
 import type { Control, FieldErrors, UseFormHandleSubmit, UseFormSetValue } from 'react-hook-form'
 import { Controller } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
+
 import type { AssignmentMode, CareRole, ContactMode, User } from '@/api/schemas'
 import { useStep2TitleLabel } from '@/hooks/labels'
+
 import type { TriageForm } from '../schema'
 import { AssignmentModeField } from './AssignmentModeField'
 import { CareRoleField } from './CareRoleField'

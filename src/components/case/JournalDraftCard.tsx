@@ -5,6 +5,7 @@ import { format } from 'date-fns';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import ReactMarkdown from 'react-markdown';
+
 import type { JournalDraft } from '@/api/schemas';
 interface Props {
     draft: JournalDraft;

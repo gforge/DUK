@@ -6,6 +6,7 @@ import TaskAltIcon from '@mui/icons-material/TaskAlt';
 import type { ChipProps } from '@mui/material';
 import { Chip } from '@mui/material';
 import React from 'react';
+
 import type { CaseStatus } from '@/api/schemas';
 import { useStatusLabel } from '@/hooks/labels';
 import { useOptionalRole } from '@/store/roleContext';

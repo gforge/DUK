@@ -4,6 +4,7 @@ import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutlineOutl
 import { Box, Divider, Paper, Stack, Typography } from '@mui/material';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+
 import type { JourneyModification } from '@/api/schemas';
 import { useJourneyModificationTypeLabel } from '@/hooks/labels';
 const MOD_ICON: Record<string, React.ReactNode> = {

@@ -5,8 +5,10 @@ import { differenceInYears, parseISO } from 'date-fns';
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+
 import type { EpisodeOfCare, JourneyTemplate, Patient, PatientJourney } from '@/api/schemas';
 import PersonalNumberCopy from '@/components/common/PersonalNumberCopy';
+
 import JourneyChips from './JourneyChips';
 interface Props {
     readonly patients: Patient[];

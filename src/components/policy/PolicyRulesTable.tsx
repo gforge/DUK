@@ -3,6 +3,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import { Box, Chip, CircularProgress, IconButton, Paper, Stack, Switch, Table, TableBody, TableCell, TableHead, TableRow, Typography, } from '@mui/material';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+
 import type { PolicyRule } from '@/api/schemas';
 import { useSeverityLabel } from '@/hooks/labels';
 interface Props {

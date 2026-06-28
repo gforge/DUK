@@ -3,6 +3,7 @@ import ScienceIcon from '@mui/icons-material/Science';
 import { Box, Button, Chip, Divider, FormControl, InputLabel, MenuItem, Select, Stack, Typography, } from '@mui/material';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import * as client from '@/api/client';
 import type { Consent, PatientJourney, ResearchModule } from '@/api/schemas';
 import { GrantConsentDialog, RevokeConsentDialog } from '@/components/journey';

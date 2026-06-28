@@ -15,6 +15,7 @@ import {
 } from '@mui/material'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
+
 import type { ScoringRowDraft } from './questionnaireUtils'
 interface Props {
   scoringRows: ScoringRowDraft[]

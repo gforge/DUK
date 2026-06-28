@@ -14,6 +14,7 @@ import {
 } from '@mui/material'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
+
 import type { JourneyTemplate, ResearchModule } from '@/api/schemas'
 interface Props {
   readonly journeyTemplateId: string

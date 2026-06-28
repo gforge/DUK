@@ -5,6 +5,7 @@ import { Box, Chip, Collapse, IconButton, Stack, TableCell, TableRow, Tooltip, T
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ReactMarkdown from 'react-markdown';
+
 import type { JourneyTemplate, JourneyTemplateInstruction } from '@/api/schemas';
 import { useOffsetFormat } from '@/hooks/useOffsetFormat';
 import { JourneyIcon } from '@/utils';

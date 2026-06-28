@@ -11,6 +11,7 @@ import TrendingDownIcon from '@mui/icons-material/TrendingDown';
 import { Chip, Stack, Tooltip } from '@mui/material';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+
 import type { TriggerType } from '@/api/schemas';
 import { useTriggerLabel } from '@/hooks/labels';
 interface TriggerChipsProps {

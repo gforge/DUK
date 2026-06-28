@@ -2,6 +2,7 @@ import AccessibilityNewIcon from '@mui/icons-material/AccessibilityNew';
 import MedicalServicesIcon from '@mui/icons-material/MedicalServices';
 import VaccinesIcon from '@mui/icons-material/Vaccines';
 import React from 'react';
+
 import type { CareRole } from '@/api/schemas';
 type CareRoleIconRole = Exclude<CareRole, null> | 'PAL' | null | undefined;
 interface Props {

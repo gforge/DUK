@@ -2,6 +2,7 @@ import RouteIcon from '@mui/icons-material/Route'
 import { Box, Chip, Paper, Stack, Tab, Tabs, Typography } from '@mui/material'
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+
 import * as client from '@/api/client'
 import type { JourneyTemplate, PatientJourney } from '@/api/schemas'
 import { InstructionTimeline } from '@/components/journey'

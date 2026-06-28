@@ -20,6 +20,7 @@ import React, { useRef } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { z } from 'zod'
+
 import { validateExpression } from '@/api/policyParser'
 import type { PolicyVariable } from '@/api/service'
 import { useSeverityLabel } from '@/hooks/labels'

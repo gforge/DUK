@@ -4,6 +4,7 @@ import ErrorOutlineIcon from '@mui/icons-material/ErrorOutlineOutlined'
 import { Box, Button, Chip, Divider, Paper, Stack, Typography } from '@mui/material'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
+
 import type { MigrationResultErr } from '@/api/migrations'
 import { CURRENT_SCHEMA_VERSION } from '@/api/schemaVersion'
 import { clearState } from '@/api/storage'

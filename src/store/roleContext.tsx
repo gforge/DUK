@@ -43,12 +43,9 @@ const LoginContext = createContext<(userId: string) => Promise<void>>(async () =
 export function RoleProvider({ children }: Readonly<{ children: React.ReactNode }>) {
   const [session, setSession] = useState<AuthSession | null>(() => getInitialSession())
 
-  const loginAs = useCallback(
-    async (userId: string) => {
-      setSession(await authProvider.loginAs(userId))
-    },
-    [],
-  )
+  const loginAs = useCallback(async (userId: string) => {
+    setSession(await authProvider.loginAs(userId))
+  }, [])
 
   const availableUsers = useMemo(
     () => authProvider.getLoginOptions().map((option) => option.user),

@@ -1,6 +1,7 @@
 import { Autocomplete, Box, Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormControlLabel, InputLabel, MenuItem, Select, Stack, Switch, TextField, ToggleButton, ToggleButtonGroup, Tooltip, } from '@mui/material';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+
 import type { InstructionTemplate, JourneyTemplateEntry, QuestionnaireTemplate, } from '@/api/schemas';
 import { ScoreAliasEditor } from '@/components/journey/editor/entry-editor';
 import { useEntryEditor } from '@/components/journey/editor/useEntryEditor';

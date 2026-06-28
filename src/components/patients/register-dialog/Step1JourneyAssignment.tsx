@@ -9,6 +9,7 @@ import {
 } from '@mui/material'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
+
 import type { JourneyTemplate } from '@/api/schemas'
 interface Props {
   journeyTemplateId: string

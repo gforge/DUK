@@ -3,6 +3,7 @@ import RouteIcon from '@mui/icons-material/Route';
 import { Accordion, AccordionDetails, AccordionSummary, Box, Chip, FormControl, InputLabel, MenuItem, Paper, Select, Stack, Typography, } from '@mui/material';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import type { EpisodeOfCare, JourneyTemplate, PatientJourney, QuestionnaireTemplate, } from '@/api/schemas';
 import { JourneyPanelContent } from '@/components/patients/JourneyPanel';
 import { useJourneyStatusLabel } from '@/hooks/labels';

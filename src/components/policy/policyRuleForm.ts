@@ -1,4 +1,5 @@
 import { z } from 'zod'
+
 import { validateExpression } from '../../api/policyParser'
 
 export const SEVERITIES = ['LOW', 'MEDIUM', 'HIGH'] as const

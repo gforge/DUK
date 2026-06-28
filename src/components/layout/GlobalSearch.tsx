@@ -17,6 +17,7 @@ import {
 import React, { useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
+
 import * as client from '@/api/client'
 import type { Patient } from '@/api/schemas'
 import { formatPersonnummer } from '@/api/utils/personnummer'

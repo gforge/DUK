@@ -65,12 +65,13 @@ export default function TriageForm({
   const contactMode = useWatch({ control, name: 'contactMode' })
   const careRole = useWatch({ control, name: 'careRole' })
   const assignmentMode = useWatch({ control, name: 'assignmentMode' })
+  const displayedStep =
+    contactModeFromRoute === undefined ? step : contactModeFromRoute === null ? 1 : 2
 
   React.useEffect(() => {
     if (contactModeFromRoute === undefined) return
 
     if (contactModeFromRoute === null) {
-      setStep(1)
       return
     }
 
@@ -80,9 +81,7 @@ export default function TriageForm({
       setValue('assignmentMode', null)
       setValue('assignedUserId', '')
       setValue('dueAtInput', '')
-      setDueAtPreset(null)
     }
-    setStep(2)
   }, [contactModeFromRoute, setValue])
 
   const eligibleNamedUsers = React.useMemo(() => {
@@ -156,7 +155,7 @@ export default function TriageForm({
     })
   }
 
-  if (step === 1) {
+  if (displayedStep === 1) {
     return <Step1 selectedMode={contactMode} onSelect={selectMode} />
   }
 

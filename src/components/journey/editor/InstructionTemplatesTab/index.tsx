@@ -7,6 +7,7 @@ import { Accordion, AccordionDetails, AccordionSummary, Box, Button, Chip, Dialo
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ReactMarkdown from 'react-markdown';
+
 import type { InstructionTemplate } from '@/api/schemas';
 interface Props {
     instructionTemplates: InstructionTemplate[] | null;

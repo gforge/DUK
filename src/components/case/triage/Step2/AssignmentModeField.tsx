@@ -11,7 +11,9 @@ import React from 'react'
 import type { Control, FieldError, UseFormSetValue } from 'react-hook-form'
 import { Controller } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
+
 import type { AssignmentMode, CareRole } from '@/api/schemas'
+
 import type { TriageForm } from '../schema'
 interface Props {
   control: Control<TriageForm>

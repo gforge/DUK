@@ -1,6 +1,7 @@
 import { Button, Checkbox, Chip, Dialog, DialogActions, DialogContent, DialogTitle, FormControlLabel, Skeleton, Stack, Typography, } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import * as client from '@/api/client';
 import type { JourneyTemplate } from '@/api/schemas';
 import type { EntryDiff } from '@/api/service/journeyTemplates';

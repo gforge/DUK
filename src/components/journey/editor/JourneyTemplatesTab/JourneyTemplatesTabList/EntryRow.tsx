@@ -4,6 +4,7 @@ import RepeatIcon from '@mui/icons-material/Repeat';
 import { Chip, IconButton, Stack, TableCell, TableRow, Tooltip, Typography } from '@mui/material';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+
 import type { JourneyTemplate, JourneyTemplateEntry } from '@/api/schemas';
 import { useOffsetFormat } from '@/hooks/useOffsetFormat';
 import { JourneyIcon } from '@/utils';

@@ -5,6 +5,7 @@ import { Alert, Box, Breadcrumbs, Chip, CircularProgress, Divider, Link as MuiLi
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate, useParams } from 'react-router-dom';
+
 import * as client from '@/api/client';
 import { CasesSection, PatientJourneyResearchCard, PatientJourneysSection, PatientResponsibilityCard, PatientSummary, } from '@/components/patients';
 import { useJourneyStatusLabel } from '@/hooks/labels';

@@ -1,5 +1,6 @@
 import { Chip, Stack, Tab, Tabs } from '@mui/material'
 import React from 'react'
+
 import type { JourneyTemplate, PatientJourney } from '@/api/schemas'
 import { useJourneyStatusLabel } from '@/hooks/labels'
 function journeyStatusColor(status: string): 'primary' | 'warning' | 'default' {

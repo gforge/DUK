@@ -3,6 +3,7 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import { Autocomplete, Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Stack, Table, TableBody, TableCell, TableHead, TableRow, TextField, ToggleButton, ToggleButtonGroup, Typography, } from '@mui/material';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import type { QuestionnaireTemplate, ResearchModule, ResearchModuleEntry } from '@/api/schemas';
 const mkId = () => Date.now().toString(36) + '-' + Math.random().toString(36).slice(2);
 type EntryMode = 'REPLACE' | 'ADDITIVE';

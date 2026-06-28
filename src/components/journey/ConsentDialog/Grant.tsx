@@ -14,10 +14,12 @@ import {
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import ReactMarkdown from 'react-markdown'
+
 import * as client from '@/api/client'
 import type { ResearchModule } from '@/api/schemas'
 import { useRole } from '@/store/roleContext'
 import { useSnack } from '@/store/snackContext'
+
 import { DeclineConsentDialog } from './Decline'
 interface ConsentDialogProps {
   readonly open: boolean

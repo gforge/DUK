@@ -3,9 +3,11 @@ import { Box, Chip, Divider, Paper, Stack, Typography } from '@mui/material'
 import { Accordion, AccordionDetails, AccordionSummary } from '@mui/material'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
+
 import type { Case, Patient, WorkCategory } from '@/api/schemas'
 import { CONTACT_MODE_UI } from '@/components/case/triage/Step1/actions'
 import { useWorkCategoryLabel } from '@/hooks/labels'
+
 import WorklistRow from './WorklistRow'
 interface GroupSectionProps {
   workCategory: WorkCategory

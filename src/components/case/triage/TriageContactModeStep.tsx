@@ -5,6 +5,7 @@ import MonitorHeartIcon from '@mui/icons-material/MonitorHeart';
 import { Box, Card, CardActionArea, CardContent, Stack, Typography } from '@mui/material';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+
 import type { ContactMode } from '@/api/schemas';
 import { useContactModeHelpLabel, useContactModeLabel } from '@/hooks/labels';
 const CONTACT_MODES: ContactMode[] = ['DIGITAL', 'PHONE', 'VISIT', 'CLOSE'];

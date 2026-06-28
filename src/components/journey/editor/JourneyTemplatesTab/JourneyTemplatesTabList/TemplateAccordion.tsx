@@ -9,7 +9,9 @@ import SyncIcon from '@mui/icons-material/Sync';
 import { Accordion, AccordionDetails, AccordionSummary, Box, Chip, IconButton, Stack, Table, TableBody, TableCell, TableHead, TableRow, Tooltip, Typography, } from '@mui/material';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+
 import type { InstructionTemplate, JourneyTemplate, JourneyTemplateEntry, JourneyTemplateInstruction, } from '@/api/schemas';
+
 import { EntryRow } from './EntryRow';
 import { InstructionRow } from './InstructionRow';
 type MergedRow = {

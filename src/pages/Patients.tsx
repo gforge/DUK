@@ -18,6 +18,7 @@ import {
 import React, { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
+
 import * as client from '@/api/client'
 import { PatientTable, RegisterPatientDialog } from '@/components/patients'
 import { useApi } from '@/hooks/useApi'

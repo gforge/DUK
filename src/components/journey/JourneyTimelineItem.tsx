@@ -6,10 +6,12 @@ import ScienceIcon from '@mui/icons-material/Science'
 import { Box, Chip, Stack, Tooltip, Typography, useTheme } from '@mui/material'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
+
 import type { ClinicalReview } from '@/api/schemas'
 import type { EffectiveStep } from '@/api/service'
 import { type StepStatus, useStepStatusLabel } from '@/hooks/labels'
 import { JourneyIcon } from '@/utils'
+
 import { StatusIcon } from './JourneyTimeline/StatusIcon'
 import type { ReviewTypeKey } from './JourneyTimeline/types'
 interface Props {

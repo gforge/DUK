@@ -2,6 +2,7 @@ import { Alert, Box, Skeleton, Stack, Typography } from '@mui/material'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
+
 import * as client from '@/api/client'
 import type { CaseCategory, Patient } from '@/api/schemas'
 import type { SortMode } from '@/components/dashboard'

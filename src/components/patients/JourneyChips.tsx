@@ -2,6 +2,7 @@ import RouteIcon from '@mui/icons-material/Route'
 import { Box, Chip, Stack, Typography, useMediaQuery, useTheme } from '@mui/material'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
+
 import type { JourneyTemplate, PatientJourney } from '@/api/schemas'
 interface Props {
   readonly journeys: PatientJourney[]

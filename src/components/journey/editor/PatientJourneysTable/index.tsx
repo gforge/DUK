@@ -4,6 +4,7 @@ import ScienceIcon from '@mui/icons-material/Science';
 import { Chip, Divider, Skeleton, Stack, Table, TableBody, TableCell, TableHead, TableRow, Typography, } from '@mui/material';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+
 import type { JourneyModification, JourneyTemplate, Patient, PatientJourney, ResearchModule, } from '@/api/schemas';
 import { useJourneyStatusLabel } from '@/hooks/labels';
 const MOD_ICON: Record<string, React.ReactNode> = {

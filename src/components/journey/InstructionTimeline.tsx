@@ -6,6 +6,7 @@ import { Accordion, AccordionDetails, AccordionSummary, Box, Button, Chip, IconB
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import ReactMarkdown from 'react-markdown';
+
 import type { ResolvedInstruction } from '@/api/service';
 import { JourneyIcon } from '@/utils';
 interface Props {

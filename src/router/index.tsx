@@ -1,6 +1,7 @@
 import { Box, CircularProgress } from '@mui/material'
 import React, { lazy, Suspense } from 'react'
 import { HashRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom'
+
 import AppShell from '@/components/layout/AppShell'
 import { useOptionalRole } from '@/store/roleContext'
 const Dashboard = lazy(() => import('../pages/Dashboard'))
