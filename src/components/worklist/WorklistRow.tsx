@@ -128,6 +128,6 @@ export default function WorklistRow({ caseData, patient, assignedUserName, highl
         </Tooltip>
       </Stack>
 
-      <CompletionDialog open={completionDialogOpen} patientLabel={patient?.displayName ?? caseData.patientId} personalNumber={patient?.personalNumber ?? null} followUpDate={followUpDate} completionComment={completionComment} isCompleting={isCompleting} onClose={() => setCompletionDialogOpen(false)} onFollowUpDateChange={setFollowUpDate} onCompletionCommentChange={setCompletionComment} onConfirm={handleDone}/>
+      <CompletionDialog open={completionDialogOpen} patientLabel={patient?.displayName ?? caseData.patientId} personalNumber={patient?.personalNumber ?? null} followUpDate={followUpDate} completionComment={completionComment} isCompleting={isCompleting} requireFollowUpDate={caseData.triageDecision?.contactMode === 'VISIT'} onClose={() => setCompletionDialogOpen(false)} onFollowUpDateChange={setFollowUpDate} onCompletionCommentChange={setCompletionComment} onConfirm={handleDone}/>
     </Box>);
 }

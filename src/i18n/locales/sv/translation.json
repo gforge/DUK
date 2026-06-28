@@ -776,13 +776,14 @@
     "XRAY_other": "{{count}} röntgen"
   },
   "role": {
+    "accountMenu": "Account",
     "currentRole": "Aktiv roll",
     "DOCTOR": "Läkare",
+    "logout": "Log out",
     "NURSE": "Sjuksköterska",
     "PAL": "PAL (Patientansvarig läkare)",
     "PATIENT": "Patient",
-    "SECRETARY": "Sekreterare",
-    "switchRole": "Byt roll"
+    "SECRETARY": "Sekreterare"
   },
   "severity": {
     "HIGH": "Hög",
@@ -927,6 +928,8 @@
     "monitoringSectionTitle": "Bevakning (tilldelade annan)",
     "nextContactDate": "Nästa kontakt (valfri)",
     "nextContactDateHint": "Ange datum om uppföljning behövs, annars lämna tomt.",
+    "nextContactDateRequired": "Bokad tid (obligatorisk)",
+    "nextContactDateRequiredHint": "Ange datum för nästa besök på mottagningen.",
     "noDeadline": "Ingen deadline",
     "openCase": "Öppna ärende",
     "showCompleted": "Visa avklarade",

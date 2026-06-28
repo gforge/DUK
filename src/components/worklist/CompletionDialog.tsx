@@ -24,6 +24,7 @@ interface CompletionDialogProps {
   followUpDate: Date | null
   completionComment: string
   isCompleting: boolean
+  requireFollowUpDate?: boolean
   onClose: () => void
   onFollowUpDateChange: (value: Date | null) => void
   onCompletionCommentChange: (value: string) => void
@@ -36,6 +37,7 @@ export default function CompletionDialog({
   followUpDate,
   completionComment,
   isCompleting,
+  requireFollowUpDate,
   onClose,
   onFollowUpDateChange,
   onCompletionCommentChange,
@@ -59,11 +61,17 @@ export default function CompletionDialog({
           />
           <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={adapterLocale}>
             <DateTimePicker
-              label={t('worklist.nextContactDate')}
+              label={requireFollowUpDate ? t('worklist.nextContactDateRequired') : t('worklist.nextContactDate')}
               value={followUpDate}
               onChange={(value) => onFollowUpDateChange(value)}
               slotProps={{
-                textField: { size: 'small', helperText: t('worklist.nextContactDateHint') },
+                textField: {
+                  size: 'small',
+                  helperText: requireFollowUpDate
+                    ? t('worklist.nextContactDateRequiredHint')
+                    : t('worklist.nextContactDateHint'),
+                  required: requireFollowUpDate,
+                },
               }}
               minTime={minTime}
               maxTime={maxTime}
@@ -83,7 +91,7 @@ export default function CompletionDialog({
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>{t('common.cancel')}</Button>
-        <Button variant="contained" color="success" onClick={onConfirm} disabled={isCompleting}>
+        <Button variant="contained" color="success" onClick={onConfirm} disabled={isCompleting || (requireFollowUpDate && !followUpDate)}>
           {t('worklist.confirmDone')}
         </Button>
       </DialogActions>

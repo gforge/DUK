@@ -775,13 +775,14 @@
     "XRAY_other": "{{count}} X-rays"
   },
   "role": {
+    "accountMenu": "Account",
     "currentRole": "Current Role",
     "DOCTOR": "Doctor",
+    "logout": "Log out",
     "NURSE": "Nurse (RN)",
     "PAL": "PAL (Responsible Physician)",
     "PATIENT": "Patient",
-    "SECRETARY": "Secretary",
-    "switchRole": "Switch Role"
+    "SECRETARY": "Secretary"
   },
   "severity": {
     "HIGH": "High",
@@ -926,6 +927,8 @@
     "monitoringSectionTitle": "Monitoring (assigned to others)",
     "nextContactDate": "Next contact (optional)",
     "nextContactDateHint": "Set a date if follow-up is needed, otherwise leave blank.",
+    "nextContactDateRequired": "Appointment date (required)",
+    "nextContactDateRequiredHint": "Set the date for the next clinic appointment.",
     "noDeadline": "No deadline",
     "openCase": "Open case",
     "showCompleted": "Show completed",
