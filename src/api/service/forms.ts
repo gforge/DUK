@@ -41,6 +41,9 @@ export function submitFormResponse(
   if (answers['INF_WOUND'] === true || answers['INF_FEVER'] === true)
     triggers.push('INFECTION_SUSPECTED')
   if (scores['OSS.total'] && scores['OSS.total'] < 30) triggers.push('LOW_FUNCTION')
+  if (scores['OKS.total'] && scores['OKS.total'] < 28) triggers.push('LOW_FUNCTION')
+  if (scores['PRWE.total'] && scores['PRWE.total'] > 55) triggers.push('LOW_FUNCTION')
+  if (scores['MOXFQ.total'] && scores['MOXFQ.total'] > 55) triggers.push('LOW_FUNCTION')
   if (scores['EQ5D.index'] && scores['EQ5D.index'] < 0.5) triggers.push('LOW_QOL')
 
   const response: FormResponse = {

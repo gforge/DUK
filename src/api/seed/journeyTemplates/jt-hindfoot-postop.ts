@@ -9,7 +9,7 @@ import { daysAgo, iso } from '../shared'
  *   Day   7 — Wound control (digital)
  *   Day  14 — X-ray control + suture removal (digital + XRAY review)
  *   Day  42 — Cast removal + functional assessment (week 6)
- *   Day 180 — 6-month digital PROMs (EQ-5D + OSS)
+ *   Day 180 — 6-month digital PROMs (EQ-5D + MOXFQ-short)
  *   Day 365 — 1-year follow-up
  *   Day 730 — 2-year final follow-up
  */
@@ -49,12 +49,12 @@ export const jtHindfootPostop: JourneyTemplate = {
       offsetDays: 42,
       windowDays: 5,
       order: 3,
-      templateId: 'qt-function-oss',
+      templateId: 'qt-function-moxfq-short',
       dashboardCategory: 'SUBACUTE',
-      scoreAliases: { PNRS_2: 'PNRS_week6', 'OSS.total': 'OSS_week6' },
+      scoreAliases: { PNRS_2: 'PNRS_week6', 'MOXFQ.total': 'MOXFQ_week6' },
       scoreAliasLabels: {
         PNRS_week6: 'Smärta vid gipsborttagning',
-        OSS_week6: 'OSS-poäng vid gipsborttagning',
+        MOXFQ_week6: 'MOXFQ-short vid gipsborttagning',
       },
     },
     {
@@ -63,11 +63,11 @@ export const jtHindfootPostop: JourneyTemplate = {
       offsetDays: 180,
       windowDays: 14,
       order: 4,
-      templateId: 'qt-eq5d-oss',
+      templateId: 'qt-eq5d-moxfq-short',
       dashboardCategory: 'CONTROL',
-      scoreAliases: { 'OSS.total': 'OSS_6m', 'EQ5D.index': 'EQ5D_6m', EQ_VAS: 'EQ_VAS_6m' },
+      scoreAliases: { 'MOXFQ.total': 'MOXFQ_6m', 'EQ5D.index': 'EQ5D_6m', EQ_VAS: 'EQ_VAS_6m' },
       scoreAliasLabels: {
-        OSS_6m: 'OSS-poäng vid 6 månader',
+        MOXFQ_6m: 'MOXFQ-short vid 6 månader',
         EQ5D_6m: 'EQ-5D index vid 6 månader',
         EQ_VAS_6m: 'EQ VAS vid 6 månader',
       },
@@ -78,11 +78,11 @@ export const jtHindfootPostop: JourneyTemplate = {
       offsetDays: 365,
       windowDays: 14,
       order: 5,
-      templateId: 'qt-eq5d-oss',
+      templateId: 'qt-eq5d-moxfq-short',
       dashboardCategory: 'CONTROL',
-      scoreAliases: { 'OSS.total': 'OSS_1yr', 'EQ5D.index': 'EQ5D_1yr', EQ_VAS: 'EQ_VAS_1yr' },
+      scoreAliases: { 'MOXFQ.total': 'MOXFQ_1yr', 'EQ5D.index': 'EQ5D_1yr', EQ_VAS: 'EQ_VAS_1yr' },
       scoreAliasLabels: {
-        OSS_1yr: 'OSS-poäng vid 1 år',
+        MOXFQ_1yr: 'MOXFQ-short vid 1 år',
         EQ5D_1yr: 'EQ-5D index vid 1 år',
         EQ_VAS_1yr: 'EQ VAS vid 1 år',
       },
@@ -93,11 +93,11 @@ export const jtHindfootPostop: JourneyTemplate = {
       offsetDays: 730,
       windowDays: 14,
       order: 6,
-      templateId: 'qt-eq5d-oss',
+      templateId: 'qt-eq5d-moxfq-short',
       dashboardCategory: 'CONTROL',
-      scoreAliases: { 'OSS.total': 'OSS_2yr', 'EQ5D.index': 'EQ5D_2yr', EQ_VAS: 'EQ_VAS_2yr' },
+      scoreAliases: { 'MOXFQ.total': 'MOXFQ_2yr', 'EQ5D.index': 'EQ5D_2yr', EQ_VAS: 'EQ_VAS_2yr' },
       scoreAliasLabels: {
-        OSS_2yr: 'OSS-poäng vid 2 år',
+        MOXFQ_2yr: 'MOXFQ-short vid 2 år',
         EQ5D_2yr: 'EQ-5D index vid 2 år',
         EQ_VAS_2yr: 'EQ VAS vid 2 år',
       },

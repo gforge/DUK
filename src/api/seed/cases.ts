@@ -365,12 +365,12 @@ export const cases: Case[] = [
         ruleId: 'rule-dr-4',
         ruleName: 'Kvarstående låg handledsfunktion',
         severity: 'MEDIUM',
-        triggeredValues: { OSS_week8: 20 },
-        expression: 'OSS_week8 < 26',
+        triggeredValues: { PRWE_week8: 70 },
+        expression: 'PRWE_week8 > 55',
       },
     ],
     internalNote:
-      'OSS-trend: V4 36/48 → V8 20/48. Smärta återkommer: NRS v4 4/10 → v8 6/10. Oväntat försämringsförlopp — ny läkarbedömning planeras. Laboratorieprover inväntas (CRP, SR).',
+      'PRWE-short trend: V4 40/100 → V8 70/100. Smärta återkommer: NRS v4 4/10 → v8 6/10. Oväntat försämringsförlopp — ny läkarbedömning planeras. Laboratorieprover inväntas (CRP, SR).',
     assignedRole: 'NURSE',
     createdByUserId: 'user-nurse-1',
     scheduledAt: iso(daysAgo(52)),
@@ -423,7 +423,7 @@ export const cases: Case[] = [
     triggers: [],
     policyWarnings: [],
     internalNote:
-      '6-månaders uppföljning efter hindfoot fusion (subtalar fusion höger fot). OSS 34/48, EQ-5D 0.72 — god återhämtning. Patienten uppger förbättrad gångförmåga men fortfarande begränsad vid längre sträckor. Diabetes kontrollerat (Metformin). Inga komplikationer.',
+      '6-månaders uppföljning efter hindfoot fusion (subtalar fusion höger fot). MOXFQ-short 33/100, EQ-5D 0.72 — god återhämtning. Patienten uppger förbättrad gångförmåga men fortfarande begränsad vid längre sträckor. Diabetes kontrollerat (Metformin). Inga komplikationer.',
     assignedRole: 'NURSE',
     createdByUserId: 'user-pal-1',
     triagedByUserId: 'user-pal-1',
@@ -513,7 +513,7 @@ export const cases: Case[] = [
     nextStep: 'DIGITAL_CONTROL',
     deadline: iso(daysFromNow(7)),
     internalNote:
-      'Distala radiusfraktur höger — V4: NRS 4/10, OSS 28/48. Rimligt förlopp trots kombinationstrauma. Digital kontroll planerad inför gipsborttagning v6. Patienten klarar sig relativt bra med kryckor.',
+      'Distala radiusfraktur höger — V4: NRS 4/10, PRWE-short 40/100. Rimligt förlopp trots kombinationstrauma. Digital kontroll planerad inför gipsborttagning v6. Patienten klarar sig relativt bra med kryckor.',
     assignedRole: 'NURSE',
     createdByUserId: 'user-doc-1',
     triagedByUserId: 'user-doc-1',
@@ -547,11 +547,11 @@ export const cases: Case[] = [
     triggers: ['HIGH_PAIN', 'LOW_FUNCTION'],
     policyWarnings: [
       {
-        ruleId: 'rule-2',
-        ruleName: 'Låg funktion (OSS)',
+        ruleId: 'rule-hf-po-1',
+        ruleName: 'Hög fot-/fotledspåverkan vid vecka 6',
         severity: 'MEDIUM',
-        triggeredValues: { 'OSS.total': 15 },
-        expression: 'OSS.total < 30',
+        triggeredValues: { MOXFQ_week6: 75 },
+        expression: 'MOXFQ_week6 > 55',
       },
       {
         ruleId: 'rule-4',
@@ -562,7 +562,7 @@ export const cases: Case[] = [
       },
     ],
     internalNote:
-      'Calcaneusfraktur vänster — V4: NRS 8/10, OSS 15/48. Svår smärta och markant funktionsnedsättning. Kombinationen med handledsfrakturen gör rehabilitering extremt utmanande — patienten är helt beroende av hjälp för ADL. Läkarbedömning rekommenderas.',
+      'Calcaneusfraktur vänster — V4: NRS 8/10, MOXFQ-short 75/100. Svår smärta och markant funktionsnedsättning. Kombinationen med handledsfrakturen gör rehabilitering extremt utmanande — patienten är helt beroende av hjälp för ADL. Läkarbedömning rekommenderas.',
     assignedRole: 'DOCTOR',
     assignedUserId: 'user-doc-1',
     createdByUserId: 'user-nurse-1',

@@ -485,12 +485,12 @@ export const patientJourneys: PatientJourney[] = [
     createdAt: iso(daysAgo(35)),
     updatedAt: iso(daysAgo(2)),
   },
-  // Left calcaneus (jt-standard — closest available for calcaneus fracture)
+  // Left calcaneus (hindfoot injury — uses foot/ankle PROMs)
   {
     id: 'pj-gu-23',
     episodeId: 'ep-23',
     patientId: 'p-22',
-    journeyTemplateId: 'jt-standard',
+    journeyTemplateId: 'jt-hindfoot-postop',
     phaseType: 'FOLLOWUP',
     joinedAt: '',
     startDate: isoDate(daysAgo(35)),

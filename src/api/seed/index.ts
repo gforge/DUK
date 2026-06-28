@@ -1,5 +1,5 @@
 import type { AppState, Case, TriageDecision } from '../schemas'
-import { CURRENT_SCHEMA_VERSION } from '../schemaVersion'
+import { CURRENT_DEMO_DATA_VERSION, CURRENT_SCHEMA_VERSION } from '../schemaVersion'
 import { ensureAllUsers } from '../utils/userGenerator'
 import { auditEvents } from './auditEvents'
 import { cases } from './cases'
@@ -22,6 +22,7 @@ const ISO_DATETIME_RE = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/
 
 const baseSeedState: AppState = {
   schemaVersion: CURRENT_SCHEMA_VERSION,
+  demoDataVersion: CURRENT_DEMO_DATA_VERSION,
   users,
   patients,
   cases,

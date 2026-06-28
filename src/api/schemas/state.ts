@@ -20,6 +20,7 @@ import { UserSchema } from './users'
 
 export const AppStateSchema = z.object({
   schemaVersion: z.number().int().default(0),
+  demoDataVersion: z.number().int(),
   users: z.array(UserSchema),
   patients: z.array(PatientSchema),
   cases: z.array(CaseSchema),

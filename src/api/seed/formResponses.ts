@@ -211,22 +211,22 @@ export const formResponses: FormResponse[] = [
   {
     id: 'fr-p14-3',
     patientId: 'p-14',
-    templateId: 'qt-function-oss',
+    templateId: 'qt-function-prwe-short',
     caseId: 'case-14',
     // week 4 response — decent but not alarming
-    answers: { OSS_1: 3, OSS_2: 4, OSS_3: 4, OSS_4: 3, OSS_5: 4, PNRS_2: 4 },
-    scores: { 'OSS.total': 36 },
+    answers: { PRWE_PAIN: 4, PRWE_FUNCTION: 4, PRWE_USUAL: 4, PNRS_2: 4 },
+    scores: { 'PRWE.total': 40 },
     submittedAt: iso(daysAgo(24)),
   },
   {
     id: 'fr-p14-4',
     patientId: 'p-14',
-    templateId: 'qt-function-oss',
+    templateId: 'qt-function-prwe-short',
     caseId: 'case-14',
     // week 8 response — pain resurges and function deteriorates
-    // PNRS_week4=6 (≥ 6 → rule-dr-2), OSS_week8=20 (< 26 → rule-dr-4)
-    answers: { OSS_1: 2, OSS_2: 2, OSS_3: 2, OSS_4: 2, OSS_5: 2, PNRS_2: 6 },
-    scores: { 'OSS.total': 20 },
+    // PNRS_week4=6 (≥ 6 → rule-dr-2), PRWE_week8=70 (> 55 → rule-dr-4)
+    answers: { PRWE_PAIN: 7, PRWE_FUNCTION: 7, PRWE_USUAL: 7, PNRS_2: 6 },
+    scores: { 'PRWE.total': 70 },
     submittedAt: iso(daysAgo(3)),
   },
 
@@ -405,19 +405,19 @@ export const formResponses: FormResponse[] = [
   {
     id: 'fr-hf-19-po-w6',
     patientId: 'p-19',
-    templateId: 'qt-function-oss',
+    templateId: 'qt-function-moxfq-short',
     caseId: 'case-19',
     patientJourneyId: 'pj-hf-19c',
     journeyTemplateEntryId: 'jte-hf-po-3',
-    answers: { OSS_1: 3, OSS_2: 3, OSS_3: 3, OSS_4: 3, OSS_5: 3, PNRS_2: 4 },
-    scores: { 'OSS.total': 30 },
+    answers: { MOXFQ_WALK: 2, MOXFQ_PAIN: 1, MOXFQ_SOCIAL: 2, PNRS_2: 4 },
+    scores: { 'MOXFQ.total': 41.67 },
     submittedAt: iso(daysAgo(138)),
   },
   // Phase 3: 6-month followup (pj-hf-19c, just submitted today — triggers current case)
   {
     id: 'fr-hf-19-6m',
     patientId: 'p-19',
-    templateId: 'qt-eq5d-oss',
+    templateId: 'qt-eq5d-moxfq-short',
     caseId: 'case-19',
     patientJourneyId: 'pj-hf-19c',
     journeyTemplateEntryId: 'jte-hf-po-4',
@@ -428,15 +428,13 @@ export const formResponses: FormResponse[] = [
       EQ_PAIN: '2',
       EQ_ANX: '1',
       EQ_VAS: 68,
-      OSS_1: 3,
-      OSS_2: 4,
-      OSS_3: 4,
-      OSS_4: 3,
-      OSS_5: 4,
+      MOXFQ_WALK: 2,
+      MOXFQ_PAIN: 1,
+      MOXFQ_SOCIAL: 1,
       FREE_TEXT:
         'Bättre än innan operationen. Kan gå kortare sträckor utan kryckor men fortfarande jobbigt i sluttande terräng.',
     },
-    scores: { 'OSS.total': 34, 'EQ5D.index': 0.72, EQ_VAS: 68 },
+    scores: { 'MOXFQ.total': 33.33, 'EQ5D.index': 0.72, EQ_VAS: 68 },
     submittedAt: iso(daysAgo(0)),
   },
 
@@ -536,11 +534,11 @@ export const formResponses: FormResponse[] = [
   {
     id: 'fr-gu-22-w4',
     patientId: 'p-22',
-    templateId: 'qt-function-oss',
+    templateId: 'qt-function-prwe-short',
     caseId: 'case-22',
     patientJourneyId: 'pj-gu-22',
-    answers: { OSS_1: 3, OSS_2: 3, OSS_3: 3, OSS_4: 3, OSS_5: 3, PNRS_2: 4 },
-    scores: { 'OSS.total': 28 },
+    answers: { PRWE_PAIN: 4, PRWE_FUNCTION: 4, PRWE_USUAL: 4, PNRS_2: 4 },
+    scores: { 'PRWE.total': 40 },
     submittedAt: iso(daysAgo(2)),
   },
   // Episode ep-23: Left calcaneus (same patient — separate journey/case)
@@ -557,11 +555,11 @@ export const formResponses: FormResponse[] = [
   {
     id: 'fr-gu-23-w4',
     patientId: 'p-22',
-    templateId: 'qt-function-oss',
+    templateId: 'qt-function-moxfq-short',
     caseId: 'case-23',
     patientJourneyId: 'pj-gu-23',
-    answers: { OSS_1: 1, OSS_2: 2, OSS_3: 2, OSS_4: 1, OSS_5: 1, PNRS_2: 8 },
-    scores: { 'OSS.total': 15 },
+    answers: { MOXFQ_WALK: 4, MOXFQ_PAIN: 3, MOXFQ_SOCIAL: 2, PNRS_2: 8 },
+    scores: { 'MOXFQ.total': 75 },
     submittedAt: iso(daysAgo(1)),
   },
 

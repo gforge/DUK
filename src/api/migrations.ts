@@ -583,6 +583,17 @@ const MIGRATIONS: Migration[] = [
       }
     },
   },
+  {
+    from: 15,
+    to: 16,
+    up: (s) => ({
+      ...s,
+      schemaVersion: 16,
+      // Legacy stores predate versioned demo content. Mark them as old so
+      // bootstrap can refresh them when the bundled example changes.
+      demoDataVersion: typeof s['demoDataVersion'] === 'number' ? s['demoDataVersion'] : 0,
+    }),
+  },
 ]
 
 // ---------------------------------------------------------------------------
