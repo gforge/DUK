@@ -5,6 +5,8 @@
   "audit": {
     "action": "Event",
     "actions": {
+      "BOOKING_CREATED": "Appointment booked",
+      "BOOKING_UPDATED": "Booking updated",
       "CALL_ATTEMPT": "Call attempt, not reached",
       "CASE_CLOSED": "Case Closed",
       "CASE_CREATED": "Case Created",
@@ -818,6 +820,7 @@
     "bookingPalUnavailableTooltip": "No PAL assigned on this journey/episode or patient.",
     "bookings": "Bookings",
     "bookingTime": "Booking time",
+    "bookingTypeXray": "Radiograph",
     "bookingUpdated": "Booking updated",
     "careRole": "Competence",
     "careRoleOption": {
@@ -881,7 +884,8 @@
       "careRoleRequired": "Competence is required",
       "dueAtInvalid": "Invalid date format",
       "namedPersonRequired": "Person must be selected"
-    }
+    },
+    "xrayBeforeVisit": "Radiograph before visit"
   },
   "trigger": {
     "ABNORMAL_ANSWER": "Abnormal Answer",
@@ -919,6 +923,7 @@
     "filterAll": "All",
     "filterClaimedByMe": "Claimed by me",
     "filterMyPatients": "My patients",
+    "filterXray": "Radiograph + visit",
     "hideCompleted": "Hide completed",
     "initiate": "Initiate",
     "monitoringLabel": "Monitoring",
@@ -930,6 +935,15 @@
     "openCase": "Open case",
     "showCompleted": "Show completed",
     "subtitle": "Triaged cases awaiting action",
-    "title": "Action List"
+    "title": "Action List",
+    "visitDate": "Follow-up visit time",
+    "visitSection": "Follow-up visit",
+    "xrayAfterVisitWarning": "The radiograph is booked at or after the follow-up visit.",
+    "xrayBeforeVisitChip": "Radiograph before visit",
+    "xrayDate": "Radiograph time",
+    "xrayDateHint": "Book the radiograph in RIS and enter the time here.",
+    "xrayLocation": "Radiology unit",
+    "xrayLocationHint": "Defaults to {{location}} – change if performed elsewhere.",
+    "xraySection": "Radiograph"
   }
 }

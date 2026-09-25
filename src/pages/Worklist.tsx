@@ -26,6 +26,7 @@ export function Worklist() {
   const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>('ALL')
   const [careRoleFilter, setCareRoleFilter] = useState<CareRoleFilter>('ALL')
   const [palOnly, setPalOnly] = useState(false)
+  const [xrayOnly, setXrayOnly] = useState(false)
   const [claimedByMe, setClaimedByMe] = useState(false)
   const [myPatientsOnly, setMyPatientsOnly] = useState(false)
   const [completedExpanded, setCompletedExpanded] = useState(false)
@@ -61,6 +62,7 @@ export function Worklist() {
       categoryFilter,
       careRoleFilter,
       palOnly,
+      xrayOnly,
       claimedByMe,
       myPatientsOnly,
     },
@@ -89,6 +91,7 @@ export function Worklist() {
         bookingId?: string
         followUpDate?: string
         completionComment?: string
+        xray?: { scheduledAt: string; location: string }
       },
     ) => {
       try {
@@ -124,11 +127,13 @@ export function Worklist() {
         categoryFilter={categoryFilter}
         careRoleFilter={careRoleFilter}
         palOnly={palOnly}
+        xrayOnly={xrayOnly}
         claimedByMe={claimedByMe}
         myPatientsOnly={myPatientsOnly}
         onCategoryFilterChange={setCategoryFilter}
         onCareRoleFilterChange={setCareRoleFilter}
         onPalOnlyToggle={() => setPalOnly((v) => !v)}
+        onXrayOnlyToggle={() => setXrayOnly((v) => !v)}
         onClaimedByMeToggle={() => setClaimedByMe((v) => !v)}
         onMyPatientsOnlyToggle={() => setMyPatientsOnly((v) => !v)}
       />

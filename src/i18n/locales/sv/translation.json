@@ -5,6 +5,8 @@
   "audit": {
     "action": "Händelse",
     "actions": {
+      "BOOKING_CREATED": "Tid bokad",
+      "BOOKING_UPDATED": "Bokning ändrad",
       "CALL_ATTEMPT": "Försökte ringa patienten, ej nådd",
       "CASE_CLOSED": "Ärende stängt",
       "CASE_CREATED": "Ärende skapat",
@@ -819,6 +821,7 @@
     "bookingPalUnavailableTooltip": "Ingen PAL tilldelad för denna resa/episod eller patient.",
     "bookings": "Bokningar",
     "bookingTime": "Bokad tid",
+    "bookingTypeXray": "Röntgen",
     "bookingUpdated": "Bokning uppdaterad",
     "careRole": "Kompetens",
     "careRoleOption": {
@@ -882,7 +885,8 @@
       "careRoleRequired": "Kompetens måste anges",
       "dueAtInvalid": "Ogiltigt datumformat",
       "namedPersonRequired": "Person måste väljas"
-    }
+    },
+    "xrayBeforeVisit": "Röntgen före besök"
   },
   "trigger": {
     "ABNORMAL_ANSWER": "Avvikande svar",
@@ -920,6 +924,7 @@
     "filterAll": "Alla",
     "filterClaimedByMe": "Mina tilldelade",
     "filterMyPatients": "Mina patienter",
+    "filterXray": "Röntgen + besök",
     "hideCompleted": "Dölj avklarade",
     "initiate": "Påbörja",
     "monitoringLabel": "Bevakning",
@@ -931,6 +936,15 @@
     "openCase": "Öppna ärende",
     "showCompleted": "Visa avklarade",
     "subtitle": "Aktiva arbetsuppgifter för nästa steg efter triage",
-    "title": "Åtgärdslista"
+    "title": "Åtgärdslista",
+    "visitDate": "Tid för återbesök",
+    "visitSection": "Återbesök",
+    "xrayAfterVisitWarning": "Röntgen är bokad samtidigt som eller efter återbesöket.",
+    "xrayBeforeVisitChip": "Röntgen före besök",
+    "xrayDate": "Tid för röntgen",
+    "xrayDateHint": "Boka röntgen i RIS och ange tiden här.",
+    "xrayLocation": "Röntgenenhet",
+    "xrayLocationHint": "Förvalt {{location}} – ändra om röntgen görs på annan plats.",
+    "xraySection": "Röntgen"
   }
 }

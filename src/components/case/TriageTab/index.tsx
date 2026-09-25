@@ -36,6 +36,7 @@ function TriageDecisionSummary({ caseData }: { caseData: Case }) {
           value: t(`triage.assignmentModeOption.${td.assignmentMode}`),
         }
       : null,
+    td.xrayBeforeVisit ? { label: t('triage.xrayBeforeVisit'), value: t('common.yes') } : null,
     td.dueAt ? { label: t('triage.dueAt'), value: td.dueAt.slice(0, 10) } : null,
     td.note ? { label: t('triage.note'), value: td.note } : null,
   ].filter(Boolean) as { label: string; value: string }[]

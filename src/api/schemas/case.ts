@@ -62,6 +62,8 @@ export const CaseSchema = z.object({
       assignedUserId: z.string().nullable().optional(),
       dueAt: z.string().datetime().nullable().optional(),
       note: z.string().nullable().optional(),
+      /** Radiograph must be booked before the follow-up visit (VISIT only). */
+      xrayBeforeVisit: z.boolean().optional(),
     })
     .superRefine((value, ctx) => {
       if (value.contactMode === 'CLOSE') {
@@ -126,6 +128,8 @@ export const CaseSchema = z.object({
         type: z.string(),
         role: BookingRoleSchema.optional(),
         scheduledAt: z.string().datetime(),
+        /** Where the booking takes place, e.g. the radiology unit for an XRAY booking. */
+        location: z.string().optional(),
         status: z.enum(['PENDING', 'SCHEDULED', 'COMPLETED', 'CANCELLED']).default('PENDING'),
         completedAt: z.string().datetime().nullable().optional(),
         completedByUserId: z.string().nullable().optional(),
@@ -153,6 +157,8 @@ export const TriageDecisionSchema = z
     assignedUserId: z.string().nullable().optional(),
     dueAt: z.string().datetime().nullable().optional(),
     note: z.string().nullable().optional(),
+    /** Radiograph must be booked before the follow-up visit (VISIT only). */
+    xrayBeforeVisit: z.boolean().optional(),
   })
   .superRefine((value, ctx) => {
     if (value.contactMode === 'CLOSE') {

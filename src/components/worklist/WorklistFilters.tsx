@@ -1,3 +1,4 @@
+import ImageIcon from '@mui/icons-material/Image'
 import { Chip, Stack } from '@mui/material'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
@@ -11,11 +12,13 @@ interface WorklistFiltersProps {
   categoryFilter: 'ALL' | WorkCategory
   careRoleFilter: 'ALL' | Exclude<CareRole, null>
   palOnly: boolean
+  xrayOnly: boolean
   claimedByMe: boolean
   myPatientsOnly: boolean
   onCategoryFilterChange: (value: 'ALL' | WorkCategory) => void
   onCareRoleFilterChange: (value: 'ALL' | Exclude<CareRole, null>) => void
   onPalOnlyToggle: () => void
+  onXrayOnlyToggle: () => void
   onClaimedByMeToggle: () => void
   onMyPatientsOnlyToggle: () => void
 }
@@ -25,11 +28,13 @@ export default function WorklistFilters({
   categoryFilter,
   careRoleFilter,
   palOnly,
+  xrayOnly,
   claimedByMe,
   myPatientsOnly,
   onCategoryFilterChange,
   onCareRoleFilterChange,
   onPalOnlyToggle,
+  onXrayOnlyToggle,
   onClaimedByMeToggle,
   onMyPatientsOnlyToggle,
 }: WorklistFiltersProps) {
@@ -79,6 +84,12 @@ export default function WorklistFilters({
           label={getAssignmentModeLabel('PAL')}
           variant={palOnly ? 'filled' : 'outlined'}
           onClick={onPalOnlyToggle}
+        />
+        <Chip
+          icon={<ImageIcon />}
+          label={t('worklist.filterXray')}
+          variant={xrayOnly ? 'filled' : 'outlined'}
+          onClick={onXrayOnlyToggle}
         />
         <Chip
           label={t('worklist.filterClaimedByMe')}

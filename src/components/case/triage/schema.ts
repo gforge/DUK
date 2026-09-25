@@ -14,6 +14,7 @@ export const TriageFormSchema = z
     assignedUserId: z.string().optional(),
     dueAtInput: z.string().optional(),
     note: z.string().optional(),
+    xrayBeforeVisit: z.boolean().optional(),
     patientMessage: z.string().optional(),
   })
   .superRefine((value, ctx) => {

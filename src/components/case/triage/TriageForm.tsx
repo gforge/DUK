@@ -22,6 +22,7 @@ interface Props {
       assignedUserId?: string | null
       dueAt?: string | null
       note?: string | null
+      xrayBeforeVisit?: boolean
     }
     patientMessage?: string
   }) => Promise<void>
@@ -56,6 +57,7 @@ export default function TriageForm({
       assignedUserId: caseData.assignedUserId,
       dueAtInput: '',
       note: caseData.internalNote ?? '',
+      xrayBeforeVisit: caseData.triageDecision?.xrayBeforeVisit ?? false,
       patientMessage: caseData.patientMessage ?? '',
     },
   })
@@ -133,6 +135,7 @@ export default function TriageForm({
       assignedUserId: values.assignedUserId,
       dueAtInput: values.dueAtInput,
       note: values.note,
+      xrayBeforeVisit: values.xrayBeforeVisit,
       patientMessage: values.patientMessage,
     })
   }
@@ -151,6 +154,7 @@ export default function TriageForm({
             : (data.assignedUserId ?? null),
         dueAt: data.contactMode === 'CLOSE' ? null : dueAt,
         note: data.note?.trim() ? data.note : null,
+        ...(data.contactMode === 'VISIT' && data.xrayBeforeVisit ? { xrayBeforeVisit: true } : {}),
       },
       patientMessage: data.patientMessage?.trim() ? data.patientMessage : undefined,
     })

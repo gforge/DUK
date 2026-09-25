@@ -3,8 +3,10 @@ import {
   Alert,
   Box,
   Button,
+  Checkbox,
   CircularProgress,
   Divider,
+  FormControlLabel,
   MenuItem,
   Stack,
   TextField,
@@ -114,6 +116,24 @@ export function Step2({
                     </MenuItem>
                   ))}
                 </TextField>
+              )}
+            />
+          )}
+
+          {contactMode === 'VISIT' && (
+            <Controller
+              name="xrayBeforeVisit"
+              control={control}
+              render={({ field }) => (
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={Boolean(field.value)}
+                      onChange={(e) => field.onChange(e.target.checked)}
+                    />
+                  }
+                  label={t('triage.xrayBeforeVisit')}
+                />
               )}
             />
           )}

@@ -7,6 +7,8 @@ interface Resources {
     "audit": {
       "action": "Händelse",
       "actions": {
+        "BOOKING_CREATED": "Tid bokad",
+        "BOOKING_UPDATED": "Bokning ändrad",
         "CALL_ATTEMPT": "Försökte ringa patienten, ej nådd",
         "CASE_CLOSED": "Ärende stängt",
         "CASE_CREATED": "Ärende skapat",
@@ -820,6 +822,7 @@ interface Resources {
       "bookingPalUnavailable": "Kan inte boka till PAL eftersom PAL-skap saknas för resa/episod och patient.",
       "bookingPalUnavailableTooltip": "Ingen PAL tilldelad för denna resa/episod eller patient.",
       "bookingTime": "Bokad tid",
+      "bookingTypeXray": "Röntgen",
       "bookingUpdated": "Bokning uppdaterad",
       "bookings": "Bokningar",
       "careRole": "Kompetens",
@@ -884,7 +887,8 @@ interface Resources {
         "careRoleRequired": "Kompetens måste anges",
         "dueAtInvalid": "Ogiltigt datumformat",
         "namedPersonRequired": "Person måste väljas"
-      }
+      },
+      "xrayBeforeVisit": "Röntgen före besök"
     },
     "trigger": {
       "ABNORMAL_ANSWER": "Avvikande svar",
@@ -922,6 +926,7 @@ interface Resources {
       "filterAll": "Alla",
       "filterClaimedByMe": "Mina tilldelade",
       "filterMyPatients": "Mina patienter",
+      "filterXray": "Röntgen + besök",
       "hideCompleted": "Dölj avklarade",
       "initiate": "Påbörja",
       "monitoringLabel": "Bevakning",
@@ -933,7 +938,16 @@ interface Resources {
       "openCase": "Öppna ärende",
       "showCompleted": "Visa avklarade",
       "subtitle": "Aktiva arbetsuppgifter för nästa steg efter triage",
-      "title": "Åtgärdslista"
+      "title": "Åtgärdslista",
+      "visitDate": "Tid för återbesök",
+      "visitSection": "Återbesök",
+      "xrayAfterVisitWarning": "Röntgen är bokad samtidigt som eller efter återbesöket.",
+      "xrayBeforeVisitChip": "Röntgen före besök",
+      "xrayDate": "Tid för röntgen",
+      "xrayDateHint": "Boka röntgen i RIS och ange tiden här.",
+      "xrayLocation": "Röntgenenhet",
+      "xrayLocationHint": "Förvalt {{location}} – ändra om röntgen görs på annan plats.",
+      "xraySection": "Röntgen"
     }
   }
 }

@@ -24,6 +24,7 @@ interface GroupSectionProps {
       bookingId?: string
       followUpDate?: string
       completionComment?: string
+      xray?: { scheduledAt: string; location: string }
     },
   ) => Promise<void> | void
 }

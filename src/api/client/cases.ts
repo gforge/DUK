@@ -32,6 +32,7 @@ export const createBooking = (
     type: string
     role?: BookingRole
     scheduledAt: string
+    location?: string
     note?: string
     createdByUserId: string
     createdAt: string
@@ -87,6 +88,8 @@ export const completeWorklistCase = (
     followUpDate?: string
     completedAt?: string
     completionComment?: string
+    /** Radiograph booked ahead of the follow-up visit. */
+    xray?: { scheduledAt: string; location: string }
   },
 ): Promise<Case> => withDelay(() => service.completeWorklistCase(caseId, userId, userRole, options))
 

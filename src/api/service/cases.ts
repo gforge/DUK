@@ -3,7 +3,7 @@ import { getStore, setStore } from '../storage'
 import { getEffectiveSteps } from './journeyResolver'
 import { getPendingReviews } from './reviews'
 import { assignmentModeToAssignedRole, triageDecisionToNextStep } from './triageDecision'
-import { addAuditEvent, normalizeIsoDateTime, now } from './utils'
+import { addAuditEvent, normalizeIsoDateTime, now, uuid } from './utils'
 
 export type CaseWithActiveCategory = Case & {
   /** null = between phases (not in any step window today) */
@@ -129,6 +129,7 @@ export function createBooking(
     type: string
     role?: BookingRole
     scheduledAt: string
+    location?: string
     note?: string
     createdByUserId: string
     createdAt: string
@@ -248,6 +249,8 @@ export function completeWorklistCase(
     followUpDate?: string
     completedAt?: string
     completionComment?: string
+    /** Radiograph booked ahead of the follow-up visit. */
+    xray?: { scheduledAt: string; location: string }
   },
 ): Case {
   let state = getStore()
@@ -275,6 +278,24 @@ export function completeWorklistCase(
     })
     if (!found) throw new Error(`Booking ${options.bookingId} not found for case ${caseId}`)
   }
+  if (options?.xray) {
+    bookings = [
+      ...bookings,
+      {
+        id: uuid(),
+        type: 'XRAY',
+        scheduledAt: options.xray.scheduledAt,
+        location: options.xray.location,
+        status: 'SCHEDULED',
+        completedAt: null,
+        completedByUserId: null,
+        followUpDate: null,
+        completionComment: null,
+        createdByUserId: userId,
+        createdAt: completedAt,
+      },
+    ]
+  }
 
   const updated: Case = {
     ...existing,
@@ -292,6 +313,8 @@ export function completeWorklistCase(
     bookingId: options?.bookingId,
     followUpDate: options?.followUpDate,
     completionComment: options?.completionComment,
+    xrayAt: options?.xray?.scheduledAt,
+    xrayLocation: options?.xray?.location,
   })
   setStore(state)
   return updated

@@ -1,4 +1,5 @@
 import {
+  Alert,
   Button,
   Dialog,
   DialogActions,
@@ -6,6 +7,7 @@ import {
   DialogTitle,
   Stack,
   TextField,
+  Typography,
 } from '@mui/material'
 import { DateTimePicker, LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
@@ -18,12 +20,20 @@ import { useTranslation } from 'react-i18next'
 // formatPersonnummer is used by PersonalNumberCopy component
 import PersonalNumberCopy from '@/components/common/PersonalNumberCopy'
 
+export const DEFAULT_XRAY_LOCATION = 'Danderyd'
+
 interface CompletionDialogProps {
   open: boolean
   patientLabel: string
   personalNumber?: string | null
   followUpDate: Date | null
   completionComment: string
+  /** Case needs a radiograph booked before the follow-up visit. */
+  needsXray?: boolean
+  xrayDate?: Date | null
+  xrayLocation?: string
+  onXrayDateChange?: (value: Date | null) => void
+  onXrayLocationChange?: (value: string) => void
   isCompleting: boolean
   onClose: () => void
   onFollowUpDateChange: (value: Date | null) => void
@@ -37,6 +47,11 @@ export default function CompletionDialog({
   personalNumber,
   followUpDate,
   completionComment,
+  needsXray = false,
+  xrayDate = null,
+  xrayLocation = DEFAULT_XRAY_LOCATION,
+  onXrayDateChange,
+  onXrayLocationChange,
   isCompleting,
   onClose,
   onFollowUpDateChange,
@@ -49,6 +64,9 @@ export default function CompletionDialog({
   const minTime = setMinutes(setHours(new Date(), 8), 0)
   const maxTime = setMinutes(setHours(new Date(), 17), 0)
   const defaultReference = setMinutes(setHours(new Date(), 12), 30)
+  const xrayAfterVisit =
+    needsXray && xrayDate && followUpDate && xrayDate.getTime() >= followUpDate.getTime()
+  const missingXray = needsXray && !xrayDate
   return (
     <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
       <DialogTitle>{t('worklist.completeDialogTitle', { name: patientLabel })}</DialogTitle>
@@ -60,8 +78,36 @@ export default function CompletionDialog({
             sx={{ pl: 0.5 }}
           />
           <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={adapterLocale}>
+            {needsXray && (
+              <>
+                <Typography variant="subtitle2">{t('worklist.xraySection')}</Typography>
+                <DateTimePicker
+                  label={t('worklist.xrayDate')}
+                  value={xrayDate}
+                  onChange={(value) => onXrayDateChange?.(value)}
+                  slotProps={{
+                    textField: {
+                      size: 'small',
+                      required: true,
+                      helperText: t('worklist.xrayDateHint'),
+                    },
+                  }}
+                  minTime={minTime}
+                  maxTime={maxTime}
+                  referenceDate={defaultReference}
+                />
+                <TextField
+                  label={t('worklist.xrayLocation')}
+                  size="small"
+                  value={xrayLocation}
+                  onChange={(e) => onXrayLocationChange?.(e.target.value)}
+                  helperText={t('worklist.xrayLocationHint', { location: DEFAULT_XRAY_LOCATION })}
+                />
+                <Typography variant="subtitle2">{t('worklist.visitSection')}</Typography>
+              </>
+            )}
             <DateTimePicker
-              label={t('worklist.nextContactDate')}
+              label={needsXray ? t('worklist.visitDate') : t('worklist.nextContactDate')}
               value={followUpDate}
               onChange={(value) => onFollowUpDateChange(value)}
               slotProps={{
@@ -72,6 +118,9 @@ export default function CompletionDialog({
               referenceDate={defaultReference}
             />
           </LocalizationProvider>
+          {xrayAfterVisit && (
+            <Alert severity="warning">{t('worklist.xrayAfterVisitWarning')}</Alert>
+          )}
           <TextField
             label={t('worklist.completionComment')}
             size="small"
@@ -85,7 +134,12 @@ export default function CompletionDialog({
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>{t('common.cancel')}</Button>
-        <Button variant="contained" color="success" onClick={onConfirm} disabled={isCompleting}>
+        <Button
+          variant="contained"
+          color="success"
+          onClick={onConfirm}
+          disabled={isCompleting || missingXray}
+        >
           {t('worklist.confirmDone')}
         </Button>
       </DialogActions>

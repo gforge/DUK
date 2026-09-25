@@ -41,6 +41,10 @@ export default function BookingsList({ caseData, onChange }: Props) {
   const { currentUser } = useRole()
   const { showSnack } = useSnack()
   const getNextStepLabel = useNextStepLabel()
+  function getBookingTypeLabel(type: string) {
+    if (type === 'XRAY') return t('triage.bookingTypeXray')
+    return getNextStepLabel(type as any) ?? type
+  }
   function getBookingRoleLabel(role?: string) {
     if (role === 'DOCTOR') return t('role.DOCTOR')
     if (role === 'NURSE') return t('role.NURSE')
@@ -76,7 +80,7 @@ export default function BookingsList({ caseData, onChange }: Props) {
     const start = new Date(b.scheduledAt)
     const end = new Date(start.getTime() + 30 * 60 * 1000)
     const fmt = (d: Date) => d.toISOString().replace(/[-:.]/g, '').split('.')[0] + 'Z'
-    const text = encodeURIComponent(getNextStepLabel(b.type as any) ?? b.type)
+    const text = encodeURIComponent(getBookingTypeLabel(b.type))
     const dates = `${fmt(start)}/${fmt(end)}`
     const details = encodeURIComponent(b.note ?? '')
     return `https://www.google.com/calendar/render?action=TEMPLATE&text=${text}&dates=${dates}&details=${details}`
@@ -87,7 +91,7 @@ export default function BookingsList({ caseData, onChange }: Props) {
     const end = new Date(start.getTime() + 30 * 60 * 1000)
     const fmt = (d: Date) => d.toISOString().replace(/[-:.]/g, '').split('.')[0] + 'Z'
     const uid = `${b.id}@duk.local`
-    const summary = getNextStepLabel(b.type as any) ?? b.type
+    const summary = getBookingTypeLabel(b.type)
     const description = b.note ?? ''
     const ics = [
       'BEGIN:VCALENDAR',
@@ -146,9 +150,10 @@ export default function BookingsList({ caseData, onChange }: Props) {
         {(caseData.bookings ?? []).map((b) => (
           <Paper key={b.id} variant="outlined" sx={{ p: 1, display: 'flex', alignItems: 'center' }}>
             <Box sx={{ flex: 1 }}>
-              <Typography variant="body2">{getNextStepLabel(b.type as any) ?? b.type}</Typography>
+              <Typography variant="body2">{getBookingTypeLabel(b.type)}</Typography>
               <Typography variant="caption" color="text.secondary">
-                {new Date(b.scheduledAt).toLocaleString()} — {getBookingRoleLabel(b.role)}
+                {new Date(b.scheduledAt).toLocaleString()} —{' '}
+                {b.location ?? getBookingRoleLabel(b.role)}
               </Typography>
               {b.note && (
                 <Typography variant="caption" display="block">

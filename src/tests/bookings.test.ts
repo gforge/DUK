@@ -132,4 +132,42 @@ describe('bookings service', () => {
     expect(ev).toBeDefined()
     expect(ev?.details?.closedAt).toBeTruthy()
   })
+
+  it('completeWorklistCase records a radiograph booking with location alongside the visit', () => {
+    const followingCase = SEED_STATE.cases.find((c) => c.status === 'FOLLOWING_UP')
+    if (!followingCase) throw new Error('No FOLLOWING_UP case found in seed data')
+
+    const xrayAt = new Date(Date.now() + 86_400_000).toISOString()
+    const visitAt = new Date(Date.now() + 2 * 86_400_000).toISOString()
+    const result = service.completeWorklistCase(
+      followingCase.id,
+      SEED_STATE.users[0].id,
+      'SECRETARY',
+      {
+        followUpDate: visitAt,
+        xray: { scheduledAt: xrayAt, location: 'Capio S:t Göran' },
+      },
+    )
+
+    const xray = result.bookings?.find((b) => b.type === 'XRAY')
+    expect(xray).toBeDefined()
+    expect(xray?.scheduledAt).toBe(xrayAt)
+    expect(xray?.location).toBe('Capio S:t Göran')
+    expect(xray?.status).toBe('SCHEDULED')
+
+    const ev = [...getStore().auditEvents]
+      .reverse()
+      .find((e) => e.action === 'STATUS_CHANGED' && e.caseId === followingCase.id)
+    expect(ev?.details?.xrayAt).toBe(xrayAt)
+    expect(ev?.details?.xrayLocation).toBe('Capio S:t Göran')
+    expect(ev?.details?.followUpDate).toBe(visitAt)
+  })
+
+  it('completeWorklistCase adds no radiograph booking when none is given', () => {
+    const followingCase = SEED_STATE.cases.find((c) => c.status === 'FOLLOWING_UP')
+    if (!followingCase) throw new Error('No FOLLOWING_UP case found in seed data')
+
+    const result = service.completeWorklistCase(followingCase.id, SEED_STATE.users[0].id, 'DOCTOR')
+    expect(result.bookings?.some((b) => b.type === 'XRAY') ?? false).toBe(false)
+  })
 })

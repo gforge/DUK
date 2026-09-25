@@ -1,5 +1,6 @@
 import AssignmentIndIcon from '@mui/icons-material/AssignmentInd'
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
+import ImageIcon from '@mui/icons-material/Image'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 import { Box, Button, Chip, IconButton, Stack, Tooltip, Typography } from '@mui/material'
 import { alpha } from '@mui/material/styles'
@@ -11,7 +12,7 @@ import type { Case, Patient } from '@/api/schemas'
 import { CareRoleIcon, DeadlineLabel, StatusChip } from '@/components/common'
 import { useAssignmentModeLabel, useCareRoleLabel } from '@/hooks/labels'
 
-import CompletionDialog from './CompletionDialog'
+import CompletionDialog, { DEFAULT_XRAY_LOCATION } from './CompletionDialog'
 
 interface WorklistRowProps {
   caseData: Case
@@ -25,6 +26,7 @@ interface WorklistRowProps {
       bookingId?: string
       followUpDate?: string
       completionComment?: string
+      xray?: { scheduledAt: string; location: string }
     },
   ) => Promise<void> | void
 }
@@ -44,11 +46,14 @@ export default function WorklistRow({
   const [completionDialogOpen, setCompletionDialogOpen] = React.useState(false)
   const [followUpDate, setFollowUpDate] = React.useState<Date | null>(null)
   const [completionComment, setCompletionComment] = React.useState('')
+  const [xrayDate, setXrayDate] = React.useState<Date | null>(null)
+  const [xrayLocation, setXrayLocation] = React.useState(DEFAULT_XRAY_LOCATION)
   const [isCompleting, setIsCompleting] = React.useState(false)
 
   const isTriaged = caseData.status === 'TRIAGED'
   const isFollowingUp = caseData.status === 'FOLLOWING_UP'
   const careRole = caseData.triageDecision?.careRole
+  const needsXray = Boolean(caseData.triageDecision?.xrayBeforeVisit)
 
   const completionBooking = React.useMemo(() => {
     const bookings = [...(caseData.bookings ?? [])].reverse()
@@ -66,10 +71,19 @@ export default function WorklistRow({
         bookingId: completionBooking?.id,
         followUpDate: followUpDate ? followUpDate.toISOString() : undefined,
         completionComment: completionComment.trim() ? completionComment.trim() : undefined,
+        xray:
+          needsXray && xrayDate
+            ? {
+                scheduledAt: xrayDate.toISOString(),
+                location: xrayLocation.trim() || DEFAULT_XRAY_LOCATION,
+              }
+            : undefined,
       })
       setCompletionDialogOpen(false)
       setFollowUpDate(null)
       setCompletionComment('')
+      setXrayDate(null)
+      setXrayLocation(DEFAULT_XRAY_LOCATION)
     }, 220)
   }
 
@@ -103,6 +117,16 @@ export default function WorklistRow({
         </Typography>
         <Stack direction="row" gap={0.5} alignItems="center" flexWrap="wrap">
           {caseData.status !== 'TRIAGED' && <StatusChip status={caseData.status} size="small" />}
+          {needsXray && (
+            <Chip
+              icon={<ImageIcon />}
+              label={t('worklist.xrayBeforeVisitChip')}
+              size="small"
+              color="info"
+              variant="outlined"
+              sx={{ height: 18, fontSize: 11 }}
+            />
+          )}
           {careRole && (
             <Chip
               icon={<CareRoleIcon role={careRole} />}
@@ -211,6 +235,11 @@ export default function WorklistRow({
         personalNumber={patient?.personalNumber ?? null}
         followUpDate={followUpDate}
         completionComment={completionComment}
+        needsXray={needsXray}
+        xrayDate={xrayDate}
+        xrayLocation={xrayLocation}
+        onXrayDateChange={setXrayDate}
+        onXrayLocationChange={setXrayLocation}
         isCompleting={isCompleting}
         onClose={() => setCompletionDialogOpen(false)}
         onFollowUpDateChange={setFollowUpDate}
