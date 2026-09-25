@@ -10,6 +10,14 @@ import { instructionTemplates } from './instructionTemplates'
 import { journalDrafts } from './journalDrafts'
 import { journalTemplates } from './journalTemplates'
 import { journeyTemplates } from './journeyTemplates'
+import {
+  pathwayAuditEvents,
+  pathwayCases,
+  pathwayEpisodes,
+  pathwayFormResponses,
+  pathwayJourneys,
+  pathwayPatients,
+} from './pathwayCases'
 import { patientJourneys } from './patientJourneys'
 import { policyRules } from './policyRules'
 import { questionnaireTemplates } from './questionnaireTemplates'
@@ -23,19 +31,19 @@ const ISO_DATETIME_RE = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/
 const baseSeedState: AppState = {
   schemaVersion: CURRENT_SCHEMA_VERSION,
   users,
-  patients,
-  cases,
+  patients: [...patients, ...pathwayPatients],
+  cases: [...cases, ...pathwayCases],
   policyRules,
-  auditEvents,
+  auditEvents: [...auditEvents, ...pathwayAuditEvents],
   questionnaireTemplates,
   formSeries,
-  formResponses,
+  formResponses: [...formResponses, ...pathwayFormResponses],
   journalDrafts,
   journalTemplates,
   journeyTemplates,
   researchModules,
-  episodesOfCare,
-  patientJourneys,
+  episodesOfCare: [...episodesOfCare, ...pathwayEpisodes],
+  patientJourneys: [...patientJourneys, ...pathwayJourneys],
   instructions: [],
   instructionTemplates,
   researchConsents: [],
