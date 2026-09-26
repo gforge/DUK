@@ -1,9 +1,12 @@
 @startuml
 ' Purpose: High-level architecture overview
 ' Source of truth:
+'   src/auth/*
 '   src/api/client/index.ts
 '   src/api/service/index.ts
 '   src/api/storage.ts
+'   src/api/bootstrap.ts
+'   src/api/migrations.ts
 
 title System Architecture - Component Diagram
 
@@ -11,6 +14,7 @@ left to right direction
 
 package "Client" {
   [React UI]
+  [Auth adapter] <<src/auth (fakeAuthProvider)>>
 }
 
 package "API Client" {
@@ -23,6 +27,8 @@ package "Service Layer" {
   package "Modules" {
     [Policy Parser] <<src/api/policyParser/*>>
     [Journal Renderer] <<src/api/journalRenderer.ts>>
+    [Case Workflow]
+    [Episodes]
     [Journey Resolver]
     [Instruction Templates]
     [Research Consents]
@@ -33,40 +39,73 @@ package "Service Layer" {
 package "Persistence" {
   [In-memory store]
   [localStorage]
+  [Bootstrap + Migrations] <<src/api/bootstrap.ts>>
 }
 
+[React UI] --> [Auth adapter]
 [React UI] --> [src/api/client]
 [src/api/client] --> [src/api/service]
 [src/api/service] --> [Policy Parser]
 [src/api/service] --> [Journal Renderer]
+[src/api/service] --> [Case Workflow]
+[src/api/service] --> [Episodes]
 [src/api/service] --> [Journey Resolver]
 [src/api/service] --> [Instruction Templates]
 [src/api/service] --> [Research Consents]
 [src/api/service] --> [Patient Journeys]
 [src/api/service] --> [In-memory store]
 [In-memory store] --> [localStorage]
+[localStorage] --> [Bootstrap + Migrations] : startup
+[Bootstrap + Migrations] --> [In-memory store] : initStore
+
+note bottom of [Auth adapter]
+  Replaceable AuthProviderAdapter
+  (session, loginAs, logout);
+  demo login maps to seeded users
+end note
+
+note bottom of [Case Workflow]
+  triageCase (ANY/PAL/NAMED/TEAM),
+  worklist advance/complete/claim,
+  bookings, clinical reviews,
+  colleague review requests,
+  care-team queues, audit events
+end note
+
+note bottom of [Episodes]
+  createEpisode, status and
+  responsible user, referral
+  diagnoses via simulated uthopp
+end note
 
 note bottom of [Journey Resolver]
   Computes effective steps,
-  hydrates instructions,
-  handles template derivation
-  and phase-aware scheduling,
+  phase-aware scheduling,
   pause-shift calculation,
+  policy alias scope,
   getMergedDueStepsForPatient
 end note
 
 note bottom of [Research Consents]
   grantConsent (idempotent),
-  revokeConsent, hasActiveConsent,
+  revokeConsent, declineConsent,
+  hasActiveConsent,
   audit trail via revokedAt
 end note
 
 note bottom of [Patient Journeys]
   assignPatientJourney,
+  startNextPhase,
   pauseJourney, resumeJourney,
   modifyPatientJourney,
   cancelJourney,
   totalPausedDays accumulation
+end note
+
+note bottom of [Bootstrap + Migrations]
+  runMigrations to schema v18;
+  reseed on older demoDataVersion,
+  else re-anchor dates to today
 end note
 
 @enduml

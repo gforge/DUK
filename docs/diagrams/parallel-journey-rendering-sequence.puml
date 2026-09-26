@@ -4,55 +4,59 @@
 '   src/api/service/journeyResolver.ts
 '   src/components/case/JourneyTab/index.tsx
 '   src/components/patientView/PatientCareplan/main.tsx
+'   src/components/patientView/PatientDueForms/index.tsx
 
 title Multiple Journeys - Combined Rendering And Deduplication
 
 actor Clinician
+actor Patient
 participant "JourneyTab\n(CaseDetail UI)" as JT
-participant "PatientCareplan\n(PatientView UI)" as PC
+participant "PatientCareplan /\nPatientDueForms\n(PatientView UI)" as PC
 participant "client/\npatientJourneys" as Client
-participant "service/\njourneyResolver" as Resolver
 participant "getEffectiveSteps" as GES
 participant "getMergedDueSteps\nForPatient" as MDS
 
 == Clinician view (CaseDetail / JourneyTab) ==
 
-Clinician -> JT : Open case detail\n(journeys tab)
+Clinician -> JT : Open case detail\n(journey tab)
 JT -> Client : getPatientJourneys(patientId)
 Client --> JT : PatientJourney[]\n(e.g. wrist + hip programmes)
 JT -> JT : Sort journeys:\n  ACTIVE → SUSPENDED → COMPLETED\n  newest-first within group
-JT -> JT : Render MUI Tabs\n  Tab 1: "Handled Radius (ACTIVE)"\n  Tab 2: "Höft (ACTIVE)"\n  ...
+JT -> JT : Render JourneySelectorTabs\n  (template name + status chip)
 Clinician -> JT : Click tab for journey N
 JT -> Client : getEffectiveSteps(journeyId_N)
-Client -> GES : getEffectiveSteps(journey)
-GES -> GES : Apply totalPauseShift\nApply modifications\nOverlay research module entries
+Client -> GES : getEffectiveSteps(journeyId_N)
+GES -> GES : Apply pause shift\nExpand recurring entries\nApply modifications\nOverlay research module entries
 GES --> Client : EffectiveStep[]
 Client --> JT : EffectiveStep[]
-JT -> JT : Render JourneyTimeline\n+ pause/resume controls\n+ consent chips
+JT -> JT : Render JourneyHeader (resume /\nmodify / pause / cancel / next phase)\n+ PatientJourneyResearchCard\n+ InstructionTimeline + JourneyTimeline
 
 == Patient self-view (PatientCareplan) ==
 
 Clinician -> PC : Switch to patient role\n-> /patient
-PC -> Client : getPatientJourneys(patientId)
+PC -> Client : getPatientJourneys(patientId)\n(via PatientView page)
 Client --> PC : PatientJourney[]
-PC -> PC : Same tab sort and render\n(read-only; no pause/consent controls)
+PC -> PC : Same sort; read-only timelines\n(no pause/modify controls)
 
-== Dashboard / Worklist — form deduplication ==
+== Patient due forms — deduplication ==
 
-JT -> MDS : getMergedDueStepsForPatient(\n  patientId, today\n)
-MDS -> Resolver : For each ACTIVE journey:\n  getEffectiveSteps(journey)
+Patient -> PC : Open patient view
+PC -> Client : getMergedDueStepsForPatient(\n  patientId, today\n)
+Client -> MDS : getMergedDueStepsForPatient(...)
 
-loop per Active Journey
-  Resolver -> GES : getEffectiveSteps(journey_i)
-  GES --> Resolver : EffectiveStep[]
-  Resolver -> Resolver : Filter steps where\n  scheduledDate is within\n  today's window
+loop per ACTIVE/SUSPENDED journey
+  MDS -> GES : getEffectiveSteps(journey_i)
+  GES --> MDS : EffectiveStep[]
+  MDS -> MDS : Keep steps with templateId\nwhose window contains today\nand not yet submitted
 end
 
-Resolver -> Resolver : Deduplicate by templateId\n(keep first occurrence;\ndiscard duplicates from\nparallel journeys)
-Resolver --> MDS : MergedDueStep[]\n(no duplicate questionnaires)
-MDS --> JT : Merged due steps for\ndashboard/worklist display
+MDS -> MDS : Merge by templateId\n(keep first step,\ncollect journeyIds)
+MDS --> Client : MergedDueStep[]
+Client --> PC : Due forms\n(no duplicate questionnaires)
+Patient -> PC : Fill form
+PC -> PC : submitFormResponse with\npatientJourneyId = journeyIds[0]
 
-note right of Resolver
+note right of MDS
   Key invariant:
   The same questionnaire
   (templateId) is shown

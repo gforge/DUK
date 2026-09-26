@@ -4,6 +4,7 @@
 '   src/api/schemas/journey.ts
 '   src/api/schemas/forms.ts
 '   src/api/schemas/case.ts
+'   src/api/schemas/team.ts
 '   src/api/service/researchConsents.ts
 
 title Core Data Model - Reference
@@ -26,6 +27,7 @@ JourneyTemplate
 - parentTemplateId?: lineage to parent template
 - derivedAt?: last parent sync timestamp
 - referenceDateLabel: visible assignment anchor label
+- group? + phaseOrder?: multi-phase care pathway grouping
 end note
 
 note as JourneyEntryRef
@@ -47,7 +49,32 @@ Consent
 - grantedAt / grantedByUserId always set on grant
 - revokedAt / revokedByUserId set on revoke
 - one active consent per patient+module+journey
+- withdrawalReason?: free-text reason on withdraw/decline
 - revoked records are retained for audit history
+end note
+
+note as TriageDecisionRef
+Case.triageDecision
+- contactMode: DIGITAL | PHONE | VISIT | CLOSE
+- careRole / assignmentMode null for CLOSE
+- assignmentMode: ANY | PAL | NAMED | TEAM
+- PAL requires careRole DOCTOR
+- NAMED: assignedUserId or assignedUserIds[]
+- TEAM: assignedTeamIds[] -> CareTeam shared queue
+end note
+
+note as CaseReviewRef
+Case reviews
+- reviews[]: LAB/XRAY results; pending blocks triage
+- colleagueReviews[]: advisory second opinion
+  (reviewerUserId, question?, respondedAt?, response?)
+end note
+
+note as ReferralRef
+EpisodeOfCare.referral?
+- receivedAt, referrer, reason
+- diagnoses[]: { code, text }
+- diagnosisSource?: UTHOPP | MANUAL
 end note
 
 note as InstructionRef
@@ -61,5 +88,7 @@ JourneyTemplateRef .. JourneyEntryRef
 JourneyEntryRef .. FormResponseRef
 FormResponseRef .. InstructionRef
 InstructionRef .. ConsentRef
+TriageDecisionRef .. CaseReviewRef
+CaseReviewRef .. ReferralRef
 
 @enduml
