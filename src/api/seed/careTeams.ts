@@ -12,5 +12,4 @@ export const careTeams: CareTeam[] = [
   { id: 'team-hip', name: 'Höft', memberUserIds: ['user-pal-1', 'user-nurse-1'] },
   { id: 'team-knee', name: 'Knä', memberUserIds: ['user-pal-1', 'user-nurse-2'] },
   { id: 'team-foot', name: 'Fot & fotled', memberUserIds: ['user-doc-1', 'user-nurse-1'] },
-  { id: 'team-spine', name: 'Rygg', memberUserIds: ['user-pal-1', 'user-doc-1'] },
 ]
