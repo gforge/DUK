@@ -16,6 +16,7 @@ import {
 import { PatientSchema } from './patient'
 import { PolicyRuleSchema } from './policy'
 import { FormSeriesSchema, QuestionnaireTemplateSchema } from './questionnaire'
+import { CareTeamSchema } from './team'
 import { UserSchema } from './users'
 
 export const AppStateSchema = z.object({
@@ -27,6 +28,7 @@ export const AppStateSchema = z.object({
    */
   seedAnchorDate: z.string().optional(),
   users: z.array(UserSchema),
+  careTeams: z.array(CareTeamSchema).default([]),
   patients: z.array(PatientSchema),
   cases: z.array(CaseSchema),
   formResponses: z.array(FormResponseSchema),

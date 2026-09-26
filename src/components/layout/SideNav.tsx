@@ -7,7 +7,6 @@ import PersonIcon from '@mui/icons-material/Person'
 import RouteIcon from '@mui/icons-material/Route'
 import {
   Box,
-  Divider,
   Drawer,
   List,
   ListItem,
@@ -23,8 +22,10 @@ import { useLocation, useNavigate } from 'react-router-dom'
 
 import { useNavItems } from '@/hooks/useNavItems'
 import { useRole } from '@/store/roleContext'
+import { tokens } from '@/theme'
 
 import { version } from '../../../package.json'
+import { TOPBAR_HEIGHT } from './layoutConstants'
 
 interface SideNavProps {
   drawerWidth: number
@@ -62,25 +63,40 @@ export default function SideNav({
 
   const drawerContent = (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-      <Toolbar sx={{ minHeight: 56 }} />
-      <Divider />
-      <List component="nav" aria-label={t('common.mainNavigation')}>
+      <Toolbar sx={{ minHeight: `${TOPBAR_HEIGHT}px !important` }} />
+      <List
+        component="nav"
+        aria-label={t('common.mainNavigation')}
+        sx={{ px: 1, py: 1.5, display: 'flex', flexDirection: 'column', gap: '2px' }}
+      >
         {navItems.map((item) => {
           const visible = item.roles.some((r) => isRole(r))
           if (!visible) return null
-          const active = location.pathname === item.path
+          const active =
+            location.pathname === item.path ||
+            (item.path !== '/' && location.pathname.startsWith(`${item.path}/`)) ||
+            (item.path === '/dashboard' && location.pathname.startsWith('/cases/'))
           return (
             <ListItem key={item.path} disablePadding>
               <ListItemButton
-                selected={active}
                 onClick={() => handleNav(item.path)}
                 aria-current={active ? 'page' : undefined}
+                sx={{
+                  borderRadius: 2,
+                  px: 1.5,
+                  py: 1.125,
+                  gap: 1.5,
+                  color: active ? tokens.primaryDark : tokens.text2,
+                  bgcolor: active ? tokens.selectedBg : 'transparent',
+                  '&:hover': { bgcolor: active ? tokens.selectedBg : tokens.greyFill },
+                }}
               >
-                <ListItemIcon sx={{ minWidth: 36, color: active ? 'primary.main' : 'inherit' }}>
+                <ListItemIcon sx={{ minWidth: 0, color: 'inherit', '& svg': { fontSize: 20 } }}>
                   {pathIcons[item.path]}
                 </ListItemIcon>
                 <ListItemText
                   primary={item.label}
+                  sx={{ my: 0 }}
                   slotProps={{ primary: { sx: { fontSize: 14, fontWeight: active ? 600 : 400 } } }}
                 />
               </ListItemButton>
@@ -88,8 +104,8 @@ export default function SideNav({
           )
         })}
       </List>
-      <Box sx={{ mt: 'auto', px: 2, py: 1.5 }}>
-        <Typography variant="caption" sx={{ color: 'text.disabled' }}>
+      <Box sx={{ mt: 'auto', p: 1.5, px: 2.5 }}>
+        <Typography variant="caption" sx={{ color: tokens.textMuted }}>
           v{version}
         </Typography>
       </Box>
@@ -120,8 +136,7 @@ export default function SideNav({
           '& .MuiDrawer-paper': {
             boxSizing: 'border-box',
             width: drawerWidth,
-            borderRight: '1px solid',
-            borderColor: 'divider',
+            borderRight: `1px solid ${tokens.border}`,
           },
         }}
         open

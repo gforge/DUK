@@ -220,6 +220,14 @@ export const JourneyTemplateSchema = z.object({
    * Examples: "Operationsdatum", "Skadedatum", "Uppföljningsstart".
    */
   referenceDateLabel: z.string().default('Startdatum'),
+  /**
+   * Optional grouping shown in the journey editor, e.g. "Frakturer" or
+   * "Knäartros". Templates in the same group with a phaseOrder form a
+   * multi-phase care pathway (vårdförlopp).
+   */
+  group: z.string().optional(),
+  /** 1-based position of this template within its group's care pathway. */
+  phaseOrder: z.number().int().positive().optional(),
 })
 export type JourneyTemplate = z.infer<typeof JourneyTemplateSchema>
 

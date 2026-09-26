@@ -87,6 +87,8 @@ export function useEntryEditor(
       scoreAliases,
       scoreAliasLabels,
       icon,
+      // Not edited here, but must survive a save
+      reviewTypes: entry?.reviewTypes,
       recurrenceIntervalDays:
         recurringEnabled && recurrenceIntervalDays !== ''
           ? Number(recurrenceIntervalDays)

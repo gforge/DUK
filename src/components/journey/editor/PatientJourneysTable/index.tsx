@@ -1,40 +1,61 @@
-import AddIcon from '@mui/icons-material/Add';
-import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
-import ScienceIcon from '@mui/icons-material/Science';
-import { Chip, Divider, Skeleton, Stack, Table, TableBody, TableCell, TableHead, TableRow, Typography, } from '@mui/material';
-import React from 'react';
-import { useTranslation } from 'react-i18next';
+import AddIcon from '@mui/icons-material/Add'
+import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutlineOutlined'
+import ScienceIcon from '@mui/icons-material/Science'
+import {
+  Chip,
+  Divider,
+  Skeleton,
+  Stack,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  Typography,
+} from '@mui/material'
+import React from 'react'
+import { useTranslation } from 'react-i18next'
 
-import type { JourneyModification, JourneyTemplate, Patient, PatientJourney, ResearchModule, } from '@/api/schemas';
-import { useJourneyStatusLabel } from '@/hooks/labels';
+import type {
+  JourneyModification,
+  JourneyTemplate,
+  Patient,
+  PatientJourney,
+  ResearchModule,
+} from '@/api/schemas'
+import { useJourneyStatusLabel } from '@/hooks/labels'
 const MOD_ICON: Record<string, React.ReactNode> = {
-    ADD_STEP: <AddIcon fontSize="inherit" />,
-    REMOVE_STEP: <RemoveCircleOutlineIcon fontSize="inherit" />,
-};
+  ADD_STEP: <AddIcon fontSize="inherit" />,
+  REMOVE_STEP: <RemoveCircleOutlineIcon fontSize="inherit" />,
+}
 interface Props {
-    patientJourneys: PatientJourney[] | null;
-    loading: boolean;
-    patients: Patient[] | null;
-    journeyTemplates: JourneyTemplate[] | null;
-    researchModules: ResearchModule[] | null;
+  patientJourneys: PatientJourney[] | null
+  loading: boolean
+  patients: Patient[] | null
+  journeyTemplates: JourneyTemplate[] | null
+  researchModules: ResearchModule[] | null
 }
 function modSummary(mod: JourneyModification, _templateName: (id: string) => string) {
-    if (mod.type === 'ADD_STEP')
-        return `+${mod.entry?.label ?? ''}`;
-    if (mod.type === 'REMOVE_STEP')
-        return `-${mod.stepId ?? ''}`;
-    return mod.type;
+  if (mod.type === 'ADD_STEP') return `+${mod.entry?.label ?? ''}`
+  if (mod.type === 'REMOVE_STEP') return `-${mod.stepId ?? ''}`
+  return mod.type
 }
-export function PatientJourneysTable({ patientJourneys, loading, patients, journeyTemplates, researchModules, }: Props) {
-    const { t } = useTranslation();
-    const getJourneyStatusLabel = useJourneyStatusLabel();
-    const patientName = (id: string) => patients?.find((p) => p.id === id)?.displayName ?? id;
-    const templateName = (id: string) => journeyTemplates?.find((jt) => jt.id === id)?.name ?? id;
-    if (loading)
-        return <Skeleton variant="rectangular" sx={{ borderRadius: 1, height: 200 }}/>;
-    if (!patientJourneys?.length)
-        return <Typography color="text.secondary">{t('journey.editor.noPatientJourneys')}</Typography>;
-    return (<Table size="small">
+export function PatientJourneysTable({
+  patientJourneys,
+  loading,
+  patients,
+  journeyTemplates,
+  researchModules,
+}: Props) {
+  const { t } = useTranslation()
+  const getJourneyStatusLabel = useJourneyStatusLabel()
+  const patientName = (id: string) => patients?.find((p) => p.id === id)?.displayName ?? id
+  const templateName = (id: string) => journeyTemplates?.find((jt) => jt.id === id)?.name ?? id
+  if (loading) return <Skeleton variant="rectangular" sx={{ borderRadius: 1, height: 200 }} />
+  if (!patientJourneys?.length)
+    return <Typography color="text.secondary">{t('journey.editor.noPatientJourneys')}</Typography>
+  return (
+    <Table size="small">
       <TableHead>
         <TableRow>
           <TableCell>{t('journey.patient')}</TableCell>
@@ -46,7 +67,8 @@ export function PatientJourneysTable({ patientJourneys, loading, patients, journ
         </TableRow>
       </TableHead>
       <TableBody>
-        {patientJourneys.map((pj) => (<TableRow key={pj.id} hover>
+        {patientJourneys.map((pj) => (
+          <TableRow key={pj.id} hover>
             <TableCell>
               <Typography variant="body2" sx={{ fontWeight: 600 }}>
                 {patientName(pj.patientId)}
@@ -59,35 +81,69 @@ export function PatientJourneysTable({ patientJourneys, loading, patients, journ
               <Typography variant="caption">{pj.startDate}</Typography>
             </TableCell>
             <TableCell>
-              <Chip label={getJourneyStatusLabel(pj.status)} size="small" color={pj.status === 'ACTIVE'
-                ? 'primary'
-                : pj.status === 'COMPLETED'
-                    ? 'success'
-                    : 'default'} variant="outlined" sx={{ fontSize: 11 }}/>
+              <Chip
+                label={getJourneyStatusLabel(pj.status)}
+                size="small"
+                color={
+                  pj.status === 'ACTIVE'
+                    ? 'primary'
+                    : pj.status === 'COMPLETED'
+                      ? 'success'
+                      : 'default'
+                }
+                variant="outlined"
+                sx={{ fontSize: 11 }}
+              />
             </TableCell>
             <TableCell>
-              {pj.researchModuleIds.length > 0 ? (<Stack direction="row" sx={{ gap: 0.5, flexWrap: 'wrap' }}>
-                  {pj.researchModuleIds.map((rmId) => (<Chip key={rmId} icon={<ScienceIcon />} label={researchModules?.find((rm) => rm.id === rmId)?.name ?? rmId} size="small" color="secondary" variant="outlined" sx={{ fontSize: 10, height: 20 }}/>))}
-                </Stack>) : (<Typography variant="caption" color="text.secondary">
+              {pj.researchModuleIds.length > 0 ? (
+                <Stack direction="row" sx={{ gap: 0.5, flexWrap: 'wrap' }}>
+                  {pj.researchModuleIds.map((rmId) => (
+                    <Chip
+                      key={rmId}
+                      icon={<ScienceIcon />}
+                      label={researchModules?.find((rm) => rm.id === rmId)?.name ?? rmId}
+                      size="small"
+                      color="secondary"
+                      variant="outlined"
+                      sx={{ fontSize: 10, height: 20 }}
+                    />
+                  ))}
+                </Stack>
+              ) : (
+                <Typography variant="caption" color="text.secondary">
                   —
-                </Typography>)}
+                </Typography>
+              )}
             </TableCell>
             <TableCell>
-              {pj.modifications.length > 0 ? (<Stack sx={{ gap: 0.25 }}>
-                  {pj.modifications.map((mod) => (<Stack key={mod.id} direction="row" sx={{ alignItems: 'center', gap: 0.5 }}>
+              {pj.modifications.length > 0 ? (
+                <Stack sx={{ gap: 0.25 }}>
+                  {pj.modifications.map((mod) => (
+                    <Stack key={mod.id} direction="row" sx={{ alignItems: 'center', gap: 0.5 }}>
                       {MOD_ICON[mod.type]}
                       <Typography variant="caption">{modSummary(mod, templateName)}</Typography>
-                      <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }}/>
-                      <Typography variant="caption" color="text.secondary" sx={{ fontStyle: 'italic' }}>
+                      <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        sx={{ fontStyle: 'italic' }}
+                      >
                         {mod.reason.slice(0, 40)}
                         {mod.reason.length > 40 ? '…' : ''}
                       </Typography>
-                    </Stack>))}
-                </Stack>) : (<Typography variant="caption" color="text.secondary">
+                    </Stack>
+                  ))}
+                </Stack>
+              ) : (
+                <Typography variant="caption" color="text.secondary">
                   —
-                </Typography>)}
+                </Typography>
+              )}
             </TableCell>
-          </TableRow>))}
+          </TableRow>
+        ))}
       </TableBody>
-    </Table>);
+    </Table>
+  )
 }

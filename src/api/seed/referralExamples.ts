@@ -191,6 +191,7 @@ export const referralCases: Case[] = [
     scheduledAt: iso(daysAgo(0)),
     lastActivityAt: iso(daysAgo(0)),
     createdAt: iso(daysAgo(0)),
+    colleagueReviews: [],
     reviews: [],
   },
   {
@@ -224,6 +225,7 @@ export const referralCases: Case[] = [
     scheduledAt: iso(daysAgo(4)),
     lastActivityAt: iso(daysAgo(4)),
     createdAt: iso(daysAgo(4)),
+    colleagueReviews: [],
     reviews: [],
   },
   {
@@ -257,6 +259,7 @@ export const referralCases: Case[] = [
     scheduledAt: iso(daysAgo(12)),
     lastActivityAt: iso(daysAgo(9)),
     createdAt: iso(daysAgo(12)),
+    colleagueReviews: [],
     reviews: [],
   },
 ]

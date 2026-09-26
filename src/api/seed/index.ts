@@ -2,6 +2,7 @@ import type { AppState, Case, TriageDecision } from '../schemas'
 import { CURRENT_DEMO_DATA_VERSION, CURRENT_SCHEMA_VERSION } from '../schemaVersion'
 import { ensureAllUsers } from '../utils/userGenerator'
 import { auditEvents } from './auditEvents'
+import { careTeams } from './careTeams'
 import { cases } from './cases'
 import { episodesOfCare } from './episodesOfCare'
 import { formResponses } from './formResponses'
@@ -31,6 +32,7 @@ const baseSeedState: AppState = {
   schemaVersion: CURRENT_SCHEMA_VERSION,
   demoDataVersion: CURRENT_DEMO_DATA_VERSION,
   users,
+  careTeams,
   patients: [...patients, ...referralPatients],
   cases: [...cases, ...referralCases],
   policyRules,

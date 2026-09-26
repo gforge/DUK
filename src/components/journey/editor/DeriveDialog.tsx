@@ -8,7 +8,7 @@ import { useSnack } from '@/store/snackContext'
 interface Props {
   parentTemplate: JourneyTemplate
   onClose: () => void
-  onDerived: () => void
+  onDerived: (derived: JourneyTemplate) => void
 }
 export default function DeriveDialog({ parentTemplate, onClose, onDerived }: Props) {
   const { t } = useTranslation()
@@ -19,9 +19,9 @@ export default function DeriveDialog({ parentTemplate, onClose, onDerived }: Pro
     if (!name.trim()) return
     setSaving(true)
     try {
-      await client.deriveJourneyTemplate(parentTemplate.id, name.trim())
+      const derived = await client.deriveJourneyTemplate(parentTemplate.id, name.trim())
       showSnack(t('journey.editor.templateSaved'), 'success')
-      onDerived()
+      onDerived(derived)
     } catch {
       showSnack(t('common.error'), 'error')
     } finally {

@@ -61,7 +61,11 @@ export default function CompletionDialog({
           />
           <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={adapterLocale}>
             <DateTimePicker
-              label={requireFollowUpDate ? t('worklist.nextContactDateRequired') : t('worklist.nextContactDate')}
+              label={
+                requireFollowUpDate
+                  ? t('worklist.nextContactDateRequired')
+                  : t('worklist.nextContactDate')
+              }
               value={followUpDate}
               onChange={(value) => onFollowUpDateChange(value)}
               slotProps={{
@@ -91,7 +95,12 @@ export default function CompletionDialog({
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>{t('common.cancel')}</Button>
-        <Button variant="contained" color="success" onClick={onConfirm} disabled={isCompleting || (requireFollowUpDate && !followUpDate)}>
+        <Button
+          variant="contained"
+          color="success"
+          onClick={onConfirm}
+          disabled={isCompleting || (requireFollowUpDate && !followUpDate)}
+        >
           {t('worklist.confirmDone')}
         </Button>
       </DialogActions>

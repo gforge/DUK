@@ -20,6 +20,8 @@ export const jtHindfootWaitinglist: JourneyTemplate = {
   description:
     'Uppföljning under väntetid för hindfoot-kirurgi. Statuscheck vid 2 månader, intressekontroll vid 3 månader och hälsodeklaration inför anestesi vid 4 månader.',
   referenceDateLabel: 'Datum för köplats',
+  group: 'Hindfoot',
+  phaseOrder: 2,
   entries: [
     {
       id: 'jte-hf-wl-1',

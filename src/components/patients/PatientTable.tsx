@@ -1,140 +1,178 @@
-import BadgeIcon from '@mui/icons-material/Badge';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import { Box, Button, Table, TableBody, TableCell, TableHead, TablePagination, TableRow, Tooltip, Typography, } from '@mui/material';
-import { differenceInYears, parseISO } from 'date-fns';
-import React, { useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import AssignmentIndIcon from '@mui/icons-material/AssignmentInd'
+import ChevronRightIcon from '@mui/icons-material/ChevronRight'
+import { Box, TablePagination } from '@mui/material'
+import { differenceInYears, parseISO } from 'date-fns'
+import React, { useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
 
-import type { EpisodeOfCare, JourneyTemplate, Patient, PatientJourney } from '@/api/schemas';
-import PersonalNumberCopy from '@/components/common/PersonalNumberCopy';
+import type { JourneyTemplate, Patient, PatientJourney } from '@/api/schemas'
+import { GridTableHeader, GridTableRow, SectionCard, Tag } from '@/components/common'
+import PersonalNumberCopy from '@/components/common/PersonalNumberCopy'
+import { tokens } from '@/theme'
 
-import JourneyChips from './JourneyChips';
+import JourneyChips from './JourneyChips'
+
+const COLUMNS = 'minmax(180px,1.2fr) 170px 60px minmax(240px,2fr) 24px'
+const MIN_WIDTH = 760
+const ROWS_PER_PAGE_OPTIONS = [25, 50, 100]
+
 interface Props {
-    readonly patients: Patient[];
-    readonly journeys: PatientJourney[];
-    readonly episodes: EpisodeOfCare[];
-    readonly journeyTemplates: JourneyTemplate[];
-    readonly isClinician: boolean;
-    readonly currentUserId?: string;
+  readonly patients: Patient[]
+  readonly journeys: PatientJourney[]
+  readonly journeyTemplates: JourneyTemplate[]
+  /** Patients for whom the current user is PAL (patient PAL or responsible for an active journey). */
+  readonly palPatientIds: ReadonlySet<string>
 }
-export default function PatientTable({ patients, journeys, episodes, journeyTemplates, isClinician, currentUserId, }: Props) {
-    const { t } = useTranslation();
-    const navigate = useNavigate();
-    const [page, setPage] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = useState(25);
-    // Clamp page to valid range when the patient list shrinks (e.g. after filtering)
-    const maxPage = Math.max(0, Math.ceil(patients.length / rowsPerPage) - 1);
-    const safePage = Math.min(page, maxPage);
-    const visible = patients.slice(safePage * rowsPerPage, (safePage + 1) * rowsPerPage);
-    const episodesById = useMemo(() => new Map(episodes.map((episode) => [episode.id, episode])), [episodes]);
-    const journeysByPatientId = useMemo(() => {
-        const map = new Map<string, PatientJourney[]>();
-        for (const journey of journeys) {
-            const list = map.get(journey.patientId) ?? [];
-            list.push(journey);
-            map.set(journey.patientId, list);
-        }
-        return map;
-    }, [journeys]);
-    const patientPalById = useMemo(() => new Map(patients.map((patient) => [patient.id, patient.palId])), [patients]);
-    const hasActiveJourneyResponsibilityByPatientId = useMemo(() => {
-        const map = new Map<string, boolean>();
-        if (!currentUserId || !isClinician)
-            return map;
-        for (const journey of journeys) {
-            if (journey.status !== 'ACTIVE')
-                continue;
-            if (journey.responsiblePhysicianUserId === null)
-                continue;
-            const episodeOwner = journey.episodeId
-                ? episodesById.get(journey.episodeId)?.responsibleUserId
-                : undefined;
-            const patientOwner = patientPalById.get(journey.patientId);
-            const responsiblePhysicianUserId = journey.responsiblePhysicianUserId ?? episodeOwner ?? patientOwner;
-            if (responsiblePhysicianUserId === currentUserId) {
-                map.set(journey.patientId, true);
-            }
-        }
-        return map;
-    }, [currentUserId, episodesById, isClinician, journeys, patientPalById]);
-    return (<>
-      <Table size="small">
-        <TableHead>
-          <TableRow>
-            <TableCell>{t('patients.displayName')}</TableCell>
-            <TableCell>{t('patients.personalNumber')}</TableCell>
-            <TableCell>{t('patients.age')}</TableCell>
-            <TableCell>{t('patients.activeJourney')}</TableCell>
-            {isClinician && <TableCell />}
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {patients.length === 0 && (<TableRow>
-              <TableCell colSpan={5}>
-                <Typography variant="body2" color="text.secondary">
-                  {t('patients.noResults')}
-                </Typography>
-              </TableCell>
-            </TableRow>)}
-          {visible.map((patient) => {
-            const patientJourneys = journeysByPatientId.get(patient.id) ?? [];
-            const isResponsiblePhysician = Boolean(currentUserId) &&
-                isClinician &&
-                (patient.palId === currentUserId ||
-                    hasActiveJourneyResponsibilityByPatientId.get(patient.id) === true);
-            return (<TableRow key={patient.id} hover sx={{ cursor: 'pointer' }} onClick={() => navigate(`/patients/${patient.id}`)}>
-                <TableCell>
-                  <Box sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    gap: 1,
-                    width: '100%',
-                }}>
-                    <Typography variant="body2" sx={{ lineHeight: 1.2, fontWeight: 600 }}>
-                      {patient.displayName}
-                    </Typography>
 
-                    <Box sx={{
-                    width: 18,
-                    minWidth: 18,
-                    display: 'inline-flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                }}>
-                      {isResponsiblePhysician && (<Tooltip title={t('patients.myResponsiblePhysician')} arrow>
-                          <BadgeIcon color="primary" fontSize="small" />
-                        </Tooltip>)}
-                    </Box>
-                  </Box>
-                </TableCell>
-                <TableCell>
-                  <PersonalNumberCopy personalNumber={patient.personalNumber} labelFormat="short" color="text.primary"/>
-                </TableCell>
-                <TableCell align="center">
-                  {patient.dateOfBirth
-                    ? differenceInYears(new Date(), parseISO(patient.dateOfBirth))
-                    : '—'}
-                </TableCell>
-                <TableCell>
-                  <JourneyChips journeys={patientJourneys} journeyTemplates={journeyTemplates}/>
-                </TableCell>
-                {isClinician && (<TableCell align="right">
-                    <Button size="small" variant="text" endIcon={<ChevronRightIcon />} onClick={(e) => {
-                        e.stopPropagation();
-                        navigate(`/patients/${patient.id}`);
-                    }}>
-                      {t('patients.openView')}
-                    </Button>
-                  </TableCell>)}
-              </TableRow>);
+export default function PatientTable({
+  patients,
+  journeys,
+  journeyTemplates,
+  palPatientIds,
+}: Props) {
+  const { t } = useTranslation()
+  const navigate = useNavigate()
+  const [page, setPage] = useState(0)
+  const [rowsPerPage, setRowsPerPage] = useState(ROWS_PER_PAGE_OPTIONS[0])
+  // Clamp page to valid range when the patient list shrinks (e.g. after filtering)
+  const maxPage = Math.max(0, Math.ceil(patients.length / rowsPerPage) - 1)
+  const safePage = Math.min(page, maxPage)
+  const visible = patients.slice(safePage * rowsPerPage, (safePage + 1) * rowsPerPage)
+  const journeysByPatientId = useMemo(() => {
+    const map = new Map<string, PatientJourney[]>()
+    for (const journey of journeys) {
+      const list = map.get(journey.patientId) ?? []
+      list.push(journey)
+      map.set(journey.patientId, list)
+    }
+    return map
+  }, [journeys])
+  const now = new Date()
+
+  return (
+    <SectionCard aria-label={t('patients.title')}>
+      <Box role="table" aria-label={t('patients.title')}>
+        <GridTableHeader columns={COLUMNS} minWidth={MIN_WIDTH}>
+          <Box role="columnheader">{t('patients.displayName')}</Box>
+          <Box role="columnheader">{t('patients.personalNumber')}</Box>
+          <Box role="columnheader">{t('patients.age')}</Box>
+          <Box role="columnheader">{t('patients.journeys')}</Box>
+          <Box role="columnheader" />
+        </GridTableHeader>
+
+        {patients.length === 0 && (
+          <Box
+            role="row"
+            sx={{
+              minWidth: MIN_WIDTH,
+              px: 2,
+              py: 2,
+              color: tokens.textSecondary,
+              borderBottom: `1px solid ${tokens.rowDivider}`,
+            }}
+          >
+            <Box role="cell">{t('patients.noResults')}</Box>
+          </Box>
+        )}
+
+        {visible.map((patient) => {
+          const isPal = palPatientIds.has(patient.id)
+          const open = () => navigate(`/patients/${patient.id}`)
+          return (
+            <GridTableRow
+              key={patient.id}
+              columns={COLUMNS}
+              minWidth={MIN_WIDTH}
+              onClick={open}
+              aria-label={t('patients.openPatient', { name: patient.displayName })}
+              sx={{ py: '11px' }}
+            >
+              <Box
+                role="cell"
+                sx={{ display: 'flex', alignItems: 'center', gap: 1, fontWeight: 600, minWidth: 0 }}
+              >
+                <Box component="span" sx={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {patient.displayName}
+                </Box>
+                {isPal && (
+                  <Tag
+                    variant="selected"
+                    icon={<AssignmentIndIcon />}
+                    label={t('patients.palTag')}
+                    title={t('patients.myResponsiblePhysician')}
+                  />
+                )}
+              </Box>
+              <Box role="cell">
+                <PersonalNumberCopy
+                  personalNumber={patient.personalNumber}
+                  labelFormat="short"
+                  sx={{
+                    gap: 0.75,
+                    '& > :not(style) ~ :not(style)': { ml: 0 },
+                    '& .MuiTypography-root': {
+                      fontFamily: 'inherit',
+                      fontSize: 14,
+                      fontVariantNumeric: 'tabular-nums',
+                      color: tokens.text2,
+                    },
+                    '& .MuiIconButton-root': {
+                      p: 0.5,
+                      borderRadius: 1,
+                      color: tokens.textMuted,
+                      '&:hover': { bgcolor: tokens.greyFill, color: tokens.text2 },
+                    },
+                    '& .MuiIconButton-root svg': { fontSize: 14 },
+                  }}
+                />
+              </Box>
+              <Box role="cell" sx={{ color: tokens.text2, fontVariantNumeric: 'tabular-nums' }}>
+                {patient.dateOfBirth ? differenceInYears(now, parseISO(patient.dateOfBirth)) : '—'}
+              </Box>
+              <Box role="cell">
+                <JourneyChips
+                  journeys={journeysByPatientId.get(patient.id) ?? []}
+                  journeyTemplates={journeyTemplates}
+                />
+              </Box>
+              <Box role="cell" aria-hidden sx={{ color: tokens.textMuted, display: 'flex' }}>
+                <ChevronRightIcon sx={{ fontSize: 20 }} />
+              </Box>
+            </GridTableRow>
+          )
         })}
-        </TableBody>
-      </Table>
-      <TablePagination component="div" count={patients.length} page={safePage} rowsPerPage={rowsPerPage} rowsPerPageOptions={[25, 50, 100]} onPageChange={(_, p) => setPage(p)} onRowsPerPageChange={(e) => {
-            setRowsPerPage(+e.target.value);
-            setPage(0);
-        }} labelRowsPerPage={t('common.rowsPerPage')}/>
-    </>);
+      </Box>
+
+      <TablePagination
+        component="div"
+        count={patients.length}
+        page={safePage}
+        rowsPerPage={rowsPerPage}
+        rowsPerPageOptions={ROWS_PER_PAGE_OPTIONS}
+        onPageChange={(_, p) => setPage(p)}
+        onRowsPerPageChange={(e) => {
+          setRowsPerPage(+e.target.value)
+          setPage(0)
+        }}
+        labelRowsPerPage={`${t('common.rowsPerPage')}:`}
+        labelDisplayedRows={({ from, to, count }) =>
+          t('patients.displayedRows', { from, to, count })
+        }
+        sx={{
+          minWidth: MIN_WIDTH,
+          color: tokens.text2,
+          borderBottom: 0,
+          '& .MuiTablePagination-toolbar': { minHeight: 0, px: 2, py: 0.75, gap: 1 },
+          '& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows, & .MuiTablePagination-select':
+            { fontSize: 13, m: 0 },
+          '& .MuiTablePagination-input': { mr: 2 },
+          '& .MuiTablePagination-displayedRows': { mr: 1 },
+          '& .MuiTablePagination-actions': { ml: 1 },
+          '& .MuiTablePagination-actions .MuiIconButton-root': { p: 0.5, color: tokens.text2 },
+          '& .MuiTablePagination-actions .Mui-disabled': { color: tokens.inputBorder },
+        }}
+      />
+    </SectionCard>
+  )
 }

@@ -50,7 +50,8 @@ describe('initializeStoreFromRaw', () => {
     const today = new Date('2032-05-10T12:00:00.000Z')
     const stored = {
       ...structuredClone(SEED_STATE),
-      schemaVersion: CURRENT_SCHEMA_VERSION - 1,
+      // v15 predates demoDataVersion (added by the 15 → 16 migration).
+      schemaVersion: 15,
     }
     delete (stored as Partial<AppState>).demoDataVersion
 

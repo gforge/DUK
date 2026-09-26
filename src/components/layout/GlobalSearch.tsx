@@ -2,16 +2,15 @@ import PersonIcon from '@mui/icons-material/Person'
 import SearchIcon from '@mui/icons-material/Search'
 import {
   Box,
+  ButtonBase,
   Dialog,
   DialogContent,
   Divider,
-  IconButton,
   InputAdornment,
   List,
   ListItemButton,
   ListItemText,
   TextField,
-  Tooltip,
   Typography,
 } from '@mui/material'
 import React, { useMemo, useRef, useState } from 'react'
@@ -22,6 +21,7 @@ import * as client from '@/api/client'
 import type { Patient } from '@/api/schemas'
 import { formatPersonnummer } from '@/api/utils/personnummer'
 import { useRole } from '@/store/roleContext'
+import { tokens } from '@/theme'
 const MAX_RESULTS = 10
 export default function GlobalSearch() {
   const { t } = useTranslation()
@@ -60,11 +60,31 @@ export default function GlobalSearch() {
   if (!isClinician) return null
   return (
     <>
-      <Tooltip title={t('common.search')}>
-        <IconButton color="inherit" aria-label={t('common.search')} onClick={handleOpen}>
-          <SearchIcon />
-        </IconButton>
-      </Tooltip>
+      <ButtonBase
+        aria-label={t('common.search')}
+        onClick={handleOpen}
+        sx={{
+          font: 'inherit',
+          width: '100%',
+          maxWidth: 420,
+          height: 36,
+          borderRadius: 2,
+          bgcolor: tokens.greyFill,
+          color: tokens.textSecondary,
+          display: 'flex',
+          justifyContent: 'flex-start',
+          alignItems: 'center',
+          px: 1.5,
+          gap: 1,
+          '&:hover': { bgcolor: tokens.segmentBg },
+          '&:focus-visible': { outline: `2px solid ${tokens.primary}` },
+        }}
+      >
+        <SearchIcon sx={{ fontSize: 18 }} />
+        <Box component="span" sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          {t('common.searchPatients')}
+        </Box>
+      </ButtonBase>
 
       <Dialog open={open} onClose={handleClose} fullWidth sx={{ maxWidth: 'sm' }}>
         <DialogContent sx={{ p: 0 }}>
