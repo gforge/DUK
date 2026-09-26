@@ -24,6 +24,7 @@ import { z } from 'zod'
 import { validateExpression } from '@/api/policyParser'
 import type { PolicyVariable } from '@/api/service'
 import { useSeverityLabel } from '@/hooks/labels'
+import { tokens } from '@/theme'
 const SEVERITIES = ['LOW', 'MEDIUM', 'HIGH'] as const
 export { SEVERITIES }
 /** General variables not tied to a specific journey template. */
@@ -98,9 +99,17 @@ export default function PolicyRuleDialog({
   }, {})
   const templateGroups = Object.entries(grouped)
   return (
-    <Dialog open={open} onClose={onClose} fullWidth sx={{ maxWidth: 'md' }}>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      fullWidth
+      sx={{ maxWidth: 'md' }}
+      slotProps={{ paper: { sx: { borderRadius: 3 } } }}
+    >
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
-        <DialogTitle>{editingId ? t('policy.editRule') : t('policy.addRule')}</DialogTitle>
+        <DialogTitle sx={{ fontSize: 18, fontWeight: 700, pb: 1 }}>
+          {editingId ? t('policy.editRule') : t('policy.addRule')}
+        </DialogTitle>
         <DialogContent>
           <Stack spacing={2.5} sx={{ pt: 1 }}>
             <Controller
@@ -120,7 +129,14 @@ export default function PolicyRuleDialog({
             />
 
             {/* ── Variable palette ──────────────────────────────────────── */}
-            <Box>
+            <Box
+              sx={{
+                border: `1px solid ${tokens.border}`,
+                borderRadius: 2,
+                bgcolor: tokens.headerBg,
+                p: 1.5,
+              }}
+            >
               <Typography
                 variant="caption"
                 color="text.secondary"
@@ -247,9 +263,17 @@ export default function PolicyRuleDialog({
             />
           </Stack>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={onClose}>{t('common.cancel')}</Button>
-          <Button type="submit" variant="contained" disabled={saving || !formState.isValid}>
+        <DialogActions sx={{ px: 3, pb: 2.5, gap: 1 }}>
+          <Button onClick={onClose} sx={{ fontWeight: 600, color: tokens.textSecondary }}>
+            {t('common.cancel')}
+          </Button>
+          <Button
+            type="submit"
+            variant="contained"
+            disableElevation
+            disabled={saving || !formState.isValid}
+            sx={{ fontWeight: 600, borderRadius: 2, px: 2 }}
+          >
             {saving ? <CircularProgress size={18} /> : t('common.save')}
           </Button>
         </DialogActions>

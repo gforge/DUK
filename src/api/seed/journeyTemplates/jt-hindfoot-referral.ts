@@ -13,6 +13,8 @@ export const jtHindfootReferral: JourneyTemplate = {
   description:
     'Basal kartläggning vid inkommen remiss. Patienten besvarar en kortfattad hälso- och livssituationsenkät innan ortopedbesök bokas.',
   referenceDateLabel: 'Remissdatum',
+  group: 'Hindfoot',
+  phaseOrder: 1,
   entries: [
     {
       id: 'jte-hf-ref-1',

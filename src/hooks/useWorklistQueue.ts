@@ -1,28 +1,38 @@
+import { differenceInCalendarDays, parseISO } from 'date-fns'
 import { useEffect, useMemo, useRef, useState } from 'react'
 
-import type { CareRole, Case, Patient, WorkCategory } from '@/api/schemas'
+import type { AssignmentMode, CareRole, CareTeam, Case, Patient, WorkCategory } from '@/api/schemas'
+import { isCaseAssignedToUser } from '@/api/service/teams'
 
 export type CategoryFilter = 'ALL' | WorkCategory
 export type CareRoleFilter = 'ALL' | Exclude<CareRole, null>
+export type RecipientFilter = 'ALL' | Exclude<AssignmentMode, null>
 
 export const WORKLIST_CATEGORY_ORDER: WorkCategory[] = ['VISIT', 'PHONE', 'DIGITAL']
 
-type CategorizedCase = { caseData: Case; category: WorkCategory }
-type GroupedCases = Array<{ workCategory: WorkCategory; cases: Case[] }>
+/** Completed tasks older than this are not shown in the "Avklarade" tab. */
+export const COMPLETED_WINDOW_DAYS = 30
 
-interface Filters {
+type CategorizedCase = { caseData: Case; category: WorkCategory }
+export type GroupedCases = Array<{ workCategory: WorkCategory; cases: Case[] }>
+
+export interface WorklistFilters {
   categoryFilter: CategoryFilter
   careRoleFilter: CareRoleFilter
-  palOnly: boolean
-  claimedByMe: boolean
+  /** Who the task was sent to (VSH / PAL / named person / team). */
+  recipientFilter: RecipientFilter
+  /** Only tasks directed at me: claimed, named, sent to my team, or PAL task for my patient. */
+  assignedToMe: boolean
+  /** Only patients where I am PAL. */
   myPatientsOnly: boolean
 }
 
 interface Params {
   cases: Case[]
   patients: Patient[]
+  teams?: CareTeam[]
   currentUserId: string
-  filters: Filters
+  filters: WorklistFilters
 }
 
 function toWorkCategory(caseData: Case): WorkCategory | null {
@@ -54,6 +64,48 @@ export function resolveCaseCareRole(caseData: Case): Exclude<CareRole, null> | n
   return null
 }
 
+/**
+ * True when the task is directed at the user: the team/named/claimed model via
+ * isCaseAssignedToUser, plus unclaimed PAL tasks for patients where the user is PAL.
+ */
+export function isWorklistTaskMine(
+  caseData: Case,
+  userId: string,
+  teams: CareTeam[],
+  patient: Patient | undefined,
+): boolean {
+  if (isCaseAssignedToUser(caseData, userId, teams)) return true
+  return (
+    !caseData.assignedUserId &&
+    caseData.triageDecision?.assignmentMode === 'PAL' &&
+    patient?.palId === userId
+  )
+}
+
+/** True when the task is directed at someone specific (person, people, team or a PAL). */
+function isDirectedAtSomeone(caseData: Case, patient: Patient | undefined): boolean {
+  if (caseData.assignedUserId) return true
+  const td = caseData.triageDecision
+  if (!td) return false
+  if (td.assignedUserIds?.length) return true
+  if (td.assignmentMode === 'TEAM' && td.assignedTeamIds?.length) return true
+  if (td.assignmentMode === 'PAL' && patient?.palId) return true
+  return false
+}
+
+/** When the task was completed: case closedAt, falling back to last activity. */
+export function getCompletedAt(caseData: Case): string | undefined {
+  return caseData.closedAt ?? caseData.lastActivityAt
+}
+
+/** Who completed the task, taken from the completed booking when recorded. */
+export function getCompletedByUserId(caseData: Case): string | undefined {
+  const completed = [...(caseData.bookings ?? [])]
+    .reverse()
+    .find((b) => b.status === 'COMPLETED' && b.completedByUserId)
+  return completed?.completedByUserId ?? undefined
+}
+
 function sortByDeadline(a: Case, b: Case): number {
   if (!a.deadline && !b.deadline) return 0
   if (!a.deadline) return 1
@@ -61,17 +113,29 @@ function sortByDeadline(a: Case, b: Case): number {
   return new Date(a.deadline).getTime() - new Date(b.deadline).getTime()
 }
 
-function groupCases(items: CategorizedCase[]): GroupedCases {
+function sortByCompletedDesc(a: Case, b: Case): number {
+  return (getCompletedAt(b) ?? '').localeCompare(getCompletedAt(a) ?? '')
+}
+
+function groupCases(items: CategorizedCase[], sort: (a: Case, b: Case) => number): GroupedCases {
   return WORKLIST_CATEGORY_ORDER.map((category) => ({
     workCategory: category,
     cases: items
       .filter((item) => item.category === category)
       .map((item) => item.caseData)
-      .sort(sortByDeadline),
+      .sort(sort),
   })).filter((g) => g.cases.length > 0)
 }
 
-export function useWorklistQueue({ cases, patients, currentUserId, filters }: Params) {
+const NO_TEAMS: CareTeam[] = []
+
+export function useWorklistQueue({
+  cases,
+  patients,
+  teams = NO_TEAMS,
+  currentUserId,
+  filters,
+}: Params) {
   const [pulseCount, setPulseCount] = useState(false)
   const [pulseCompletedCount, setPulseCompletedCount] = useState(false)
   const [highlightedCaseIds, setHighlightedCaseIds] = useState<Set<string>>(new Set())
@@ -95,6 +159,7 @@ export function useWorklistQueue({ cases, patients, currentUserId, filters }: Pa
 
   const filtered = useMemo(() => {
     return worklistEligibleCases.filter(({ caseData, category }) => {
+      const patient = patientMap.get(caseData.patientId)
       if (filters.categoryFilter !== 'ALL' && category !== filters.categoryFilter) return false
       if (
         filters.careRoleFilter !== 'ALL' &&
@@ -102,14 +167,19 @@ export function useWorklistQueue({ cases, patients, currentUserId, filters }: Pa
       ) {
         return false
       }
-      if (filters.palOnly && caseData.triageDecision?.assignmentMode !== 'PAL') return false
-      if (filters.claimedByMe && caseData.assignedUserId !== currentUserId) return false
-      if (filters.myPatientsOnly && patientMap.get(caseData.patientId)?.palId !== currentUserId) {
+      if (
+        filters.recipientFilter !== 'ALL' &&
+        (caseData.triageDecision?.assignmentMode ?? 'ANY') !== filters.recipientFilter
+      ) {
         return false
       }
+      if (filters.assignedToMe && !isWorklistTaskMine(caseData, currentUserId, teams, patient)) {
+        return false
+      }
+      if (filters.myPatientsOnly && patient?.palId !== currentUserId) return false
       return true
     })
-  }, [filters, worklistEligibleCases, currentUserId, patientMap])
+  }, [filters, worklistEligibleCases, currentUserId, patientMap, teams])
 
   const activeFiltered = useMemo(
     () =>
@@ -119,34 +189,49 @@ export function useWorklistQueue({ cases, patients, currentUserId, filters }: Pa
     [filtered],
   )
 
+  const isActionable = useMemo(
+    () => (caseData: Case) => {
+      const patient = patientMap.get(caseData.patientId)
+      return (
+        isWorklistTaskMine(caseData, currentUserId, teams, patient) ||
+        !isDirectedAtSomeone(caseData, patient)
+      )
+    },
+    [currentUserId, patientMap, teams],
+  )
+
   const actionableActiveFiltered = useMemo(
-    () =>
-      activeFiltered.filter(
-        (item) => !item.caseData.assignedUserId || item.caseData.assignedUserId === currentUserId,
-      ),
-    [activeFiltered, currentUserId],
+    () => activeFiltered.filter((item) => isActionable(item.caseData)),
+    [activeFiltered, isActionable],
   )
 
   const monitoringFiltered = useMemo(
-    () =>
-      activeFiltered.filter(
-        (item) =>
-          Boolean(item.caseData.assignedUserId) && item.caseData.assignedUserId !== currentUserId,
-      ),
-    [activeFiltered, currentUserId],
+    () => activeFiltered.filter((item) => !isActionable(item.caseData)),
+    [activeFiltered, isActionable],
   )
 
-  const completedFiltered = useMemo(
-    () => filtered.filter((item) => item.caseData.status === 'CLOSED'),
-    [filtered],
-  )
+  const completedFiltered = useMemo(() => {
+    const today = new Date()
+    return filtered.filter((item) => {
+      if (item.caseData.status !== 'CLOSED') return false
+      const completedAt = getCompletedAt(item.caseData)
+      if (!completedAt) return true
+      return differenceInCalendarDays(today, parseISO(completedAt)) <= COMPLETED_WINDOW_DAYS
+    })
+  }, [filtered])
 
   const activeGroupedCases = useMemo(
-    () => groupCases(actionableActiveFiltered),
+    () => groupCases(actionableActiveFiltered, sortByDeadline),
     [actionableActiveFiltered],
   )
-  const monitoringGroupedCases = useMemo(() => groupCases(monitoringFiltered), [monitoringFiltered])
-  const completedGroupedCases = useMemo(() => groupCases(completedFiltered), [completedFiltered])
+  const monitoringGroupedCases = useMemo(
+    () => groupCases(monitoringFiltered, sortByDeadline),
+    [monitoringFiltered],
+  )
+  const completedGroupedCases = useMemo(
+    () => groupCases(completedFiltered, sortByCompletedDesc),
+    [completedFiltered],
+  )
 
   useEffect(() => {
     const currentIds = new Set(actionableActiveFiltered.map((item) => item.caseData.id))

@@ -107,6 +107,28 @@ export const instructionTemplates: InstructionTemplate[] = [
     createdAt: iso(daysAgo(30)),
     updatedAt: iso(daysAgo(30)),
   },
+  // ── Generic referral phase ────────────────────────────────────────────────
+  {
+    id: 'it-pre-visit',
+    name: 'Förberedelse inför ortopedbesök',
+    tags: ['pre-visit', 'referral', 'patient-info'],
+    content: `## Förberedelse inför ditt ortopedbesök
+
+Din remiss har kommit till Ortopedkliniken. Innan besöket ber vi dig fylla i formulären i appen. Då kan vi använda besöket till att prata om det viktigaste: dina besvär och vilken behandling som passar dig.
+
+**Ta med till besöket:**
+- Lista med aktuella läkemedel och doser
+- Antecknade frågor till läkaren
+
+**Tänk igenom inför besöket:**
+- Hur länge har du haft besvären?
+- Vilka aktiviteter begränsas av besvären?
+- Vad har du provat hittills (t.ex. fysioterapi, smärtlindring)?
+
+> **Akuta besvär:** Kontakta 1177 eller vid livshotande tillstånd 112. Formulären i appen läses inte dygnet runt.`,
+    createdAt: iso(daysAgo(60)),
+    updatedAt: iso(daysAgo(60)),
+  },
   // ── Knee OA templates ─────────────────────────────────────────────────────
   {
     id: 'it-knee-previsit',

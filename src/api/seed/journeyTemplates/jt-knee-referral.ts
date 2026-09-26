@@ -1,35 +1,44 @@
 import type { JourneyTemplate } from '../../schemas'
 import { daysAgo, iso } from '../shared'
 
+/**
+ * Referral phase for knee osteoarthritis. Same structure as the hip referral:
+ * generic basic information form plus the knee-specific OKS-short.
+ */
 export const jtKneeReferral: JourneyTemplate = {
   id: 'jt-knee-referral',
   name: 'Knäartros — Remissfas',
-  description: 'Grundläggande kartläggning efter inkommen remiss, innan besök hos ortoped.',
+  description:
+    'Skickas när remissen registrerats. Basformulär (läkemedel, boende, allergier) och knäspecifikt formulär besvaras inför besök hos ortoped.',
   referenceDateLabel: 'Remissdatum',
+  group: 'Knäartros',
+  phaseOrder: 1,
   entries: [
     {
       id: 'jte-knee-ref-1',
-      label: 'Remiss mottagen — basfrågor',
-      offsetDays: 1,
-      windowDays: 3,
+      label: 'Basformulär inför besök',
+      // Available from registration (day 0), to be answered by day 10
+      offsetDays: 10,
+      windowDays: 10,
       order: 1,
-      templateId: 'qt-numbness-infection',
-      dashboardCategory: 'ACUTE',
+      templateId: 'qt-preop-intake',
+      dashboardCategory: 'CONTROL',
       icon: 'Assignment',
-      scoreAliases: {},
-      scoreAliasLabels: {},
+      scoreAliases: { PNRS_1: 'PNRS_referral' },
+      scoreAliasLabels: { PNRS_referral: 'Smärta vid remiss' },
     },
     {
       id: 'jte-knee-ref-2',
-      label: 'Symtomkontroll inför besök',
-      offsetDays: 7,
-      windowDays: 3,
+      label: 'Knäfunktion (OKS-kort)',
+      // Available from registration (day 0), to be answered by day 10
+      offsetDays: 10,
+      windowDays: 10,
       order: 2,
-      templateId: 'qt-wound-pain',
-      dashboardCategory: 'SUBACUTE',
+      templateId: 'qt-function-oks-short',
+      dashboardCategory: 'CONTROL',
       icon: 'Assignment',
-      scoreAliases: {},
-      scoreAliasLabels: {},
+      scoreAliases: { 'OKS.total': 'OKS_referral' },
+      scoreAliasLabels: { OKS_referral: 'OKS vid remiss' },
     },
   ],
   instructions: [

@@ -3,10 +3,8 @@ import { IconButton, Menu, MenuItem, Tooltip } from '@mui/material'
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-const LANGUAGES = [
-  { code: 'sv', label: 'Svenska' },
-  { code: 'en', label: 'English' },
-]
+import { LANGUAGES } from './languages'
+
 
 export default function LanguageSwitcher() {
   const { i18n, t } = useTranslation()

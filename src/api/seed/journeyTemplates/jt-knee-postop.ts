@@ -7,6 +7,8 @@ export const jtKneePostop: JourneyTemplate = {
   description:
     'Strukturerad rehabilitering efter knäprotesoperation med fysioinstruktioner och kontrolltillfällen.',
   referenceDateLabel: 'Operationsdatum',
+  group: 'Knäartros',
+  phaseOrder: 3,
   entries: [
     {
       id: 'jte-knee-po-1',

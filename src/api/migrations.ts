@@ -1,6 +1,8 @@
 import type { AppState } from './schemas'
 import { AppStateSchema } from './schemas'
 import { CURRENT_SCHEMA_VERSION } from './schemaVersion'
+import { careTeams } from './seed/careTeams'
+import { journeyTemplates as seedJourneyTemplates } from './seed/journeyTemplates'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -593,6 +595,41 @@ const MIGRATIONS: Migration[] = [
       // bootstrap can refresh them when the bundled example changes.
       demoDataVersion: typeof s['demoDataVersion'] === 'number' ? s['demoDataVersion'] : 0,
     }),
+  },
+  {
+    from: 16,
+    to: 17,
+    // Team assignment and colleague reviews. Cases get colleagueReviews via the
+    // schema default; stores without teams get the bundled demo teams.
+    up: (s) => ({
+      ...s,
+      schemaVersion: 17,
+      careTeams: Array.isArray(s['careTeams']) ? s['careTeams'] : careTeams,
+    }),
+  },
+  {
+    from: 17,
+    to: 18,
+    // Journey editor grouping: fill group/phaseOrder on bundled templates that
+    // predate the fields. User-made templates and existing values are kept.
+    up: (s) => {
+      const seedById = new Map(seedJourneyTemplates.map((t) => [t.id, t]))
+      return {
+        ...s,
+        schemaVersion: 18,
+        journeyTemplates: Array.isArray(s['journeyTemplates'])
+          ? (s['journeyTemplates'] as Record<string, unknown>[]).map((t) => {
+              const seed = seedById.get(t['id'] as string)
+              if (!seed) return t
+              return {
+                ...t,
+                group: t['group'] ?? seed.group,
+                phaseOrder: t['phaseOrder'] ?? seed.phaseOrder,
+              }
+            })
+          : s['journeyTemplates'],
+      }
+    },
   },
 ]
 

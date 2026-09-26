@@ -7,6 +7,9 @@
 '   src/api/schemas/journey.ts
 '   src/api/schemas/forms.ts
 '   src/api/schemas/journal.ts
+'   src/api/schemas/team.ts
+'   src/api/schemas/users.ts
+'   src/api/schemas/questionnaire.ts
 
 title Core Data Model - Overview
 
@@ -23,6 +26,13 @@ package "Patient Core" #E3F2FD {
   class Patient
   class Case
   class EpisodeOfCare
+  class Referral
+  class ColleagueReview
+}
+
+package "Organisation" #ECEFF1 {
+  class User
+  class CareTeam
 }
 
 package "Runtime" #E8F5E9 {
@@ -37,6 +47,7 @@ package "Templates" #FFF8E1 {
   class JourneyTemplateEntry
   class JourneyTemplateInstruction
   class InstructionTemplate
+  class QuestionnaireTemplate
 }
 
 package "Research" #F3E5F5 {
@@ -51,6 +62,13 @@ Patient "1" -- "*" Consent
 Case "0..1" -- "1" EpisodeOfCare
 Case "1" -- "*" FormResponse
 Case "1" -- "*" JournalDraft
+Case "1" *-- "*" ColleagueReview
+Case "*" -- "*" CareTeam : TEAM assignment
+Case "*" -- "*" User : NAMED assignment
+EpisodeOfCare "1" *-- "0..1" Referral
+
+CareTeam "*" -- "*" User : members
+ColleagueReview "*" -- "1" User : reviewer
 
 EpisodeOfCare "1" -- "*" PatientJourney
 PatientJourney "1" -- "*" Instruction
@@ -61,11 +79,15 @@ FormResponse "*" -- "0..1" PatientJourney
 JourneyTemplate "1" -- "*" JourneyTemplateEntry
 JourneyTemplate "1" -- "*" JourneyTemplateInstruction
 JourneyTemplateInstruction "*" -- "1" InstructionTemplate
+JourneyTemplateEntry "*" -- "0..1" QuestionnaireTemplate
+FormResponse "*" -- "1" QuestionnaireTemplate
 
 Consent "*" -- "1" ResearchModule
 
 note right of Patient
   Simplified overview.
+  Referral and ColleagueReview are nested
+  objects, not top-level AppState collections.
   Detailed fields and edge cases are documented in
   core-data-model-reference.puml
   and docs/design/data-model.md.

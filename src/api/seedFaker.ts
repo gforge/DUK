@@ -174,6 +174,7 @@ export async function buildFakerSeed(): Promise<AppState> {
         createdAt,
         scheduledAt: createdAt,
         lastActivityAt: isoTs(-faker.number.int({ min: 0, max: 5 })),
+        colleagueReviews: [],
         reviews: [],
         nextStep,
         triageDecision,

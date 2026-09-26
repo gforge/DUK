@@ -7,6 +7,8 @@ export const jtKneeSurgeryQueue: JourneyTemplate = {
   description:
     'Uppföljning under väntetid på knäoperation: hälsodeklaration vid start, kvartalsvisa kontroller.',
   referenceDateLabel: 'Datum för köplats',
+  group: 'Knäartros',
+  phaseOrder: 2,
   entries: [
     {
       id: 'jte-knee-sq-1',

@@ -134,4 +134,5 @@ export const jtDistalRadius: JourneyTemplate = {
   ],
   createdAt: iso(daysAgo(60)),
   referenceDateLabel: 'Operationsdatum',
+  group: 'Frakturer',
 }

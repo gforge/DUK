@@ -4,6 +4,7 @@ import { jtDistalRadius } from './journeyTemplates/jt-distal-radius'
 import { jtHindfootPostop } from './journeyTemplates/jt-hindfoot-postop'
 import { jtHindfootReferral } from './journeyTemplates/jt-hindfoot-referral'
 import { jtHindfootWaitinglist } from './journeyTemplates/jt-hindfoot-waitinglist'
+import { jtHipReferral } from './journeyTemplates/jt-hip-referral'
 import { jtKneePostop } from './journeyTemplates/jt-knee-postop'
 import { jtKneeReferral } from './journeyTemplates/jt-knee-referral'
 import { jtKneeSurgeryQueue } from './journeyTemplates/jt-knee-surgery-queue'
@@ -20,6 +21,7 @@ export const journeyTemplates: JourneyTemplate[] = [
   jtKneeReferral,
   jtKneeSurgeryQueue,
   jtKneePostop,
+  jtHipReferral,
   // ── Hindfoot elective surgery pathway (3 phases) ──────────────────────
   jtHindfootReferral,
   jtHindfootWaitinglist,

@@ -1,7 +1,18 @@
+import { differenceInDays, parseISO } from 'date-fns'
+
 import type { Patient } from '@/api/schemas'
 import type { CaseWithActiveCategory } from '@/api/service'
 
 export type SortMode = 'time' | 'flags' | 'name'
+
+export const SORT_MODES: readonly SortMode[] = ['time', 'flags', 'name']
+
+/** Days at or above which a waiting time is shown as overdue (red). */
+export const LONG_WAIT_DAYS = 30
+
+/** Whole days since the case was scheduled (negative = scheduled in the future). */
+export const waitedDays = (c: { scheduledAt: string }, now: Date = new Date()) =>
+  differenceInDays(now, parseISO(c.scheduledAt))
 
 /** Positive = overdue (in the past), negative = upcoming */
 const overdueDays = (c: CaseWithActiveCategory) =>

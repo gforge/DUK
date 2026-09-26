@@ -1,18 +1,35 @@
-import { Alert, Box, Skeleton, Stack, Typography } from '@mui/material'
+import { Alert, Skeleton, Stack } from '@mui/material'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 
 import * as client from '@/api/client'
 import type { CaseCategory, Patient } from '@/api/schemas'
-import type { SortMode } from '@/components/dashboard'
-import { DashboardToolbar, QueueColumn, sortCases } from '@/components/dashboard'
+import { PageHeader } from '@/components/common'
+import type { PalFilter, SortMode } from '@/components/dashboard'
+import {
+  DashboardToolbar,
+  LONG_WAIT_DAYS,
+  QueueColumn,
+  sortCases,
+  waitedDays,
+} from '@/components/dashboard'
 import { useApi } from '@/hooks/useApi'
-import { useExpandedCategories } from '@/hooks/useExpandedCategories'
+import { useCollapsedSections } from '@/hooks/useCollapsedSections'
 import { useFocusRestore } from '@/hooks/useFocusRestore'
 import { useHotkeys } from '@/hooks/useHotkeys'
+import { useRovingTabIndex } from '@/hooks/useRovingTabIndex'
 import { useRole } from '@/store/roleContext'
-type PalFilter = 'all' | 'mine' | 'created_by_me'
+
+const CATEGORIES: CaseCategory[] = ['ACUTE', 'SUBACUTE', 'CONTROL']
+
+const toggleIn = (prev: Set<CaseCategory>, cat: CaseCategory) => {
+  const next = new Set(prev)
+  if (next.has(cat)) next.delete(cat)
+  else next.add(cat)
+  return next
+}
+
 export default function Dashboard() {
   const { t } = useTranslation()
   const navigate = useNavigate()
@@ -21,10 +38,10 @@ export default function Dashboard() {
   const searchRef = useRef<HTMLInputElement>(null)
   const [search, setSearch] = useState('')
   const [palFilter, setPalFilter] = useState<PalFilter>('all')
-  const [showWaiting, setShowWaiting] = useState(false)
   const [sortMode, setSortMode] = useState<SortMode>('time')
-  // manage persistent accordion state via custom hook
-  const { expanded, toggleExpanded } = useExpandedCategories()
+  const [showWaiting, setShowWaiting] = useState<Set<CaseCategory>>(() => new Set())
+  const [showClosed, setShowClosed] = useState<Set<CaseCategory>>(() => new Set())
+  const sectionsState = useCollapsedSections<CaseCategory>('dashboard.collapsedCategories')
   useEffect(() => {
     restore()
   }, [restore])
@@ -32,7 +49,6 @@ export default function Dashboard() {
     data: cases,
     loading: casesLoading,
     error: casesError,
-    refetch,
   } = useApi(() => client.getCasesForDashboard(), [])
   const { data: patients, loading: patientsLoading } = useApi(() => client.getPatients(), [])
   useHotkeys(
@@ -82,7 +98,7 @@ export default function Dashboard() {
     })
     return { activeCases: active, waitingCases: waiting, closedCases: closed }
   }, [filteredCases])
-  const effectiveShowWaiting = showWaiting || search.trim().length > 0
+  const searchActive = search.trim().length > 0
   const sortedActiveCases = useMemo(
     () => sortCases(activeCases, sortMode, patientMap),
     [activeCases, sortMode, patientMap],
@@ -91,24 +107,71 @@ export default function Dashboard() {
     () => sortCases(waitingCases, sortMode, patientMap),
     [waitingCases, sortMode, patientMap],
   )
-  const byCategory = useCallback(
-    (cat: CaseCategory) => sortedActiveCases.filter((c) => c.activeCategory === cat),
-    [sortedActiveCases],
+
+  const sections = useMemo(
+    () =>
+      CATEGORIES.map((cat) => ({
+        category: cat,
+        cases: sortedActiveCases.filter((c) => c.activeCategory === cat),
+        waitingCases: sortedWaitingCases.filter((c) => c.category === cat),
+        closedCases: closedCases.filter((c) => c.category === cat),
+        waitingVisible: searchActive || showWaiting.has(cat),
+        closedVisible: showClosed.has(cat),
+        open: sectionsState.isOpen(cat),
+      })),
+    [
+      sortedActiveCases,
+      sortedWaitingCases,
+      closedCases,
+      searchActive,
+      showWaiting,
+      showClosed,
+      sectionsState,
+    ],
   )
-  const waitingByCategory = useCallback(
-    (cat: CaseCategory) =>
-      effectiveShowWaiting ? sortedWaitingCases.filter((c) => c.category === cat) : [],
-    [sortedWaitingCases, effectiveShowWaiting],
+
+  // One roving tab index across all sections (rows are queried in DOM order).
+  const sectionRowCounts = sections.map((s) =>
+    !s.open
+      ? 0
+      : s.cases.length +
+        (s.waitingVisible ? s.waitingCases.length : 0) +
+        (s.closedVisible ? s.closedCases.length : 0),
   )
-  const closedByCategory = useCallback(
-    (cat: CaseCategory) => closedCases.filter((c) => c.category === cat),
-    [closedCases],
+  const totalRows = sectionRowCounts.reduce((a, b) => a + b, 0)
+  const { getItemProps } = useRovingTabIndex(totalRows)
+  const sectionOffset = (idx: number) => sectionRowCounts.slice(0, idx).reduce((a, b) => a + b, 0)
+
+  const subtitle = useMemo(() => {
+    const now = new Date()
+    const awaitingTriage = activeCases.filter(
+      (c) => c.status === 'NEW' || c.status === 'NEEDS_REVIEW',
+    ).length
+    const longWait = activeCases.filter((c) => waitedDays(c, now) >= LONG_WAIT_DAYS).length
+    return [
+      t('dashboard.subtitleAwaitingTriage', { count: awaitingTriage }),
+      longWait > 0
+        ? t('dashboard.subtitleLongWait', { count: longWait, days: LONG_WAIT_DAYS })
+        : null,
+    ]
+      .filter(Boolean)
+      .join(' · ')
+  }, [activeCases, t])
+
+  const toggleWaiting = useCallback(
+    (cat: CaseCategory) => setShowWaiting((prev) => toggleIn(prev, cat)),
+    [],
   )
+  const toggleClosed = useCallback(
+    (cat: CaseCategory) => setShowClosed((prev) => toggleIn(prev, cat)),
+    [],
+  )
+
+  const loading = casesLoading || patientsLoading
+
   return (
-    <Box>
-      <Typography sx={{ fontWeight: 700 }} variant="h5" gutterBottom>
-        {t('dashboard.title')}
-      </Typography>
+    <Stack sx={{ gap: 2.5 }}>
+      <PageHeader title={t('dashboard.title')} subtitle={loading ? undefined : subtitle} />
 
       <DashboardToolbar
         searchRef={searchRef}
@@ -118,43 +181,38 @@ export default function Dashboard() {
         onPalFilter={setPalFilter}
         sortMode={sortMode}
         onSortMode={setSortMode}
-        showWaiting={showWaiting}
-        onToggleWaiting={() => setShowWaiting((v) => !v)}
-        waitingCount={waitingCases.length}
         showPalFilter={isRole('DOCTOR', 'NURSE')}
         showMineFilter={isRole('DOCTOR', 'NURSE')}
+        allCollapsed={sections.every((s) => !s.open)}
+        onToggleAll={() => sectionsState.toggleAll(CATEGORIES)}
       />
 
-      {casesError && (
-        <Alert severity="error" sx={{ mb: 2 }}>
-          {casesError}
-        </Alert>
-      )}
+      {casesError && <Alert severity="error">{casesError}</Alert>}
 
-      {casesLoading || patientsLoading ? (
-        <Stack sx={{ gap: 1.5 }}>
-          {[0, 1, 2].map((i) => (
-            <Skeleton key={i} variant="rectangular" sx={{ borderRadius: 2, height: 64 }} />
-          ))}
-        </Stack>
-      ) : (
-        <Stack sx={{ gap: 1.5 }}>
-          {(['ACUTE', 'SUBACUTE', 'CONTROL'] as CaseCategory[]).map((cat) => (
-            <QueueColumn
-              key={cat}
-              category={cat}
-              cases={byCategory(cat)}
-              waitingCases={waitingByCategory(cat)}
-              closedCases={closedByCategory(cat)}
-              patients={patientMap}
-              onRefresh={refetch}
-              expanded={expanded.has(cat)}
-              onToggle={() => toggleExpanded(cat)}
-              sortMode={sortMode}
-            />
-          ))}
-        </Stack>
-      )}
-    </Box>
+      {loading
+        ? [0, 1, 2].map((i) => (
+            <Skeleton key={i} variant="rectangular" sx={{ borderRadius: 3, height: 120 }} />
+          ))
+        : sections.map((s, idx) => {
+            const offset = sectionOffset(idx)
+            return (
+              <QueueColumn
+                key={s.category}
+                category={s.category}
+                cases={s.cases}
+                waitingCases={s.waitingCases}
+                closedCases={s.closedCases}
+                patients={patientMap}
+                showWaiting={s.waitingVisible}
+                onToggleWaiting={searchActive ? undefined : () => toggleWaiting(s.category)}
+                showClosed={s.closedVisible}
+                onToggleClosed={() => toggleClosed(s.category)}
+                open={s.open}
+                onToggleOpen={() => sectionsState.toggle(s.category)}
+                getItemProps={(i) => getItemProps(offset + i)}
+              />
+            )
+          })}
+    </Stack>
   )
 }

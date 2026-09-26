@@ -40,6 +40,18 @@ export const ClinicalReviewSchema = z.object({
 })
 export type ClinicalReview = z.infer<typeof ClinicalReviewSchema>
 
+/** A clinician asks a named colleague for a second opinion on the triage. Advisory, never blocks. */
+export const ColleagueReviewSchema = z.object({
+  id: z.string(),
+  requestedByUserId: z.string(),
+  requestedAt: z.string().datetime(),
+  reviewerUserId: z.string(),
+  question: z.string().nullable().default(null),
+  respondedAt: z.string().datetime().nullable().default(null),
+  response: z.string().nullable().default(null),
+})
+export type ColleagueReview = z.infer<typeof ColleagueReviewSchema>
+
 export const CaseSchema = z.object({
   id: z.string(),
   patientId: z.string(),
@@ -60,6 +72,10 @@ export const CaseSchema = z.object({
       careRole: CareRoleSchema,
       assignmentMode: AssignmentModeSchema,
       assignedUserId: z.string().nullable().optional(),
+      /** NAMED with several people: everyone listed sees the task as theirs. */
+      assignedUserIds: z.array(z.string()).optional(),
+      /** TEAM: the task goes to the teams' shared queue. */
+      assignedTeamIds: z.array(z.string()).optional(),
       dueAt: z.string().datetime().nullable().optional(),
       note: z.string().nullable().optional(),
     })
@@ -97,13 +113,21 @@ export const CaseSchema = z.object({
             message: 'careRole is required for NAMED',
           })
         }
-        if (!value.assignedUserId) {
+        if (!value.assignedUserId && !value.assignedUserIds?.length) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             path: ['assignedUserId'],
             message: 'assignedUserId is required for NAMED',
           })
         }
+      }
+
+      if (value.assignmentMode === 'TEAM' && !value.assignedTeamIds?.length) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['assignedTeamIds'],
+          message: 'assignedTeamIds is required for TEAM',
+        })
       }
 
       if (value.assignmentMode !== 'NAMED' && value.assignedUserId) {
@@ -138,6 +162,7 @@ export const CaseSchema = z.object({
     )
     .optional(),
   reviews: z.array(ClinicalReviewSchema).default([]),
+  colleagueReviews: z.array(ColleagueReviewSchema).default([]),
   scheduledAt: z.string().datetime(),
   lastActivityAt: z.string().datetime(),
   closedAt: z.string().datetime().nullable().optional(),
@@ -151,6 +176,8 @@ export const TriageDecisionSchema = z
     careRole: CareRoleSchema,
     assignmentMode: AssignmentModeSchema,
     assignedUserId: z.string().nullable().optional(),
+    assignedUserIds: z.array(z.string()).optional(),
+    assignedTeamIds: z.array(z.string()).optional(),
     dueAt: z.string().datetime().nullable().optional(),
     note: z.string().nullable().optional(),
   })
@@ -178,11 +205,22 @@ export const TriageDecisionSchema = z
         message: 'PAL is only valid when careRole is DOCTOR',
       })
     }
-    if (value.assignmentMode === 'NAMED' && !value.assignedUserId) {
+    if (
+      value.assignmentMode === 'NAMED' &&
+      !value.assignedUserId &&
+      !value.assignedUserIds?.length
+    ) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ['assignedUserId'],
         message: 'assignedUserId is required for NAMED',
+      })
+    }
+    if (value.assignmentMode === 'TEAM' && !value.assignedTeamIds?.length) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['assignedTeamIds'],
+        message: 'assignedTeamIds is required for TEAM',
       })
     }
     if (value.assignmentMode !== 'NAMED' && value.assignedUserId) {

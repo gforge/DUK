@@ -1,7 +1,7 @@
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive'
 import PhoneIcon from '@mui/icons-material/Phone'
 import PhoneDisabledIcon from '@mui/icons-material/PhoneDisabled'
-import { Alert, Button, Stack, Typography } from '@mui/material'
+import { Box, Button, Stack, Typography } from '@mui/material'
 import React, { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -12,6 +12,7 @@ import { useContactActionText } from '@/hooks/labels'
 import { useApi } from '@/hooks/useApi'
 import { useRole } from '@/store/roleContext'
 import { useSnack } from '@/store/snackContext'
+import { tokens } from '@/theme'
 /** Triggers that surface the contact action panel */
 const CONTACT_TRIGGERS = new Set(['SEEK_CONTACT', 'NOT_OPENED'] as const)
 type ContactTrigger = 'SEEK_CONTACT' | 'NOT_OPENED'
@@ -87,7 +88,18 @@ export default function ContactActions({ caseData, onRefetch }: Props) {
   }
   const isSubmitting = loading !== null
   return (
-    <Alert severity="warning" sx={{ mt: 2 }} icon={false}>
+    <Box
+      component="section"
+      aria-label={t(`trigger.${primaryTrigger}`)}
+      sx={{
+        bgcolor: tokens.paper,
+        border: `1px solid ${tokens.border}`,
+        borderLeft: `4px solid ${tokens.textMuted}`,
+        borderRadius: '12px',
+        px: 2.5,
+        py: 2,
+      }}
+    >
       <Stack sx={{ gap: 1.5 }}>
         <Typography variant="body2">
           {(() => {
@@ -97,7 +109,7 @@ export default function ContactActions({ caseData, onRefetch }: Props) {
             // the Swedish "den".
             const dateToShow = lastContacted ?? lastReminder
             if (!dateToShow) {
-              return t(`contactActions.suggestion.${primaryTrigger}`)
+              return t(`contactActions.suggestion.${primaryTrigger}_noDate`)
             }
             const formatted = formatRelativeContactDate(dateToShow)
             const isRelative = /^(idag|igår|today|yesterday)/i.test(formatted)
@@ -160,6 +172,6 @@ export default function ContactActions({ caseData, onRefetch }: Props) {
           )}
         </Stack>
       </Stack>
-    </Alert>
+    </Box>
   )
 }

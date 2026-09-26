@@ -189,6 +189,68 @@ export const qtFunctionOksShort: QuestionnaireTemplate = {
   createdAt: CREATED_AT,
 }
 
+/** Hip OA referral / follow-up: short OHS-style function screen + pain NRS. */
+export const qtFunctionOhsShort: QuestionnaireTemplate = {
+  id: 'qt-function-ohs-short',
+  name: 'Hip Function & Pain (OHS-short)',
+  questions: [
+    {
+      id: 'q-ohs-pain',
+      key: 'OHS_PAIN',
+      type: 'SCALE',
+      label: { sv: 'Höftsmärta vid aktivitet (0=svår, 4=ingen)' },
+      required: true,
+      min: 0,
+      max: 4,
+    },
+    {
+      id: 'q-ohs-walk',
+      key: 'OHS_WALK',
+      type: 'SCALE',
+      label: { sv: 'Hur långt kan du gå innan smärtan blir svår? (0=inte alls, 4=obegränsat)' },
+      required: true,
+      min: 0,
+      max: 4,
+    },
+    {
+      id: 'q-ohs-socks',
+      key: 'OHS_SOCKS',
+      type: 'SCALE',
+      label: { sv: 'Ta på strumpor och skor (0=omöjligt, 4=utan svårighet)' },
+      required: true,
+      min: 0,
+      max: 4,
+    },
+    {
+      id: 'q-ohs-night',
+      key: 'OHS_NIGHT',
+      type: 'SCALE',
+      label: { sv: 'Nattsmärta från höften (0=varje natt, 4=aldrig)' },
+      required: true,
+      min: 0,
+      max: 4,
+    },
+    {
+      id: 'q-ohs-pnrs',
+      key: 'PNRS_2',
+      type: 'SCALE',
+      label: { sv: 'Smärta just nu (0–10)' },
+      required: true,
+      min: 0,
+      max: 10,
+    },
+  ],
+  scoringRules: [
+    {
+      outputKey: 'OHS.total',
+      formula: 'SUM',
+      inputKeys: ['OHS_PAIN', 'OHS_WALK', 'OHS_SOCKS', 'OHS_NIGHT'],
+      scale: 12,
+    },
+  ],
+  createdAt: CREATED_AT,
+}
+
 /** Foot/ankle follow-up: compact MOXFQ-style walking/pain/social screen + pain NRS. */
 export const qtFunctionMoxfqShort: QuestionnaireTemplate = {
   id: 'qt-function-moxfq-short',

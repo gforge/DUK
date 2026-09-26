@@ -177,6 +177,7 @@ export function buildRealisticSeed(): AppState {
         scheduledAt: createdAt,
         lastActivityAt: isoTs(-rng.int(0, 3)),
         reviews,
+        colleagueReviews: [],
         nextStep,
         triageDecision,
       })

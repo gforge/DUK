@@ -2,7 +2,7 @@
 
 A fully interactive clinical triage flow demonstration built with React, TypeScript and Material UI.
 
-> **This is a demo application. It contains no real patient data, no authentication, and no network calls. All data is stored in browser `localStorage`.**
+> **This is a demo application. It contains no real patient data, no real authentication (only a fake local login), and no network calls. All data is stored in browser `localStorage`.**
 
 **[→ Live demo](https://gforge.github.io/DUK/)**
 
@@ -31,41 +31,48 @@ duk-run [dev|preview|test]     # dev server (default), serve dist/, or watch tes
 
 ## Features
 
-### Role-based views
+### Login & role-based views
 
-Switch role from the top bar to experience each perspective:
+The app opens on a fake login page (`/login`) where you pick a demo account. The session is kept in `localStorage` for 8 hours; log out (or change language) from the account menu behind the avatar in the top bar. The fake provider lives in `src/auth/` behind an `AuthProviderAdapter` interface so a real provider (GrandID, SITHS, OIDC, SAML) can be plugged in later.
 
-| Role          | Description                                                 |
-| ------------- | ----------------------------------------------------------- |
-| **Doctor**    | Dashboard, triage, journal approve                          |
-| **Nurse**     | Dashboard, triage, journal view                             |
-| **Secretary** | Worklist coordination, contact logistics, booking follow-up |
-| **Patient**   | Patient portal: view own cases, open app, seek contact      |
+| Role          | Description                                                                |
+| ------------- | -------------------------------------------------------------------------- |
+| **Doctor**    | Patientöversikt, triage, journal approve, start next journey phase         |
+| **Nurse**     | Patientöversikt, triage, journal drafts (no approve)                       |
+| **Secretary** | Åtgärdslista (worklist) coordination, contact logistics, booking follow-up |
+| **Patient**   | Patient portal: view own cases, answer forms, seek contact                 |
 
 `PAL` (patient-responsible physician) is modeled as an ownership assignment, not as a separate user role.
 Ownership can be set on patient level and journey level (with episode fallback).
 
-### Dashboard
+Clinicians can also search patients by name or personal number from the top bar.
 
-- Three queues: **Acute**, **Sub-acute**, **Control**
-- Filter by "All", "Assigned to me", or "Created by me"
-- Search patients by name
-- Keyboard shortcut `/` to focus search, `g d` to go to Dashboard
+### Patientöversikt (`/dashboard`)
 
-### Case Detail (5 tabs)
+- One table section per category: **Acute**, **Sub-acute**, **Control** — collapsible (state is remembered), with expand/collapse all
+- Filter by "All", "My patients" (PAL) or "Created by me"; sort by longest wait, priority or name
+- Search by patient name or case/patient id
+- Cases between journey phases and cases closed during the last 7 days can be shown as muted rows
+
+### Case Detail / Triagera (5 tabs)
+
+A case header shows patient, status and triggers, plus contact actions (contacted, reminder sent, call attempt — all audited).
 
 1. **Forms** — View all submitted questionnaire responses with computed scores
-2. **Journey** — View and manage assigned journeys, effective steps, and timeline
-3. **Triage** — Clinician decision form (next step, deadline, role assignment, patient message)
-4. **Journal** — Generate draft journal entries from templates, preview, copy, approve
+2. **Journey** — Episode of care with referral info (referrer, reason, diagnoses via simulated TakeCare "uthopp"), all patient journeys, effective steps and timeline; pause/resume, modify, cancel, start next phase
+3. **Triage** — Single-page triage form: contact mode (digital / phone / visit / close), competence (doctor / nurse / physio), recipient (any, PAL, one or more named people, or a care team), due date (accepts shorthands like `3d`, `2v`, `1/3`) and patient message, with a sticky decision summary. Also lab/X-ray reviews (pending reviews block triage) and advisory colleague review requests (second opinion)
+4. **Journal** — Bookings, plus draft journal entries toggled per template (deselecting deletes the draft): preview, copy, approve (doctor)
 5. **Audit Log** — Full activity history per case
 
 ### State Machine
 
 ```
-NEW → NEEDS_REVIEW → TRIAGED → FOLLOWING_UP → CLOSED
-                              ↘ CLOSED
+NEW ──→ NEEDS_REVIEW ──→ TRIAGED ──→ FOLLOWING_UP ──→ CLOSED
+ └───────────────────────↗
+(every non-closed status can also go directly to CLOSED)
 ```
+
+`NEW → NEEDS_REVIEW` happens when the patient submits a form; clinicians can triage or close a `NEW` case directly.
 
 ### Policy Engine
 
@@ -80,7 +87,9 @@ EQ5D.index <= 0.5 || EQ_VAS < 30
 (OSS.total + PNRS_1) > 25
 ```
 
-Available variables: `PNRS_1`, `PNRS_2`, `OSS.total`, `EQ5D.index`, `EQ_VAS`, `OSS.function`, `OSS.pain`
+Operators: `+ - * /`, `== != < <= > >=`, `&& ||` and parentheses.
+
+Variables are the answer keys and computed scores of the case's form responses (e.g. `PNRS_1`, `PNRS_2`, `OSS.total`, `OKS.total`, `OHS.total`, `PRWE.total`, `MOXFQ.total`, `EQ5D.index`, `EQ_VAS`), plus journey-step score aliases (e.g. `PNRS_week4`, `EQ5D_6m`). Each rule is bound to a journey template and only evaluated when the patient has an active journey on it.
 
 ### Journal Templates
 
@@ -96,18 +105,26 @@ Score: {{scores.PNRS_1}}
 
 - **Export** current app state as JSON
 - **Import** a previously exported JSON state
-- **Reset & Re-seed** back to the original demo data
+- **Seed presets**: minimal hand-crafted seed, realistic cohort (~320 patients) or large faker seed (~1 000 patients), or clear all data
 
-### Worklist (`/worklist`)
+The demo data is versioned: an outdated stored demo is replaced by the current seed on startup, and demo dates are re-anchored to today so the examples never go stale.
 
-- Structured queue for operational follow-up tasks
-- Filters for category, assigned role, responsible-physician and ownership views
-- Completion dialog with scheduling metadata and comments
+### Åtgärdslista / Worklist (`/worklist`)
 
-### Patient Detail (`/patients/:id`)
+- Structured queue for operational follow-up tasks, in **Active**, **Monitoring** and **Completed** tabs
+- Filters for contact type, competence, recipient (any / PAL / named / team), "Assigned to me" and "My patients"; groups per contact type are collapsible
+- Tasks without a single owner (any, multi-person or team) can be claimed
+- Completion dialog with next contact date and comments
 
-- Clinician detail page for longitudinal patient context
-- Complements list view (`/patients`) and patient self-view (`/patient`)
+### Patients (`/patients`, `/patients/:id`)
+
+- Patient list and clinician detail page for longitudinal patient context (responsibility/PAL, journeys, cases)
+- Complements the patient self-view (`/patient`)
+
+### Patientresor / Journey Editor (`/journeys`)
+
+- Journey templates grouped into care pathways with ordered phases, timeline, step list with inline instructions and a step editor drawer
+- Tabs for research modules, patient journeys, instruction templates and questionnaires; editor changes can be undone
 
 ---
 
@@ -116,35 +133,46 @@ Score: {{scores.PNRS_1}}
 ```
 src/
 ├── api/
-│   ├── schemas.ts          # Zod schemas — single source of truth for all types
+│   ├── schemas/            # Zod schemas — single source of truth for all types
+│   ├── schemaVersion.ts    # CURRENT_SCHEMA_VERSION (v18) + CURRENT_DEMO_DATA_VERSION
+│   ├── migrations.ts       # Contiguous migration chain for stored state
+│   ├── bootstrap.ts        # Boot: migrate, replace outdated demo data, re-anchor dates
 │   ├── storage.ts          # localStorage persistence + in-memory singleton store
-│   ├── seed.ts             # Demo data: 10 patients, 10 cases, 8 form responses
-│   ├── policyParser.ts     # Safe recursive-descent expression parser (no eval)
+│   ├── seed/               # Minimal hand-crafted demo data (incl. referral examples)
+│   ├── seedRealistic/      # ~320-patient cohort; seedFaker.ts ~1 000 patients
+│   ├── policyParser/       # Safe recursive-descent expression parser (no eval)
 │   ├── journalRenderer.ts  # Safe Mustache-like template renderer
-│   ├── service.ts          # All state mutations + business logic
-│   └── client.ts           # Async wrapper with 100–400ms simulated delay
+│   ├── service/            # All state mutations + business logic
+│   └── client/             # Async wrapper with 100–400ms simulated delay
+├── auth/                   # Replaceable fake auth provider + session types
 ├── i18n/
-│   ├── index.ts            # i18next config (sv primary, en fallback)
+│   ├── index.ts            # i18next config (sv default, en available)
 │   └── locales/
 │       ├── sv/translation.json  # Swedish translations
 │       └── en/translation.json  # English translations
 ├── store/
-│   ├── roleContext.tsx     # Global role/user switching context
+│   ├── roleContext.tsx     # Session/current user context (login, logout, isRole)
 │   └── snackContext.tsx    # Global MUI Snackbar notifications
-├── hooks/
-│   ├── useApi.ts           # Generic async data-fetching hook
-│   ├── useRovingTabIndex.ts# A11y arrow-key navigation
-│   ├── useHotkeys.ts       # Keyboard shortcuts
-│   └── useFocusRestore.ts  # Focus restoration on back navigation
+├── hooks/                  # useApi, useHotkeys, useRovingTabIndex, useFocusRestore,
+│                           #   useNavItems, useWorklistQueue, useCollapsedSections, …
 ├── router/
-│   └── index.tsx           # React Router v7 routes
+│   └── index.tsx           # React Router v7 routes (login + protected app)
+├── theme.ts                # MUI theme + design tokens
 ├── components/
-│   ├── layout/             # AppShell, TopBar, SideNav
-│   ├── common/             # RoleSwitcher, LanguageSwitcher, StatusChip
-│   ├── dashboard/          # QueueColumn, CaseListItem
-│   └── case/               # PatientCard, FormResponsesTab, TriageTab,
-│                           #   JournalTab, AuditLogTab
+│   ├── layout/             # AppShell, TopBar, SideNav, GlobalSearch
+│   ├── common/             # Shared primitives: PageHeader, SectionCard, GridTable,
+│   │                       #   SegmentedControl, Tag, StatusChip, RoleSwitcher (account menu), …
+│   ├── dashboard/          # QueueColumn, CaseListItem, DashboardToolbar
+│   ├── case/               # CaseHeader, ContactActions, tabs, triage/ form sections,
+│   │                       #   ColleagueReviews, ClinicalReviewPanel, BookingsList
+│   ├── journey/            # Timeline, dialogs and journey editor tabs
+│   ├── patients/           # Patient table, detail sections, register/assign dialogs
+│   ├── patientView/        # Patient portal components
+│   ├── policy/             # Policy rules table and dialogs
+│   ├── worklist/           # Worklist filters, groups, rows, completion dialog
+│   └── demo/               # Seed, export and import panels
 └── pages/
+    ├── Login.tsx
     ├── Dashboard.tsx
     ├── CaseDetail.tsx
     ├── PatientView.tsx
@@ -153,8 +181,11 @@ src/
     ├── PolicyEditor.tsx
     ├── JourneyEditor.tsx
     ├── Worklist.tsx
-    └── DemoTools.tsx
+    ├── DemoTools.tsx
+    └── NotFound.tsx
 ```
+
+Selected shared components from `src/components/common` and `src/components/layout` are synced to claude.ai/design (config in `.design-sync/`, see `.design-sync/NOTES.md`).
 
 ### Design docs & diagrams
 
@@ -166,9 +197,12 @@ src/
 Use this reading order for architecture and flow understanding:
 
 1. `docs/design.md` — integrated narrative with inline diagrams.
-2. `docs/design/patient-journey.md` — journey lifecycle, pause/resume, parallel deduplication.
-3. `docs/design/policy.md` — policy grammar, scope aliasing, evaluation flow.
-4. `docs/diagrams/*.puml` — source diagrams (render with `npm run diagrams:render`).
+2. `docs/design/data-model.md` — entities and relationships.
+3. `docs/design/patient-journey.md` — journey lifecycle, pause/resume, parallel deduplication.
+4. `docs/design/policy.md` — policy grammar, scope aliasing, evaluation flow.
+5. `docs/design/templating.md` — journal template rendering.
+6. `docs/user_stories.md` — user stories per role.
+7. `docs/diagrams/*.puml` — source diagrams (render with `npm run diagrams:render`).
 
 ---
 
@@ -179,8 +213,10 @@ Use this reading order for architecture and flow understanding:
 | `npm run dev`           | Start dev server at http://localhost:5173                                                                                                     |
 | `npm run build`         | Type-check + build for production                                                                                                             |
 | `npm run preview`       | Preview production build                                                                                                                      |
+| `npm run deploy`        | Build and publish `dist/` to GitHub Pages (or use `duk-publish`)                                                                              |
 | `npm test`              | Run all tests once                                                                                                                            |
 | `npm run test:watch`    | Run tests in watch mode                                                                                                                       |
+| `npm run check`         | Type-check + lint                                                                                                                             |
 | `npm run format`        | Format source files with Prettier                                                                                                             |
 | `npm run generate:i18n` | Extract i18n keys into `src/i18n/locales/*/translation.json` — run after adding or changing UI text; updates both `sv` and `en` locale files. |
 
@@ -188,22 +224,21 @@ Use this reading order for architecture and flow understanding:
 
 ## Keyboard Shortcuts
 
-| Shortcut       | Action                                 |
-| -------------- | -------------------------------------- |
-| `/`            | Focus search box (on Dashboard)        |
-| `g d`          | Go to Dashboard                        |
-| `g c`          | Go to current Case (if on a case page) |
-| `↑ ↓`          | Navigate within queue columns          |
-| `Home` / `End` | Jump to first/last item in queue       |
+| Shortcut       | Action                          |
+| -------------- | ------------------------------- |
+| `/`            | Focus search box (on Dashboard) |
+| `g d`          | Go to Dashboard                 |
+| `↑ ↓`          | Navigate between case rows      |
+| `Home` / `End` | Jump to first/last case row     |
 
 ---
 
 ## Technology Stack
 
 - **React 19** + **TypeScript**
-- **Vite 7** — build tool
-- **MUI v7** — UI components
-- **React Hook Form v7** + **Zod** — form validation
+- **Vite 8** — build tool
+- **MUI v9** — UI components
+- **React Hook Form v7** + **Zod v4** — form validation
 - **i18next** — internationalisation (sv/en)
 - **React Router v7** — client-side routing
 - **date-fns v4** — date formatting
@@ -215,5 +250,5 @@ Use this reading order for architecture and flow understanding:
 
 - No `eval()` or `new Function()` — the policy parser is a hand-written recursive descent parser
 - No network calls — all API calls resolve against an in-memory store backed by localStorage
-- No authentication — role switching is for demo purposes only
+- No real authentication — the fake login only picks a demo account; it has no credentials and must be replaced by a real provider before any production use
 - No real patient data — all names, personal numbers and clinical data are entirely fictional

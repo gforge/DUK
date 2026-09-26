@@ -1,21 +1,25 @@
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import { Box, Chip, Divider, Paper, Stack, Typography } from '@mui/material'
-import { Accordion, AccordionDetails, AccordionSummary } from '@mui/material'
+import { Box } from '@mui/material'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 
-import type { Case, Patient, WorkCategory } from '@/api/schemas'
-import { CONTACT_MODE_UI } from '@/components/case/triage/Step1/actions'
+import type { CareTeam, Case, Patient, WorkCategory } from '@/api/schemas'
+import { GridTableHeader, SectionCard } from '@/components/common'
 import { useWorkCategoryLabel } from '@/hooks/labels'
 
-import WorklistRow from './WorklistRow'
+import { WORK_CATEGORY_ICONS } from './workCategoryIcons'
+import type { WorklistRowMode } from './WorklistRow'
+import WorklistRow, { WORKLIST_COLUMNS, WORKLIST_MIN_WIDTH } from './WorklistRow'
+
 interface GroupSectionProps {
   workCategory: WorkCategory
   cases: Case[]
+  mode: WorklistRowMode
   patientMap: Map<string, Patient>
   userMap: Map<string, string>
+  teamMap: Map<string, CareTeam>
   highlightedCaseIds: Set<string>
-  defaultExpanded?: boolean
+  open: boolean
+  onToggleOpen: () => void
   onClaim: (caseId: string) => void
   onMarkDone: (
     caseId: string,
@@ -26,104 +30,60 @@ interface GroupSectionProps {
     },
   ) => Promise<void> | void
 }
+
 export default function GroupSection({
   workCategory,
   cases,
+  mode,
   patientMap,
   userMap,
+  teamMap,
   highlightedCaseIds,
-  defaultExpanded = true,
+  open,
+  onToggleOpen,
   onClaim,
   onMarkDone,
 }: GroupSectionProps) {
   const { t } = useTranslation()
   const getWorkCategoryLabel = useWorkCategoryLabel()
-  const groupUi = CONTACT_MODE_UI[workCategory]
-  const GroupIcon = groupUi.icon
-  const accentColor =
-    workCategory === 'DIGITAL'
-      ? 'info.main'
-      : workCategory === 'PHONE'
-        ? 'warning.main'
-        : 'success.main'
+  const GroupIcon = WORK_CATEGORY_ICONS[workCategory]
+  const title = getWorkCategoryLabel(workCategory)
+
   return (
-    <Paper
-      variant="outlined"
-      sx={{
-        borderRadius: 2,
-        overflow: 'hidden',
-        mb: 2.5,
-        bgcolor: 'background.paper',
-        border: '1px solid',
-        borderColor: 'divider',
-      }}
+    <SectionCard
+      title={title}
+      icon={<GroupIcon />}
+      count={cases.length}
+      aria-label={title}
+      open={open}
+      onToggle={onToggleOpen}
+      headerMinWidth={WORKLIST_MIN_WIDTH}
     >
-      <Accordion
-        defaultExpanded={defaultExpanded}
-        disableGutters
-        sx={{ '&:before': { display: 'none' }, bgcolor: 'transparent' }}
-      >
-        <AccordionSummary
-          expandIcon={<ExpandMoreIcon />}
-          sx={{
-            px: 2,
-            minHeight: 44,
-            bgcolor: 'background.paper',
-            borderLeft: 4,
-            borderLeftColor: accentColor,
-          }}
-        >
-          <Stack direction="row" sx={{ alignItems: 'center', gap: 1 }}>
-            <Box
-              sx={{
-                width: 24,
-                height: 24,
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                borderRadius: 1,
-                color: groupUi.iconColor,
-                bgcolor: groupUi.bgColor,
-                border: 1,
-                borderColor: groupUi.borderColor,
-              }}
-            >
-              <GroupIcon sx={{ fontSize: 16 }} />
-            </Box>
-            <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
-              {getWorkCategoryLabel(workCategory)}
-            </Typography>
-            <Chip label={cases.length} size="small" color="default" />
-          </Stack>
-        </AccordionSummary>
-        <AccordionDetails sx={{ p: 0, bgcolor: 'background.paper' }}>
-          {cases.length === 0 ? (
-            <Box sx={{ px: 2, py: 1.5 }}>
-              <Typography variant="body2" color="text.secondary">
-                {t('worklist.emptyGroup')}
-              </Typography>
-            </Box>
-          ) : (
-            cases.map((c, idx) => (
-              <React.Fragment key={c.id}>
-                <WorklistRow
-                  caseData={c}
-                  patient={patientMap.get(c.patientId)}
-                  assignedUserName={
-                    c.assignedUserId
-                      ? (userMap.get(c.assignedUserId) ?? c.assignedUserId)
-                      : undefined
-                  }
-                  highlighted={highlightedCaseIds.has(c.id)}
-                  onClaim={onClaim}
-                  onMarkDone={onMarkDone}
-                />
-                {idx < cases.length - 1 && <Divider />}
-              </React.Fragment>
-            ))
-          )}
-        </AccordionDetails>
-      </Accordion>
-    </Paper>
+      <Box role="table" aria-label={title}>
+        <GridTableHeader columns={WORKLIST_COLUMNS} minWidth={WORKLIST_MIN_WIDTH}>
+          <div role="columnheader">{t('worklist.columns.patient')}</div>
+          <div role="columnheader">{t('worklist.columns.competence')}</div>
+          <div role="columnheader">{t('worklist.columns.recipient')}</div>
+          <div role="columnheader">
+            {mode === 'completed' ? t('worklist.columns.completed') : t('worklist.columns.due')}
+          </div>
+          <div role="columnheader">{t('worklist.columns.note')}</div>
+          <div role="columnheader" aria-label={t('worklist.columns.actions')} />
+        </GridTableHeader>
+        {cases.map((c) => (
+          <WorklistRow
+            key={c.id}
+            caseData={c}
+            patient={patientMap.get(c.patientId)}
+            mode={mode}
+            userMap={userMap}
+            teamMap={teamMap}
+            highlighted={highlightedCaseIds.has(c.id)}
+            onClaim={onClaim}
+            onMarkDone={onMarkDone}
+          />
+        ))}
+      </Box>
+    </SectionCard>
   )
 }

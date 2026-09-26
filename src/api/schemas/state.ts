@@ -16,12 +16,19 @@ import {
 import { PatientSchema } from './patient'
 import { PolicyRuleSchema } from './policy'
 import { FormSeriesSchema, QuestionnaireTemplateSchema } from './questionnaire'
+import { CareTeamSchema } from './team'
 import { UserSchema } from './users'
 
 export const AppStateSchema = z.object({
   schemaVersion: z.number().int().default(0),
   demoDataVersion: z.number().int(),
+  /**
+   * Local date (YYYY-MM-DD) the demo timeline is anchored to. On startup all
+   * dates are shifted by the days elapsed since then (see reanchorDemoState).
+   */
+  seedAnchorDate: z.string().optional(),
   users: z.array(UserSchema),
+  careTeams: z.array(CareTeamSchema).default([]),
   patients: z.array(PatientSchema),
   cases: z.array(CaseSchema),
   formResponses: z.array(FormResponseSchema),

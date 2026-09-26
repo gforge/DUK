@@ -1,37 +1,41 @@
-import AccessTimeIcon from '@mui/icons-material/AccessTime'
-import HourglassEmptyIcon from '@mui/icons-material/HourglassEmpty'
-import PriorityHighIcon from '@mui/icons-material/PriorityHigh'
+import ExpandLessIcon from '@mui/icons-material/ExpandLess'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import SearchIcon from '@mui/icons-material/Search'
-import SortByAlphaIcon from '@mui/icons-material/SortByAlpha'
-import {
-  Box,
-  Chip,
-  InputAdornment,
-  Stack,
-  TextField,
-  ToggleButton,
-  ToggleButtonGroup,
-  Tooltip,
-} from '@mui/material'
+import { Box, Button, InputAdornment, Stack, TextField } from '@mui/material'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 
+import type { SegmentOption } from '@/components/common'
+import { DropdownButton, SegmentedControl } from '@/components/common'
+import { tokens } from '@/theme'
+
 import type { SortMode } from './sortCases'
-type PalFilter = 'all' | 'mine' | 'created_by_me'
+import { SORT_MODES } from './sortCases'
+
+export type PalFilter = 'all' | 'mine' | 'created_by_me'
+
 interface Props {
-  searchRef: React.RefObject<HTMLInputElement | null>
-  search: string
-  onSearch: (v: string) => void
-  palFilter: PalFilter
-  onPalFilter: (v: PalFilter) => void
-  sortMode: SortMode
-  onSortMode: (v: SortMode) => void
-  showWaiting: boolean
-  onToggleWaiting: () => void
-  waitingCount: number
-  showPalFilter: boolean
-  showMineFilter: boolean
+  readonly searchRef: React.RefObject<HTMLInputElement | null>
+  readonly search: string
+  readonly onSearch: (v: string) => void
+  readonly palFilter: PalFilter
+  readonly onPalFilter: (v: PalFilter) => void
+  readonly sortMode: SortMode
+  readonly onSortMode: (v: SortMode) => void
+  readonly showPalFilter: boolean
+  readonly showMineFilter: boolean
+  /** True when every queue section is collapsed. */
+  readonly allCollapsed: boolean
+  readonly onToggleAll: () => void
 }
+
+const SORT_LABEL_KEY = {
+  time: 'dashboard.sortLongestWait',
+  flags: 'dashboard.sortFlags',
+  name: 'dashboard.sortName',
+} as const satisfies Record<SortMode, string>
+
+/** Search, patient filter and sort picker above the queue sections. */
 export default function DashboardToolbar({
   searchRef,
   search,
@@ -40,108 +44,67 @@ export default function DashboardToolbar({
   onPalFilter,
   sortMode,
   onSortMode,
-  showWaiting,
-  onToggleWaiting,
-  waitingCount,
   showPalFilter,
   showMineFilter,
+  allCollapsed,
+  onToggleAll,
 }: Props) {
   const { t } = useTranslation()
+
+  const palOptions: SegmentOption<PalFilter>[] = [
+    { value: 'all', label: t('dashboard.filterAll') },
+    ...(showMineFilter ? [{ value: 'mine' as const, label: t('dashboard.filterMine') }] : []),
+    { value: 'created_by_me', label: t('dashboard.filterCreatedByMe') },
+  ]
+
   return (
-    <Box
-      sx={{
-        mb: 2,
-        p: 1.5,
-        border: '1px solid',
-        borderColor: 'divider',
-        borderRadius: 2,
-        bgcolor: 'background.paper',
-      }}
-    >
-      <Stack
-        sx={{ gap: 2, alignItems: 'center', flexWrap: 'wrap' }}
-        direction={{ xs: 'column', sm: 'row' }}
-      >
-        <TextField
-          inputRef={searchRef}
-          size="small"
-          placeholder={t('dashboard.search')}
-          value={search}
-          onChange={(e) => onSearch(e.target.value)}
-          slotProps={{
-            input: {
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon fontSize="small" />
-                </InputAdornment>
-              ),
-            },
-          }}
-          sx={{ minWidth: 240 }}
-          aria-label={t('dashboard.search')}
-        />
+    <Stack direction="row" sx={{ gap: 1.5, alignItems: 'center', flexWrap: 'wrap' }}>
+      <TextField
+        inputRef={searchRef}
+        size="small"
+        placeholder={t('dashboard.search')}
+        value={search}
+        onChange={(e) => onSearch(e.target.value)}
+        slotProps={{
+          input: {
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon sx={{ fontSize: 18, color: tokens.textMuted }} />
+              </InputAdornment>
+            ),
+          },
+          htmlInput: { 'aria-label': t('dashboard.search') },
+        }}
+        sx={{ minWidth: 240, bgcolor: tokens.paper, '& .MuiOutlinedInput-root': { height: 36 } }}
+      />
 
-        {showPalFilter && (
-          <ToggleButtonGroup
+      {showPalFilter && (
+        <Box sx={{ display: 'flex' }}>
+          <SegmentedControl
             value={palFilter}
-            exclusive
-            onChange={(_, v) => v && onPalFilter(v)}
-            size="small"
+            options={palOptions}
+            onChange={onPalFilter}
             aria-label={t('common.patientFilter')}
-          >
-            <ToggleButton value="all" aria-label={t('dashboard.filterAll')}>
-              {t('dashboard.filterAll')}
-            </ToggleButton>
-            {showMineFilter && (
-              <ToggleButton value="mine" aria-label={t('dashboard.filterMine')}>
-                {t('dashboard.filterMine')}
-              </ToggleButton>
-            )}
-            <ToggleButton value="created_by_me" aria-label={t('dashboard.filterCreatedByMe')}>
-              {t('dashboard.filterCreatedByMe')}
-            </ToggleButton>
-          </ToggleButtonGroup>
-        )}
-
-        <ToggleButtonGroup
-          value={sortMode}
-          exclusive
-          onChange={(_, v) => v && onSortMode(v as SortMode)}
-          size="small"
-          aria-label={t('dashboard.sortLabel')}
-        >
-          <Tooltip title={t('dashboard.sortTime')} arrow>
-            <ToggleButton value="time" aria-label={t('dashboard.sortTime')}>
-              <AccessTimeIcon sx={{ mr: 0.5, fontSize: 'small' }} />
-              {t('dashboard.sortTime')}
-            </ToggleButton>
-          </Tooltip>
-          <Tooltip title={t('dashboard.sortFlags')} arrow>
-            <ToggleButton value="flags" aria-label={t('dashboard.sortFlags')}>
-              <PriorityHighIcon sx={{ mr: 0.5, fontSize: 'small' }} />
-              {t('dashboard.sortFlags')}
-            </ToggleButton>
-          </Tooltip>
-          <Tooltip title={t('dashboard.sortName')} arrow>
-            <ToggleButton value="name" aria-label={t('dashboard.sortName')}>
-              <SortByAlphaIcon sx={{ mr: 0.5, fontSize: 'small' }} />
-              {t('dashboard.sortName')}
-            </ToggleButton>
-          </Tooltip>
-        </ToggleButtonGroup>
-
-        {waitingCount > 0 && (
-          <Chip
-            icon={<HourglassEmptyIcon fontSize="small" />}
-            label={t('dashboard.waiting', { count: waitingCount })}
-            variant={showWaiting ? 'filled' : 'outlined'}
-            color={showWaiting ? 'warning' : 'default'}
-            onClick={onToggleWaiting}
-            clickable
-            size="small"
           />
-        )}
-      </Stack>
-    </Box>
+        </Box>
+      )}
+
+      <Box sx={{ ml: 'auto', display: 'flex', alignItems: 'center', gap: 1 }}>
+        <Button
+          onClick={onToggleAll}
+          startIcon={allCollapsed ? <ExpandMoreIcon /> : <ExpandLessIcon />}
+          sx={{ fontWeight: 500 }}
+        >
+          {allCollapsed ? t('dashboard.expandAll') : t('dashboard.collapseAll')}
+        </Button>
+        <DropdownButton
+          label={t('dashboard.sortPrefix')}
+          value={sortMode}
+          options={SORT_MODES.map((m) => ({ value: m, label: t(SORT_LABEL_KEY[m]) }))}
+          onChange={onSortMode}
+          aria-label={t('dashboard.sortLabel')}
+        />
+      </Box>
+    </Stack>
   )
 }

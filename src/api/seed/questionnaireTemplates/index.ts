@@ -2,7 +2,13 @@ import type { QuestionnaireTemplate } from '../../schemas'
 import { qtNumbnessInfection, qtWoundPain } from './acute'
 import { qtEq5dMoxfqShort, qtEq5dOksShort, qtEq5dOss, qtEq5dPrweShort } from './longterm'
 import { qtHealthDeclaration, qtPreopIntake, qtSurgeryInterest, qtWaitinglistStatus } from './preop'
-import { qtFunctionMoxfqShort, qtFunctionOksShort, qtFunctionOss, qtFunctionPrweShort } from './subacute'
+import {
+  qtFunctionMoxfqShort,
+  qtFunctionOhsShort,
+  qtFunctionOksShort,
+  qtFunctionOss,
+  qtFunctionPrweShort,
+} from './subacute'
 
 export const questionnaireTemplates: QuestionnaireTemplate[] = [
   qtNumbnessInfection,
@@ -11,6 +17,7 @@ export const questionnaireTemplates: QuestionnaireTemplate[] = [
   qtFunctionPrweShort,
   qtFunctionOksShort,
   qtFunctionMoxfqShort,
+  qtFunctionOhsShort,
   qtEq5dOss,
   qtEq5dPrweShort,
   qtEq5dOksShort,

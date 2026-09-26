@@ -1,55 +1,76 @@
 @startuml
-' Purpose: Research consent grant and revoke flow
+' Purpose: Research consent grant, decline and revoke flow
 ' Source of truth:
 '   src/api/service/researchConsents.ts
-'   src/components/journey/ConsentDialog.tsx
+'   src/components/patients/PatientJourneyResearchCard.tsx
+'   src/components/patientView/PatientCareplan/ResearchStudiesSection.tsx
+'   src/components/journey/ConsentDialog/Grant.tsx
+'   src/components/journey/ConsentDialog/Decline.tsx
 '   src/components/journey/RevokeConsentDialog.tsx
 
-title Research Consent - Grant And Revoke Sequence Diagram
+title Research Consent - Grant, Decline And Revoke Sequence Diagram
 
-actor Clinician
-participant "JourneyTab\n(UI)" as UI
-participant "ConsentDialog /\nRevokeConsentDialog" as Dialog
+actor "Clinician / Patient" as User
+participant "PatientJourneyResearchCard (JourneyTab)\n/ ResearchStudiesSection (PatientCareplan)" as UI
+participant "GrantConsentDialog /\nDeclineConsentDialog /\nRevokeConsentDialog" as Dialog
 participant "react-markdown" as MD
 participant "client/\nresearchConsents" as Client
 participant "service/\nresearchConsents" as Service
-participant "patchStore" as Store
+participant "store" as Store
 
 == Grant Consent ==
 
-Clinician -> UI : Click module chip\n(amber = no consent)
-UI -> Dialog : Open ConsentDialog\n(studyInfoMarkdown, moduleId,\npatientId, journeyId)
-Dialog -> MD : Render studyInfoMarkdown
+User -> UI : "Read and consent" on module\n(amber chip = consent pending)
+note right of UI
+  Clinician can also enroll a new module
+  (enrollResearchModule) and go straight
+  to the consent dialog.
+end note
+UI -> Dialog : Open GrantConsentDialog\n(module, patientId, journeyId)
+Dialog -> MD : Render module.studyInfoMarkdown
 MD --> Dialog : Formatted study information
-Dialog --> Clinician : Display info + unchecked checkbox
-Clinician -> Dialog : Tick checkbox\n"I confirm the patient has been informed"
-Dialog -> Dialog : Enable Confirm button
-Clinician -> Dialog : Click Confirm
+Dialog --> User : Display info + unchecked checkbox
+User -> Dialog : Tick confirmation checkbox
+Dialog -> Dialog : Enable Grant button
+User -> Dialog : Click Grant
 Dialog -> Client : grantConsent(\n  patientId,\n  researchModuleId,\n  patientJourneyId,\n  grantedByUserId\n)
 Client -> Service : grantConsent(...)
 Service -> Service : Check: active consent\nalready exists for\npatient + module + journey?
 alt Consent already exists (idempotent)
   Service --> Client : existing Consent (unchanged)
 else No active consent
-  Service -> Store : patchStore:\n  append new Consent {\n    grantedAt: now(),\n    grantedByUserId,\n    revokedAt: null\n  }
-  Store --> Service : updated AppState
+  Service -> Store : append new Consent {\n  grantedAt: now(),\n  grantedByUserId,\n  revokedAt: null\n}
   Service --> Client : new Consent
 end
 Client --> Dialog : Consent record
-Dialog --> UI : Close, refetch journeys
-UI -> UI : Consent chip turns green\n(active consent)
+Dialog --> UI : Close, refetch
+UI -> UI : Chip turns green\n(consent granted)
 
-== Revoke Consent ==
+== Decline (patient role only) ==
 
-Clinician -> UI : Click revoke on green chip
-UI -> Dialog : Open RevokeConsentDialog\n(consentId)
-Dialog --> Clinician : Show confirmation step
-Clinician -> Dialog : Confirm revocation
-Dialog -> Client : revokeConsent(consentId, revokedByUserId)
-Client -> Service : revokeConsent(consentId, revokedByUserId)
+User -> Dialog : "Decline" in GrantConsentDialog
+Dialog -> Dialog : Open DeclineConsentDialog\n(mode = decline, optional reason)
+Dialog -> Client : declineConsent(patientId, moduleId,\njourneyId, userId, reason?)
+Client -> Service : declineConsent(...)
+alt active consent exists
+  Service -> Service : revokeConsent(existing, userId, reason)
+else none
+  Service -> Store : append Consent with\nrevokedAt = grantedAt = now(),\nwithdrawalReason = reason
+end
+
+== Revoke / Withdraw Consent ==
+
+User -> UI : "Withdraw" on green chip
+alt Patient role
+  UI -> Dialog : DeclineConsentDialog\n(mode = withdraw, optional reason)
+else Clinician role
+  UI -> Dialog : RevokeConsentDialog\n(confirmation step)
+end
+User -> Dialog : Confirm
+Dialog -> Client : revokeConsent(consentId, revokedByUserId, reason?)
+Client -> Service : revokeConsent(...)
 Service -> Service : Find Consent by id\n(throws if not found)
-Service -> Store : patchStore:\n  revokedAt = now()\n  revokedByUserId = userId
-Store --> Service : updated AppState
+Service -> Store : revokedAt = now()\nrevokedByUserId = userId\nwithdrawalReason = reason
 
 note right of Store
   The original Consent record
@@ -60,7 +81,7 @@ end note
 
 Service --> Client : revoked Consent
 Client --> Dialog : Consent record
-Dialog --> UI : Close, refetch journeys
-UI -> UI : Consent chip turns amber\n(no active consent)
+Dialog --> UI : Close, refetch
+UI -> UI : Chip turns amber\n(no active consent)
 
 @enduml

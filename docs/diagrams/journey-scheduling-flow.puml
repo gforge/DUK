@@ -1,38 +1,59 @@
 @startuml
-' Purpose: Dashboard journey scheduling and due-step computation
+' Purpose: Effective-step computation and its consumers
 ' Source of truth:
 '   src/api/service/journeyResolver.ts
-'   src/api/service/patientJourneys.ts
+'   src/api/service/journeyResearch.ts
+'   src/api/service/journeyDates.ts
+'   src/api/service/cases.ts
 
-title Dashboard Due-Step Computation - Activity Diagram
+title Effective Steps and Due-Step Computation - Activity Diagram
 
 start
-:Load patients & journeys;
-:For each patient: collect
-ALL PatientJourney records
-(may be multiple parallel journeys);
-:For each ACTIVE/SUSPENDED journey:
-Apply pause shift
-(totalPausedDays + currentPauseDays);
-:Apply modifications per journey
-(ADD_STEP, REMOVE_STEP);
-:Overlay research module
-entries if researchModuleIds
-are present;
-:Compute effective steps per journey
-(getEffectiveSteps);
-:Resolve patient instructions
-from persisted Instruction
-records;
-:Merge & deduplicate due steps
-across parallel journeys by
-templateId
-(getMergedDueStepsForPatient);
-:Map merged steps to
-queue/category;
-:Build dashboard Case rows
-with computed category
-and nextStep;
+partition "getEffectiveSteps(journeyId)" {
+  :Load PatientJourney + JourneyTemplate;
+  :Compute pause shift
+  (computeTotalPauseShift:
+  totalPausedDays + currentPauseDays);
+  :Expand template entries;
+  note right
+    Recurring entries (recurrenceIntervalDays)
+    expand to ${id}__r${n} occurrences up to a
+    5-year horizon, re-anchored on
+    recurringCompletions.
+  end note
+  :Apply modifications
+  (ADD_STEP, REMOVE_STEP);
+  :Overlay research module entries
+  (applyResearchModules);
+  :Sort by offsetDays, order;
+}
+
+split
+  :Dashboard: getCasesForDashboard();
+  :Per case: newest ACTIVE journey
+  for the patient;
+  :activeCategory = highest-priority
+  dashboardCategory among steps whose
+  window (offsetDays ± windowDays)
+  contains today
+  (null = between phases);
+split again
+  :Patient view: getMergedDueStepsForPatient
+  (patientId, today);
+  :For each ACTIVE/SUSPENDED journey:
+  keep steps with templateId whose
+  window contains today and that are
+  not yet submitted;
+  :Merge across parallel journeys
+  by templateId;
+split again
+  :Case JourneyTab / PatientCareplan:
+  render JourneyTimeline for the
+  selected journey;
+  :Render InstructionTimeline from
+  persisted Instruction rows
+  (getResolvedInstructionsForJourney);
+end split
 stop
 
 @enduml

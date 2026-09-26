@@ -1,165 +1,147 @@
-import { Box, Divider, Stack, Typography } from '@mui/material'
-import { differenceInDays, format, parseISO } from 'date-fns'
+import RateReviewOutlinedIcon from '@mui/icons-material/RateReviewOutlined'
+import { Box, Stack, Typography } from '@mui/material'
+import { format, parseISO } from 'date-fns'
+import { enUS, sv } from 'date-fns/locale'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 
-import type { Case, CaseStatus, Patient } from '@/api/schemas'
-import { AutoWarningsBadge, DeadlineLabel, StatusChip, TriggerChips } from '@/components/common'
+import type { Case, Patient } from '@/api/schemas'
+import { formatPersonnummer } from '@/api/utils/personnummer'
+import { AutoWarningsBadge, GridTableRow, StatusChip, Tag, TriggerChips } from '@/components/common'
 import { useStatusLabel } from '@/hooks/labels'
 import { useFocusRestore } from '@/hooks/useFocusRestore'
+import { tokens } from '@/theme'
 
-interface CaseListItemProps extends React.HTMLAttributes<HTMLDivElement> {
-  caseData: Case
-  patient?: Patient
-  onRefresh: () => void
-  'data-list-item'?: boolean
+import { LONG_WAIT_DAYS, waitedDays } from './sortCases'
+
+/** Shared grid template for the queue table header and rows. */
+export const QUEUE_COLUMNS = 'minmax(170px,1.3fr) minmax(180px,2fr) 96px 84px 120px 140px'
+export const QUEUE_MIN_WIDTH = 900
+
+interface CaseListItemProps {
+  readonly caseData: Case
+  readonly patient?: Patient
+  /** Rendered greyed out (between-phase and recently closed cases). */
+  readonly muted?: boolean
+  readonly tabIndex?: number
+  readonly onKeyDown?: (e: React.KeyboardEvent<HTMLElement>) => void
+  readonly onClick?: () => void
+  readonly 'data-list-item'?: boolean
 }
 
-/** Left-border colour communicates urgency at a glance */
-const STATUS_BORDER: Record<CaseStatus, string> = {
-  NEW: '#9e9e9e',
-  NEEDS_REVIEW: '#f44336',
-  TRIAGED: '#42a5f5',
-  FOLLOWING_UP: '#ab47bc',
-  CLOSED: '#66bb6a',
-}
-
-function ScheduledLabel({ scheduledAt }: { scheduledAt: string }) {
+function WaitedCell({ scheduledAt }: { readonly scheduledAt: string }) {
   const { t } = useTranslation()
-  const days = differenceInDays(new Date(), parseISO(scheduledAt))
-
+  const days = waitedDays({ scheduledAt })
+  const long = days >= LONG_WAIT_DAYS
   let label: string
-  let color: string
-
-  if (days > 14) {
-    label = t('dashboard.scheduledDaysAgo', { count: days })
-    color = 'error.main'
-  } else if (days > 0) {
-    label = t('dashboard.scheduledDaysAgo', { count: days })
-    color = 'warning.main'
-  } else if (days === 0) {
-    label = t('dashboard.scheduledToday')
-    color = 'success.main'
-  } else {
-    label = t('dashboard.scheduledInDays', { count: Math.abs(days) })
-    color = 'text.secondary'
-  }
-
+  if (days === 0) label = t('dashboard.scheduledToday')
+  else if (days > 0) label = t('dashboard.waitedDays', { count: days })
+  else label = t('dashboard.waitInDays', { count: Math.abs(days) })
   return (
-    <Typography variant="caption" sx={{ color }}>
+    <Box
+      sx={{
+        fontVariantNumeric: 'tabular-nums',
+        color: long ? tokens.danger : days < 0 ? tokens.textSecondary : tokens.text2,
+        fontWeight: long ? 600 : 400,
+        whiteSpace: 'nowrap',
+      }}
+    >
       {label}
-    </Typography>
+    </Box>
   )
 }
 
+/** One case as a row in the dashboard queue table. */
 export default function CaseListItem({
   caseData,
   patient,
-  onRefresh: _onRefresh,
-  ...props
+  muted = false,
+  tabIndex,
+  onKeyDown,
+  onClick,
+  'data-list-item': dataListItem,
 }: CaseListItemProps) {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const getStatusLabel = useStatusLabel()
   const navigate = useNavigate()
   const { save } = useFocusRestore()
 
   const handleOpen = () => {
+    onClick?.()
     save()
     navigate(`/cases/${caseData.id}`)
   }
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault()
-      handleOpen()
-    }
-    props.onKeyDown?.(e as React.KeyboardEvent<HTMLDivElement>)
-  }
-
+  const dateLocale = (i18n.resolvedLanguage ?? i18n.language ?? 'sv').startsWith('en') ? enUS : sv
   const lastActivity = caseData.lastActivityAt
-    ? format(new Date(caseData.lastActivityAt), 'dd MMM HH:mm')
+    ? format(parseISO(caseData.lastActivityAt), 'd MMM HH:mm', { locale: dateLocale })
     : '—'
-
-  const deadline = caseData.deadline ?? null
-  const isRecentlyTriaged = caseData.status === 'TRIAGED'
+  const name = patient?.displayName ?? caseData.patientId
+  const reviewPending = caseData.colleagueReviews.some((r) => r.respondedAt === null)
+  const isRecentlyTriaged = caseData.status === 'TRIAGED' && !muted
 
   return (
-    <>
-      <Box
-        role="listitem"
-        tabIndex={props.tabIndex ?? 0}
-        sx={{
-          pl: 1.5,
-          pr: 2,
-          py: 1.25,
-          cursor: 'pointer',
-          borderLeft: `4px solid ${STATUS_BORDER[caseData.status]}`,
-          bgcolor: 'transparent',
-          transition: 'box-shadow 0.15s, background-color 0.35s ease',
-          animation: isRecentlyTriaged ? 'recentlyTriaged 5s ease forwards' : undefined,
-          '@keyframes recentlyTriaged': {
-            '0%, 80%': { backgroundColor: '#e3f2fd' },
-            '100%': { backgroundColor: 'transparent' },
-          },
-          '&:hover': {
-            bgcolor: isRecentlyTriaged ? '#bbdefb' : 'action.hover',
-            boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
-          },
-          '&:focus-visible': {
-            outline: '2px solid',
-            outlineColor: 'primary.main',
-            outlineOffset: -2,
-          },
-        }}
-        aria-label={`${patient?.displayName ?? caseData.patientId} – ${getStatusLabel(caseData.status)}`}
-        {...props}
-        onClick={(e) => {
-          props.onClick?.(e)
-          handleOpen()
-        }}
-        onKeyDown={(e) => {
-          handleKeyDown(e)
-          props.onKeyDown?.(e)
-        }}
-      >
-        {/* Row 1: Patient name + Status badge */}
-        <Stack
-          sx={{ alignItems: 'center', justifyContent: 'space-between', gap: 1 }}
-          direction="row"
+    <GridTableRow
+      columns={QUEUE_COLUMNS}
+      minWidth={QUEUE_MIN_WIDTH}
+      muted={muted}
+      tabIndex={tabIndex}
+      onKeyDown={onKeyDown}
+      onClick={handleOpen}
+      data-list-item={dataListItem}
+      aria-label={`${name} – ${getStatusLabel(caseData.status)}`}
+      sx={
+        isRecentlyTriaged
+          ? {
+              animation: 'recentlyTriaged 5s ease forwards',
+              '@keyframes recentlyTriaged': {
+                '0%, 80%': { backgroundColor: tokens.infoBg },
+                '100%': { backgroundColor: 'transparent' },
+              },
+            }
+          : undefined
+      }
+    >
+      <Stack role="cell" sx={{ gap: 0.25, minWidth: 0 }}>
+        <Typography
+          noWrap
+          sx={{ fontWeight: 600, color: muted ? tokens.textSecondary : tokens.text }}
         >
-          <Typography sx={{ fontWeight: 600, maxWidth: 160 }} variant="body2" noWrap>
-            {patient?.displayName ?? caseData.patientId}
+          {name}
+        </Typography>
+        {patient?.personalNumber && (
+          <Typography noWrap sx={{ fontSize: 12, color: tokens.textSecondary }}>
+            {formatPersonnummer(patient.personalNumber)}
           </Typography>
-          <StatusChip status={caseData.status} />
-        </Stack>
-
-        {/* Row 2: Trigger chips */}
-        {caseData.triggers.length > 0 && (
-          <Box sx={{ mt: 0.5 }}>
-            <TriggerChips triggers={caseData.triggers} />
-          </Box>
         )}
-
-        {/* Row 3: Auto-warnings badge + meta */}
-        <Stack
-          sx={{ alignItems: 'center', justifyContent: 'space-between', gap: 1, mt: 0.5 }}
-          direction="row"
-        >
-          <AutoWarningsBadge
-            warnings={caseData.policyWarnings}
-            lastActivityAt={caseData.lastActivityAt}
+      </Stack>
+      <Stack role="cell" direction="row" sx={{ flexWrap: 'wrap', gap: 0.75, minWidth: 0 }}>
+        {caseData.triggers.length > 0 && <TriggerChips triggers={caseData.triggers} />}
+        {reviewPending && (
+          <Tag
+            variant="admin"
+            icon={<RateReviewOutlinedIcon fontSize="inherit" />}
+            label={t('dashboard.reviewRequested')}
           />
-          <Stack sx={{ gap: 1, flexWrap: 'wrap', justifyContent: 'flex-end' }} direction="row">
-            {caseData.scheduledAt && <ScheduledLabel scheduledAt={caseData.scheduledAt} />}
-            <Typography variant="caption" color="text.secondary">
-              {t('dashboard.lastActivity')}: {lastActivity}
-            </Typography>
-            {deadline && <DeadlineLabel deadline={deadline} />}
-          </Stack>
-        </Stack>
+        )}
+      </Stack>
+      <Box role="cell">
+        <AutoWarningsBadge
+          warnings={caseData.policyWarnings}
+          lastActivityAt={caseData.lastActivityAt}
+          compact
+        />
       </Box>
-      <Divider />
-    </>
+      <Box role="cell">
+        <WaitedCell scheduledAt={caseData.scheduledAt} />
+      </Box>
+      <Box role="cell" sx={{ color: tokens.textSecondary, fontSize: 13, whiteSpace: 'nowrap' }}>
+        {lastActivity}
+      </Box>
+      <Box role="cell">
+        <StatusChip status={caseData.status} />
+      </Box>
+    </GridTableRow>
   )
 }

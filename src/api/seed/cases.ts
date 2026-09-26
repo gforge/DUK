@@ -19,6 +19,7 @@ export const cases: Case[] = [
     lastActivityAt: iso(daysAgo(1)),
     createdAt: iso(daysAgo(2)),
     formSeriesId: 'fs-1',
+    colleagueReviews: [],
     reviews: [
       {
         id: 'case-1-review-1',
@@ -76,6 +77,7 @@ export const cases: Case[] = [
     lastActivityAt: iso(daysAgo(1)),
     createdAt: iso(daysAgo(3)),
     formSeriesId: 'fs-1',
+    colleagueReviews: [],
     reviews: [],
   },
   {
@@ -92,6 +94,7 @@ export const cases: Case[] = [
     lastActivityAt: iso(daysAgo(1)),
     createdAt: iso(daysAgo(1)),
     formSeriesId: 'fs-1',
+    colleagueReviews: [],
     reviews: [],
   },
   // ── SUBACUTE ───────────────────────────────────────────────────────────────
@@ -115,6 +118,7 @@ export const cases: Case[] = [
     lastActivityAt: iso(daysAgo(2)),
     createdAt: iso(daysAgo(21)),
     formSeriesId: 'fs-2',
+    colleagueReviews: [],
     reviews: [],
   },
   {
@@ -131,6 +135,7 @@ export const cases: Case[] = [
     lastActivityAt: iso(daysAgo(5)),
     createdAt: iso(daysAgo(25)),
     formSeriesId: 'fs-2',
+    colleagueReviews: [],
     reviews: [],
   },
   {
@@ -162,6 +167,7 @@ export const cases: Case[] = [
     lastActivityAt: iso(daysAgo(1)),
     createdAt: iso(daysAgo(18)),
     formSeriesId: 'fs-2',
+    colleagueReviews: [],
     reviews: [],
   },
   // ── CONTROL ────────────────────────────────────────────────────────────────
@@ -194,6 +200,7 @@ export const cases: Case[] = [
     lastActivityAt: iso(daysAgo(3)),
     createdAt: iso(daysAgo(63)),
     formSeriesId: 'fs-3',
+    colleagueReviews: [],
     reviews: [],
   },
   {
@@ -216,6 +223,7 @@ export const cases: Case[] = [
     lastActivityAt: iso(daysAgo(7)),
     createdAt: iso(daysAgo(90)),
     formSeriesId: 'fs-3',
+    colleagueReviews: [],
     reviews: [],
   },
   {
@@ -232,6 +240,7 @@ export const cases: Case[] = [
     lastActivityAt: iso(daysAgo(5)),
     createdAt: iso(daysAgo(70)),
     formSeriesId: 'fs-3',
+    colleagueReviews: [],
     reviews: [],
   },
   {
@@ -254,6 +263,7 @@ export const cases: Case[] = [
     lastActivityAt: iso(daysAgo(2)),
     createdAt: iso(daysAgo(100)),
     formSeriesId: 'fs-3',
+    colleagueReviews: [],
     reviews: [],
   },
   // ── Proximal humerus cases ─────────────────────────────────────────────
@@ -272,6 +282,7 @@ export const cases: Case[] = [
     lastActivityAt: iso(daysAgo(1)),
     createdAt: iso(daysAgo(2)),
     formSeriesId: 'fs-1',
+    colleagueReviews: [],
     reviews: [],
   },
   {
@@ -305,6 +316,7 @@ export const cases: Case[] = [
     lastActivityAt: iso(daysAgo(2)),
     createdAt: iso(daysAgo(35)),
     formSeriesId: 'fs-2',
+    colleagueReviews: [],
     reviews: [],
   },
   // ── Distal radius cases ───────────────────────────────────────────────
@@ -332,6 +344,7 @@ export const cases: Case[] = [
     lastActivityAt: iso(daysAgo(1)),
     createdAt: iso(daysAgo(14)),
     formSeriesId: 'fs-1',
+    colleagueReviews: [],
     reviews: [
       {
         id: 'rev-dr-1',
@@ -377,6 +390,7 @@ export const cases: Case[] = [
     lastActivityAt: iso(daysAgo(3)),
     createdAt: iso(daysAgo(52)),
     formSeriesId: 'fs-2',
+    colleagueReviews: [],
     reviews: [
       {
         id: 'rev-dr-2',
@@ -410,6 +424,7 @@ export const cases: Case[] = [
     scheduledAt: iso(daysAgo(14)),
     lastActivityAt: iso(daysAgo(1)),
     createdAt: iso(daysAgo(14)),
+    colleagueReviews: [],
     reviews: [],
   },
   // ── Hindfoot elective surgery pathway ─────────────────────────────────
@@ -430,6 +445,7 @@ export const cases: Case[] = [
     scheduledAt: iso(daysAgo(180)),
     lastActivityAt: iso(daysAgo(0)),
     createdAt: iso(daysAgo(180)),
+    colleagueReviews: [],
     reviews: [
       {
         id: 'rev-p19-xray',
@@ -462,6 +478,7 @@ export const cases: Case[] = [
     scheduledAt: iso(daysAgo(95)),
     lastActivityAt: iso(daysAgo(5)),
     createdAt: iso(daysAgo(95)),
+    colleagueReviews: [],
     reviews: [],
   },
   // ── Journey-switch demo ───────────────────────────────────────────────
@@ -498,6 +515,7 @@ export const cases: Case[] = [
     scheduledAt: iso(daysAgo(42)),
     lastActivityAt: iso(daysAgo(2)),
     createdAt: iso(daysAgo(42)),
+    colleagueReviews: [],
     reviews: [],
   },
   // ── Two simultaneous fractures (Gunnar Eriksson, p-22) ───────────────
@@ -520,6 +538,7 @@ export const cases: Case[] = [
     scheduledAt: iso(daysAgo(35)),
     lastActivityAt: iso(daysAgo(2)),
     createdAt: iso(daysAgo(35)),
+    colleagueReviews: [],
     reviews: [
       {
         id: 'rev-p22-xray',
@@ -569,6 +588,7 @@ export const cases: Case[] = [
     scheduledAt: iso(daysAgo(35)),
     lastActivityAt: iso(daysAgo(1)),
     createdAt: iso(daysAgo(35)),
+    colleagueReviews: [],
     reviews: [],
   },
   // ── Old fracture 1yr + new acute fracture (Birgit Magnusson, p-23) ───
@@ -602,6 +622,7 @@ export const cases: Case[] = [
     scheduledAt: iso(daysAgo(365)),
     lastActivityAt: iso(daysAgo(1)),
     createdAt: iso(daysAgo(365)),
+    colleagueReviews: [],
     reviews: [],
   },
   {
@@ -620,6 +641,7 @@ export const cases: Case[] = [
     scheduledAt: iso(daysAgo(10)),
     lastActivityAt: iso(daysAgo(1)),
     createdAt: iso(daysAgo(10)),
+    colleagueReviews: [],
     reviews: [],
   },
   // ── Late-join demo case (p-16) ─────────────────────────────────────────
@@ -636,6 +658,7 @@ export const cases: Case[] = [
     scheduledAt: iso(daysAgo(0)),
     lastActivityAt: iso(daysAgo(0)),
     createdAt: iso(daysAgo(0)),
+    colleagueReviews: [],
     reviews: [],
   },
 ]

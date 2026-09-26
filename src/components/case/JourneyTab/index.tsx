@@ -19,6 +19,7 @@ import EpisodeHeader from './EpisodeHeader'
 import JourneyHeader from './JourneyHeader'
 import JourneySelectorTabs from './JourneySelectorTabs'
 import PauseConfirmDialog from './PauseConfirmDialog'
+import ReferralCard from './ReferralCard'
 import { useJourneyActions } from './useJourneyActions'
 const STATUS_ORDER: Record<string, number> = { ACTIVE: 0, SUSPENDED: 1, COMPLETED: 2 }
 interface JourneyTabProps {
@@ -56,13 +57,19 @@ export default function JourneyTab({ caseData }: JourneyTabProps) {
   }, [journeys])
   const selectedJourney =
     sortedJourneys.find((j) => j.id === selectedJourneyId) ?? sortedJourneys[0] ?? null
-  const { data: episode, loading: episodeLoading } = useApi(
-    () =>
-      selectedJourney?.episodeId
-        ? client.getEpisodeById(selectedJourney.episodeId)
-        : Promise.resolve(undefined),
-    [selectedJourney?.episodeId],
+  // A freshly registered referral has an episode but no journey yet.
+  const episodeId = selectedJourney?.episodeId ?? caseData.episodeId
+  const {
+    data: episode,
+    loading: episodeLoading,
+    refetch: refetchEpisode,
+  } = useApi(
+    () => (episodeId ? client.getEpisodeById(episodeId) : Promise.resolve(undefined)),
+    [episodeId],
   )
+  const referralCard = episode?.referral ? (
+    <ReferralCard episode={episode} onChanged={refetchEpisode} />
+  ) : null
   const { data: resolvedInstructions, refetch: refetchInstructions } = useApi(
     () =>
       selectedJourney
@@ -125,14 +132,19 @@ export default function JourneyTab({ caseData }: JourneyTabProps) {
   }
   if (sortedJourneys.length === 0) {
     return (
-      <Alert severity="info" sx={{ mt: 1 }}>
-        {t('journey.noActiveJourney')}
-      </Alert>
+      <Box>
+        <EpisodeHeader episode={episode} loading={episodeLoading && !!episodeId} />
+        {referralCard}
+        <Alert severity="info" sx={{ mt: 1 }}>
+          {episode?.referral ? t('referral.noJourneyYet') : t('journey.noActiveJourney')}
+        </Alert>
+      </Box>
     )
   }
   return (
     <Box>
-      <EpisodeHeader episode={episode} loading={episodeLoading && !!selectedJourney?.episodeId} />
+      <EpisodeHeader episode={episode} loading={episodeLoading && !!episodeId} />
+      {referralCard}
 
       <JourneySelectorTabs
         journeys={sortedJourneys}

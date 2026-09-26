@@ -1,7 +1,7 @@
 import type { MigrationResultErr } from './migrations'
 import { runMigrations } from './migrations'
 import { CURRENT_DEMO_DATA_VERSION } from './schemaVersion'
-import { buildMinimalSeed } from './seed'
+import { buildMinimalSeed, reanchorDemoState } from './seed'
 import { initStore } from './storage'
 
 export interface BootstrapOptions {
@@ -24,7 +24,7 @@ export function initializeStoreFromRaw(
   if (result.state.demoDataVersion < CURRENT_DEMO_DATA_VERSION) {
     init(buildMinimalSeed(today))
   } else {
-    init(result.state)
+    init(reanchorDemoState(result.state, today))
   }
 
   return undefined

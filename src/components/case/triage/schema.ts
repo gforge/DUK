@@ -4,17 +4,22 @@ import { parseDeadlineInput } from './parseDeadlineInput'
 
 const ContactModeSchema = z.enum(['DIGITAL', 'PHONE', 'VISIT', 'CLOSE']).nullable()
 const CareRoleSchema = z.enum(['DOCTOR', 'NURSE', 'PHYSIO']).nullable()
-const AssignmentModeSchema = z.enum(['ANY', 'PAL', 'NAMED']).nullable()
+const AssignmentModeSchema = z.enum(['ANY', 'PAL', 'NAMED', 'TEAM']).nullable()
+
+export const PATIENT_MESSAGE_MAX = 500
 
 export const TriageFormSchema = z
   .object({
     contactMode: ContactModeSchema,
     careRole: CareRoleSchema,
     assignmentMode: AssignmentModeSchema,
-    assignedUserId: z.string().optional(),
+    /** NAMED: one or more people. */
+    assignedUserIds: z.array(z.string()),
+    /** TEAM: one or more care teams. */
+    assignedTeamIds: z.array(z.string()),
     dueAtInput: z.string().optional(),
     note: z.string().optional(),
-    patientMessage: z.string().optional(),
+    patientMessage: z.string().max(PATIENT_MESSAGE_MAX).optional(),
   })
   .superRefine((value, ctx) => {
     if (!value.contactMode) {
@@ -64,11 +69,27 @@ export const TriageFormSchema = z
       })
     }
 
-    if (value.assignmentMode === 'NAMED' && !value.assignedUserId) {
+    if (value.assignmentMode === 'NAMED' && value.assignedUserIds.length === 0) {
       ctx.addIssue({
         code: 'custom',
-        path: ['assignedUserId'],
-        message: 'Pick a person for NAMED',
+        path: ['assignedUserIds'],
+        message: 'Pick at least one person for NAMED',
+      })
+    }
+
+    if (value.assignmentMode === 'TEAM' && value.assignedTeamIds.length === 0) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['assignedTeamIds'],
+        message: 'Pick at least one team for TEAM',
+      })
+    }
+
+    if (!value.dueAtInput?.trim()) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['dueAtInput'],
+        message: 'dueAtInput is required',
       })
     }
   })

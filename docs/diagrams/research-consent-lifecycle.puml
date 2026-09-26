@@ -7,13 +7,17 @@
 title Research Consent Lifecycle - State Diagram
 
 state "GRANTED\n(active)" as GRANTED
-state "REVOKED\n(terminal)" as REVOKED
+state "REVOKED\n(withdrawn, terminal)" as REVOKED
+state "DECLINED\n(terminal)" as DECLINED
 
 [*] --> GRANTED : grantConsent(\n  patientId,\n  researchModuleId,\n  patientJourneyId,\n  grantedByUserId\n)\ngrantedAt = now()
 
-GRANTED --> REVOKED : revokeConsent(\n  consentId,\n  revokedByUserId\n)\nrevokedAt = now()
+[*] --> DECLINED : declineConsent(\n  patientId, researchModuleId,\n  patientJourneyId, userId, reason?\n)\n(no active consent)\ngrantedAt = revokedAt = now()
+
+GRANTED --> REVOKED : revokeConsent(\n  consentId,\n  revokedByUserId,\n  reason?\n)\n or declineConsent (active consent)\nrevokedAt = now()
 
 REVOKED --> [*]
+DECLINED --> [*]
 
 note right of GRANTED
   Idempotency:
@@ -26,8 +30,9 @@ end note
 
 note right of REVOKED
   The record is NEVER deleted.
-  revokedAt and revokedByUserId
-  are set for audit purposes.
+  revokedAt, revokedByUserId and optional
+  withdrawalReason are set for audit
+  purposes (GCP ICH E6).
   hasActiveConsent() returns false.
 
   A new call to grantConsent
@@ -38,10 +43,18 @@ note right of REVOKED
   AppState.researchConsents.
 end note
 
+note right of DECLINED
+  A decline is recorded as a Consent with
+  revokedAt equal to grantedAt, which
+  distinguishes it from a post-consent
+  withdrawal.
+end note
+
 note bottom
   Service: src/api/service/researchConsents.ts
   Storage: AppState.researchConsents[]
-  UI: src/components/journey/ConsentDialog.tsx
+  UI: src/components/journey/ConsentDialog/ (Grant, Decline),
+      src/components/journey/RevokeConsentDialog.tsx
 end note
 
 @enduml

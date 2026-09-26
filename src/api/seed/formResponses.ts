@@ -235,26 +235,39 @@ export const formResponses: FormResponse[] = [
   {
     id: 'fr-knee-ref-1',
     patientId: 'p-15',
-    templateId: 'qt-numbness-infection',
+    templateId: 'qt-preop-intake',
     caseId: 'case-15',
     patientJourneyId: 'pj-knee-1',
     journeyTemplateEntryId: 'jte-knee-ref-1',
-    // Day 1 baseline: no red flags, moderate OA pain
-    answers: { NUMB_1: false, NUMB_2: false, INF_WOUND: false, INF_FEVER: false, PNRS_1: 6 },
+    // Basic information at referral: moderate OA pain, lives with partner
+    answers: {
+      HEIGHT: 166,
+      WEIGHT: 81,
+      PREV_SURGERY: false,
+      PREV_SURGERY_DETAILS: '',
+      WALKING_AID: 'NONE',
+      HOME_CARE: false,
+      LIVES_ALONE: false,
+      STAIRS_AT_HOME: true,
+      MEDICATIONS: 'Enalapril 10 mg x1, Paracetamol 1 g vid behov',
+      ALLERGIES: 'Inga kända',
+      SMOKING: 'NEVER',
+      PNRS_1: 6,
+    },
     scores: {},
     submittedAt: iso(daysAgo(119)),
   },
   {
     id: 'fr-knee-ref-2',
     patientId: 'p-15',
-    templateId: 'qt-wound-pain',
+    templateId: 'qt-function-oks-short',
     caseId: 'case-15',
     patientJourneyId: 'pj-knee-1',
     journeyTemplateEntryId: 'jte-knee-ref-2',
-    // Day 7 symptom check before orthopaedic visit: significant knee pain, no wound issues
-    answers: { WOUND_HEALED: true, WOUND_DISCHARGE: false, PNRS_2: 7, PNRS_NIGHT: 5 },
-    scores: {},
-    submittedAt: iso(daysAgo(113)),
+    // Knee-specific screen before orthopaedic visit: significant functional limitation
+    answers: { OKS_PAIN: 1, OKS_WALK: 2, OKS_STAIRS: 1, OKS_ADL: 2, PNRS_2: 7 },
+    scores: { 'OKS.total': 18 },
+    submittedAt: iso(daysAgo(119)),
   },
 
   // Phase 2: Väntelista operation (pj-knee-2, started daysAgo(90))

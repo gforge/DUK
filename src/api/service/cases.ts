@@ -90,7 +90,14 @@ export function triageCase(
   const dueAt = normalizeIsoDateTime(rawDueAt) ?? null
 
   const deadline: string | undefined = dueAt ?? undefined
-  const assignedUserId = input.triageDecision.assignedUserId ?? input.assignedUserId
+  // A single named person owns the task directly; several people or a team leave it claimable.
+  const namedIds = input.triageDecision.assignedUserIds ?? []
+  const assignedUserId =
+    input.triageDecision.assignedUserId ??
+    input.assignedUserId ??
+    (input.triageDecision.assignmentMode === 'NAMED' && namedIds.length === 1
+      ? namedIds[0]
+      : undefined)
 
   const updated: Case = {
     ...existing,
@@ -113,6 +120,8 @@ export function triageCase(
     contactMode: input.triageDecision.contactMode,
     careRole: input.triageDecision.careRole,
     assignmentMode: input.triageDecision.assignmentMode,
+    assignedUserIds: input.triageDecision.assignedUserIds,
+    assignedTeamIds: input.triageDecision.assignedTeamIds,
     nextStep: derivedNextStep,
     deadline,
     internalNote: note,

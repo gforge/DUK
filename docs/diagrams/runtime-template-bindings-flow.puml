@@ -2,6 +2,7 @@
 ' Purpose: Runtime <-> template bindings
 ' Source of truth:
 '   src/api/service/patientJourneys.ts
+'   src/api/service/instructions.ts
 '   src/api/service/journeyResolver.ts
 '   src/api/schemas/forms.ts
 
@@ -24,16 +25,18 @@ rectangle "Runtime Layer" #E8F5E9 {
   class FormResponse
 }
 
-JourneyTemplate --> PatientJourney : assignPatientJourney()
-JourneyTemplateInstruction --> Instruction : instantiate on assignment
-InstructionTemplate --> Instruction : instructionTemplateId
-JourneyTemplateEntry --> FormResponse : journeyTemplateEntryId
+JourneyTemplate --> PatientJourney : assignPatientJourney() /\nstartNextPhase()
+JourneyTemplateInstruction --> Instruction : instantiate on assignment /\nnext phase (journeyTemplateInstructionId)
+InstructionTemplate --> Instruction : instructionTemplateId\n(also ad hoc via addJourneyInstruction)
+JourneyTemplateEntry --> FormResponse : journeyTemplateEntryId\n(base id, + occurrenceIndex)
 PatientJourney --> FormResponse : patientJourneyId
 PatientJourney --> JourneyTemplate : journeyTemplateId
 
 note bottom
-  getEffectiveSteps() resolves due steps from JourneyTemplateEntry,
-  while Instruction rows are persisted runtime entities.
+  getEffectiveSteps() resolves steps from JourneyTemplateEntry at read time
+  (pause shift, recurrence, modifications, research overlays),
+  while Instruction rows are persisted runtime entities with resolved
+  startAt/endAt (re-dated on resumeJourney).
 end note
 
 @enduml

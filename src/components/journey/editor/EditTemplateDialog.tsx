@@ -16,7 +16,7 @@ import { useSnack } from '@/store/snackContext'
 interface Props {
   template?: JourneyTemplate
   onClose: () => void
-  onSaved: () => void
+  onSaved: (saved: JourneyTemplate) => void
 }
 export default function EditTemplateDialog({ template, onClose, onSaved }: Props) {
   const { t } = useTranslation()
@@ -26,28 +26,36 @@ export default function EditTemplateDialog({ template, onClose, onSaved }: Props
   const [referenceDateLabel, setReferenceDateLabel] = useState(
     template?.referenceDateLabel ?? t('journey.referenceDateDefault'),
   )
+  const [group, setGroup] = useState(template?.group ?? '')
+  const [phaseOrder, setPhaseOrder] = useState<number | ''>(template?.phaseOrder ?? '')
   const [saving, setSaving] = useState(false)
   const handleSave = async () => {
     if (!name.trim()) return
     setSaving(true)
     try {
-      await client.saveJourneyTemplate(
+      const grouping = {
+        group: group.trim() || undefined,
+        phaseOrder: phaseOrder === '' || phaseOrder < 1 ? undefined : Math.round(phaseOrder),
+      }
+      const saved = await client.saveJourneyTemplate(
         template
           ? {
               ...template,
               name: name.trim(),
               description: description.trim() || undefined,
               referenceDateLabel: referenceDateLabel.trim() || t('journey.referenceDateDefault'),
+              ...grouping,
             }
           : {
               name: name.trim(),
               description: description.trim() || undefined,
               referenceDateLabel: referenceDateLabel.trim() || t('journey.referenceDateDefault'),
               entries: [],
+              ...grouping,
             },
       )
       showSnack(t('journey.editor.templateSaved'), 'success')
-      onSaved()
+      onSaved(saved)
     } catch {
       showSnack(t('common.error'), 'error')
     } finally {
@@ -87,6 +95,24 @@ export default function EditTemplateDialog({ template, onClose, onSaved }: Props
             fullWidth
             required
             helperText={t('journey.template.referenceDateLabelHint')}
+          />
+          <TextField
+            label={t('journey.template.group')}
+            value={group}
+            onChange={(e) => setGroup(e.target.value)}
+            size="small"
+            fullWidth
+            helperText={t('journey.template.groupHint')}
+          />
+          <TextField
+            label={t('journey.template.phaseOrder')}
+            type="number"
+            value={phaseOrder}
+            onChange={(e) => setPhaseOrder(e.target.value === '' ? '' : Number(e.target.value))}
+            size="small"
+            fullWidth
+            slotProps={{ htmlInput: { min: 1 } }}
+            helperText={t('journey.template.phaseOrderHint')}
           />
         </Stack>
       </DialogContent>
