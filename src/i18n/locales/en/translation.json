@@ -12,6 +12,7 @@
       "FORM_SUBMITTED": "Form Submitted",
       "JOURNAL_DRAFT_APPROVED": "Journal Draft Approved",
       "JOURNAL_DRAFT_CREATED": "Journal Draft Created",
+      "REFERRAL_DIAGNOSES_SET": "Diagnoses set via context launch",
       "REMINDER_SENT": "Reminder Sent",
       "SEEK_CONTACT": "Seeking Contact",
       "STATUS_CHANGED": "Status Changed",
@@ -730,6 +731,19 @@
     "SCALE": "Scale",
     "SELECT": "Select",
     "TEXT": "Text"
+  },
+  "referral": {
+    "changeViaUthopp": "Change via context launch",
+    "diagnosesSaved": "Diagnoses retrieved from TakeCare",
+    "diagnosisMissing": "No diagnosis yet. Diagnoses are set in TakeCare and passed in via context launch.",
+    "noJourneyYet": "The referral is registered but no care journey is assigned. Assign a referral journey (e.g. Hip OA — referral phase) to send the forms to the patient.",
+    "openUthopp": "Open via context launch",
+    "received": "Received {{date}} from {{referrer}}",
+    "title": "Referral",
+    "uthoppConfirm": "Retrieve diagnoses",
+    "uthoppInfo": "In production the app is opened from the patient record in TakeCare and the diagnoses are passed in automatically. Here this is simulated by selecting diagnoses.",
+    "uthoppTitle": "Context launch from TakeCare (simulated)",
+    "viaUthopp": "(from TakeCare via context launch)"
   },
   "review": {
     "addReview": "Add review",

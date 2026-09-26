@@ -11,4 +11,4 @@ export const CURRENT_SCHEMA_VERSION = 16
  * schema shape. Bump this when the seed content should replace older local
  * demo stores on startup.
  */
-export const CURRENT_DEMO_DATA_VERSION = 2
+export const CURRENT_DEMO_DATA_VERSION = 3

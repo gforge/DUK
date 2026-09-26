@@ -13,6 +13,13 @@ import { journeyTemplates } from './journeyTemplates'
 import { patientJourneys } from './patientJourneys'
 import { policyRules } from './policyRules'
 import { questionnaireTemplates } from './questionnaireTemplates'
+import {
+  referralCases,
+  referralEpisodes,
+  referralFormResponses,
+  referralJourneys,
+  referralPatients,
+} from './referralExamples'
 import { researchModules } from './researchModules'
 import { patients, users } from './users'
 
@@ -24,19 +31,19 @@ const baseSeedState: AppState = {
   schemaVersion: CURRENT_SCHEMA_VERSION,
   demoDataVersion: CURRENT_DEMO_DATA_VERSION,
   users,
-  patients,
-  cases,
+  patients: [...patients, ...referralPatients],
+  cases: [...cases, ...referralCases],
   policyRules,
   auditEvents,
   questionnaireTemplates,
   formSeries,
-  formResponses,
+  formResponses: [...formResponses, ...referralFormResponses],
   journalDrafts,
   journalTemplates,
   journeyTemplates,
   researchModules,
-  episodesOfCare,
-  patientJourneys,
+  episodesOfCare: [...episodesOfCare, ...referralEpisodes],
+  patientJourneys: [...patientJourneys, ...referralJourneys],
   instructions: [],
   instructionTemplates,
   researchConsents: [],
@@ -62,6 +69,9 @@ function shiftDate(value: string, shiftDays: number): string {
   return new Date(parsed.getTime() + shiftDays * MS_PER_DAY).toISOString().slice(0, 10)
 }
 
+/** Dates that describe the patient rather than the care timeline must not move. */
+const UNSHIFTED_KEYS = new Set(['dateOfBirth'])
+
 function shiftDatesDeep<T>(value: T, shiftDays: number): T {
   if (shiftDays === 0) return structuredClone(value)
 
@@ -72,7 +82,7 @@ function shiftDatesDeep<T>(value: T, shiftDays: number): T {
   if (value && typeof value === 'object') {
     const entries = Object.entries(value as Record<string, unknown>).map(([k, v]) => [
       k,
-      shiftDatesDeep(v, shiftDays),
+      UNSHIFTED_KEYS.has(k) ? v : shiftDatesDeep(v, shiftDays),
     ])
     return Object.fromEntries(entries) as T
   }
@@ -148,12 +158,36 @@ function buildBaseMinimalSeed(): AppState {
   }
 }
 
+/** Local calendar date (YYYY-MM-DD) — the day the demo timeline is anchored to. */
+function localDateKey(date: Date): string {
+  const d = dayStart(date)
+  const pad = (n: number) => String(n).padStart(2, '0')
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
+}
+
+function daysBetween(from: Date, to: Date): number {
+  return Math.round((dayStart(to).getTime() - dayStart(from).getTime()) / MS_PER_DAY)
+}
+
 export function buildMinimalSeed(today: Date = new Date()): AppState {
   const seed = buildBaseMinimalSeed()
-  const target = dayStart(today)
-  const anchor = inferSeedAnchorDate(seed)
-  const shiftDays = Math.round((target.getTime() - anchor.getTime()) / MS_PER_DAY)
-  return shiftDatesDeep(seed, shiftDays)
+  const shiftDays = daysBetween(inferSeedAnchorDate(seed), today)
+  return { ...shiftDatesDeep(seed, shiftDays), seedAnchorDate: localDateKey(today) }
+}
+
+/**
+ * Moves every date in a stored demo state forward so that it keeps the same
+ * position relative to "today" as when it was anchored. Keeps the demo from
+ * filling up with stale, overdue examples when the browser store gets old.
+ * States without an anchor (e.g. imported real-looking data) are left alone.
+ */
+export function reanchorDemoState(state: AppState, today: Date = new Date()): AppState {
+  if (!state.seedAnchorDate) return state
+  const anchor = new Date(`${state.seedAnchorDate}T00:00:00`)
+  if (Number.isNaN(anchor.getTime())) return state
+  const shiftDays = daysBetween(anchor, today)
+  if (shiftDays === 0) return state
+  return { ...shiftDatesDeep(state, shiftDays), seedAnchorDate: localDateKey(today) }
 }
 
 export const SEED_STATE: AppState = buildMinimalSeed()

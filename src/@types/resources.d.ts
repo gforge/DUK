@@ -15,6 +15,7 @@ export default interface Resources {
         "JOURNAL_DRAFT_APPROVED": "Journalutkast godkänt",
         "JOURNAL_DRAFT_CREATED": "Journalutkast skapat",
         "JOURNAL_DRAFT_DELETED": "Journalutkast borttaget",
+        "REFERRAL_DIAGNOSES_SET": "Diagnoser satta via uthopp",
         "REMINDER_SENT": "Påminnelse skickad",
         "SEEK_CONTACT": "Söker kontakt",
         "STATUS_CHANGED": "Status ändrad",
@@ -733,6 +734,19 @@ export default interface Resources {
       "pain_now": "Smärta just nu (0–10)",
       "wound_discharge": "Sekret från såret?",
       "wound_healed": "Är såret läkt?"
+    },
+    "referral": {
+      "changeViaUthopp": "Ändra via uthopp",
+      "diagnosesSaved": "Diagnoser hämtade från TakeCare",
+      "diagnosisMissing": "Diagnos saknas. Diagnos anges i TakeCare och följer med via uthopp.",
+      "noJourneyYet": "Remissen är registrerad men inget vårdförlopp är tilldelat. Tilldela ett remissförlopp (t.ex. Höftartros — Remissfas) för att skicka formulären till patienten.",
+      "openUthopp": "Öppna via uthopp",
+      "received": "Mottagen {{date}} från {{referrer}}",
+      "title": "Remiss",
+      "uthoppConfirm": "Hämta diagnoser",
+      "uthoppInfo": "I drift öppnas appen från patientens journal i TakeCare och diagnoserna följer med automatiskt. Här simuleras det genom att välja diagnoser.",
+      "uthoppTitle": "Uthopp från TakeCare (simulerat)",
+      "viaUthopp": "(från TakeCare via uthopp)"
     },
     "review": {
       "addReview": "Lägg till granskning",

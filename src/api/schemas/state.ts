@@ -21,6 +21,11 @@ import { UserSchema } from './users'
 export const AppStateSchema = z.object({
   schemaVersion: z.number().int().default(0),
   demoDataVersion: z.number().int(),
+  /**
+   * Local date (YYYY-MM-DD) the demo timeline is anchored to. On startup all
+   * dates are shifted by the days elapsed since then (see reanchorDemoState).
+   */
+  seedAnchorDate: z.string().optional(),
   users: z.array(UserSchema),
   patients: z.array(PatientSchema),
   cases: z.array(CaseSchema),
