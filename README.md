@@ -17,6 +17,16 @@ npm run dev
 
 Then open http://localhost:5173 in your browser.
 
+Alternatively, add the `duk-*` helper commands to your PATH (with tab completion):
+
+```bash
+source setup.sh                # this shell only; add --install to persist in ~/.bashrc
+duk-install [--clean] [--setup] # npm install (or clean npm ci); --setup adds PATH + completion to ~/.bashrc
+duk-build [check]              # build into dist/; check = typecheck+lint+tests first
+duk-publish [--check] [--yes]  # build and publish to GitHub Pages (asks first)
+duk-run [dev|preview|test]     # dev server (default), serve dist/, or watch tests
+```
+
 ---
 
 ## Features

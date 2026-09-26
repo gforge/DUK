@@ -1,0 +1,59 @@
+#!/bin/bash
+set -e
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/../utils/common.sh"
+
+SITE_URL="https://gforge.github.io/DUK/"
+
+show_help() {
+  echo "Usage: duk-publish [--check] [--yes]"
+  echo "  Build and publish dist/ to GitHub Pages ($SITE_URL)"
+  echo "  --check|-c: Run typecheck, lint and tests before publishing"
+  echo "  --yes|-y:   Skip the confirmation prompt"
+  exit 1
+}
+
+CHECK=false
+YES=false
+for arg in "$@"; do
+  case "$arg" in
+    --check|-c) CHECK=true ;;
+    --yes|-y) YES=true ;;
+    *) show_help ;;
+  esac
+done
+
+require_npm
+cd "$PROJECT_ROOT"
+ensure_dependencies
+
+BRANCH=$(git rev-parse --abbrev-ref HEAD)
+COMMIT=$(git rev-parse --short HEAD)
+VERSION=$(node -p "require('./package.json').version")
+
+echo -e "${BOLD}Publishing DUK v$VERSION${NC} from ${CYAN}$BRANCH${NC} @ ${CYAN}$COMMIT${NC}"
+if [ -n "$(git status --porcelain)" ]; then
+  echo -e "${YELLOW}⚠️  Working tree has uncommitted changes — they will be included in the published build.${NC}"
+fi
+
+if [ "$YES" != true ]; then
+  read -r -p "Publish to $SITE_URL? [y/N] " answer
+  if [[ ! "$answer" =~ ^[Yy]$ ]]; then
+    echo "Aborted."
+    exit 1
+  fi
+fi
+
+if [ "$CHECK" = true ]; then
+  print_banner "Checking DUK (typecheck + lint)"
+  npm run check
+  print_banner "Running tests"
+  npm test
+fi
+
+print_banner "Building and publishing DUK to GitHub Pages"
+npm run deploy -- -m "Publish v$VERSION ($COMMIT)"
+
+echo -e "\n${BOLD}${GREEN}✅ Published v$VERSION to $SITE_URL${NC}"
+echo "GitHub Pages may take a minute to update."
