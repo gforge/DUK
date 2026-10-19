@@ -82,6 +82,8 @@ export function useTransitionTriggerLabel() {
   const { t } = useTranslation()
   return (trigger: TransitionTriggerType): string => {
     switch (trigger) {
+      case 'INJURY':
+        return t('journey.transitionTrigger.INJURY')
       case 'REFERRAL_RECEIVED':
         return t('journey.transitionTrigger.REFERRAL_RECEIVED')
       case 'TRIAGE_DECISION':

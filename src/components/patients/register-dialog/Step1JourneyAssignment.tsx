@@ -10,10 +10,13 @@ import {
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 
-import type { JourneyTemplate } from '@/api/schemas'
+import type { JourneyTemplate, TransitionTriggerType } from '@/api/schemas'
+import TriggerEventSelect from '@/components/journey/TriggerEventSelect'
 interface Props {
   journeyTemplateId: string
   setJourneyTemplateId: (v: string) => void
+  eventType: TransitionTriggerType | ''
+  setEventType: (v: TransitionTriggerType | '') => void
   startDate: string
   setStartDate: (v: string) => void
   joinedAt: string
@@ -23,6 +26,8 @@ interface Props {
 export function Step1JourneyAssignment({
   journeyTemplateId,
   setJourneyTemplateId,
+  eventType,
+  setEventType,
   startDate,
   setStartDate,
   joinedAt,
@@ -54,6 +59,13 @@ export function Step1JourneyAssignment({
           ))}
         </Select>
       </FormControl>
+      <TriggerEventSelect
+        label={t('patients.register.eventType')}
+        helperText={t('patients.register.eventTypeHint')}
+        value={eventType}
+        onChange={setEventType}
+        required
+      />
       <TextField
         label={selectedTemplate?.referenceDateLabel ?? t('patients.register.referenceDate')}
         helperText={t('patients.register.referenceDateHint', {

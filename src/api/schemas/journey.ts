@@ -26,6 +26,8 @@ export type PhaseType = z.infer<typeof PhaseTypeSchema>
  * Why a new phase was started — the clinical event that triggered the transition.
  */
 export const TransitionTriggerTypeSchema = z.enum([
+  /** Injury/fracture — the anchor event for conservatively treated fractures. */
+  'INJURY',
   'REFERRAL_RECEIVED',
   'TRIAGE_DECISION',
   'VISIT_DECISION',
@@ -220,6 +222,12 @@ export const JourneyTemplateSchema = z.object({
    * Examples: "Operationsdatum", "Skadedatum", "Uppföljningsstart".
    */
   referenceDateLabel: z.string().default('Startdatum'),
+  /**
+   * The clinical event that `referenceDateLabel` refers to, e.g. SURGERY_COMPLETED for
+   * "Operationsdatum" or INJURY for "Skadedatum". Pre-selects the triggering event when
+   * the template is assigned and is recorded as the journey's `transition`.
+   */
+  anchorEventType: TransitionTriggerTypeSchema.optional(),
   /**
    * Optional grouping shown in the journey editor, e.g. "Frakturer" or
    * "Knäartros". Templates in the same group with a phaseOrder form a

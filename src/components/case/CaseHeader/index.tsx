@@ -16,7 +16,7 @@ interface Props {
   readonly patient: Patient | null | undefined
 }
 
-const OVERDUE_DAYS = 30
+const OVERDUE_DAYS = 7
 
 function MetaCell({ label, value, color }: { label: string; value: string; color?: string }) {
   return (

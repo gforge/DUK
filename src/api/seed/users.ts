@@ -35,7 +35,7 @@ export const patients: Patient[] = [
     dateOfBirth: '1978-07-20',
     palId: 'user-doc-1',
     lastOpenedAt: iso(daysAgo(2)),
-    createdAt: iso(daysAgo(7)),
+    createdAt: iso(daysAgo(29)),
   },
   {
     id: 'p-4',
@@ -52,7 +52,7 @@ export const patients: Patient[] = [
     dateOfBirth: '1988-04-08',
     palId: 'user-doc-1',
     lastOpenedAt: iso(daysAgo(3)),
-    createdAt: iso(daysAgo(60)),
+    createdAt: iso(daysAgo(183)),
   },
   {
     id: 'p-6',
@@ -61,7 +61,7 @@ export const patients: Patient[] = [
     dateOfBirth: '1972-02-17',
     palId: 'user-pal-1',
     lastOpenedAt: iso(daysAgo(30)),
-    createdAt: iso(daysAgo(90)),
+    createdAt: iso(daysAgo(190)),
   },
   {
     id: 'p-7',
@@ -78,7 +78,7 @@ export const patients: Patient[] = [
     dateOfBirth: '1950-03-03',
     palId: 'user-pal-1',
     lastOpenedAt: iso(daysAgo(1)),
-    createdAt: iso(daysAgo(20)),
+    createdAt: iso(daysAgo(30)),
   },
   {
     id: 'p-9',
@@ -87,7 +87,7 @@ export const patients: Patient[] = [
     dateOfBirth: '1975-11-15',
     palId: 'user-doc-1',
     lastOpenedAt: iso(daysAgo(4)),
-    createdAt: iso(daysAgo(40)),
+    createdAt: iso(daysAgo(192)),
   },
   {
     id: 'p-10',
@@ -96,7 +96,7 @@ export const patients: Patient[] = [
     dateOfBirth: '1980-01-01',
     palId: 'user-pal-1',
     lastOpenedAt: iso(daysAgo(6)),
-    createdAt: iso(daysAgo(100)),
+    createdAt: iso(daysAgo(182)),
   },
   // ── Proximal Humerus patients ────────────────────────────────────────────
   {
@@ -115,7 +115,7 @@ export const patients: Patient[] = [
     dateOfBirth: '1953-08-08',
     palId: 'user-doc-1',
     lastOpenedAt: iso(daysAgo(2)),
-    createdAt: iso(daysAgo(35)),
+    createdAt: iso(daysAgo(30)),
   },
   // ── Distal Radius patients ───────────────────────────────────────────────
   {
@@ -215,7 +215,7 @@ export const patients: Patient[] = [
     dateOfBirth: '1951-11-03',
     palId: 'user-doc-1',
     lastOpenedAt: iso(daysAgo(1)),
-    createdAt: iso(daysAgo(35)),
+    createdAt: iso(daysAgo(44)),
   },
   // ── Old fracture 1yr + new acute fracture ────────────────────────────────
   {

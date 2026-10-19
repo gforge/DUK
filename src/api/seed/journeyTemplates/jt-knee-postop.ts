@@ -7,6 +7,7 @@ export const jtKneePostop: JourneyTemplate = {
   description:
     'Strukturerad rehabilitering efter knäprotesoperation med fysioinstruktioner och kontrolltillfällen.',
   referenceDateLabel: 'Operationsdatum',
+  anchorEventType: 'SURGERY_COMPLETED',
   group: 'Knäartros',
   phaseOrder: 3,
   entries: [
@@ -30,7 +31,7 @@ export const jtKneePostop: JourneyTemplate = {
       windowDays: 3,
       order: 2,
       templateId: 'qt-function-oks-short',
-      dashboardCategory: 'SUBACUTE',
+      dashboardCategory: 'ACUTE',
       icon: 'Healing',
       scoreAliases: { 'OKS.total': 'OKS_week2' },
       scoreAliasLabels: { OKS_week2: 'OKS-short vid vecka 2' },
@@ -42,7 +43,7 @@ export const jtKneePostop: JourneyTemplate = {
       windowDays: 5,
       order: 3,
       templateId: 'qt-function-oks-short',
-      dashboardCategory: 'CONTROL',
+      dashboardCategory: 'SUBACUTE',
       icon: 'Healing',
       scoreAliases: { 'OKS.total': 'OKS_week6' },
       scoreAliasLabels: { OKS_week6: 'OKS-short vid vecka 6' },

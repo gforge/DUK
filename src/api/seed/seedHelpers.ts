@@ -52,9 +52,12 @@ export function isoTsOffset(daysOffset: number): string {
   return new Date(todayMs + daysOffset * MS_PER_DAY).toISOString()
 }
 
-/** Derive clinical case category from days elapsed since surgery. */
+/**
+ * Derive the dashboard category from days elapsed since the triggering event
+ * (fracture, surgery …): 0–2 weeks ACUTE, 2–8 weeks SUBACUTE, later CONTROL.
+ */
 export function categoryFromDaysAgo(startDaysAgo: number): 'ACUTE' | 'SUBACUTE' | 'CONTROL' {
-  if (startDaysAgo <= 21) return 'ACUTE'
-  if (startDaysAgo <= 90) return 'SUBACUTE'
+  if (startDaysAgo <= 14) return 'ACUTE'
+  if (startDaysAgo <= 56) return 'SUBACUTE'
   return 'CONTROL'
 }

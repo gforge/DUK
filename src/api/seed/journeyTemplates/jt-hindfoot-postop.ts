@@ -19,6 +19,7 @@ export const jtHindfootPostop: JourneyTemplate = {
   description:
     'Strukturerad rehabilitering och uppföljning efter hindfoot-kirurgi. Täcker sårkontroll, röntgen, gipsborttagning och långtidsuppföljning till 2 år.',
   referenceDateLabel: 'Operationsdatum',
+  anchorEventType: 'SURGERY_COMPLETED',
   group: 'Hindfoot',
   phaseOrder: 3,
   entries: [

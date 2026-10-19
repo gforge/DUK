@@ -39,6 +39,22 @@ export const instructionTemplates: InstructionTemplate[] = [
     updatedAt: iso(daysAgo(90)),
   },
   {
+    id: 'it-cast-care',
+    name: 'Gipsvård — Distal radiusfraktur',
+    tags: ['cast', 'wrist', 'fracture'],
+    content: `## Gipsvård — Distal radiusfraktur
+
+**Första dygnen:** Håll handen i högläge (över hjärthöjd) så ofta som möjligt för att minska svullnad. Rör aktivt på fingrarna, tummen, armbågen och axeln flera gånger per timme.
+
+**Under gipsperioden:** Håll gipset torrt. Stoppa inte in föremål under gipset vid klåda. Belasta inte handen.
+
+**Röntgenkontroll dag 7–10:** Frakturens läge kontrolleras med röntgen. Om läget försämrats kan operation bli aktuell — du får då ett nytt uppföljningsprogram.
+
+> **Kontakta mottagningen omgående** vid tilltagande smärta trots högläge och smärtlindring, domningar eller stickningar i fingrarna, bleka/blå eller kalla fingrar, eller om gipset känns för trångt eller skaver.`,
+    createdAt: iso(daysAgo(60)),
+    updatedAt: iso(daysAgo(60)),
+  },
+  {
     id: 'it-wound-care',
     name: 'Wound Care Instructions',
     tags: ['wound', 'post-op', 'infection'],

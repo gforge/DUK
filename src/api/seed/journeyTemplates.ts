@@ -1,6 +1,7 @@
 import type { JourneyTemplate } from '../schemas'
 import { jtComplex } from './journeyTemplates/jt-complex'
 import { jtDistalRadius } from './journeyTemplates/jt-distal-radius'
+import { jtDistalRadiusConservative } from './journeyTemplates/jt-distal-radius-conservative'
 import { jtHindfootPostop } from './journeyTemplates/jt-hindfoot-postop'
 import { jtHindfootReferral } from './journeyTemplates/jt-hindfoot-referral'
 import { jtHindfootWaitinglist } from './journeyTemplates/jt-hindfoot-waitinglist'
@@ -16,6 +17,7 @@ export const journeyTemplates: JourneyTemplate[] = [
   jtStandard,
   jtComplex,
   jtProximalHumerus,
+  jtDistalRadiusConservative,
   jtDistalRadius,
   jtMonitoring,
   jtKneeReferral,

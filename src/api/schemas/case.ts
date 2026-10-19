@@ -163,6 +163,11 @@ export const CaseSchema = z.object({
     .optional(),
   reviews: z.array(ClinicalReviewSchema).default([]),
   colleagueReviews: z.array(ColleagueReviewSchema).default([]),
+  /**
+   * When the case entered the review queue (creation, or the first patient signal on a
+   * NEW case). The dashboard "Väntat" column counts days from here; the service target is
+   * that every case is attended within a week.
+   */
   scheduledAt: z.string().datetime(),
   lastActivityAt: z.string().datetime(),
   closedAt: z.string().datetime().nullable().optional(),

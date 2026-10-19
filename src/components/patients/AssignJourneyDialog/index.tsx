@@ -15,7 +15,7 @@ import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import * as client from '@/api/client'
-import type { ResearchModule } from '@/api/schemas'
+import type { ResearchModule, TransitionTriggerType } from '@/api/schemas'
 import type { JourneyStepConflict } from '@/api/service'
 import { useApi } from '@/hooks/useApi'
 import { useRole } from '@/store/roleContext'
@@ -44,6 +44,7 @@ export default function AssignJourneyDialog({
   // Step 0 — template / date / research modules
   const [wizardStep, setWizardStep] = useState(0)
   const [journeyTemplateId, setJourneyTemplateId] = useState('')
+  const [eventType, setEventType] = useState<TransitionTriggerType | ''>('')
   const [startDate, setStartDate] = useState(new Date().toISOString().slice(0, 10))
   const [selectedModuleIds, setSelectedModuleIds] = useState<string[]>([])
   // Step 1 — conflict resolution
@@ -68,6 +69,7 @@ export default function AssignJourneyDialog({
   const handleClose = () => {
     setWizardStep(0)
     setJourneyTemplateId('')
+    setEventType('')
     setStartDate(new Date().toISOString().slice(0, 10))
     setSelectedModuleIds([])
     setConflicts([])
@@ -80,8 +82,13 @@ export default function AssignJourneyDialog({
     setConsentChecked(false)
     onClose()
   }
+  const handleTemplateChange = (id: string) => {
+    setJourneyTemplateId(id)
+    const template = journeyTemplates?.find((jt) => jt.id === id)
+    setEventType(template?.anchorEventType ?? 'MANUAL')
+  }
   const handleNext = async () => {
-    if (!journeyTemplateId || !startDate) {
+    if (!journeyTemplateId || !eventType || !startDate) {
       setError(t('patients.register.journeyRequired'))
       return
     }
@@ -111,6 +118,9 @@ export default function AssignJourneyDialog({
         undefined,
         selectedModuleIds,
         mergedStepIds,
+        undefined,
+        undefined,
+        eventType ? { type: eventType, triggeredByUserId: currentUser.id } : undefined,
       )
       const modulesToConsent =
         researchModules?.filter((rm) => selectedModuleIds.includes(rm.id)) ?? []
@@ -205,11 +215,13 @@ export default function AssignJourneyDialog({
         {wizardStep === 0 && (
           <WizardStep0
             journeyTemplateId={journeyTemplateId}
+            eventType={eventType}
             startDate={startDate}
             selectedModuleIds={selectedModuleIds}
             journeyTemplates={journeyTemplates ?? undefined}
             researchModules={researchModules ?? undefined}
-            onTemplateChange={setJourneyTemplateId}
+            onTemplateChange={handleTemplateChange}
+            onEventTypeChange={setEventType}
             onDateChange={setStartDate}
             onModulesChange={setSelectedModuleIds}
           />

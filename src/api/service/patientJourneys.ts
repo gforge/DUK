@@ -4,6 +4,8 @@ import type {
   JourneyTemplateEntry,
   JourneyTemplateInstruction,
   PatientJourney,
+  PhaseType,
+  TransitionTriggerType,
 } from '../schemas'
 import { getStore, setStore } from '../storage'
 import { computeTotalPauseShift, toScheduledDate } from './journeyDates'
@@ -42,6 +44,30 @@ function buildLateJoinModifications(
     }))
 }
 
+/** The triggering event recorded when a journey is assigned (first phase of an episode). */
+export interface JourneyStartEvent {
+  type: TransitionTriggerType
+  triggeredByUserId?: string
+  note?: string
+}
+
+/**
+ * Default phase role implied by the event that started the journey:
+ * a referral opens a REFERRAL phase, a completed surgery a POST_OP phase, etc.
+ */
+export function phaseTypeForTrigger(type: TransitionTriggerType): PhaseType {
+  switch (type) {
+    case 'REFERRAL_RECEIVED':
+      return 'REFERRAL'
+    case 'SURGERY_SCHEDULED':
+      return 'WAITING_LIST'
+    case 'SURGERY_COMPLETED':
+      return 'POST_OP'
+    default:
+      return 'FOLLOWUP'
+  }
+}
+
 export function getPatientJourneys(patientId?: string): PatientJourney[] {
   const journeys = getStore().patientJourneys
   return patientId ? journeys.filter((j) => j.patientId === patientId) : journeys
@@ -56,9 +82,19 @@ export function assignPatientJourney(
   mergedStepIds: { stepId: string; fromJourneyId: string }[] = [],
   joinedAt: string = '',
   responsiblePhysicianUserId?: string,
+  startEvent?: JourneyStartEvent,
 ): PatientJourney {
   const state = getStore()
   const template = state.journeyTemplates.find((t) => t.id === journeyTemplateId)
+  // The event date is the clinical anchor (startDate); all step offsets count from it.
+  const transition = startEvent
+    ? {
+        type: startEvent.type,
+        triggeredAt: `${startDate}T00:00:00.000Z`,
+        triggeredByUserId: startEvent.triggeredByUserId,
+        note: startEvent.note,
+      }
+    : undefined
   const episode = episodeId ? state.episodesOfCare.find((e) => e.id === episodeId) : undefined
   const patient = state.patients.find((p) => p.id === patientId)
   const resolvedResponsiblePhysicianUserId =
@@ -90,7 +126,8 @@ export function assignPatientJourney(
     episodeId,
     patientId,
     journeyTemplateId,
-    phaseType: 'FOLLOWUP',
+    phaseType: startEvent ? phaseTypeForTrigger(startEvent.type) : 'FOLLOWUP',
+    transition,
     responsiblePhysicianUserId: resolvedResponsiblePhysicianUserId,
     joinedAt,
     startDate,

@@ -72,7 +72,7 @@ Field-heavy details stay here instead of in overview diagrams.
     - `FOLLOWING_UP → CLOSED` — nurse/secretary marks the worklist item done (`completeWorklistCase`)
   - `triageCase` is blocked while LAB/XRAY `reviews` are pending.
   - **Note:** `TRIAGED` and `FOLLOWING_UP` transitions are owned by the Worklist, not the TriageTab. The TriageTab shows a read-only summary of the triage decision for these statuses.
-- `category: ACUTE | SUBACUTE | CONTROL`
+- `category: ACUTE | SUBACUTE | CONTROL` — dashboard column by time since the triggering event (fracture, surgery …): 0–2 weeks `ACUTE`, 2–8 weeks `SUBACUTE`, later `CONTROL`. This static value is the fallback; the live column comes from the active step's `dashboardCategory` (`getCasesForDashboard`, which prefers the active journey of the case's own `episodeId`).
 - `triggers: TriggerType[]`
 - `policyWarnings: PolicyWarning[]`
 - `createdByUserId: string`, `triagedByUserId?: string`
@@ -88,7 +88,7 @@ Field-heavy details stay here instead of in overview diagrams.
 - `bookings?: Booking[]` (status `PENDING | SCHEDULED | COMPLETED | CANCELLED`, completion metadata)
 - `reviews: ClinicalReview[]` (LAB/XRAY result reviews, outcome `OK | UNCERTAIN | PROBLEM`)
 - `colleagueReviews: ColleagueReview[]` — advisory second opinion requested from a named colleague (`requestedByUserId`, `reviewerUserId`, `question`, `respondedAt`, `response`); never blocks triage
-- `scheduledAt: string`
+- `scheduledAt: string` — when the case entered the review queue (creation, or the first patient signal on a `NEW` case); the dashboard "Väntat" column counts days from here and marks ≥ 7 days as overdue
 - `createdAt: string`
 - `lastActivityAt: string`
 - `closedAt?: string | null`
@@ -130,7 +130,7 @@ Login is handled outside `AppState` by a replaceable auth adapter (`src/auth/`);
 - `phaseLabel?: string`
 - `startDate: string` (`YYYY-MM-DD`)
 - `joinedAt: string`
-- `transition?: JourneyPhaseTransition`
+- `transition?: JourneyPhaseTransition` — `{ fromJourneyId?, type, triggeredAt, triggeredByUserId?, note? }`. `type` is a `TransitionTriggerType`: `INJURY | REFERRAL_RECEIVED | TRIAGE_DECISION | VISIT_DECISION | SURGERY_SCHEDULED | SURGERY_COMPLETED | PHYSIO_COMPLETED | MILESTONE | MANUAL`. Set by `assignPatientJourney(...)` when the registration supplies a triggering event (then `triggeredAt` = the event date = `startDate`) and by `startNextPhase(...)` for later phases.
 - `status: ACTIVE | SUSPENDED | COMPLETED`
 - `responsiblePhysicianUserId?: string | null`
 - `pausedAt: string | null`
@@ -145,7 +145,8 @@ Login is handled outside `AppState` by a replaceable auth adapter (`src/auth/`);
 - `JourneyTemplate.instructions: JourneyTemplateInstruction[]`
 - `JourneyTemplate.parentTemplateId?: string`
 - `JourneyTemplate.derivedAt?: string`
-- `JourneyTemplate.referenceDateLabel: string`
+- `JourneyTemplate.referenceDateLabel: string` — e.g. "Operationsdatum", "Skadedatum"
+- `JourneyTemplate.anchorEventType?: TransitionTriggerType` — the event the reference date refers to; pre-selects the triggering event in the registration/assign dialogs and the trigger in `StartNextPhaseDialog`
 - `JourneyTemplate.group?: string` — editor grouping, e.g. "Frakturer"
 - `JourneyTemplate.phaseOrder?: number` — 1-based position within the group's multi-phase care pathway
 
@@ -153,7 +154,7 @@ Login is handled outside `AppState` by a replaceable auth adapter (`src/auth/`);
 - `JourneyTemplateEntry.offsetDays: number`
 - `JourneyTemplateEntry.windowDays: number`
 - `JourneyTemplateEntry.stepKey?: string`
-- `JourneyTemplateEntry.dashboardCategory: ACUTE | SUBACUTE | CONTROL`
+- `JourneyTemplateEntry.dashboardCategory: ACUTE | SUBACUTE | CONTROL` — for post-event templates (`anchorEventType` INJURY/SURGERY_COMPLETED) this follows `offsetDays`: ≤ 14 days `ACUTE`, ≤ 56 days `SUBACUTE`, else `CONTROL`; referral/waiting-list/monitoring steps are `CONTROL`
 - `JourneyTemplateEntry.scoreAliases: Record<string, string>`
 - `JourneyTemplateEntry.scoreAliasLabels: Record<string, string>`
 - `JourneyTemplateEntry.recurrenceIntervalDays?: number`

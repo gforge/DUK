@@ -27,6 +27,7 @@ JourneyTemplate
 - parentTemplateId?: lineage to parent template
 - derivedAt?: last parent sync timestamp
 - referenceDateLabel: visible assignment anchor label
+- anchorEventType?: event the anchor date refers to
 - group? + phaseOrder?: multi-phase care pathway grouping
 end note
 

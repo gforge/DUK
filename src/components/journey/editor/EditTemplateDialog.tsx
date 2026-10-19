@@ -11,8 +11,10 @@ import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import * as client from '@/api/client'
-import type { JourneyTemplate } from '@/api/schemas'
+import type { JourneyTemplate, TransitionTriggerType } from '@/api/schemas'
 import { useSnack } from '@/store/snackContext'
+
+import TriggerEventSelect from '../TriggerEventSelect'
 interface Props {
   template?: JourneyTemplate
   onClose: () => void
@@ -26,6 +28,9 @@ export default function EditTemplateDialog({ template, onClose, onSaved }: Props
   const [referenceDateLabel, setReferenceDateLabel] = useState(
     template?.referenceDateLabel ?? t('journey.referenceDateDefault'),
   )
+  const [anchorEventType, setAnchorEventType] = useState<TransitionTriggerType | ''>(
+    template?.anchorEventType ?? '',
+  )
   const [group, setGroup] = useState(template?.group ?? '')
   const [phaseOrder, setPhaseOrder] = useState<number | ''>(template?.phaseOrder ?? '')
   const [saving, setSaving] = useState(false)
@@ -34,6 +39,7 @@ export default function EditTemplateDialog({ template, onClose, onSaved }: Props
     setSaving(true)
     try {
       const grouping = {
+        anchorEventType: anchorEventType || undefined,
         group: group.trim() || undefined,
         phaseOrder: phaseOrder === '' || phaseOrder < 1 ? undefined : Math.round(phaseOrder),
       }
@@ -95,6 +101,13 @@ export default function EditTemplateDialog({ template, onClose, onSaved }: Props
             fullWidth
             required
             helperText={t('journey.template.referenceDateLabelHint')}
+          />
+          <TriggerEventSelect
+            label={t('journey.template.anchorEventType')}
+            helperText={t('journey.template.anchorEventTypeHint')}
+            value={anchorEventType}
+            onChange={setAnchorEventType}
+            allowEmpty
           />
           <TextField
             label={t('journey.template.group')}
