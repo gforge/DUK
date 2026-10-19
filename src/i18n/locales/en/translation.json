@@ -896,6 +896,11 @@
   },
   "review": {
     "addReview": "Add review",
+    "awaitResultButton": "Await lab/X-ray result",
+    "awaitResultConfirm": "Add",
+    "awaitResultHelp": "Triage is blocked until the result is marked as reviewed.",
+    "awaitResultLabel": "Which result must be reviewed before triage?",
+    "awaitResultTitle": "Await lab or X-ray result",
     "comment": "Comment",
     "commentPlaceholder": "Review notes",
     "commentRequired": "Comment required for this outcome",

@@ -896,6 +896,11 @@
   },
   "review": {
     "addReview": "Lägg till granskning",
+    "awaitResultButton": "Invänta prov-/röntgensvar",
+    "awaitResultConfirm": "Lägg till",
+    "awaitResultHelp": "Triage spärras tills svaret är markerat som granskat.",
+    "awaitResultLabel": "Vilket svar ska granskas innan triage?",
+    "awaitResultTitle": "Invänta prov- eller röntgensvar",
     "comment": "Kommentar",
     "commentPlaceholder": "Notering från granskningen",
     "commentRequired": "Kommentar krävs för detta utfall",

@@ -38,8 +38,8 @@ export function PendingReviewsSection({
   const getReviewTypeLabel = useReviewTypeLabel()
   if (reviews.length === 0) return null
   return (
-    <Box sx={{ mb: 2 }}>
-      <Alert severity="info" sx={{ mb: 2 }} icon={<PendingIcon />}>
+    <Box>
+      <Alert severity="info" icon={<PendingIcon />}>
         <Stack sx={{ gap: 1.5 }}>
           <Typography variant="body2" sx={{ fontWeight: 600 }}>
             {t('review.pending')} ({reviews.length})
