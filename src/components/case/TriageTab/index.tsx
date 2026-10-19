@@ -19,6 +19,7 @@ import { useRole } from '@/store/roleContext'
 import { useSnack } from '@/store/snackContext'
 import { tokens } from '@/theme'
 
+import LatestFormPanel from '../triage/LatestFormPanel'
 import { AsideTitle, DecisionRows, TriageLayout } from '../triage/layout'
 import { contactModeToRouteSegment } from '../triage/routeContactMode'
 import { cardSx } from '../triage/styles'
@@ -153,6 +154,7 @@ export default function TriageTab({ caseData, onTriaged, routeContactMode }: Tri
     return (
       <Stack sx={{ gap: 2.5 }}>
         <ClinicalReviewPanel caseData={caseData} onRefetch={onTriaged} />
+        <LatestFormPanel caseId={caseData.id} />
         {hasPendingReviews ? (
           <TriageLayout
             main={<Alert severity="warning">{t('triage.pendingReviews')}</Alert>}

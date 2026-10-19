@@ -7,18 +7,15 @@ import {
   Chip,
   CircularProgress,
   Stack,
-  Table,
-  TableBody,
-  TableCell,
-  TableRow,
   Typography,
 } from '@mui/material'
 import { format } from 'date-fns'
-import React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import * as client from '@/api/client'
 import { useApi } from '@/hooks/useApi'
+
+import FormAnswersTable from './FormAnswersTable'
 
 interface FormResponsesTabProps {
   caseId: string
@@ -87,44 +84,11 @@ export default function FormResponsesTab({ caseId }: FormResponsesTabProps) {
               </Stack>
             </AccordionSummary>
             <AccordionDetails>
-              <Table size="small" aria-label={`form responses for ${template?.name}`}>
-                <TableBody>
-                  {Object.entries(resp.answers).map(([key, value]) => {
-                    const question = template?.questions.find((q) => q.key === key)
-                    return (
-                      <TableRow key={key}>
-                        <TableCell
-                          sx={{ fontWeight: 500, width: '50%', borderBottom: 'none', py: 0.5 }}
-                        >
-                          {question ? question.label['sv'] || key : key}
-                        </TableCell>
-                        <TableCell sx={{ borderBottom: 'none', py: 0.5 }}>
-                          <AnswerValue value={value} />
-                        </TableCell>
-                      </TableRow>
-                    )
-                  })}
-                </TableBody>
-              </Table>
+              <FormAnswersTable response={resp} template={template} />
             </AccordionDetails>
           </Accordion>
         )
       })}
     </Stack>
   )
-}
-
-function AnswerValue({ value }: { value: string | number | boolean }) {
-  const { t } = useTranslation()
-  if (typeof value === 'boolean') {
-    return (
-      <Chip
-        label={value ? t('common.yes') : t('common.no')}
-        size="small"
-        color={value ? 'success' : 'default'}
-        variant="outlined"
-      />
-    )
-  }
-  return <Typography variant="body2">{String(value)}</Typography>
 }
