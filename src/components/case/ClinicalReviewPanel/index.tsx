@@ -1,5 +1,5 @@
 import AddIcon from '@mui/icons-material/Add'
-import { Box, Button, CircularProgress } from '@mui/material'
+import { Box, Button, CircularProgress, Stack } from '@mui/material'
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -33,7 +33,8 @@ export default function ClinicalReviewPanel({ caseData, onRefetch }: Props) {
 
   const { data: reviewsData, loading } = useApi(
     () => client.getAllReviews(caseData.id),
-    [caseData.id],
+    // caseData is refetched after every review change; reload the list with it
+    [caseData.id, caseData.reviews],
   )
   const allReviews = reviewsData ?? []
 
@@ -114,14 +115,14 @@ export default function ClinicalReviewPanel({ caseData, onRefetch }: Props) {
     if (!isClinician) return null
 
     return (
-      <Box sx={{ mb: 2 }}>
+      <Box>
         <Button
           startIcon={<AddIcon />}
           variant="outlined"
           size="small"
           onClick={() => setOpenAddDialog(true)}
         >
-          {t('review.addReview')}
+          {t('review.awaitResultButton')}
         </Button>
         <AddReviewDialog
           open={openAddDialog}
@@ -135,8 +136,21 @@ export default function ClinicalReviewPanel({ caseData, onRefetch }: Props) {
     )
   }
 
+  const addButton = (sx?: object) =>
+    isClinician ? (
+      <Button
+        startIcon={<AddIcon />}
+        variant="outlined"
+        size="small"
+        sx={sx}
+        onClick={() => setOpenAddDialog(true)}
+      >
+        {t('review.awaitResultButton')}
+      </Button>
+    ) : null
+
   return (
-    <Box sx={{ mb: 3 }}>
+    <Stack sx={{ gap: 2 }}>
       <PendingReviewsSection
         reviews={pendingReviews}
         userMap={userMap}
@@ -147,19 +161,15 @@ export default function ClinicalReviewPanel({ caseData, onRefetch }: Props) {
         onDelete={handleDeleteReview}
       />
 
-      {isClinician && (
-        <Button
-          startIcon={<AddIcon />}
-          variant="outlined"
-          size="small"
-          sx={{ mb: 2 }}
-          onClick={() => setOpenAddDialog(true)}
-        >
-          {t('review.addReview')}
-        </Button>
+      {completedReviews.length > 0 ? (
+        <CompletedReviewsTable
+          reviews={completedReviews}
+          userMap={userMap}
+          action={addButton({ height: 30 })}
+        />
+      ) : (
+        <Box>{addButton()}</Box>
       )}
-
-      <CompletedReviewsTable reviews={completedReviews} userMap={userMap} />
 
       <AddReviewDialog
         open={openAddDialog}
@@ -187,6 +197,6 @@ export default function ClinicalReviewPanel({ caseData, onRefetch }: Props) {
         personalNumber={patient?.personalNumber}
         reviewType={selectedReview?.type ?? null}
       />
-    </Box>
+    </Stack>
   )
 }
