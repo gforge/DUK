@@ -949,9 +949,13 @@
   "status": {
     "CLOSED": "Closed",
     "FOLLOWING_UP": "Following Up",
-    "NEEDS_REVIEW": "Next follow-up",
-    "NEW": "New Checkpoint",
+    "NEEDS_REVIEW": "To review",
+    "NEW": "Awaiting patient",
     "TRIAGED": "Triaged"
+  },
+  "statusPatient": {
+    "NEEDS_REVIEW": "Sent – awaiting care team",
+    "NEW": "Awaiting your reply"
   },
   "triage": {
     "addToGoogle": "Add to Google Calendar",

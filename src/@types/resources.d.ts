@@ -951,9 +951,13 @@ export default interface Resources {
     "status": {
       "CLOSED": "Stängd",
       "FOLLOWING_UP": "Uppföljning",
-      "NEEDS_REVIEW": "Nästa uppföljning",
-      "NEW": "Ny kontrollpunkt",
+      "NEEDS_REVIEW": "Att granska",
+      "NEW": "Väntar på patient",
       "TRIAGED": "Triagerad"
+    },
+    "statusPatient": {
+      "NEEDS_REVIEW": "Skickat – väntar på vården",
+      "NEW": "Väntar på ditt svar"
     },
     "triage": {
       "addToGoogle": "Lägg till i Google Kalender",
