@@ -18,16 +18,17 @@ type Severity = 'LOW' | 'MEDIUM' | 'HIGH'
 
 /**
  * Returns a label function for CaseStatus.
- * Pass isPatientView=true to get patient-friendly copy for NEEDS_REVIEW.
+ * Pass isPatientView=true to get patient-friendly copy for NEW and NEEDS_REVIEW
+ * (the staff labels describe who the case is waiting on from the clinic's side).
  */
 export function useStatusLabel() {
   const { t } = useTranslation()
-  return (status: CaseStatus, _isPatientView = false): string => {
+  return (status: CaseStatus, isPatientView = false): string => {
     switch (status) {
       case 'NEW':
-        return t('status.NEW')
+        return isPatientView ? t('statusPatient.NEW') : t('status.NEW')
       case 'NEEDS_REVIEW':
-        return t('status.NEEDS_REVIEW')
+        return isPatientView ? t('statusPatient.NEEDS_REVIEW') : t('status.NEEDS_REVIEW')
       case 'TRIAGED':
         return t('status.TRIAGED')
       case 'FOLLOWING_UP':
