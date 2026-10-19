@@ -148,7 +148,7 @@ export const formResponses: FormResponse[] = [
     caseId: 'case-12',
     answers: { NUMB_1: false, NUMB_2: false, INF_WOUND: false, INF_FEVER: false, PNRS_1: 6 },
     scores: {},
-    submittedAt: iso(daysAgo(34)),
+    submittedAt: iso(daysAgo(29)),
   },
   {
     id: 'fr-p12-2',
@@ -157,7 +157,7 @@ export const formResponses: FormResponse[] = [
     caseId: 'case-12',
     answers: { WOUND_HEALED: true, WOUND_DISCHARGE: false, PNRS_2: 5, PNRS_NIGHT: 4 },
     scores: {},
-    submittedAt: iso(daysAgo(25)),
+    submittedAt: iso(daysAgo(19)),
   },
   {
     id: 'fr-p12-3',
@@ -167,7 +167,7 @@ export const formResponses: FormResponse[] = [
     // PNRS_week4=7 (≥ 7 → rule-ph-2), OSS_week4=20 (< 25 → rule-ph-3)
     answers: { OSS_1: 2, OSS_2: 2, OSS_3: 2, OSS_4: 2, OSS_5: 2, PNRS_2: 7 },
     scores: { 'OSS.total': 20 },
-    submittedAt: iso(daysAgo(7)),
+    submittedAt: iso(daysAgo(2)),
   },
   // ── Distal radius patients ───────────────────────────────────────────────
   // Ragnhild — case-13 — acute, pain increasing (PNRS_1=6 → PNRS_2=8 → rule-dr-1)
@@ -529,7 +529,7 @@ export const formResponses: FormResponse[] = [
     patientJourneyId: 'pj-ax-21b',
     answers: { OSS_1: 2, OSS_2: 2, OSS_3: 2, OSS_4: 2, OSS_5: 2, PNRS_2: 8 },
     scores: { 'OSS.total': 18 },
-    submittedAt: iso(daysAgo(2)),
+    submittedAt: iso(daysAgo(6)),
   },
 
   // ── Gunnar Eriksson — Two simultaneous fractures (p-22) ──────────────────
@@ -542,7 +542,7 @@ export const formResponses: FormResponse[] = [
     patientJourneyId: 'pj-gu-22',
     answers: { NUMB_1: false, NUMB_2: true, INF_WOUND: false, INF_FEVER: false, PNRS_1: 6 },
     scores: {},
-    submittedAt: iso(daysAgo(34)),
+    submittedAt: iso(daysAgo(43)),
   },
   {
     id: 'fr-gu-22-w4',
@@ -550,8 +550,9 @@ export const formResponses: FormResponse[] = [
     templateId: 'qt-function-prwe-short',
     caseId: 'case-22',
     patientJourneyId: 'pj-gu-22',
-    answers: { PRWE_PAIN: 4, PRWE_FUNCTION: 4, PRWE_USUAL: 4, PNRS_2: 4 },
-    scores: { 'PRWE.total': 40 },
+    // week 6–8 response — reasonable recovery
+    answers: { PRWE_PAIN: 3, PRWE_FUNCTION: 4, PRWE_USUAL: 3, PNRS_2: 3 },
+    scores: { 'PRWE.total': 35 },
     submittedAt: iso(daysAgo(2)),
   },
   // Episode ep-23: Left calcaneus (same patient — separate journey/case)
@@ -563,7 +564,7 @@ export const formResponses: FormResponse[] = [
     patientJourneyId: 'pj-gu-23',
     answers: { NUMB_1: false, NUMB_2: false, INF_WOUND: false, INF_FEVER: false, PNRS_1: 8 },
     scores: {},
-    submittedAt: iso(daysAgo(34)),
+    submittedAt: iso(daysAgo(43)),
   },
   {
     id: 'fr-gu-23-w4',

@@ -23,6 +23,7 @@ export const assignPatientJourney = (
   mergedStepIds?: { stepId: string; fromJourneyId: string }[],
   joinedAt?: string,
   responsiblePhysicianUserId?: string,
+  startEvent?: service.JourneyStartEvent,
 ): Promise<PatientJourney> =>
   withDelay(() =>
     service.assignPatientJourney(
@@ -34,6 +35,7 @@ export const assignPatientJourney = (
       mergedStepIds,
       joinedAt,
       responsiblePhysicianUserId,
+      startEvent,
     ),
   )
 

@@ -3,9 +3,9 @@ import { daysAgo, iso } from '../shared'
 
 export const jtDistalRadius: JourneyTemplate = {
   id: 'jt-distal-radius',
-  name: 'Distala radiusfraktur',
+  name: 'Distala radiusfraktur — operativ',
   description:
-    'Härledd från Standardfraktur — handledsspecifika fysioterapiinstruktioner med gipsborttagning vid vecka 4',
+    'Opererad distal radiusfraktur (volar platta). Härledd från Standardfraktur — handledsspecifika fysioterapiinstruktioner med gipsborttagning vid vecka 4. Används även när en gipsbehandlad fraktur opereras efter sekundär dislokation.',
   parentTemplateId: 'jt-standard',
   derivedAt: iso(daysAgo(60)),
   entries: [
@@ -134,5 +134,6 @@ export const jtDistalRadius: JourneyTemplate = {
   ],
   createdAt: iso(daysAgo(60)),
   referenceDateLabel: 'Operationsdatum',
+  anchorEventType: 'SURGERY_COMPLETED',
   group: 'Frakturer',
 }

@@ -14,6 +14,7 @@ export const jtHipReferral: JourneyTemplate = {
   description:
     'Skickas när remissen registrerats. Basformulär (läkemedel, boende, allergier) och höftspecifikt formulär besvaras inför besök hos ortoped.',
   referenceDateLabel: 'Remissdatum',
+  anchorEventType: 'REFERRAL_RECEIVED',
   group: 'Höftartros',
   phaseOrder: 1,
   entries: [

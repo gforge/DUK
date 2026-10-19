@@ -15,8 +15,10 @@ import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import * as client from '@/api/client'
+import type { TransitionTriggerType } from '@/api/schemas'
 import { parsePersonnummer } from '@/api/utils/personnummer'
 import { useApi } from '@/hooks/useApi'
+import { useRole } from '@/store/roleContext'
 import { useSnack } from '@/store/snackContext'
 
 // split steps to reduce component length
@@ -32,6 +34,7 @@ interface Props {
 export default function RegisterPatientDialog({ open, onClose, onCreated }: Props) {
   const { t } = useTranslation()
   const { showSnack } = useSnack()
+  const { currentUser } = useRole()
   const [step, setStep] = useState(0)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -46,6 +49,8 @@ export default function RegisterPatientDialog({ open, onClose, onCreated }: Prop
   const [dateOfBirth, setDateOfBirth] = useState('')
   // Step 1 — journey assignment
   const [journeyTemplateId, setJourneyTemplateId] = useState('')
+  // The clinical event (fracture, surgery, referral …) whose date anchors the journey.
+  const [eventType, setEventType] = useState<TransitionTriggerType | ''>('')
   const [startDate, setStartDate] = useState(new Date().toISOString().slice(0, 10))
   const [joinedAt, setJoinedAt] = useState('')
   // Step 2 — research module enrollment
@@ -69,12 +74,19 @@ export default function RegisterPatientDialog({ open, onClose, onCreated }: Prop
     setDisplayName('')
     setDateOfBirth('')
     setJourneyTemplateId('')
+    setEventType('')
     setStartDate(new Date().toISOString().slice(0, 10))
     setJoinedAt('')
     setSelectedModuleIds([])
     setError(null)
     setHintOpen(false)
     onClose()
+  }
+  /** Selecting a template pre-selects the event its reference date refers to. */
+  const handleTemplateChange = (id: string) => {
+    setJourneyTemplateId(id)
+    const template = journeyTemplates?.find((jt) => jt.id === id)
+    setEventType(template?.anchorEventType ?? 'MANUAL')
   }
   const handleLookup = async () => {
     setLookupStatus('loading')
@@ -116,7 +128,7 @@ export default function RegisterPatientDialog({ open, onClose, onCreated }: Prop
         return
       }
     } else if (step === 1) {
-      if (!journeyTemplateId || !startDate) {
+      if (!journeyTemplateId || !eventType || !startDate) {
         setError(t('patients.register.journeyRequired'))
         return
       }
@@ -142,6 +154,8 @@ export default function RegisterPatientDialog({ open, onClose, onCreated }: Prop
         selectedModuleIds,
         [],
         joinedAt || undefined,
+        undefined,
+        eventType ? { type: eventType, triggeredByUserId: currentUser.id } : undefined,
       )
       showSnack(t('patients.register.success'), 'success')
       onCreated(patient.id)
@@ -213,7 +227,9 @@ export default function RegisterPatientDialog({ open, onClose, onCreated }: Prop
         {step === 1 && (
           <Step1JourneyAssignment
             journeyTemplateId={journeyTemplateId}
-            setJourneyTemplateId={setJourneyTemplateId}
+            setJourneyTemplateId={handleTemplateChange}
+            eventType={eventType}
+            setEventType={setEventType}
             startDate={startDate}
             setStartDate={setStartDate}
             joinedAt={joinedAt}
@@ -238,6 +254,7 @@ export default function RegisterPatientDialog({ open, onClose, onCreated }: Prop
             personalNumber={personalNumber}
             dateOfBirth={pnrInfo.dateOfBirth ?? dateOfBirth}
             selectedTemplate={selectedTemplate}
+            eventType={eventType}
             startDate={startDate}
             selectedModuleIds={selectedModuleIds}
             researchModules={

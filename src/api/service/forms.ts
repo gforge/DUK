@@ -69,6 +69,8 @@ export function submitFormResponse(
     policyWarnings: warnings,
     lastActivityAt: now(),
     status: existingCase.status === 'NEW' ? 'NEEDS_REVIEW' : existingCase.status,
+    // First patient signal puts the case in the review queue: "Väntat" counts from here.
+    scheduledAt: existingCase.status === 'NEW' ? now() : existingCase.scheduledAt,
   }
 
   // If linked to a recurring step, record the completion so the next occurrence
@@ -128,6 +130,7 @@ export function seekContact(patientId: string, caseId: string): Case {
     triggers: [...new Set([...existing.triggers, 'SEEK_CONTACT' as TriggerType])],
     lastActivityAt: now(),
     status: existing.status === 'NEW' ? 'NEEDS_REVIEW' : existing.status,
+    scheduledAt: existing.status === 'NEW' ? now() : existing.scheduledAt,
   }
   state = { ...state, cases: state.cases.map((c) => (c.id === caseId ? updated : c)) }
   state = addAuditEvent(state, caseId, patientId, 'PATIENT', 'SEEK_CONTACT', {})

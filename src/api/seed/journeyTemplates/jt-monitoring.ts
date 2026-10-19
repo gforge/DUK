@@ -7,6 +7,7 @@ export const jtMonitoring: JourneyTemplate = {
   description:
     'Löpande halvårsuppföljning utan koppling till operation. Varje tillfälle upprepas automatiskt 6 månader efter att patienten besvarar formuläret.',
   referenceDateLabel: 'Uppföljningsstart',
+  anchorEventType: 'MILESTONE',
   group: 'Löpande uppföljning',
   entries: [
     {

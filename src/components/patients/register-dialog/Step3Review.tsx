@@ -2,12 +2,14 @@ import { Box, Stack, Typography } from '@mui/material'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 
-import type { JourneyTemplate } from '@/api/schemas'
+import type { JourneyTemplate, TransitionTriggerType } from '@/api/schemas'
+import { useTransitionTriggerLabel } from '@/hooks/labels'
 interface Props {
   effectiveName: string
   personalNumber: string
   dateOfBirth: string
   selectedTemplate: JourneyTemplate | undefined | null
+  eventType: TransitionTriggerType | ''
   startDate: string
   selectedModuleIds: string[]
   researchModules: Array<{
@@ -20,11 +22,13 @@ export function Step3Review({
   personalNumber,
   dateOfBirth,
   selectedTemplate,
+  eventType,
   startDate,
   selectedModuleIds,
   researchModules,
 }: Props) {
   const { t } = useTranslation()
+  const triggerLabel = useTransitionTriggerLabel()
   return (
     <Stack sx={{ gap: 1.5 }}>
       <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
@@ -48,6 +52,11 @@ export function Step3Review({
           <Typography variant="body2">
             <strong>{t('nav.journeys')}:</strong> {selectedTemplate?.name}
           </Typography>
+          {eventType && (
+            <Typography variant="body2">
+              <strong>{t('patients.register.eventType')}:</strong> {triggerLabel(eventType)}
+            </Typography>
+          )}
           <Typography variant="body2">
             <strong>{selectedTemplate?.referenceDateLabel ?? t('journey.startDate')}:</strong>{' '}
             {startDate}

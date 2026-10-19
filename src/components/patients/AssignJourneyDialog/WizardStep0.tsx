@@ -15,28 +15,34 @@ import {
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 
-import type { JourneyTemplate, ResearchModule } from '@/api/schemas'
+import type { JourneyTemplate, ResearchModule, TransitionTriggerType } from '@/api/schemas'
+import TriggerEventSelect from '@/components/journey/TriggerEventSelect'
 interface Props {
   readonly journeyTemplateId: string
+  readonly eventType: TransitionTriggerType | ''
   readonly startDate: string
   readonly selectedModuleIds: string[]
   readonly journeyTemplates: JourneyTemplate[] | undefined
   readonly researchModules: ResearchModule[] | undefined
   readonly onTemplateChange: (id: string) => void
+  readonly onEventTypeChange: (type: TransitionTriggerType | '') => void
   readonly onDateChange: (date: string) => void
   readonly onModulesChange: (ids: string[]) => void
 }
 export default function WizardStep0({
   journeyTemplateId,
+  eventType,
   startDate,
   selectedModuleIds,
   journeyTemplates,
   researchModules,
   onTemplateChange,
+  onEventTypeChange,
   onDateChange,
   onModulesChange,
 }: Props) {
   const { t } = useTranslation()
+  const selectedTemplate = journeyTemplates?.find((jt) => jt.id === journeyTemplateId)
   const handleModuleToggle = (id: string, checked: boolean) => {
     onModulesChange(
       checked ? [...selectedModuleIds, id] : selectedModuleIds.filter((m) => m !== id),
@@ -58,9 +64,18 @@ export default function WizardStep0({
           ))}
         </Select>
       </FormControl>
+      <TriggerEventSelect
+        label={t('patients.register.eventType')}
+        helperText={t('patients.register.eventTypeHint')}
+        value={eventType}
+        onChange={onEventTypeChange}
+        required
+      />
       <TextField
-        label={t('patients.register.referenceDate')}
-        helperText={t('patients.register.referenceDateHint')}
+        label={selectedTemplate?.referenceDateLabel ?? t('patients.register.referenceDate')}
+        helperText={t('patients.register.referenceDateHint', {
+          label: selectedTemplate?.referenceDateLabel ?? t('patients.register.referenceDate'),
+        })}
         value={startDate}
         onChange={(e) => onDateChange(e.target.value)}
         size="small"

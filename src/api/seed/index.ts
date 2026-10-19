@@ -4,6 +4,13 @@ import { ensureAllUsers } from '../utils/userGenerator'
 import { auditEvents } from './auditEvents'
 import { careTeams } from './careTeams'
 import { cases } from './cases'
+import {
+  switchedCases,
+  switchedEpisodes,
+  switchedFormResponses,
+  switchedJourneys,
+  switchedPatients,
+} from './conservativeToOperativeExamples'
 import { episodesOfCare } from './episodesOfCare'
 import { formResponses } from './formResponses'
 import { formSeries } from './formSeries'
@@ -33,19 +40,19 @@ const baseSeedState: AppState = {
   demoDataVersion: CURRENT_DEMO_DATA_VERSION,
   users,
   careTeams,
-  patients: [...patients, ...referralPatients],
-  cases: [...cases, ...referralCases],
+  patients: [...patients, ...referralPatients, ...switchedPatients],
+  cases: [...cases, ...referralCases, ...switchedCases],
   policyRules,
   auditEvents,
   questionnaireTemplates,
   formSeries,
-  formResponses: [...formResponses, ...referralFormResponses],
+  formResponses: [...formResponses, ...referralFormResponses, ...switchedFormResponses],
   journalDrafts,
   journalTemplates,
   journeyTemplates,
   researchModules,
-  episodesOfCare: [...episodesOfCare, ...referralEpisodes],
-  patientJourneys: [...patientJourneys, ...referralJourneys],
+  episodesOfCare: [...episodesOfCare, ...referralEpisodes, ...switchedEpisodes],
+  patientJourneys: [...patientJourneys, ...referralJourneys, ...switchedJourneys],
   instructions: [],
   instructionTemplates,
   researchConsents: [],

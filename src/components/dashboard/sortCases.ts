@@ -8,7 +8,7 @@ export type SortMode = 'time' | 'flags' | 'name'
 export const SORT_MODES: readonly SortMode[] = ['time', 'flags', 'name']
 
 /** Days at or above which a waiting time is shown as overdue (red). */
-export const LONG_WAIT_DAYS = 30
+export const LONG_WAIT_DAYS = 7
 
 /** Whole days since the case was scheduled (negative = scheduled in the future). */
 export const waitedDays = (c: { scheduledAt: string }, now: Date = new Date()) =>

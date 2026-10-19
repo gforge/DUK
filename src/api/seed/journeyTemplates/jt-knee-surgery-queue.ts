@@ -7,6 +7,7 @@ export const jtKneeSurgeryQueue: JourneyTemplate = {
   description:
     'Uppföljning under väntetid på knäoperation: hälsodeklaration vid start, kvartalsvisa kontroller.',
   referenceDateLabel: 'Datum för köplats',
+  anchorEventType: 'SURGERY_SCHEDULED',
   group: 'Knäartros',
   phaseOrder: 2,
   entries: [
@@ -17,7 +18,7 @@ export const jtKneeSurgeryQueue: JourneyTemplate = {
       windowDays: 5,
       order: 1,
       templateId: 'qt-numbness-infection',
-      dashboardCategory: 'ACUTE',
+      dashboardCategory: 'CONTROL',
       icon: 'MonitorHeart',
       scoreAliases: {},
       scoreAliasLabels: {},

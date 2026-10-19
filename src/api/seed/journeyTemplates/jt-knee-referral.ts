@@ -11,6 +11,7 @@ export const jtKneeReferral: JourneyTemplate = {
   description:
     'Skickas när remissen registrerats. Basformulär (läkemedel, boende, allergier) och knäspecifikt formulär besvaras inför besök hos ortoped.',
   referenceDateLabel: 'Remissdatum',
+  anchorEventType: 'REFERRAL_RECEIVED',
   group: 'Knäartros',
   phaseOrder: 1,
   entries: [

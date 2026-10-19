@@ -22,13 +22,26 @@ Source modules:
 - `src/api/service/patientJourneys.ts`
 
 `assignPatientJourney(...)` creates an `ACTIVE` journey and instantiates `Instruction` rows
-from the template's `instructions[]`. When `joinedAt` is after `startDate` (late enrolment),
+from the template's `instructions[]`. The registration and assign dialogs ask for the
+triggering event (fracture, surgery, referral …, pre-selected from the template's
+`anchorEventType`) and its date: the date becomes `startDate` and the event is stored as the
+journey's `transition` (`phaseType` is derived with `phaseTypeForTrigger`). When `joinedAt` is after `startDate` (late enrolment),
 steps whose window already closed get system `REMOVE_STEP` modifications and
 instructions whose end already passed are created as `CANCELLED` (`cancelReason = LATE_JOIN`).
 
 Phase progression inside an episode uses `startNextPhase(...)`,
 which completes the previous journey and creates a new one linked to the same `episodeId`,
 recording `phaseType` and a `transition` (`fromJourneyId`, trigger type, user, note).
+
+Two switch patterns are seeded:
+
+- **New event, new anchor** — conservative → operative distal radius (p-27 Astrid Wallin,
+  p-28 Håkan Nordin): the cast journey (`jt-distal-radius-conservative`, anchored on the
+  injury) is completed and an operative journey (`jt-distal-radius`) starts with trigger
+  `SURGERY_COMPLETED` and `startDate` = surgery date.
+- **Same event, other protocol** — standard → complex ankle fracture (p-21 Axel Lindström):
+  the new journey keeps the surgery date as `startDate` and sets `joinedAt` to the switch day,
+  so steps whose window already closed are removed as late-join modifications.
 
 An `EpisodeOfCare` may carry an incoming `referral` (referrer, reason, diagnoses).
 Diagnoses are set via `setReferralDiagnoses(...)`, simulating an "uthopp" context launch
@@ -69,7 +82,7 @@ Key methods:
 - `getEffectiveSteps(journeyId)`
 - `getEffectiveStepsForTemplate(templateId, startDate)` (unsaved journey, used for conflict detection)
 - `getMergedDueStepsForPatient(patientId, date)`
-- `getCasesForDashboard()` (dashboard `activeCategory` from the open step window of the newest `ACTIVE` journey)
+- `getCasesForDashboard()` (dashboard `activeCategory` from the open step window of the case's episode journey, else the patient's newest `ACTIVE` journey; columns mean time since the triggering event — 0–2 weeks Akut, 2–8 weeks Subakut, later Kontroll)
 
 Source modules:
 
