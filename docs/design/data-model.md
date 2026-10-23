@@ -52,7 +52,7 @@ Field-heavy details stay here instead of in overview diagrams.
 - `personalNumber: string`
 - `dateOfBirth: string`
 - `palId?: string`
-- `lastOpenedAt?: string` (set by `patientOpenedApp(...)`)
+- `noDigitalChannel?: boolean` (no e-ID/app: forms are never sent, checkpoints become `NO_DIGITAL_CHANNEL` cases for staff), `lastOpenedAt?: string` (set by `patientOpenedApp(...)`)
 - `createdAt: string`
 
 ### Case (`src/api/schemas/case.ts`)
@@ -88,6 +88,7 @@ Field-heavy details stay here instead of in overview diagrams.
 - `bookings?: Booking[]` (status `PENDING | SCHEDULED | COMPLETED | CANCELLED`, completion metadata)
 - `reviews: ClinicalReview[]` (LAB/XRAY result reviews, outcome `OK | UNCERTAIN | PROBLEM`)
 - `colleagueReviews: ColleagueReview[]` — advisory second opinion requested from a named colleague (`requestedByUserId`, `reviewerUserId`, `question`, `respondedAt`, `response`); never blocks triage
+- `triageDecision.handledNow?: boolean` — PHONE only: the triaging clinician called right away; `triageCase` then logs `CONTACTED` and closes the case without a worklist task
 - `scheduledAt: string` — when the case entered the review queue (creation, or the first patient signal on a `NEW` case); the dashboard "Väntat" column counts days from here and marks ≥ 7 days as overdue
 - `createdAt: string`
 - `lastActivityAt: string`

@@ -1,6 +1,6 @@
 import type { AssignmentMode, CareRole, ContactMode } from '@/api/schemas'
 
-import type { TriageForm } from './schema'
+import { isHandledNow, type TriageForm } from './schema'
 import { computeDueAtFromInput } from './utils'
 
 export interface TriageSubmitData {
@@ -14,18 +14,42 @@ export interface TriageSubmitData {
     dueAt?: string | null
     note?: string | null
     xrayBeforeVisit?: boolean
+    handledNow?: boolean
   }
   patientMessage?: string
+}
+
+/** Who performs a "calling now" phone contact: the triaging clinician. */
+export interface HandledBy {
+  userId: string
+  careRole: Exclude<CareRole, null>
 }
 
 /**
  * Map validated form values to the triage input. A single named person owns
  * the task (assignedUserId); several people or teams leave it claimable.
  */
-export function toTriageSubmitData(data: TriageForm): TriageSubmitData {
+export function toTriageSubmitData(data: TriageForm, handledBy?: HandledBy): TriageSubmitData {
   const note = data.note?.trim() ? data.note : null
   const patientMessage = data.patientMessage?.trim() ? data.patientMessage : undefined
   const contactMode = data.contactMode as ContactMode
+
+  if (isHandledNow(data)) {
+    if (!handledBy) throw new Error('handledBy is required when the clinician calls now')
+    return {
+      triageDecision: {
+        contactMode: 'PHONE',
+        careRole: handledBy.careRole,
+        assignmentMode: 'NAMED',
+        assignedUserId: handledBy.userId,
+        assignedUserIds: [handledBy.userId],
+        dueAt: new Date().toISOString(),
+        note,
+        handledNow: true,
+      },
+      patientMessage,
+    }
+  }
 
   if (contactMode === 'CLOSE') {
     return {
@@ -63,7 +87,7 @@ export function toTriageSubmitData(data: TriageForm): TriageSubmitData {
 export function countMissingRequired(v: Partial<TriageForm>): number {
   if (!v.contactMode)
     return 4 - [v.careRole, hasAssignee(v), v.dueAtInput?.trim()].filter(Boolean).length
-  if (v.contactMode === 'CLOSE') return 0
+  if (v.contactMode === 'CLOSE' || isHandledNow(v)) return 0
   return [v.careRole, hasAssignee(v), v.dueAtInput?.trim()].filter((x) => !x).length
 }
 

@@ -1,5 +1,6 @@
 import BiotechIcon from '@mui/icons-material/Biotech';
 import BugReportIcon from '@mui/icons-material/BugReport';
+import ContactPhoneIcon from '@mui/icons-material/ContactPhone';
 import ImageIcon from '@mui/icons-material/Image';
 import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment';
 import PhoneMissedIcon from '@mui/icons-material/PhoneMissed';
@@ -31,6 +32,7 @@ const TRIGGER_CONFIG: Record<TriggerType, TriggerConfig> = {
     LOW_QOL: { icon: <SentimentDissatisfiedIcon fontSize="inherit" />, kind: 'clinical' },
     NOT_OPENED: { icon: <SmartphoneIcon fontSize="inherit" />, kind: 'admin' },
     NO_RESPONSE: { icon: <PhoneMissedIcon fontSize="inherit" />, kind: 'admin' },
+    NO_DIGITAL_CHANNEL: { icon: <ContactPhoneIcon fontSize="inherit" />, kind: 'admin' },
     SEEK_CONTACT: { icon: <SupportAgentIcon fontSize="inherit" />, kind: 'admin' },
     INFECTION_SUSPECTED: { icon: <BugReportIcon fontSize="inherit" />, kind: 'clinical' },
     ABNORMAL_ANSWER: { icon: <ReportProblemIcon fontSize="inherit" />, kind: 'clinical' },

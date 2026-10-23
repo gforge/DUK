@@ -21,6 +21,8 @@ export const TriageFormSchema = z
     note: z.string().optional(),
     /** VISIT only: book a radiograph before the follow-up visit. */
     xrayBeforeVisit: z.boolean().optional(),
+    /** PHONE only: the clinician calls right away; competence, assignee and due date are implied. */
+    handledNow: z.boolean().optional(),
     patientMessage: z.string().max(PATIENT_MESSAGE_MAX).optional(),
   })
   .superRefine((value, ctx) => {
@@ -46,6 +48,7 @@ export const TriageFormSchema = z
     }
 
     if (value.contactMode === 'CLOSE') return
+    if (value.contactMode === 'PHONE' && value.handledNow) return
 
     if (!value.careRole) {
       ctx.addIssue({
@@ -97,3 +100,7 @@ export const TriageFormSchema = z
   })
 
 export type TriageForm = z.infer<typeof TriageFormSchema>
+
+/** True when the clinician handles a phone contact immediately (no task, case closes). */
+export const isHandledNow = (v: Partial<TriageForm>): boolean =>
+  v.contactMode === 'PHONE' && v.handledNow === true

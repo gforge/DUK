@@ -25,9 +25,14 @@ import { ContactModeSection } from './ContactModeSection'
 import { DueAtField, type DueAtPreset } from './DueAtField'
 import { AsideTitle, type DecisionRow, DecisionRows, TriageLayout } from './layout'
 import { MessageSection } from './MessageSection'
-import { type TriageForm as TriageFormValues, TriageFormSchema } from './schema'
+import { isHandledNow, type TriageForm as TriageFormValues, TriageFormSchema } from './schema'
 import { cardSx } from './styles'
-import { countMissingRequired, toTriageSubmitData, type TriageSubmitData } from './toSubmitData'
+import {
+  countMissingRequired,
+  type HandledBy,
+  toTriageSubmitData,
+  type TriageSubmitData,
+} from './toSubmitData'
 import { eligibleUsersFor, useDateLocale, useTriageDirectory } from './useTriageDirectory'
 import { computeDueAtFromInput } from './utils'
 
@@ -40,6 +45,8 @@ interface Props {
   readonly onContactModeRouteChange?: (mode: ContactMode | null) => void
   /** Extra aside content under the submit button (colleague review). */
   readonly asideFooter?: React.ReactNode
+  /** The clinician doing the triage; enables "I am calling the patient now" for phone contact. */
+  readonly handledBy?: HandledBy
 }
 
 export default function TriageForm({
@@ -48,6 +55,7 @@ export default function TriageForm({
   contactModeFromRoute,
   onContactModeRouteChange,
   asideFooter,
+  handledBy,
 }: Props) {
   const { t } = useTranslation()
   const locale = useDateLocale()
@@ -74,6 +82,7 @@ export default function TriageForm({
       dueAtInput: '',
       note: caseData.internalNote ?? '',
       xrayBeforeVisit: caseData.triageDecision?.xrayBeforeVisit ?? false,
+      handledNow: false,
       patientMessage: caseData.patientMessage ?? '',
     },
   })
@@ -86,6 +95,10 @@ export default function TriageForm({
   const assignedTeamIds = values.assignedTeamIds ?? []
   const isClose = contactMode === 'CLOSE'
   const isVisit = contactMode === 'VISIT'
+  const isPhone = contactMode === 'PHONE'
+  const handledNow = isHandledNow(values)
+  /** Hide competence/assignee/due date: the clinician is handling it right now. */
+  const skipFollowUpFields = isClose || handledNow
 
   const clearFollowUpFields = React.useCallback(() => {
     setValue('careRole', null)
@@ -103,6 +116,7 @@ export default function TriageForm({
 
   function selectMode(mode: ContactMode) {
     setValue('contactMode', mode, { shouldValidate: true })
+    if (mode !== 'PHONE') setValue('handledNow', false)
     if (mode === 'CLOSE') clearFollowUpFields()
     onContactModeRouteChange?.(mode)
   }
@@ -124,44 +138,57 @@ export default function TriageForm({
   }
 
   async function submitForm(data: TriageFormValues) {
-    await onSubmit(toTriageSubmitData(data))
+    await onSubmit(toTriageSubmitData(data, handledBy))
   }
 
   const submit = handleSubmit(submitForm)
   const missing = countMissingRequired(values)
-  const dueIso = isClose ? null : computeDueAtFromInput(values.dueAtInput)
+  const dueIso = skipFollowUpFields ? null : computeDueAtFromInput(values.dueAtInput)
 
   const rows: DecisionRow[] = isClose
     ? [{ key: 'mode', label: t('triage.contactModeLabel'), value: getContactModeLabel('CLOSE') }]
-    : [
-        {
-          key: 'mode',
-          label: t('triage.contactModeLabel'),
-          value: contactMode ? getContactModeLabel(contactMode) : null,
-        },
-        {
-          key: 'role',
-          label: t('triage.careRole'),
-          value: careRole ? getCareRoleLabel(careRole) : null,
-        },
-        {
-          key: 'who',
-          label: t('triage.responsible'),
-          value: getAssigneeLabel(
-            { assignmentMode, careRole, assignedUserIds, assignedTeamIds },
-            users,
-            teams,
-          ),
-        },
-        {
-          key: 'due',
-          label: t('triage.dueShort'),
-          value: dueIso ? format(new Date(dueIso), 'd MMM yyyy', { locale }) : null,
-        },
-        ...(isVisit && values.xrayBeforeVisit
-          ? [{ key: 'xray', label: t('triage.xrayBeforeVisit'), value: t('common.yes') }]
-          : []),
-      ]
+    : handledNow
+      ? [
+          {
+            key: 'mode',
+            label: t('triage.contactModeLabel'),
+            value: `${getContactModeLabel('PHONE')} · ${t('triage.handledNowDecision')}`,
+          },
+          {
+            key: 'who',
+            label: t('triage.responsible'),
+            value: users.find((u) => u.id === handledBy?.userId)?.name ?? null,
+          },
+        ]
+      : [
+          {
+            key: 'mode',
+            label: t('triage.contactModeLabel'),
+            value: contactMode ? getContactModeLabel(contactMode) : null,
+          },
+          {
+            key: 'role',
+            label: t('triage.careRole'),
+            value: careRole ? getCareRoleLabel(careRole) : null,
+          },
+          {
+            key: 'who',
+            label: t('triage.responsible'),
+            value: getAssigneeLabel(
+              { assignmentMode, careRole, assignedUserIds, assignedTeamIds },
+              users,
+              teams,
+            ),
+          },
+          {
+            key: 'due',
+            label: t('triage.dueShort'),
+            value: dueIso ? format(new Date(dueIso), 'd MMM yyyy', { locale }) : null,
+          },
+          ...(isVisit && values.xrayBeforeVisit
+            ? [{ key: 'xray', label: t('triage.xrayBeforeVisit'), value: t('common.yes') }]
+            : []),
+        ]
 
   const main = (
     <Stack sx={{ ...cardSx, p: 3, gap: 3.5 }}>
@@ -186,26 +213,56 @@ export default function TriageForm({
         />
       )}
 
-      {isClose ? (
-        <Stack
-          direction="row"
-          sx={{
-            gap: 1,
-            alignItems: 'flex-start',
-            bgcolor: tokens.headerBg,
-            border: `1px solid ${tokens.border}`,
-            borderRadius: '10px',
-            p: 1.75,
-          }}
-        >
-          <InfoOutlinedIcon fontSize="small" sx={{ color: tokens.textSecondary, mt: '1px' }} />
-          <Box>
-            <Typography sx={{ fontWeight: 600 }}>{t('triage.closeNoWorklist')}</Typography>
-            <Typography sx={{ fontSize: 13, color: tokens.textSecondary }}>
-              {t('triage.closeBackHint')}
-            </Typography>
-          </Box>
-        </Stack>
+      {isPhone && handledBy && (
+        <Controller
+          name="handledNow"
+          control={control}
+          render={({ field }) => (
+            <Box>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={Boolean(field.value)}
+                    onChange={(e) => {
+                      field.onChange(e.target.checked)
+                      if (e.target.checked) clearFollowUpFields()
+                    }}
+                  />
+                }
+                label={t('triage.handledNow')}
+              />
+              {field.value && (
+                <Typography sx={{ fontSize: 13, color: tokens.textSecondary, ml: 4 }}>
+                  {t('triage.handledNowHint')}
+                </Typography>
+              )}
+            </Box>
+          )}
+        />
+      )}
+
+      {skipFollowUpFields ? (
+        isClose && (
+          <Stack
+            direction="row"
+            sx={{
+              gap: 1,
+              alignItems: 'flex-start',
+              bgcolor: tokens.headerBg,
+              border: `1px solid ${tokens.border}`,
+              borderRadius: '10px',
+              p: 1.75,
+            }}
+          >
+            <InfoOutlinedIcon fontSize="small" sx={{ color: tokens.textSecondary, mt: '1px' }} />
+            <Box>
+              <Typography sx={{ fontWeight: 600 }}>{t('triage.closeNoWorklist')}</Typography>
+              <Typography sx={{ fontSize: 13, color: tokens.textSecondary }}>
+                {t('triage.closeBackHint')}
+              </Typography>
+            </Box>
+          </Stack>
+        )
       ) : (
         <>
           <CareRoleSection value={careRole} onChange={selectCareRole} />
@@ -235,7 +292,7 @@ export default function TriageForm({
 
       <MessageSection
         control={control}
-        number={isClose ? 2 : 5}
+        number={skipFollowUpFields ? 2 : 5}
         patientMessageLength={values.patientMessage?.length ?? 0}
         caseNote={caseData.internalNote}
       />
@@ -258,14 +315,20 @@ export default function TriageForm({
         startIcon={isSubmitting ? <CircularProgress size={16} color="inherit" /> : undefined}
         sx={{ py: 1.25, borderRadius: 2 }}
       >
-        {isSubmitting ? t('triage.submitting') : t('triage.submit')}
+        {isSubmitting
+          ? t('triage.submitting')
+          : handledNow
+            ? t('triage.handledNowSubmit')
+            : t('triage.submit')}
       </Button>
       <Typography sx={{ fontSize: 12, color: tokens.textSecondary, textAlign: 'center' }}>
         {missing > 0
           ? t('triage.missingRequired', { count: missing })
           : isClose
             ? t('triage.closeNoWorklist')
-            : t('triage.createsTask')}
+            : handledNow
+              ? t('triage.handledNowHint')
+              : t('triage.createsTask')}
       </Typography>
       {asideFooter}
       <ConfirmDialog

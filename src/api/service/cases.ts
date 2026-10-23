@@ -140,7 +140,62 @@ export function triageCase(
     assignedRole: derivedAssignedRole,
   })
   setStore(state)
+  if (input.triageDecision.handledNow && input.triageDecision.contactMode === 'PHONE') {
+    // The clinician phones the patient right away: log the contact and close the case
+    // in the same step, so no worklist task is created.
+    state = addAuditEvent(getStore(), caseId, userId, userRole, 'CONTACTED')
+    setStore(state)
+    return completeWorklistCase(caseId, userId, userRole, {
+      completionComment: note ?? undefined,
+    })
+  }
   return updated
+}
+
+const CATEGORY_ORDER: Record<CaseCategory, number> = { ACUTE: 0, SUBACUTE: 1, CONTROL: 2 }
+
+/** Cases waiting for a triage decision, in dashboard order: Akut first, longest wait first. */
+export function getReviewQueue(): CaseWithActiveCategory[] {
+  return getCasesForDashboard()
+    .filter((c) => c.status === 'NEEDS_REVIEW')
+    .sort((a, b) => {
+      const byCategory =
+        CATEGORY_ORDER[a.activeCategory ?? a.category] -
+        CATEGORY_ORDER[b.activeCategory ?? b.category]
+      if (byCategory !== 0) return byCategory
+      return a.scheduledAt.localeCompare(b.scheduledAt)
+    })
+}
+
+export interface NextCaseToReview {
+  /** The next case in the review queue, or null when the queue is empty. */
+  next: {
+    id: string
+    patientId: string
+    patientName: string
+    category: CaseCategory
+    scheduledAt: string
+  } | null
+  /** Cases left in the queue, excluding the current one. */
+  remaining: number
+}
+
+/** What to open after finishing `currentCaseId` ("Gå till nästa"). */
+export function getNextCaseToReview(currentCaseId: string): NextCaseToReview {
+  const queue = getReviewQueue().filter((c) => c.id !== currentCaseId)
+  const first = queue[0]
+  if (!first) return { next: null, remaining: 0 }
+  const patient = getStore().patients.find((p) => p.id === first.patientId)
+  return {
+    next: {
+      id: first.id,
+      patientId: first.patientId,
+      patientName: patient?.displayName ?? first.patientId,
+      category: first.activeCategory ?? first.category,
+      scheduledAt: first.scheduledAt,
+    },
+    remaining: queue.length,
+  }
 }
 
 export function createBooking(

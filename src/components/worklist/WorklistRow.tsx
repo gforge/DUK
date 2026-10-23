@@ -222,7 +222,17 @@ export default function WorklistRow({
     >
       {/* Patient */}
       <Box role="cell" sx={{ display: 'flex', flexDirection: 'column', gap: '2px', minWidth: 0 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, minWidth: 0 }}>
+        {/* Chips wrap to their own line instead of squeezing the name into an ellipsis */}
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: 0.75,
+            rowGap: '2px',
+            minWidth: 0,
+          }}
+        >
           <Typography component="span" sx={{ fontWeight: 600, fontSize: 'inherit' }} noWrap>
             {patientName}
           </Typography>

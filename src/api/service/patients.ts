@@ -11,7 +11,7 @@ export function getPatient(id: string): Patient | undefined {
 }
 
 export function createPatient(
-  data: Pick<Patient, 'displayName' | 'personalNumber' | 'dateOfBirth'>,
+  data: Pick<Patient, 'displayName' | 'personalNumber' | 'dateOfBirth' | 'noDigitalChannel'>,
 ): Patient {
   const state = getStore()
   const patient: Patient = {
@@ -19,6 +19,7 @@ export function createPatient(
     displayName: data.displayName,
     personalNumber: data.personalNumber,
     dateOfBirth: data.dateOfBirth,
+    ...(data.noDigitalChannel ? { noDigitalChannel: true } : {}),
     createdAt: now(),
   }
   setStore({ ...state, patients: [...state.patients, patient] })

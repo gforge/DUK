@@ -462,3 +462,45 @@ These stories map directly to the workflows and components described in the desi
 3. The referral card indicates when diagnoses are missing and when they came from uthopp.
 
 > _Related code_: `src/api/service/episodes.ts`, `src/api/schemas/journey.ts`, `src/components/case/JourneyTab/ReferralCard.tsx`, `src/components/case/JourneyTab/UthoppDiagnosisDialog.tsx`, `src/api/seed/referralExamples.ts`.
+
+---
+
+## US24 – Go to next case
+
+**As a** clinician **I want** to work through the review queue without returning to the dashboard between cases.
+
+**Acceptance criteria**
+
+1. After a decision (TRIAGED, FOLLOWING_UP or CLOSED) the triage tab shows a "Nästa att granska" bar with the next case (patient, category, days waited, cases left) and a "Gå till nästa" button.
+2. The queue order follows the dashboard: Akut before Subakut before Kontroll, longest wait first (`getReviewQueue`, `getNextCaseToReview`).
+3. An empty queue is stated explicitly, with a link back to the dashboard.
+
+> _Related code_: `src/api/service/cases.ts`, `src/components/case/TriageTab/index.tsx`, `src/tests/fastTriage.test.tsx`.
+
+---
+
+## US25 – "I am calling the patient now"
+
+**As a** doctor or nurse **I want** to phone the patient myself during triage instead of creating a task for someone else.
+
+**Acceptance criteria**
+
+1. With contact mode PHONE a checkbox "Jag ringer patienten nu" (`handledNow`) hides competence, assignee and due date; the decision panel shows "Telefonkontakt · Ringer nu" and the clinician as responsible.
+2. On confirm the service records the decision (NAMED, the clinician, due today), logs `CONTACTED` and closes the case; no worklist task is created.
+3. The patient message can still be sent in the same step.
+
+> _Related code_: `src/components/case/triage/schema.ts`, `toSubmitData.ts`, `TriageForm.tsx`, `src/api/service/cases.ts` (`triageCase`).
+
+---
+
+## US26 – Patients without a digital channel
+
+**As a** clinician or secretary **I want** to follow up patients who have no e-ID or app without waiting for answers that never come.
+
+**Acceptance criteria**
+
+1. Registration (step 1) and the patient page can mark `Patient.noDigitalChannel`; the case header and patient summary show it.
+2. Such patients never get `NOT_OPENED` / `NO_RESPONSE`; their checkpoint cases carry the admin signal `NO_DIGITAL_CHANNEL` and go straight to NEEDS_REVIEW (demo data: p-42 / case-44).
+3. The contact panel offers "Kontaktad" and "Ringde – ej nådd" but no reminder.
+
+> _Related code_: `src/api/schemas/patient.ts`, `src/api/schemas/enums.ts`, `src/components/case/ContactActions/index.tsx`, `src/api/seed/nonDigitalExamples.ts`.

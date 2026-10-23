@@ -80,6 +80,8 @@ export const CaseSchema = z.object({
       note: z.string().nullable().optional(),
       /** Radiograph must be booked before the follow-up visit (VISIT only). */
       xrayBeforeVisit: z.boolean().optional(),
+      /** PHONE only: the triaging clinician called the patient right away; no worklist task. */
+      handledNow: z.boolean().optional(),
     })
     .superRefine((value, ctx) => {
       if (value.contactMode === 'CLOSE') {
@@ -191,6 +193,8 @@ export const TriageDecisionSchema = z
     note: z.string().nullable().optional(),
     /** Radiograph must be booked before the follow-up visit (VISIT only). */
     xrayBeforeVisit: z.boolean().optional(),
+    /** PHONE only: the triaging clinician calls the patient right away; no worklist task, case closes. */
+    handledNow: z.boolean().optional(),
   })
   .superRefine((value, ctx) => {
     if (value.contactMode === 'CLOSE') {

@@ -9,7 +9,7 @@ export const getPatient = (id: string): Promise<Patient | undefined> =>
   withDelay(() => service.getPatient(id))
 
 export const createPatient = (
-  data: Pick<Patient, 'displayName' | 'personalNumber' | 'dateOfBirth'>,
+  data: Pick<Patient, 'displayName' | 'personalNumber' | 'dateOfBirth' | 'noDigitalChannel'>,
 ): Promise<Patient> => withDelay(() => service.createPatient(data))
 
 export const patientOpenedApp = (patientId: string): Promise<Patient> =>

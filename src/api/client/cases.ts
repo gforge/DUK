@@ -115,3 +115,6 @@ export const getWorklistCases = (): Promise<Case[]> =>
         return new Date(a.deadline).getTime() - new Date(b.deadline).getTime()
       }),
   )
+
+export const getNextCaseToReview = (currentCaseId: string): Promise<service.NextCaseToReview> =>
+  withDelay(() => service.getNextCaseToReview(currentCaseId))

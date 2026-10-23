@@ -43,6 +43,8 @@ The app opens on a fake login page (`/login`) where you pick a demo account. The
 | **Patient**   | Patient portal: view own cases, answer forms, seek contact                 |
 
 `PAL` (patient-responsible physician) is modeled as an ownership assignment, not as a separate user role.
+
+Patients without e-ID or app can be registered with **"Ingen digital kanal"**: no forms are sent, each checkpoint instead becomes a case with the `NO_DIGITAL_CHANNEL` signal for staff to call or book, and the contact panel offers no reminder.
 Ownership can be set on patient level and journey level (with episode fallback).
 
 Clinicians can also search patients by name or personal number from the top bar.
@@ -60,7 +62,7 @@ A case header shows patient, status and triggers, plus contact actions (contacte
 
 1. **Forms** — View all submitted questionnaire responses with computed scores
 2. **Journey** — Episode of care with referral info (referrer, reason, diagnoses via simulated TakeCare "uthopp"), all patient journeys, effective steps and timeline; pause/resume, modify, cancel, start next phase
-3. **Triage** — Single-page triage form: contact mode (digital / phone / visit / close), competence (doctor / nurse / physio), recipient (any, PAL, one or more named people, or a care team), due date (accepts shorthands like `3d`, `2v`, `1/3`) and patient message, with a sticky decision summary. Also lab/X-ray reviews (pending reviews block triage) and advisory colleague review requests (second opinion)
+3. **Triage** — Single-page triage form: contact mode (digital / phone / visit / close), competence (doctor / nurse / physio), recipient (any, PAL, one or more named people, or a care team), due date (accepts shorthands like `3d`, `2v`, `1/3`) and patient message, with a sticky decision summary. Also lab/X-ray reviews (pending reviews block triage) and advisory colleague review requests (second opinion). For phone contact the clinician can tick **"Jag ringer patienten nu"**: the call is logged and the case closes without a worklist task. After any decision a **"Nästa att granska"** bar offers the next case in queue order ("Gå till nästa")
 4. **Journal** — Bookings, plus draft journal entries toggled per template (deselecting deletes the draft): preview, copy, approve (doctor)
 5. **Audit Log** — Full activity history per case
 
