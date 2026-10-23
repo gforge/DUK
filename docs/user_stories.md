@@ -462,3 +462,49 @@ These stories map directly to the workflows and components described in the desi
 3. The referral card indicates when diagnoses are missing and when they came from uthopp.
 
 > _Related code_: `src/api/service/episodes.ts`, `src/api/schemas/journey.ts`, `src/components/case/JourneyTab/ReferralCard.tsx`, `src/components/case/JourneyTab/UthoppDiagnosisDialog.tsx`, `src/api/seed/referralExamples.ts`.
+
+---
+
+## US24 – Go to next case
+
+**As a** clinician **I want** to work through the review queue without returning to the dashboard between cases.
+
+**Acceptance criteria**
+
+1. After a decision (TRIAGED, FOLLOWING_UP or CLOSED) the triage tab shows a "Nästa att granska" bar with the next case (patient, category, days waited, cases left) and a "Gå till nästa" button.
+2. The queue order follows the dashboard: Akut before Subakut before Kontroll, longest wait first (`getReviewQueue`, `getNextCaseToReview`).
+3. An empty queue is stated explicitly, with a link back to the dashboard.
+
+> _Related code_: `src/api/service/cases.ts`, `src/components/case/TriageTab/index.tsx`, `src/tests/fastTriage.test.tsx`.
+
+---
+
+## US25 – "I am calling / replying to the patient now"
+
+**As a** doctor or nurse **I want** to phone or answer the patient myself during triage instead of creating a task for someone else.
+
+**Acceptance criteria**
+
+1. For DIGITAL and PHONE contact a step 2 "När och av vem?" offers two cards: do it now yourself ("Jag svarar patienten nu" / "Jag ringer patienten nu") or plan a task ("Planera digital uppföljning" / "Planera telefonsamtal"). Later steps are numbered after what is shown.
+2. Replying now: an info banner explains that the case closes when the reply is sent; the reply to the patient is the only required field. The aside shows the chip "Direktsvar", the rows Åtgärd / Utförs / Ansvarig / Ärendet, a "När du skickar" checklist and the button "Skicka svar och avsluta".
+3. Calling now: a phone box shows the patient's number (`patient.phone`), a copy button and when the call started. Step 3 "Samtalsutfall" asks whether the patient was reached.
+4. Reached: a required call note (logged as `CONTACTED` details and used as completion comment) and an optional summary to the patient. The case closes with "Logga samtal och avsluta".
+5. Not reached: a warning banner states the case cannot close. Step 4 "Hur går du vidare?" offers "Ring igen senare" (retry time chips, task for the clinician), "Be patienten ringa in" (prefilled message, task due tomorrow 09:00) or "Lämna över" (competence, assignee and due date as for a planned task). The attempt is logged as `CALL_ATTEMPT`, the case stays `TRIAGED`, the aside chip reads "Ej nådd · försök N".
+6. Closing a case ("Stäng ärendet") opens a dialog with an optional message to the patient.
+7. The aside always states what happens on confirm and which choices remain ("Kvar att välja: …").
+
+> _Related code_: `src/components/case/triage/schema.ts`, `toSubmitData.ts`, `TriageForm.tsx`, `TimingSection.tsx`, `CallOutcomeSection.tsx`, `NotReachedSection.tsx`, `PhoneBox.tsx`, `src/api/service/cases.ts` (`triageCase`).
+
+---
+
+## US26 – Patients without a digital channel
+
+**As a** clinician or secretary **I want** to follow up patients who have no e-ID or app without waiting for answers that never come.
+
+**Acceptance criteria**
+
+1. Registration (step 1) and the patient page can mark `Patient.noDigitalChannel`; the case header and patient summary show it.
+2. Such patients never get `NOT_OPENED` / `NO_RESPONSE`; their checkpoint cases carry the admin signal `NO_DIGITAL_CHANNEL` and go straight to NEEDS_REVIEW (demo data: p-42 / case-44).
+3. The contact panel offers "Kontaktad" and "Ringde – ej nådd" but no reminder.
+
+> _Related code_: `src/api/schemas/patient.ts`, `src/api/schemas/enums.ts`, `src/components/case/ContactActions/index.tsx`, `src/api/seed/nonDigitalExamples.ts`.

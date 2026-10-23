@@ -23,6 +23,7 @@ export function Worklist() {
   const [recipientFilter, setRecipientFilter] = useState<RecipientFilter>('ALL')
   const [assignedToMe, setAssignedToMe] = useState(false)
   const [myPatientsOnly, setMyPatientsOnly] = useState(false)
+  const [xrayOnly, setXrayOnly] = useState(false)
   const {
     data: cases,
     loading: casesLoading,
@@ -56,6 +57,7 @@ export function Worklist() {
       recipientFilter,
       assignedToMe,
       myPatientsOnly,
+      xrayOnly,
     },
   })
   const loading = casesLoading || patientsLoading || usersLoading
@@ -79,6 +81,7 @@ export function Worklist() {
         bookingId?: string
         followUpDate?: string
         completionComment?: string
+        xray?: { scheduledAt: string; location: string }
       },
     ) => {
       try {
@@ -129,11 +132,13 @@ export function Worklist() {
         recipientFilter={recipientFilter}
         assignedToMe={assignedToMe}
         myPatientsOnly={myPatientsOnly}
+        xrayOnly={xrayOnly}
         onCategoryFilterChange={setCategoryFilter}
         onCareRoleFilterChange={setCareRoleFilter}
         onRecipientFilterChange={setRecipientFilter}
         onAssignedToMeToggle={() => setAssignedToMe((v) => !v)}
         onMyPatientsOnlyToggle={() => setMyPatientsOnly((v) => !v)}
+        onXrayOnlyToggle={() => setXrayOnly((v) => !v)}
       />
 
       {isInitialLoading && (

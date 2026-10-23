@@ -62,6 +62,7 @@ export default function CaseHeader({ caseData, patient }: Props) {
               date: format(parseISO(patient.lastOpenedAt), 'd MMM yyyy HH:mm', { locale }),
             })
           : null,
+        patient.noDigitalChannel ? t('case.noDigitalChannel') : null,
       ].filter(Boolean)
     : []
   const warnings = caseData.policyWarnings

@@ -15,10 +15,31 @@ interface Props {
   /** The case's current internal note; the triage note defaults to it. */
   readonly caseNote: string | undefined
   readonly number: number
+  /** The message is the whole reply ("Jag svarar patienten nu"): no longer optional. */
+  readonly required?: boolean
+  /** Heading; defaults to "Meddelande till patient". */
+  readonly title?: string
+  /** Helper line under the field; defaults to nothing. */
+  readonly hint?: React.ReactNode
+  readonly placeholder?: string
+  readonly rows?: number
+  /** Show the collapsed internal-note editor under the message (default true). */
+  readonly withNote?: boolean
 }
 
 /** Step 5: optional message to the patient and the (collapsed) internal note. */
-export function MessageSection({ control, patientMessageLength, caseNote, number }: Props) {
+export function MessageSection({
+  control,
+  patientMessageLength,
+  caseNote,
+  number,
+  required = false,
+  title,
+  hint,
+  placeholder,
+  rows = 3,
+  withNote = true,
+}: Props) {
   const { t } = useTranslation()
   const [editNote, setEditNote] = React.useState(false)
   const hasNote = Boolean(caseNote?.trim())
@@ -26,8 +47,9 @@ export function MessageSection({ control, patientMessageLength, caseNote, number
   return (
     <TriageSection
       number={number}
-      title={t('triage.patientMessage')}
-      optional
+      title={title ?? t('triage.patientMessage')}
+      required={required}
+      optional={!required}
       id="triage-message"
       trailing={
         <Typography
@@ -46,10 +68,10 @@ export function MessageSection({ control, patientMessageLength, caseNote, number
           <TextField
             fullWidth
             multiline
-            minRows={3}
+            minRows={rows}
             value={field.value ?? ''}
             onChange={(e) => field.onChange(e.target.value.slice(0, PATIENT_MESSAGE_MAX))}
-            placeholder={t('triage.patientMessagePlaceholder')}
+            placeholder={placeholder ?? t('triage.patientMessagePlaceholder')}
             slotProps={{
               htmlInput: {
                 maxLength: PATIENT_MESSAGE_MAX,
@@ -60,7 +82,9 @@ export function MessageSection({ control, patientMessageLength, caseNote, number
         )}
       />
 
-      {editNote ? (
+      {hint && <Box sx={{ fontSize: 13, color: tokens.textSecondary }}>{hint}</Box>}
+
+      {!withNote ? null : editNote ? (
         <Controller
           name="note"
           control={control}

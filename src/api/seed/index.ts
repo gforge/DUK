@@ -18,6 +18,21 @@ import { instructionTemplates } from './instructionTemplates'
 import { journalDrafts } from './journalDrafts'
 import { journalTemplates } from './journalTemplates'
 import { journeyTemplates } from './journeyTemplates'
+import {
+  nonDigitalAuditEvents,
+  nonDigitalCases,
+  nonDigitalEpisodes,
+  nonDigitalJourneys,
+  nonDigitalPatients,
+} from './nonDigitalExamples'
+import {
+  pathwayAuditEvents,
+  pathwayCases,
+  pathwayEpisodes,
+  pathwayFormResponses,
+  pathwayJourneys,
+  pathwayPatients,
+} from './pathwayCases'
 import { patientJourneys } from './patientJourneys'
 import { policyRules } from './policyRules'
 import { questionnaireTemplates } from './questionnaireTemplates'
@@ -40,19 +55,42 @@ const baseSeedState: AppState = {
   demoDataVersion: CURRENT_DEMO_DATA_VERSION,
   users,
   careTeams,
-  patients: [...patients, ...referralPatients, ...switchedPatients],
-  cases: [...cases, ...referralCases, ...switchedCases],
+  patients: [
+    ...patients,
+    ...referralPatients,
+    ...switchedPatients,
+    ...pathwayPatients,
+    ...nonDigitalPatients,
+  ],
+  cases: [...cases, ...referralCases, ...switchedCases, ...pathwayCases, ...nonDigitalCases],
   policyRules,
-  auditEvents,
+  auditEvents: [...auditEvents, ...pathwayAuditEvents, ...nonDigitalAuditEvents],
   questionnaireTemplates,
   formSeries,
-  formResponses: [...formResponses, ...referralFormResponses, ...switchedFormResponses],
+  formResponses: [
+    ...formResponses,
+    ...referralFormResponses,
+    ...switchedFormResponses,
+    ...pathwayFormResponses,
+  ],
   journalDrafts,
   journalTemplates,
   journeyTemplates,
   researchModules,
-  episodesOfCare: [...episodesOfCare, ...referralEpisodes, ...switchedEpisodes],
-  patientJourneys: [...patientJourneys, ...referralJourneys, ...switchedJourneys],
+  episodesOfCare: [
+    ...episodesOfCare,
+    ...referralEpisodes,
+    ...switchedEpisodes,
+    ...pathwayEpisodes,
+    ...nonDigitalEpisodes,
+  ],
+  patientJourneys: [
+    ...patientJourneys,
+    ...referralJourneys,
+    ...switchedJourneys,
+    ...pathwayJourneys,
+    ...nonDigitalJourneys,
+  ],
   instructions: [],
   instructionTemplates,
   researchConsents: [],

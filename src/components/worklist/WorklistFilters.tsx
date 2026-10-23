@@ -1,5 +1,6 @@
 import AssignmentIndIcon from '@mui/icons-material/AssignmentInd'
 import FilterListIcon from '@mui/icons-material/FilterList'
+import ImageIcon from '@mui/icons-material/Image'
 import PersonIcon from '@mui/icons-material/Person'
 import { Stack } from '@mui/material'
 import React from 'react'
@@ -20,11 +21,13 @@ interface WorklistFiltersProps {
   recipientFilter: RecipientFilter
   assignedToMe: boolean
   myPatientsOnly: boolean
+  xrayOnly: boolean
   onCategoryFilterChange: (value: CategoryFilter) => void
   onCareRoleFilterChange: (value: CareRoleFilter) => void
   onRecipientFilterChange: (value: RecipientFilter) => void
   onAssignedToMeToggle: () => void
   onMyPatientsOnlyToggle: () => void
+  onXrayOnlyToggle: () => void
 }
 
 export default function WorklistFilters({
@@ -34,11 +37,13 @@ export default function WorklistFilters({
   recipientFilter,
   assignedToMe,
   myPatientsOnly,
+  xrayOnly,
   onCategoryFilterChange,
   onCareRoleFilterChange,
   onRecipientFilterChange,
   onAssignedToMeToggle,
   onMyPatientsOnlyToggle,
+  onXrayOnlyToggle,
 }: WorklistFiltersProps) {
   const { t } = useTranslation()
   const getCareRoleLabel = useCareRoleLabel()
@@ -104,6 +109,12 @@ export default function WorklistFilters({
         onClick={onMyPatientsOnlyToggle}
         label={t('worklist.filterMyPatients')}
         icon={<PersonIcon />}
+      />
+      <FilterPill
+        selected={xrayOnly}
+        onClick={onXrayOnlyToggle}
+        label={t('worklist.filterXray')}
+        icon={<ImageIcon />}
       />
     </Stack>
   )

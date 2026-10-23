@@ -5,6 +5,8 @@
   "audit": {
     "action": "Event",
     "actions": {
+      "BOOKING_CREATED": "Appointment booked",
+      "BOOKING_UPDATED": "Booking updated",
       "CALL_ATTEMPT": "Call attempt, not reached",
       "CASE_CLOSED": "Case Closed",
       "CASE_CREATED": "Case Created",
@@ -44,6 +46,7 @@
     "headerLastOpened": "Last opened {{date}}",
     "internalNote": "Internal Note",
     "latestAnswer": "Latest answer",
+    "noDigitalChannel": "No digital channel – staff contact the patient",
     "noForms": "No form responses yet",
     "previousAnswer": "Previous",
     "question": "Question",
@@ -110,6 +113,9 @@
     "reminded": "Reminder sent",
     "remindedDone": "Reminder event logged",
     "suggestion": {
+      "NO_DIGITAL_CHANNEL": "The patient has no digital channel – staff handle this checkpoint. Last contacted {{date}}.",
+      "NO_DIGITAL_CHANNEL_noDate": "The patient has no digital channel – staff handle this checkpoint. Call the patient or book a visit.",
+      "NO_DIGITAL_CHANNEL_withDen": "The patient has no digital channel – staff handle this checkpoint. Last contacted {{date}}.",
       "NOT_OPENED": "The patient has not opened the form. Patient reminded {{date}}.",
       "NOT_OPENED_noDate": "The patient has not opened the form. No reminder sent yet.",
       "NOT_OPENED_withDen": "The patient has not opened the form. Patient reminded {{date}}.",
@@ -745,6 +751,7 @@
     "moreJourneys_one": "{{count}} more patient journey",
     "moreJourneys_other": "{{count}} more patient journeys",
     "myResponsiblePhysician": "You are the responsible physician (PAL) for this patient",
+    "noDigitalChannel": "No digital channel",
     "noJourney": "No active journey",
     "noResults": "No patients found",
     "openPatient": "Open {{name}}",
@@ -765,6 +772,8 @@
       "journeyRequired": "Select a journey template, triggering event and event date.",
       "nameOverride": "Name override (optional)",
       "nameOverrideHint": "Leave blank to use the name from the register.",
+      "noDigitalChannel": "Patient has no digital channel (no e-ID or app)",
+      "noDigitalChannelHint": "No forms or reminders are sent. At each checkpoint a case is created for staff to call the patient or book a visit.",
       "noStudies": "No research modules configured.",
       "noStudiesSelected": "None selected",
       "notFoundInRegister": "Not found in population register — please enter name manually.",
@@ -905,12 +914,9 @@
     "marked": "Confirmed",
     "markReviewed": "Mark as reviewed",
     "notAvailableHere": "Not available in this view",
-    "note": "Note",
-    "outcome": "Outcome",
     "pending": "Pending review",
     "remove": "Cancel order",
     "reviewedAt": "Reviewed",
-    "reviewedBy": "Reviewed by",
     "reviewTypeTitle": {
       "Lab": "Review lab results",
       "XRAY": "Review X-Ray results"
@@ -959,6 +965,43 @@
   },
   "triage": {
     "addToGoogle": "Add to Google Calendar",
+    "aside": {
+      "action": "Action",
+      "actionValue": {
+        "DIGITAL": "Form in the app",
+        "PHONE": "Phone call",
+        "reply": "Reply in the app",
+        "VISIT": "Clinic visit"
+      },
+      "case": {
+        "closes": "Closes",
+        "followedUp": "Followed up",
+        "stays": "Stays open"
+      },
+      "caseLabel": "Case",
+      "chip": {
+        "call": "Direct call",
+        "close": "Closing",
+        "notReached_one": "Not reached · attempt {{count}}",
+        "notReached_other": "Not reached · attempt {{count}}",
+        "planned": "Planned",
+        "reply": "Direct reply"
+      },
+      "nextStep": {
+        "ASK_PATIENT_TO_CALL": "Patient calls in",
+        "CALL_AGAIN": "Call again",
+        "HAND_OVER": "Handed over"
+      },
+      "nextStepLabel": "Next step",
+      "outcome": "Outcome",
+      "performed": "Performed",
+      "performedNow": "Now, by you",
+      "whenConfirm": "When you confirm",
+      "whenSend": "When you send"
+    },
+    "askToCallHint": "Sent to the patient's app. The case stays with you until the patient gets in touch.",
+    "askToCallTemplate": "Hello! We tried to reach you by phone without success. Please call the clinic on [PHONE NUMBER] so we can check how you are doing.",
+    "askToCallTitle": "Message to the patient",
     "assignmentModeHelp": {
       "ANY": "Anyone with appropriate competence",
       "NAMED": "Choose a specific person to assign",
@@ -980,7 +1023,22 @@
     "bookingPalUnavailableTooltip": "No PAL assigned on this journey/episode or patient.",
     "bookings": "Bookings",
     "bookingTime": "Booking time",
+    "bookingTypeXray": "Radiograph",
     "bookingUpdated": "Booking updated",
+    "callNote": {
+      "hint": "Saved in the event log and suggested as journal text.",
+      "placeholder": "What the patient reports, your assessment and the advice given …",
+      "title": "Call note"
+    },
+    "callOutcome": {
+      "NOT_REACHED": "Did not reach the patient",
+      "NOT_REACHED_short": "Not reached",
+      "REACHED": "Reached the patient",
+      "title": "Call outcome"
+    },
+    "callSummaryLabel": "Summary to the patient",
+    "callSummaryLink": "+ Also send a summary to the patient in the app",
+    "callSummaryPlaceholder": "Shown to the patient in the app",
     "careRole": "Competence",
     "careRoleOption": {
       "DOCTOR": "Doctor",
@@ -990,8 +1048,10 @@
     "closeBackHint": "Does the patient need follow-up after all? Choose a contact mode above.",
     "closeConfirmMessage": "The case will be closed without creating a task on the worklist.",
     "closeConfirmTitle": "Close the case?",
+    "closeMessagePlaceholder": "Optional. Shown to the patient in the app, e.g. that all looks well and no further follow-up is needed.",
     "closeNoWorklist": "Close the case without creating a worklist item",
     "closePrompt": "No follow-up needed?",
+    "closeWithMessage": "Send and close the case",
     "colleagueReview": {
       "advisory": "Advisory – does not block triage.",
       "answered": "Answered {{date}}",
@@ -1021,9 +1081,9 @@
     },
     "contactModeHelp": {
       "CLOSE": "Close the case directly without follow-up",
-      "DIGITAL": "Patient answers digital form",
-      "PHONE": "Healthcare professional calls the patient",
-      "VISIT": "Patient visits the clinic"
+      "DIGITAL": "Via the app",
+      "PHONE": "Someone calls the patient",
+      "VISIT": "Summoned to the clinic"
     },
     "contactModeLabel": "Contact mode",
     "createsTask": "Creates a task on the worklist",
@@ -1041,6 +1101,23 @@
     },
     "dueShort": "Due",
     "editBooking": "Edit booking",
+    "effects": {
+      "askMessage": "The patient gets a message in the app",
+      "attemptLogged": "The attempt is logged in the event log",
+      "awaitTask": "A task for you to follow up if the patient does not get in touch",
+      "callLogged": "The call and the note are logged",
+      "callTask": "The assignee calls the patient by the due date",
+      "caseCloses": "The case closes and leaves the overview",
+      "caseStays": "The case stays open until the patient is reached",
+      "formSentOnDue": "A form is sent to the patient on the due date",
+      "handOverTask": "The task goes to whoever you hand over to",
+      "noTask": "No task is created on the worklist",
+      "replySent": "The reply is sent to the patient's app",
+      "retryTask": "The “Call again” task lands on your worklist",
+      "summarySent": "The summary is sent to the patient's app",
+      "taskCreated": "A task is created on the worklist",
+      "visitTask": "The patient is summoned and the visit booked via the worklist"
+    },
     "error": "Triage error",
     "exportIcal": "Export iCal",
     "followingUpInWorklist": "Follow-up in progress — handled via the worklist.",
@@ -1049,23 +1126,76 @@
     "internalNoteAdd": "Add",
     "internalNoteNone": "No internal note",
     "internalNoteSame": "Internal note: same as the case note",
+    "irrevocable": "The reply cannot be withdrawn once sent.",
     "latestForm": "Latest form",
-    "missingRequired_one": "{{count}} required choice left",
-    "missingRequired_other": "{{count}} required choices left",
+    "missing": {
+      "assignee": "assignee",
+      "callNote": "call note",
+      "callOutcome": "call outcome",
+      "careRole": "competence",
+      "contactMode": "contact mode",
+      "dueAt": "due date",
+      "notReachedPlan": "how to proceed",
+      "patientMessage": "message to the patient",
+      "retryAt": "retry time"
+    },
+    "missingList": "Still to choose: {{items}}",
     "moreFormsHint_one": "1 earlier form is available in the Forms tab.",
     "moreFormsHint_other": "{{count}} earlier forms are available in the Forms tab.",
+    "nextCase": {
+      "none": "No more cases are waiting for review.",
+      "open": "Go to next",
+      "remaining_one": "{{count}} case left in the queue",
+      "remaining_other": "{{count}} cases left in the queue",
+      "title": "Next to review",
+      "toDashboard": "To the patient overview",
+      "waited_one": "waited {{count}} day",
+      "waited_other": "waited {{count}} days"
+    },
     "noNamedUsers": "No users available for this role",
     "notChosen": "Not chosen",
     "note": "Internal note",
+    "notReached": {
+      "ASK_PATIENT_TO_CALL": "Ask the patient to call in",
+      "ASK_PATIENT_TO_CALL_hint": "Message in the app with the clinic's number",
+      "banner": {
+        "body": "The attempt is logged. Choose how the case continues.",
+        "title": "The case cannot be closed – the patient has not been informed"
+      },
+      "CALL_AGAIN": "Call again later",
+      "CALL_AGAIN_hint": "A task for you on the worklist",
+      "HAND_OVER": "Hand over",
+      "HAND_OVER_hint": "To a person or group",
+      "title": "How do you proceed?"
+    },
     "optional": "(optional)",
     "palRequiresDoctor": "PAL can only be chosen when the competence is Doctor",
     "patientMessage": "Message to patient",
     "patientMessagePlaceholder": "Shown to the patient in the app together with the form",
     "pendingReviews": "Cannot triage until lab or imaging reviews are complete.",
+    "phone": {
+      "call": "Call {{name}}",
+      "copied": "Copied",
+      "copy": "Copy phone number",
+      "missing": "No phone number on file – see the medical record system",
+      "started": "Call started {{time}}"
+    },
     "pickPersonsHint": "Choose one or more people",
     "previousFormLabel": "Previous ({{date}})",
+    "replyBanner": {
+      "body": "The reply is shown in the patient's app · no form is sent · no worklist task",
+      "title": "Direct reply – the case closes when you send"
+    },
+    "replyPlaceholder": "Write your reply to the patient …",
+    "replySigned": "Shown to the patient in the app, signed {{name}}.",
+    "replyTitle": "Reply to the patient",
     "requiresClinician": "Triage requires clinical staff access.",
     "responsible": "Responsible",
+    "retry": {
+      "custom": "Pick a time",
+      "todayLate": "Today 17:00",
+      "tomorrowMorning": "Tomorrow 09:00"
+    },
     "scoreWithPrevious": "{{key}}: {{value}} (prev. {{previous}})",
     "searchPerson": "Search person",
     "showAnswers": "Show answers",
@@ -1073,10 +1203,26 @@
     "specificOption": "Person or group",
     "specificPerson": "Person",
     "submit": "Confirm triage",
+    "submitLabel": {
+      "callNotReached": "Log attempt and create task",
+      "callReached": "Log call and close",
+      "reply": "Send reply and close"
+    },
     "submitting": "Submitting...",
     "success": "Triage saved",
     "teamMembers_one": "{{count}} ppl",
     "teamMembers_other": "{{count}} ppl",
+    "timing": {
+      "callNow": "I am calling the patient now",
+      "callNowHint": "You call and log the outcome. The case closes if you reach the patient.",
+      "planCall": "Plan a phone call",
+      "planCallHint": "A call task is created on the worklist.",
+      "planDigital": "Plan digital follow-up",
+      "planDigitalHint": "A form is sent later. A task is created on the worklist.",
+      "replyNow": "I am replying to the patient now",
+      "replyNowHint": "You write the reply here. The case closes – no task is created.",
+      "title": "When, and by whom?"
+    },
     "validation": {
       "dueAtInvalid": "Invalid date format",
       "dueAtRequired": "Due date is required"
@@ -1085,7 +1231,8 @@
       "DIGITAL": "Who is responsible for the follow-up?",
       "PHONE": "Who should call the patient?",
       "VISIT": "Who should see the patient?"
-    }
+    },
+    "xrayBeforeVisit": "Radiograph before visit"
   },
   "trigger": {
     "ABNORMAL_ANSWER": "Abnormal Answer",
@@ -1094,6 +1241,7 @@
     "LAB_PENDING": "Lab Pending",
     "LOW_FUNCTION": "Low Function",
     "LOW_QOL": "Low QoL",
+    "NO_DIGITAL_CHANNEL": "No digital channel",
     "NO_RESPONSE": "No Response",
     "NOT_OPENED": "App Not Opened",
     "SEEK_CONTACT": "Seeking Contact",
@@ -1139,6 +1287,7 @@
     "filterAll": "All",
     "filterClaimedByMe": "Assigned to me",
     "filterMyPatients": "My patients",
+    "filterXray": "Radiograph + visit",
     "infoActive": "Tasks waiting for you or your unit",
     "infoCompleted_one": "Tasks completed in the last day",
     "infoCompleted_other": "Tasks completed in the last {{count}} days",
@@ -1156,6 +1305,15 @@
     "subtitle": "Tasks created during triage",
     "tabsLabel": "Action list tabs",
     "title": "Action List",
-    "typeFilterLabel": "Filter by contact type"
+    "typeFilterLabel": "Filter by contact type",
+    "visitDate": "Follow-up visit time",
+    "visitSection": "Follow-up visit",
+    "xrayAfterVisitWarning": "The radiograph is booked at or after the follow-up visit.",
+    "xrayBeforeVisitChip": "Radiograph before visit",
+    "xrayDate": "Radiograph time",
+    "xrayDateHint": "Book the radiograph in RIS and enter the time here.",
+    "xrayLocation": "Radiology unit",
+    "xrayLocationHint": "Defaults to {{location}} – change if performed elsewhere.",
+    "xraySection": "Radiograph"
   }
 }

@@ -25,6 +25,8 @@ export interface WorklistFilters {
   assignedToMe: boolean
   /** Only patients where I am PAL. */
   myPatientsOnly: boolean
+  /** Only cases that need a radiograph booked before the visit. */
+  xrayOnly?: boolean
 }
 
 interface Params {
@@ -177,6 +179,7 @@ export function useWorklistQueue({
         return false
       }
       if (filters.myPatientsOnly && patient?.palId !== currentUserId) return false
+      if (filters.xrayOnly && !caseData.triageDecision?.xrayBeforeVisit) return false
       return true
     })
   }, [filters, worklistEligibleCases, currentUserId, patientMap, teams])

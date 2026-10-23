@@ -47,6 +47,7 @@ export default function RegisterPatientDialog({ open, onClose, onCreated }: Prop
   const [registerName, setRegisterName] = useState<string | null>(null)
   const [displayName, setDisplayName] = useState('')
   const [dateOfBirth, setDateOfBirth] = useState('')
+  const [noDigitalChannel, setNoDigitalChannel] = useState(false)
   // Step 1 — journey assignment
   const [journeyTemplateId, setJourneyTemplateId] = useState('')
   // The clinical event (fracture, surgery, referral …) whose date anchors the journey.
@@ -145,6 +146,7 @@ export default function RegisterPatientDialog({ open, onClose, onCreated }: Prop
         displayName: effectiveName,
         personalNumber,
         dateOfBirth: effectiveDob,
+        noDigitalChannel,
       })
       await client.assignPatientJourney(
         patient.id,
@@ -214,6 +216,8 @@ export default function RegisterPatientDialog({ open, onClose, onCreated }: Prop
             setDisplayName={setDisplayName}
             dateOfBirth={dateOfBirth}
             setDateOfBirth={setDateOfBirth}
+            noDigitalChannel={noDigitalChannel}
+            setNoDigitalChannel={setNoDigitalChannel}
             registerName={registerName}
             hintOpen={hintOpen}
             setHintOpen={setHintOpen}
@@ -250,6 +254,7 @@ export default function RegisterPatientDialog({ open, onClose, onCreated }: Prop
         {/* ── Step 3: Review ── */}
         {step === 3 && (
           <Step3Review
+            noDigitalChannel={noDigitalChannel}
             effectiveName={effectiveName}
             personalNumber={personalNumber}
             dateOfBirth={pnrInfo.dateOfBirth ?? dateOfBirth}

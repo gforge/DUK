@@ -14,6 +14,14 @@ import {
   TriggerTypeSchema,
 } from './enums'
 
+/** Outcome of a call the triaging clinician makes on the spot. */
+export const CallOutcomeSchema = z.enum(['REACHED', 'NOT_REACHED'])
+export type CallOutcome = z.infer<typeof CallOutcomeSchema>
+
+/** What happens next when the patient could not be reached on the spot. */
+export const NotReachedPlanSchema = z.enum(['CALL_AGAIN', 'ASK_PATIENT_TO_CALL', 'HAND_OVER'])
+export type NotReachedPlan = z.infer<typeof NotReachedPlanSchema>
+
 export const PolicyWarningSchema = z.object({
   ruleId: z.string(),
   ruleName: z.string(),
@@ -78,6 +86,14 @@ export const CaseSchema = z.object({
       assignedTeamIds: z.array(z.string()).optional(),
       dueAt: z.string().datetime().nullable().optional(),
       note: z.string().nullable().optional(),
+      /** Radiograph must be booked before the follow-up visit (VISIT only). */
+      xrayBeforeVisit: z.boolean().optional(),
+      /** PHONE/DIGITAL: the triaging clinician called or replied right away. */
+      handledNow: z.boolean().optional(),
+      /** PHONE + handledNow: whether the patient was reached. */
+      callOutcome: CallOutcomeSchema.optional(),
+      /** PHONE + handledNow + NOT_REACHED: how the case continues. */
+      notReachedPlan: NotReachedPlanSchema.optional(),
     })
     .superRefine((value, ctx) => {
       if (value.contactMode === 'CLOSE') {
@@ -150,6 +166,8 @@ export const CaseSchema = z.object({
         type: z.string(),
         role: BookingRoleSchema.optional(),
         scheduledAt: z.string().datetime(),
+        /** Where the booking takes place, e.g. the radiology unit for an XRAY booking. */
+        location: z.string().optional(),
         status: z.enum(['PENDING', 'SCHEDULED', 'COMPLETED', 'CANCELLED']).default('PENDING'),
         completedAt: z.string().datetime().nullable().optional(),
         completedByUserId: z.string().nullable().optional(),
@@ -185,6 +203,14 @@ export const TriageDecisionSchema = z
     assignedTeamIds: z.array(z.string()).optional(),
     dueAt: z.string().datetime().nullable().optional(),
     note: z.string().nullable().optional(),
+    /** Radiograph must be booked before the follow-up visit (VISIT only). */
+    xrayBeforeVisit: z.boolean().optional(),
+    /** PHONE/DIGITAL: the triaging clinician calls or replies right away instead of creating a task. */
+    handledNow: z.boolean().optional(),
+    /** PHONE + handledNow: whether the patient was reached. REACHED closes the case. */
+    callOutcome: CallOutcomeSchema.optional(),
+    /** PHONE + handledNow + NOT_REACHED: how the case continues (a task is created). */
+    notReachedPlan: NotReachedPlanSchema.optional(),
   })
   .superRefine((value, ctx) => {
     if (value.contactMode === 'CLOSE') {

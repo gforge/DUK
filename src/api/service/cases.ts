@@ -3,7 +3,7 @@ import { getStore, setStore } from '../storage'
 import { getEffectiveSteps } from './journeyResolver'
 import { getPendingReviews } from './reviews'
 import { assignmentModeToAssignedRole, triageDecisionToNextStep } from './triageDecision'
-import { addAuditEvent, normalizeIsoDateTime, now } from './utils'
+import { addAuditEvent, normalizeIsoDateTime, now, uuid } from './utils'
 
 export type CaseWithActiveCategory = Case & {
   /** null = between phases (not in any step window today) */
@@ -140,7 +140,81 @@ export function triageCase(
     assignedRole: derivedAssignedRole,
   })
   setStore(state)
+  const mode = input.triageDecision.contactMode
+  if (input.triageDecision.handledNow && mode === 'PHONE') {
+    if (input.triageDecision.callOutcome === 'NOT_REACHED') {
+      // The call did not get through: log the attempt and keep the case open with the
+      // follow-up task the clinician chose (call again, await the patient's call, hand over).
+      state = addAuditEvent(getStore(), caseId, userId, userRole, 'CALL_ATTEMPT', {
+        plan: input.triageDecision.notReachedPlan,
+        note,
+      })
+      setStore(state)
+      return updated
+    }
+    // The clinician reached the patient: log the call with its note and close the case
+    // in the same step, so no worklist task is created.
+    state = addAuditEvent(getStore(), caseId, userId, userRole, 'CONTACTED', { note })
+    setStore(state)
+    return completeWorklistCase(caseId, userId, userRole, {
+      completionComment: note ?? undefined,
+    })
+  }
+  if (input.triageDecision.handledNow && mode === 'DIGITAL') {
+    // The clinician replies in the app right away: the message is the contact; close the case.
+    state = addAuditEvent(getStore(), caseId, userId, userRole, 'CONTACTED')
+    setStore(state)
+    return completeWorklistCase(caseId, userId, userRole, {
+      completionComment: note ?? undefined,
+    })
+  }
   return updated
+}
+
+const CATEGORY_ORDER: Record<CaseCategory, number> = { ACUTE: 0, SUBACUTE: 1, CONTROL: 2 }
+
+/** Cases waiting for a triage decision, in dashboard order: Akut first, longest wait first. */
+export function getReviewQueue(): CaseWithActiveCategory[] {
+  return getCasesForDashboard()
+    .filter((c) => c.status === 'NEEDS_REVIEW')
+    .sort((a, b) => {
+      const byCategory =
+        CATEGORY_ORDER[a.activeCategory ?? a.category] -
+        CATEGORY_ORDER[b.activeCategory ?? b.category]
+      if (byCategory !== 0) return byCategory
+      return a.scheduledAt.localeCompare(b.scheduledAt)
+    })
+}
+
+export interface NextCaseToReview {
+  /** The next case in the review queue, or null when the queue is empty. */
+  next: {
+    id: string
+    patientId: string
+    patientName: string
+    category: CaseCategory
+    scheduledAt: string
+  } | null
+  /** Cases left in the queue, excluding the current one. */
+  remaining: number
+}
+
+/** What to open after finishing `currentCaseId` ("Gå till nästa"). */
+export function getNextCaseToReview(currentCaseId: string): NextCaseToReview {
+  const queue = getReviewQueue().filter((c) => c.id !== currentCaseId)
+  const first = queue[0]
+  if (!first) return { next: null, remaining: 0 }
+  const patient = getStore().patients.find((p) => p.id === first.patientId)
+  return {
+    next: {
+      id: first.id,
+      patientId: first.patientId,
+      patientName: patient?.displayName ?? first.patientId,
+      category: first.activeCategory ?? first.category,
+      scheduledAt: first.scheduledAt,
+    },
+    remaining: queue.length,
+  }
 }
 
 export function createBooking(
@@ -150,6 +224,7 @@ export function createBooking(
     type: string
     role?: BookingRole
     scheduledAt: string
+    location?: string
     note?: string
     createdByUserId: string
     createdAt: string
@@ -269,6 +344,8 @@ export function completeWorklistCase(
     followUpDate?: string
     completedAt?: string
     completionComment?: string
+    /** Radiograph booked ahead of the follow-up visit. */
+    xray?: { scheduledAt: string; location: string }
   },
 ): Case {
   let state = getStore()
@@ -296,6 +373,24 @@ export function completeWorklistCase(
     })
     if (!found) throw new Error(`Booking ${options.bookingId} not found for case ${caseId}`)
   }
+  if (options?.xray) {
+    bookings = [
+      ...bookings,
+      {
+        id: uuid(),
+        type: 'XRAY',
+        scheduledAt: options.xray.scheduledAt,
+        location: options.xray.location,
+        status: 'SCHEDULED',
+        completedAt: null,
+        completedByUserId: null,
+        followUpDate: null,
+        completionComment: null,
+        createdByUserId: userId,
+        createdAt: completedAt,
+      },
+    ]
+  }
 
   const updated: Case = {
     ...existing,
@@ -313,6 +408,8 @@ export function completeWorklistCase(
     bookingId: options?.bookingId,
     followUpDate: options?.followUpDate,
     completionComment: options?.completionComment,
+    xrayAt: options?.xray?.scheduledAt,
+    xrayLocation: options?.xray?.location,
   })
   setStore(state)
   return updated

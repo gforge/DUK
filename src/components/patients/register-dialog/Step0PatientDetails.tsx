@@ -1,5 +1,14 @@
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutlineOutlined'
-import { Alert, Box, Button, CircularProgress, TextField } from '@mui/material'
+import {
+  Alert,
+  Box,
+  Button,
+  Checkbox,
+  CircularProgress,
+  FormControlLabel,
+  TextField,
+  Typography,
+} from '@mui/material'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -16,6 +25,8 @@ interface Props {
   setDisplayName: (v: string) => void
   dateOfBirth: string
   setDateOfBirth: (v: string) => void
+  noDigitalChannel: boolean
+  setNoDigitalChannel: (v: boolean) => void
   registerName: string | null
   hintOpen: boolean
   setHintOpen: (v: boolean) => void
@@ -34,6 +45,8 @@ export function Step0PatientDetails({
   setDisplayName,
   dateOfBirth,
   setDateOfBirth,
+  noDigitalChannel,
+  setNoDigitalChannel,
   registerName,
   hintOpen,
   setHintOpen,
@@ -134,6 +147,22 @@ export function Step0PatientDetails({
         registeredPnrs={registeredPnrs}
         onSelectPnr={onSelectPnr}
       />
+      <Box sx={{ mt: 1 }}>
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={noDigitalChannel}
+              onChange={(e) => setNoDigitalChannel(e.target.checked)}
+            />
+          }
+          label={t('patients.register.noDigitalChannel')}
+        />
+        {noDigitalChannel && (
+          <Typography variant="body2" color="text.secondary" sx={{ ml: 4 }}>
+            {t('patients.register.noDigitalChannelHint')}
+          </Typography>
+        )}
+      </Box>
     </>
   )
 }

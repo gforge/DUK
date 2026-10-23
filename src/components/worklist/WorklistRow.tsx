@@ -1,3 +1,4 @@
+import ImageIcon from '@mui/icons-material/Image'
 import LocalHospitalIcon from '@mui/icons-material/LocalHospital'
 import MedicalServicesIcon from '@mui/icons-material/MedicalServices'
 import PeopleIcon from '@mui/icons-material/People'
@@ -6,7 +7,7 @@ import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt'
 import PlayArrowIcon from '@mui/icons-material/PlayArrow'
 import ScheduleIcon from '@mui/icons-material/Schedule'
 import TaskAltIcon from '@mui/icons-material/TaskAlt'
-import { Box, Button, Typography } from '@mui/material'
+import { Box, Button, Chip, Typography } from '@mui/material'
 import { differenceInCalendarDays, format, parseISO, startOfDay } from 'date-fns'
 import { enUS, sv } from 'date-fns/locale'
 import React from 'react'
@@ -20,7 +21,7 @@ import { useAssignmentModeLabel, useCareRoleLabel } from '@/hooks/labels'
 import { getCompletedAt, getCompletedByUserId, resolveCaseCareRole } from '@/hooks/useWorklistQueue'
 import { tokens } from '@/theme'
 
-import CompletionDialog from './CompletionDialog'
+import CompletionDialog, { DEFAULT_XRAY_LOCATION } from './CompletionDialog'
 
 export const WORKLIST_COLUMNS = 'minmax(170px,1.2fr) 150px 120px 150px minmax(200px,2fr) 210px'
 export const WORKLIST_MIN_WIDTH = 1040
@@ -46,6 +47,7 @@ interface WorklistRowProps {
       bookingId?: string
       followUpDate?: string
       completionComment?: string
+      xray?: { scheduledAt: string; location: string }
     },
   ) => Promise<void> | void
 }
@@ -110,10 +112,13 @@ export default function WorklistRow({
   const [completionDialogOpen, setCompletionDialogOpen] = React.useState(false)
   const [followUpDate, setFollowUpDate] = React.useState<Date | null>(null)
   const [completionComment, setCompletionComment] = React.useState('')
+  const [xrayDate, setXrayDate] = React.useState<Date | null>(null)
+  const [xrayLocation, setXrayLocation] = React.useState(DEFAULT_XRAY_LOCATION)
   const [isCompleting, setIsCompleting] = React.useState(false)
   const isCompleted = mode === 'completed'
   const isActive = caseData.status === 'TRIAGED' || caseData.status === 'FOLLOWING_UP'
   const careRole = resolveCaseCareRole(caseData)
+  const needsXray = Boolean(caseData.triageDecision?.xrayBeforeVisit)
   const recipient = useRecipient(caseData, patient, userMap, teamMap)
   const patientName = patient?.displayName ?? caseData.patientId
   const dateLocale = (i18n.resolvedLanguage ?? i18n.language ?? 'sv').startsWith('en') ? enUS : sv
@@ -135,10 +140,19 @@ export default function WorklistRow({
         bookingId: completionBooking?.id,
         followUpDate: followUpDate ? followUpDate.toISOString() : undefined,
         completionComment: completionComment.trim() ? completionComment.trim() : undefined,
+        xray:
+          needsXray && xrayDate
+            ? {
+                scheduledAt: xrayDate.toISOString(),
+                location: xrayLocation.trim() || DEFAULT_XRAY_LOCATION,
+              }
+            : undefined,
       })
       setCompletionDialogOpen(false)
       setFollowUpDate(null)
       setCompletionComment('')
+      setXrayDate(null)
+      setXrayLocation(DEFAULT_XRAY_LOCATION)
     }, 220)
   }
 
@@ -208,12 +222,32 @@ export default function WorklistRow({
     >
       {/* Patient */}
       <Box role="cell" sx={{ display: 'flex', flexDirection: 'column', gap: '2px', minWidth: 0 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, minWidth: 0 }}>
+        {/* Chips wrap to their own line instead of squeezing the name into an ellipsis */}
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: 0.75,
+            rowGap: '2px',
+            minWidth: 0,
+          }}
+        >
           <Typography component="span" sx={{ fontWeight: 600, fontSize: 'inherit' }} noWrap>
             {patientName}
           </Typography>
           {caseData.status === 'FOLLOWING_UP' && (
             <StatusChip status={caseData.status} size="small" />
+          )}
+          {needsXray && !isCompleted && (
+            <Chip
+              icon={<ImageIcon />}
+              label={t('worklist.xrayBeforeVisitChip')}
+              size="small"
+              color="info"
+              variant="outlined"
+              sx={{ height: 18, fontSize: 11 }}
+            />
           )}
         </Box>
         {patient?.personalNumber && (
@@ -343,6 +377,11 @@ export default function WorklistRow({
           completionComment={completionComment}
           isCompleting={isCompleting}
           requireFollowUpDate={caseData.triageDecision?.contactMode === 'VISIT'}
+          needsXray={needsXray}
+          xrayDate={xrayDate}
+          xrayLocation={xrayLocation}
+          onXrayDateChange={setXrayDate}
+          onXrayLocationChange={setXrayLocation}
           onClose={() => setCompletionDialogOpen(false)}
           onFollowUpDateChange={setFollowUpDate}
           onCompletionCommentChange={setCompletionComment}

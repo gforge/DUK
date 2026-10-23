@@ -8,6 +8,7 @@ interface Props {
   effectiveName: string
   personalNumber: string
   dateOfBirth: string
+  noDigitalChannel: boolean
   selectedTemplate: JourneyTemplate | undefined | null
   eventType: TransitionTriggerType | ''
   startDate: string
@@ -21,6 +22,7 @@ export function Step3Review({
   effectiveName,
   personalNumber,
   dateOfBirth,
+  noDigitalChannel,
   selectedTemplate,
   eventType,
   startDate,
@@ -45,6 +47,11 @@ export function Step3Review({
           <Typography variant="body2">
             <strong>{t('patients.dateOfBirth')}:</strong> {dateOfBirth}
           </Typography>
+          {noDigitalChannel && (
+            <Typography variant="body2">
+              <strong>{t('patients.noDigitalChannel')}:</strong> {t('common.yes')}
+            </Typography>
+          )}
         </Stack>
       </Box>
       <Box sx={{ border: 1, borderColor: 'divider', borderRadius: 1, p: 1.5 }}>

@@ -120,10 +120,12 @@ export async function buildFakerSeed(): Promise<AppState> {
           ? {
               contactMode: 'VISIT' as const,
               careRole: 'DOCTOR' as const,
-              assignmentMode: 'ANY' as const,
+              // Deterministic spread so PAL and radiograph-before-visit pathways appear.
+              assignmentMode: idx % 3 === 0 ? ('PAL' as const) : ('ANY' as const),
               assignedUserId: null,
               dueAt: null,
               note: null,
+              ...(idx % 2 === 0 ? { xrayBeforeVisit: true } : {}),
             }
           : nextStep === 'NURSE_VISIT'
             ? {
