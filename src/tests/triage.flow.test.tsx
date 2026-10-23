@@ -47,7 +47,10 @@ describe('TriageForm', () => {
     }
     expect(screen.getByRole('button', { name: tr('triage.contactMode.CLOSE') })).toBeVisible()
     expect(submitButton()).toBeDisabled()
-    expect(screen.getByText(tr('triage.missingRequired_other').replace('{{count}}', '4')))
+    const missing = ['contactMode', 'careRole', 'assignee', 'dueAt']
+      .map((f) => tr(`triage.missing.${f}`))
+      .join(', ')
+    expect(screen.getByText(tr('triage.missingList').replace('{{items}}', missing))).toBeVisible()
   })
 
   it('closing asks for confirmation and submits a CLOSE decision', async () => {
@@ -58,7 +61,9 @@ describe('TriageForm', () => {
     await user.click(screen.getByRole('button', { name: tr('triage.contactMode.CLOSE') }))
     expect(screen.getAllByText(tr('triage.closeNoWorklist')).length).toBeGreaterThan(0)
 
-    await user.click(submitButton())
+    // once CLOSE is chosen the submit button is itself labelled "Stäng ärendet"
+    const closeButtons = screen.getAllByRole('button', { name: tr('triage.contactMode.CLOSE') })
+    await user.click(closeButtons[closeButtons.length - 1])
     const dialog = await screen.findByRole('dialog')
     expect(onSubmit).not.toHaveBeenCalled()
     await user.click(within(dialog).getByRole('button', { name: tr('triage.contactMode.CLOSE') }))

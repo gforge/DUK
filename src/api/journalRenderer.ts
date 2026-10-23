@@ -106,6 +106,7 @@ const WHITELIST_FLAGS = new Set<string>([
   'triggers.INFECTION_SUSPECTED',
   'triggers.NO_RESPONSE',
   'triggers.NOT_OPENED',
+  'triggers.NO_DIGITAL_CHANNEL',
   'triggers.LOW_FUNCTION',
   'triggers.LOW_QOL',
   'triggers.SEEK_CONTACT',

@@ -1,20 +1,23 @@
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutlined'
-import { Alert, Box, Stack, Typography } from '@mui/material'
-import { format } from 'date-fns'
+import { Alert, Box, Button, Stack, Typography } from '@mui/material'
+import { differenceInDays, format, parseISO } from 'date-fns'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 
 import * as client from '@/api/client'
-import type { Case, ContactMode } from '@/api/schemas'
+import type { CareRole, Case, ContactMode, Role } from '@/api/schemas'
 import ClinicalReviewPanel from '@/components/case/ClinicalReviewPanel'
 import ColleagueReviews from '@/components/case/ColleagueReviews'
 import {
   useAssigneeLabel,
   useCareRoleLabel,
+  useCategoryLabel,
   useContactModeLabel,
   useRoleLabel,
 } from '@/hooks/labels'
+import { useApi } from '@/hooks/useApi'
 import { useRole } from '@/store/roleContext'
 import { useSnack } from '@/store/snackContext'
 import { tokens } from '@/theme'
@@ -31,6 +34,79 @@ interface TriageTabProps {
   readonly caseData: Case
   readonly onTriaged: () => void
   readonly routeContactMode: ContactMode | null
+}
+
+/** The competence a user acts with when phoning a patient directly; null for roles that cannot. */
+function careRoleForUser(role: Role): Exclude<CareRole, null> | null {
+  switch (role) {
+    case 'DOCTOR':
+      return 'DOCTOR'
+    case 'NURSE':
+      return 'NURSE'
+    default:
+      return null
+  }
+}
+
+/** "Gå till nästa": shown once the decision is made, so the clinician keeps working through the queue. */
+function NextCaseBar({ caseId }: { readonly caseId: string }) {
+  const { t } = useTranslation()
+  const navigate = useNavigate()
+  const getCategoryLabel = useCategoryLabel()
+  const { data } = useApi(() => client.getNextCaseToReview(caseId), [caseId])
+  if (!data) return null
+  const { next, remaining } = data
+  return (
+    <Stack
+      direction={{ xs: 'column', sm: 'row' }}
+      sx={{
+        ...cardSx,
+        p: 2,
+        gap: 1.5,
+        alignItems: { sm: 'center' },
+        justifyContent: 'space-between',
+      }}
+      aria-label={t('triage.nextCase.title')}
+    >
+      <Box sx={{ minWidth: 0 }}>
+        <Typography sx={{ fontSize: 12, color: tokens.textSecondary }}>
+          {t('triage.nextCase.title')}
+        </Typography>
+        {next ? (
+          <Typography sx={{ fontWeight: 600 }}>
+            {next.patientName}
+            <Typography component="span" sx={{ color: tokens.textSecondary, fontWeight: 400 }}>
+              {' · '}
+              {getCategoryLabel(next.category)}
+              {' · '}
+              {t('triage.nextCase.waited', {
+                count: Math.max(0, differenceInDays(new Date(), parseISO(next.scheduledAt))),
+              })}
+              {' · '}
+              {t('triage.nextCase.remaining', { count: remaining })}
+            </Typography>
+          </Typography>
+        ) : (
+          <Typography sx={{ fontWeight: 600 }}>{t('triage.nextCase.none')}</Typography>
+        )}
+      </Box>
+      <Stack direction="row" sx={{ gap: 1, flexShrink: 0 }}>
+        <Button variant="text" onClick={() => navigate('/dashboard')}>
+          {t('triage.nextCase.toDashboard')}
+        </Button>
+        {next && (
+          <Button
+            variant="contained"
+            disableElevation
+            endIcon={<ArrowForwardIcon />}
+            onClick={() => navigate(`/cases/${next.id}`)}
+          >
+            {t('triage.nextCase.open')}
+          </Button>
+        )}
+      </Stack>
+    </Stack>
+  )
 }
 
 function NoteBlock({ label, text }: { readonly label: string; readonly text: string }) {
@@ -83,6 +159,27 @@ function TriageDecisionSummary({ caseData, info }: { caseData: Case; info: strin
           ...(td.xrayBeforeVisit
             ? [{ key: 'xray', label: t('triage.xrayBeforeVisit'), value: t('common.yes') }]
             : []),
+          ...(td.handledNow
+            ? [
+                {
+                  key: 'now',
+                  label: t('triage.aside.performed'),
+                  value: t('triage.aside.performedNow'),
+                },
+              ]
+            : []),
+          ...(td.callOutcome
+            ? [
+                {
+                  key: 'outcome',
+                  label: t('triage.aside.outcome'),
+                  value:
+                    td.callOutcome === 'REACHED'
+                      ? t('triage.callOutcome.REACHED')
+                      : t('triage.callOutcome.NOT_REACHED'),
+                },
+              ]
+            : []),
         ]}
       />
       {/* the internal note is shown in the case header; only repeat it when it differs */}
@@ -120,6 +217,14 @@ export default function TriageTab({ caseData, onTriaged, routeContactMode }: Tri
   const { showSnack } = useSnack()
   const getRoleLabel = useRoleLabel()
   const canTriage = isRole('NURSE', 'DOCTOR')
+  const handledByRole = careRoleForUser(currentUser.role)
+  const handledBy = handledByRole ? { userId: currentUser.id, careRole: handledByRole } : undefined
+  const { data: patient } = useApi(
+    () => client.getPatient(caseData.patientId),
+    [caseData.patientId],
+  )
+  const { data: auditEvents } = useApi(() => client.getAuditEvents(caseData.id), [caseData.id])
+  const priorCallAttempts = (auditEvents ?? []).filter((e) => e.action === 'CALL_ATTEMPT').length
   const isOpen = caseData.status === 'NEW' || caseData.status === 'NEEDS_REVIEW'
   // determine if any lab/xray reviews are pending for this case
   const hasPendingReviews = React.useMemo(
@@ -176,6 +281,10 @@ export default function TriageTab({ caseData, onTriaged, routeContactMode }: Tri
               navigate(`/cases/${caseData.id}/${contactModeToRouteSegment(mode)}`)
             }}
             asideFooter={colleagueReviews(true)}
+            handledBy={handledBy}
+            patientName={patient?.displayName}
+            patientPhone={patient?.phone}
+            priorCallAttempts={priorCallAttempts}
           />
         )}
       </Stack>
@@ -193,16 +302,22 @@ export default function TriageTab({ caseData, onTriaged, routeContactMode }: Tri
     if (!caseData.triageDecision) {
       return <Alert severity="info">{info}</Alert>
     }
-    return hasColleagueReviews ? (
-      <TriageLayout main={summary} aside={colleagueReviews(false)} />
-    ) : (
-      <Box sx={{ maxWidth: 720 }}>{summary}</Box>
+    return (
+      <Stack sx={{ gap: 2.5 }}>
+        <NextCaseBar caseId={caseData.id} />
+        {hasColleagueReviews ? (
+          <TriageLayout main={summary} aside={colleagueReviews(false)} />
+        ) : (
+          <Box sx={{ maxWidth: 720 }}>{summary}</Box>
+        )}
+      </Stack>
     )
   }
 
   // CLOSED
   return (
     <Stack sx={{ gap: 2.5 }}>
+      <NextCaseBar caseId={caseData.id} />
       <Alert severity="success">{t('status.CLOSED')}</Alert>
       {hasColleagueReviews && <Box sx={{ ...cardSx, p: 2.5 }}>{colleagueReviews(false)}</Box>}
     </Stack>

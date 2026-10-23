@@ -31,6 +31,8 @@ export type CaseCategory = z.infer<typeof CaseCategorySchema>
 export const TriggerTypeSchema = z.enum([
   'NO_RESPONSE',
   'NOT_OPENED',
+  /** Patient has no e-ID/app: staff handle every checkpoint by phone or visit. */
+  'NO_DIGITAL_CHANNEL',
   'HIGH_PAIN',
   'INFECTION_SUSPECTED',
   'LOW_FUNCTION',

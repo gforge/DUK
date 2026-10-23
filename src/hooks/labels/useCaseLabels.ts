@@ -84,6 +84,8 @@ export function useTriggerLabel() {
         return t('trigger.NO_RESPONSE')
       case 'NOT_OPENED':
         return t('trigger.NOT_OPENED')
+      case 'NO_DIGITAL_CHANNEL':
+        return t('trigger.NO_DIGITAL_CHANNEL')
       case 'HIGH_PAIN':
         return t('trigger.HIGH_PAIN')
       case 'INFECTION_SUSPECTED':

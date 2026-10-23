@@ -19,6 +19,7 @@ export type DueAtPreset = '1w' | '2w' | '1m' | 'custom'
 const PRESETS: Exclude<DueAtPreset, 'custom'>[] = ['1w', '2w', '1m']
 
 interface Props {
+  readonly number?: number
   readonly control: Control<TriageForm>
   readonly error?: FieldError
   readonly dueAtPreset: DueAtPreset | null
@@ -41,7 +42,7 @@ function normalizeDeadlineInput(input: string): string {
 }
 
 /** Step 4: due date presets (1 vecka / 2 veckor / 1 månad) or a custom date. */
-export function DueAtField({ control, error, dueAtPreset, setDueAtPreset }: Props) {
+export function DueAtField({ number = 4, control, error, dueAtPreset, setDueAtPreset }: Props) {
   const { t } = useTranslation()
   const locale = useDateLocale()
   const dueDatePickerRef = React.useRef<HTMLInputElement>(null)
@@ -60,7 +61,7 @@ export function DueAtField({ control, error, dueAtPreset, setDueAtPreset }: Prop
       render={({ field }) => {
         const customIso = dueAtPreset === 'custom' ? computeDueAtFromInput(field.value) : null
         return (
-          <TriageSection number={4} title={t('triage.dueAt')} required id="triage-due">
+          <TriageSection number={number} title={t('triage.dueAt')} required id="triage-due">
             <Box
               role="radiogroup"
               aria-labelledby="triage-due"

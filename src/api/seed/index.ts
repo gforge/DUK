@@ -19,6 +19,13 @@ import { journalDrafts } from './journalDrafts'
 import { journalTemplates } from './journalTemplates'
 import { journeyTemplates } from './journeyTemplates'
 import {
+  nonDigitalAuditEvents,
+  nonDigitalCases,
+  nonDigitalEpisodes,
+  nonDigitalJourneys,
+  nonDigitalPatients,
+} from './nonDigitalExamples'
+import {
   pathwayAuditEvents,
   pathwayCases,
   pathwayEpisodes,
@@ -48,10 +55,16 @@ const baseSeedState: AppState = {
   demoDataVersion: CURRENT_DEMO_DATA_VERSION,
   users,
   careTeams,
-  patients: [...patients, ...referralPatients, ...switchedPatients, ...pathwayPatients],
-  cases: [...cases, ...referralCases, ...switchedCases, ...pathwayCases],
+  patients: [
+    ...patients,
+    ...referralPatients,
+    ...switchedPatients,
+    ...pathwayPatients,
+    ...nonDigitalPatients,
+  ],
+  cases: [...cases, ...referralCases, ...switchedCases, ...pathwayCases, ...nonDigitalCases],
   policyRules,
-  auditEvents: [...auditEvents, ...pathwayAuditEvents],
+  auditEvents: [...auditEvents, ...pathwayAuditEvents, ...nonDigitalAuditEvents],
   questionnaireTemplates,
   formSeries,
   formResponses: [
@@ -64,12 +77,19 @@ const baseSeedState: AppState = {
   journalTemplates,
   journeyTemplates,
   researchModules,
-  episodesOfCare: [...episodesOfCare, ...referralEpisodes, ...switchedEpisodes, ...pathwayEpisodes],
+  episodesOfCare: [
+    ...episodesOfCare,
+    ...referralEpisodes,
+    ...switchedEpisodes,
+    ...pathwayEpisodes,
+    ...nonDigitalEpisodes,
+  ],
   patientJourneys: [
     ...patientJourneys,
     ...referralJourneys,
     ...switchedJourneys,
     ...pathwayJourneys,
+    ...nonDigitalJourneys,
   ],
   instructions: [],
   instructionTemplates,

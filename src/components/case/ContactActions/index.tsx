@@ -14,8 +14,8 @@ import { useRole } from '@/store/roleContext'
 import { useSnack } from '@/store/snackContext'
 import { tokens } from '@/theme'
 /** Triggers that surface the contact action panel */
-const CONTACT_TRIGGERS = new Set(['SEEK_CONTACT', 'NOT_OPENED'] as const)
-type ContactTrigger = 'SEEK_CONTACT' | 'NOT_OPENED'
+const CONTACT_TRIGGERS = new Set(['SEEK_CONTACT', 'NOT_OPENED', 'NO_DIGITAL_CHANNEL'] as const)
+type ContactTrigger = 'SEEK_CONTACT' | 'NOT_OPENED' | 'NO_DIGITAL_CHANNEL'
 type ContactPanelAction = Extract<ContactAction, 'CONTACTED' | 'REMINDER_SENT' | 'CALL_ATTEMPT'>
 interface Props {
   caseData: Case
@@ -159,15 +159,18 @@ export default function ContactActions({ caseData, onRefetch }: Props) {
                 {t('contactActions.callAttempted')}
               </Button>
 
-              <Button
-                size="small"
-                variant="outlined"
-                startIcon={<NotificationsActiveIcon />}
-                onClick={() => handle('REMINDER_SENT')}
-                disabled={isSubmitting}
-              >
-                {t('contactActions.reminded')}
-              </Button>
+              {/* a reminder presumes an app or SMS; patients without a digital channel get a call */}
+              {primaryTrigger !== 'NO_DIGITAL_CHANNEL' && (
+                <Button
+                  size="small"
+                  variant="outlined"
+                  startIcon={<NotificationsActiveIcon />}
+                  onClick={() => handle('REMINDER_SENT')}
+                  disabled={isSubmitting}
+                >
+                  {t('contactActions.reminded')}
+                </Button>
+              )}
             </>
           )}
         </Stack>

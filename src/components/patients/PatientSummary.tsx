@@ -36,6 +36,16 @@ export default function PatientSummary({ patient }: PatientSummaryProps) {
             {patient.dateOfBirth}
           </Typography>
         </Box>
+        {patient.noDigitalChannel && (
+          <Box>
+            <Typography variant="caption" color="text.secondary">
+              {t('patients.noDigitalChannel')}
+            </Typography>
+            <Typography variant="body2" sx={{ fontWeight: 500 }}>
+              {t('common.yes')}
+            </Typography>
+          </Box>
+        )}
         {patient.lastOpenedAt && (
           <Box>
             <Typography variant="caption" color="text.secondary">
