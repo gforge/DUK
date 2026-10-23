@@ -485,12 +485,15 @@ These stories map directly to the workflows and components described in the desi
 
 **Acceptance criteria**
 
-1. With contact mode PHONE a checkbox "Jag ringer patienten nu" (`handledNow`) hides competence, assignee and due date; the decision panel shows "Telefonkontakt · Ringer nu" and the clinician as responsible.
-2. With contact mode DIGITAL the same checkbox reads "Jag svarar patienten nu": the message to the patient becomes the only required field and the submit button reads "Skicka svar och avsluta".
-3. On confirm the service records the decision (NAMED, the clinician, due today), stores the message, logs `CONTACTED` and closes the case; no worklist task is created.
-4. Closing a case ("Stäng ärendet") opens a dialog with an optional message to the patient, so the all-clear can be sent in the same step.
+1. For DIGITAL and PHONE contact a step 2 "När och av vem?" offers two cards: do it now yourself ("Jag svarar patienten nu" / "Jag ringer patienten nu") or plan a task ("Planera digital uppföljning" / "Planera telefonsamtal"). Later steps are numbered after what is shown.
+2. Replying now: an info banner explains that the case closes when the reply is sent; the reply to the patient is the only required field. The aside shows the chip "Direktsvar", the rows Åtgärd / Utförs / Ansvarig / Ärendet, a "När du skickar" checklist and the button "Skicka svar och avsluta".
+3. Calling now: a phone box shows the patient's number (`patient.phone`), a copy button and when the call started. Step 3 "Samtalsutfall" asks whether the patient was reached.
+4. Reached: a required call note (logged as `CONTACTED` details and used as completion comment) and an optional summary to the patient. The case closes with "Logga samtal och avsluta".
+5. Not reached: a warning banner states the case cannot close. Step 4 "Hur går du vidare?" offers "Ring igen senare" (retry time chips, task for the clinician), "Be patienten ringa in" (prefilled message, task due tomorrow 09:00) or "Lämna över" (competence, assignee and due date as for a planned task). The attempt is logged as `CALL_ATTEMPT`, the case stays `TRIAGED`, the aside chip reads "Ej nådd · försök N".
+6. Closing a case ("Stäng ärendet") opens a dialog with an optional message to the patient.
+7. The aside always states what happens on confirm and which choices remain ("Kvar att välja: …").
 
-> _Related code_: `src/components/case/triage/schema.ts`, `toSubmitData.ts`, `TriageForm.tsx`, `src/api/service/cases.ts` (`triageCase`).
+> _Related code_: `src/components/case/triage/schema.ts`, `toSubmitData.ts`, `TriageForm.tsx`, `TimingSection.tsx`, `CallOutcomeSection.tsx`, `NotReachedSection.tsx`, `PhoneBox.tsx`, `src/api/service/cases.ts` (`triageCase`).
 
 ---
 

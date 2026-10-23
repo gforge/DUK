@@ -52,7 +52,7 @@ Field-heavy details stay here instead of in overview diagrams.
 - `personalNumber: string`
 - `dateOfBirth: string`
 - `palId?: string`
-- `noDigitalChannel?: boolean` (no e-ID/app: forms are never sent, checkpoints become `NO_DIGITAL_CHANNEL` cases for staff), `lastOpenedAt?: string` (set by `patientOpenedApp(...)`)
+- `noDigitalChannel?: boolean` (no e-ID/app: forms are never sent, checkpoints become `NO_DIGITAL_CHANNEL` cases for staff), `phone?: string` (shown in the triage "ringer nu" phone box), `lastOpenedAt?: string` (set by `patientOpenedApp(...)`)
 - `createdAt: string`
 
 ### Case (`src/api/schemas/case.ts`)
@@ -88,7 +88,9 @@ Field-heavy details stay here instead of in overview diagrams.
 - `bookings?: Booking[]` (status `PENDING | SCHEDULED | COMPLETED | CANCELLED`, completion metadata)
 - `reviews: ClinicalReview[]` (LAB/XRAY result reviews, outcome `OK | UNCERTAIN | PROBLEM`)
 - `colleagueReviews: ColleagueReview[]` — advisory second opinion requested from a named colleague (`requestedByUserId`, `reviewerUserId`, `question`, `respondedAt`, `response`); never blocks triage
-- `triageDecision.handledNow?: boolean` — PHONE only: the triaging clinician called right away; `triageCase` then logs `CONTACTED` and closes the case without a worklist task
+- `triageDecision.handledNow?: boolean` — PHONE/DIGITAL: the triaging clinician called or replied right away instead of planning a task (always NAMED to themselves)
+- `triageDecision.callOutcome?: 'REACHED' | 'NOT_REACHED'` — PHONE + handledNow. REACHED: `triageCase` logs `CONTACTED` (with the call note) and closes the case. NOT_REACHED: logs `CALL_ATTEMPT` and leaves the case `TRIAGED` with the chosen follow-up task
+- `triageDecision.notReachedPlan?: 'CALL_AGAIN' | 'ASK_PATIENT_TO_CALL' | 'HAND_OVER'` — how a not-reached call continues: a retry task for the clinician (`dueAt` = retry time), a message to the patient plus a task due tomorrow 09:00, or an ordinary assignment to someone else
 - `scheduledAt: string` — when the case entered the review queue (creation, or the first patient signal on a `NEW` case); the dashboard "Väntat" column counts days from here and marks ≥ 7 days as overdue
 - `createdAt: string`
 - `lastActivityAt: string`

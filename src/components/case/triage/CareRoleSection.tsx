@@ -11,16 +11,17 @@ import { TriageSection } from './layout'
 const CARE_ROLES: Exclude<CareRole, null>[] = ['DOCTOR', 'NURSE', 'PHYSIO']
 
 interface Props {
+  readonly number?: number
   readonly value: CareRole
   readonly onChange: (role: Exclude<CareRole, null>) => void
 }
 
 /** Step 2: which competence should handle the follow-up. */
-export function CareRoleSection({ value, onChange }: Props) {
+export function CareRoleSection({ number = 2, value, onChange }: Props) {
   const { t } = useTranslation()
   const getLabel = useCareRoleLabel()
   return (
-    <TriageSection number={2} title={t('triage.careRole')} required id="triage-care-role">
+    <TriageSection number={number} title={t('triage.careRole')} required id="triage-care-role">
       <Box
         role="radiogroup"
         aria-labelledby="triage-care-role"

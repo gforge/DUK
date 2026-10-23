@@ -141,9 +141,27 @@ export function triageCase(
   })
   setStore(state)
   const mode = input.triageDecision.contactMode
-  if (input.triageDecision.handledNow && (mode === 'PHONE' || mode === 'DIGITAL')) {
-    // The clinician phones the patient or replies in the app right away: log the contact
-    // and close the case in the same step, so no worklist task is created.
+  if (input.triageDecision.handledNow && mode === 'PHONE') {
+    if (input.triageDecision.callOutcome === 'NOT_REACHED') {
+      // The call did not get through: log the attempt and keep the case open with the
+      // follow-up task the clinician chose (call again, await the patient's call, hand over).
+      state = addAuditEvent(getStore(), caseId, userId, userRole, 'CALL_ATTEMPT', {
+        plan: input.triageDecision.notReachedPlan,
+        note,
+      })
+      setStore(state)
+      return updated
+    }
+    // The clinician reached the patient: log the call with its note and close the case
+    // in the same step, so no worklist task is created.
+    state = addAuditEvent(getStore(), caseId, userId, userRole, 'CONTACTED', { note })
+    setStore(state)
+    return completeWorklistCase(caseId, userId, userRole, {
+      completionComment: note ?? undefined,
+    })
+  }
+  if (input.triageDecision.handledNow && mode === 'DIGITAL') {
+    // The clinician replies in the app right away: the message is the contact; close the case.
     state = addAuditEvent(getStore(), caseId, userId, userRole, 'CONTACTED')
     setStore(state)
     return completeWorklistCase(caseId, userId, userRole, {

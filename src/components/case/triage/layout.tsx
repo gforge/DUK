@@ -1,3 +1,6 @@
+import CheckIcon from '@mui/icons-material/Check'
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
+import WarningAmberOutlinedIcon from '@mui/icons-material/WarningAmberOutlined'
 import { Box, Stack, Typography } from '@mui/material'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
@@ -144,5 +147,103 @@ export function DecisionRows({ rows }: { readonly rows: readonly DecisionRow[] }
         </Box>
       ))}
     </Box>
+  )
+}
+
+/** Tinted banner with a bold first line, e.g. "Direktsvar – ärendet avslutas när du skickar". */
+export function Banner({
+  tone,
+  title,
+  body,
+}: {
+  readonly tone: 'info' | 'warning'
+  readonly title: React.ReactNode
+  readonly body?: React.ReactNode
+}) {
+  const info = tone === 'info'
+  const Icon = info ? InfoOutlinedIcon : WarningAmberOutlinedIcon
+  return (
+    <Stack
+      direction="row"
+      role="status"
+      sx={{
+        gap: 1.25,
+        alignItems: 'flex-start',
+        p: '12px 14px',
+        borderRadius: '10px',
+        bgcolor: info ? tokens.infoBg : tokens.warningBg,
+        color: info ? tokens.infoFg : tokens.warningFg,
+      }}
+    >
+      <Icon fontSize="small" sx={{ mt: '1px', flexShrink: 0 }} />
+      <Box sx={{ fontSize: 13, lineHeight: 1.45 }}>
+        <Box sx={{ fontWeight: 600 }}>{title}</Box>
+        {body && <Box>{body}</Box>}
+      </Box>
+    </Stack>
+  )
+}
+
+/** Small pill next to the "Beslut" heading: Direktsvar, Direktsamtal, Planerad… */
+export function OutcomeChip({
+  tone,
+  children,
+}: {
+  readonly tone: 'info' | 'warning' | 'neutral'
+  readonly children: React.ReactNode
+}) {
+  const colors = {
+    info: { bg: tokens.infoBg, fg: tokens.infoFg },
+    warning: { bg: tokens.warningBg, fg: tokens.warningFg },
+    neutral: { bg: tokens.greyFill, fg: tokens.text2 },
+  }[tone]
+  return (
+    <Box
+      component="span"
+      sx={{
+        fontSize: 11,
+        fontWeight: 600,
+        color: colors.fg,
+        bgcolor: colors.bg,
+        borderRadius: '999px',
+        px: 1,
+        py: '3px',
+        whiteSpace: 'nowrap',
+      }}
+    >
+      {children}
+    </Box>
+  )
+}
+
+/** "När du bekräftar" checklist in the aside; green ticks when the case closes. */
+export function EffectsList({
+  title,
+  items,
+  closing,
+}: {
+  readonly title: string
+  readonly items: readonly string[]
+  readonly closing: boolean
+}) {
+  return (
+    <Stack sx={{ gap: 1, borderTop: `1px solid ${tokens.greyFill}`, pt: 1.75 }}>
+      <Typography sx={{ fontSize: 12, fontWeight: 600, color: tokens.text2 }}>{title}</Typography>
+      {items.map((item) => (
+        <Stack key={item} direction="row" sx={{ gap: 1, alignItems: 'flex-start' }}>
+          <CheckIcon
+            sx={{
+              fontSize: 15,
+              mt: '1px',
+              flexShrink: 0,
+              color: closing ? tokens.successFg : tokens.textSecondary,
+            }}
+          />
+          <Typography sx={{ fontSize: 12, lineHeight: 1.4, color: tokens.text2 }}>
+            {item}
+          </Typography>
+        </Stack>
+      ))}
+    </Stack>
   )
 }

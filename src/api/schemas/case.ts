@@ -14,6 +14,14 @@ import {
   TriggerTypeSchema,
 } from './enums'
 
+/** Outcome of a call the triaging clinician makes on the spot. */
+export const CallOutcomeSchema = z.enum(['REACHED', 'NOT_REACHED'])
+export type CallOutcome = z.infer<typeof CallOutcomeSchema>
+
+/** What happens next when the patient could not be reached on the spot. */
+export const NotReachedPlanSchema = z.enum(['CALL_AGAIN', 'ASK_PATIENT_TO_CALL', 'HAND_OVER'])
+export type NotReachedPlan = z.infer<typeof NotReachedPlanSchema>
+
 export const PolicyWarningSchema = z.object({
   ruleId: z.string(),
   ruleName: z.string(),
@@ -80,8 +88,12 @@ export const CaseSchema = z.object({
       note: z.string().nullable().optional(),
       /** Radiograph must be booked before the follow-up visit (VISIT only). */
       xrayBeforeVisit: z.boolean().optional(),
-      /** PHONE only: the triaging clinician called the patient right away; no worklist task. */
+      /** PHONE/DIGITAL: the triaging clinician called or replied right away. */
       handledNow: z.boolean().optional(),
+      /** PHONE + handledNow: whether the patient was reached. */
+      callOutcome: CallOutcomeSchema.optional(),
+      /** PHONE + handledNow + NOT_REACHED: how the case continues. */
+      notReachedPlan: NotReachedPlanSchema.optional(),
     })
     .superRefine((value, ctx) => {
       if (value.contactMode === 'CLOSE') {
@@ -193,8 +205,12 @@ export const TriageDecisionSchema = z
     note: z.string().nullable().optional(),
     /** Radiograph must be booked before the follow-up visit (VISIT only). */
     xrayBeforeVisit: z.boolean().optional(),
-    /** PHONE only: the triaging clinician calls the patient right away; no worklist task, case closes. */
+    /** PHONE/DIGITAL: the triaging clinician calls or replies right away instead of creating a task. */
     handledNow: z.boolean().optional(),
+    /** PHONE + handledNow: whether the patient was reached. REACHED closes the case. */
+    callOutcome: CallOutcomeSchema.optional(),
+    /** PHONE + handledNow + NOT_REACHED: how the case continues (a task is created). */
+    notReachedPlan: NotReachedPlanSchema.optional(),
   })
   .superRefine((value, ctx) => {
     if (value.contactMode === 'CLOSE') {

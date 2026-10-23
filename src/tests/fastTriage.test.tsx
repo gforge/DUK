@@ -8,7 +8,11 @@ import * as service from '@/api/service'
 import { getStore, initStore } from '@/api/storage'
 import ContactActions from '@/components/case/ContactActions'
 import type { TriageForm as TriageFormValues } from '@/components/case/triage/schema'
-import { countMissingRequired, toTriageSubmitData } from '@/components/case/triage/toSubmitData'
+import {
+  countMissingRequired,
+  missingRequired,
+  toTriageSubmitData,
+} from '@/components/case/triage/toSubmitData'
 import { RoleProvider } from '@/store/roleContext'
 import { SnackProvider } from '@/store/snackContext'
 
@@ -27,18 +31,23 @@ const callingNowForm: TriageFormValues = {
   assignedUserIds: [],
   assignedTeamIds: [],
   dueAtInput: '',
-  note: 'Ringde, patienten mår bra',
+  note: '',
   handledNow: true,
+  callOutcome: 'REACHED',
+  callNote: 'Ringde, patienten mår bra',
+  notReachedPlan: null,
   patientMessage: '',
 }
 
 describe('"Jag ringer patienten nu" (handledNow)', () => {
-  it('needs no further choices once the clinician calls now', () => {
+  it('needs only the call outcome and a note once the clinician calls now', () => {
+    expect(missingRequired({ ...callingNowForm, callOutcome: null })).toEqual(['callOutcome'])
+    expect(missingRequired({ ...callingNowForm, callNote: '' })).toEqual(['callNote'])
     expect(countMissingRequired(callingNowForm)).toBe(0)
     expect(countMissingRequired({ ...callingNowForm, handledNow: false })).toBe(3)
   })
 
-  it('maps to a phone decision owned by the triaging clinician', () => {
+  it('maps a reached call to a phone decision owned by the triaging clinician', () => {
     const data = toTriageSubmitData(callingNowForm, { userId: 'user-pal-1', careRole: 'DOCTOR' })
     expect(data.triageDecision).toMatchObject({
       contactMode: 'PHONE',
@@ -46,8 +55,78 @@ describe('"Jag ringer patienten nu" (handledNow)', () => {
       assignmentMode: 'NAMED',
       assignedUserId: 'user-pal-1',
       handledNow: true,
+      callOutcome: 'REACHED',
+      note: 'Ringde, patienten mår bra',
     })
     expect(() => toTriageSubmitData(callingNowForm)).toThrow()
+  })
+
+  it('asks how to proceed when the patient was not reached', () => {
+    const notReached: TriageFormValues = {
+      ...callingNowForm,
+      callOutcome: 'NOT_REACHED',
+      callNote: '',
+    }
+    expect(missingRequired(notReached)).toEqual(['notReachedPlan'])
+    expect(missingRequired({ ...notReached, notReachedPlan: 'CALL_AGAIN' })).toEqual(['retryAt'])
+    expect(missingRequired({ ...notReached, notReachedPlan: 'ASK_PATIENT_TO_CALL' })).toEqual([
+      'patientMessage',
+    ])
+    expect(missingRequired({ ...notReached, notReachedPlan: 'HAND_OVER' })).toEqual([
+      'careRole',
+      'assignee',
+      'dueAt',
+    ])
+  })
+
+  it('turns "ring igen senare" into a task for the clinician at the retry time', () => {
+    const retryAt = new Date(Date.now() + 3 * 3600_000).toISOString()
+    const data = toTriageSubmitData(
+      {
+        ...callingNowForm,
+        callOutcome: 'NOT_REACHED',
+        notReachedPlan: 'CALL_AGAIN',
+        dueAtInput: retryAt,
+      },
+      { userId: 'user-pal-1', careRole: 'DOCTOR' },
+    )
+    expect(data.triageDecision).toMatchObject({
+      contactMode: 'PHONE',
+      assignmentMode: 'NAMED',
+      assignedUserId: 'user-pal-1',
+      dueAt: retryAt,
+      handledNow: true,
+      callOutcome: 'NOT_REACHED',
+      notReachedPlan: 'CALL_AGAIN',
+    })
+  })
+
+  it('logs the attempt and keeps the case open when the patient was not reached', () => {
+    const c = reviewCase()
+    const result = service.triageCase(
+      c.id,
+      {
+        triageDecision: {
+          contactMode: 'PHONE',
+          careRole: 'NURSE',
+          assignmentMode: 'NAMED',
+          assignedUserId: 'user-nurse-1',
+          assignedUserIds: ['user-nurse-1'],
+          dueAt: new Date(Date.now() + 3600_000).toISOString(),
+          note: null,
+          handledNow: true,
+          callOutcome: 'NOT_REACHED',
+          notReachedPlan: 'CALL_AGAIN',
+        },
+      },
+      'user-nurse-1',
+      'NURSE',
+    )
+    expect(result.status).toBe('TRIAGED')
+    expect(result.assignedUserId).toBe('user-nurse-1')
+    const actions = service.getAuditEvents(c.id).map((e) => e.action)
+    expect(actions).toContain('CALL_ATTEMPT')
+    expect(actions).not.toContain('CONTACTED')
   })
 
   it('logs the call and closes the case without a worklist task', () => {
@@ -64,6 +143,7 @@ describe('"Jag ringer patienten nu" (handledNow)', () => {
           dueAt: new Date().toISOString(),
           note: 'Ringde nu',
           handledNow: true,
+          callOutcome: 'REACHED',
         },
       },
       'user-nurse-1',
@@ -85,6 +165,8 @@ describe('"Jag svarar patienten nu" (replying in the app)', () => {
     ...callingNowForm,
     contactMode: 'DIGITAL',
     patientMessage: 'Allt ser bra ut, ingen mer uppföljning behövs.',
+    callOutcome: null,
+    callNote: '',
   }
 
   it('requires a message to the patient and nothing else', () => {

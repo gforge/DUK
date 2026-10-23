@@ -18,6 +18,7 @@ import { eligibleUsersFor } from './useTriageDirectory'
 type SpecificTab = 'NAMED' | 'TEAM'
 
 interface Props {
+  readonly number?: number
   readonly contactMode: ContactMode | null
   readonly careRole: CareRole
   readonly assignmentMode: AssignmentMode
@@ -38,6 +39,7 @@ function toggle(list: readonly string[], id: string): string[] {
 
 /** Step 3: VSH / PAL / a specific person or group. */
 export function AssigneeSection({
+  number = 3,
   contactMode,
   careRole,
   assignmentMode,
@@ -63,7 +65,7 @@ export function AssigneeSection({
   const visibleUsers = q ? eligible.filter((u) => u.name.toLowerCase().includes(q)) : eligible
 
   return (
-    <TriageSection number={3} title={getWhoLabel(contactMode)} required id="triage-assignee">
+    <TriageSection number={number} title={getWhoLabel(contactMode)} required id="triage-assignee">
       <Box
         role="radiogroup"
         aria-labelledby="triage-assignee"

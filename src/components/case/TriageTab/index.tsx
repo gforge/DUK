@@ -163,12 +163,20 @@ function TriageDecisionSummary({ caseData, info }: { caseData: Case; info: strin
             ? [
                 {
                   key: 'now',
-                  label: t(
-                    td.contactMode === 'DIGITAL'
-                      ? 'triage.replyNowDecision'
-                      : 'triage.handledNowDecision',
-                  ),
-                  value: t('common.yes'),
+                  label: t('triage.aside.performed'),
+                  value: t('triage.aside.performedNow'),
+                },
+              ]
+            : []),
+          ...(td.callOutcome
+            ? [
+                {
+                  key: 'outcome',
+                  label: t('triage.aside.outcome'),
+                  value:
+                    td.callOutcome === 'REACHED'
+                      ? t('triage.callOutcome.REACHED')
+                      : t('triage.callOutcome.NOT_REACHED'),
                 },
               ]
             : []),
@@ -211,6 +219,12 @@ export default function TriageTab({ caseData, onTriaged, routeContactMode }: Tri
   const canTriage = isRole('NURSE', 'DOCTOR')
   const handledByRole = careRoleForUser(currentUser.role)
   const handledBy = handledByRole ? { userId: currentUser.id, careRole: handledByRole } : undefined
+  const { data: patient } = useApi(
+    () => client.getPatient(caseData.patientId),
+    [caseData.patientId],
+  )
+  const { data: auditEvents } = useApi(() => client.getAuditEvents(caseData.id), [caseData.id])
+  const priorCallAttempts = (auditEvents ?? []).filter((e) => e.action === 'CALL_ATTEMPT').length
   const isOpen = caseData.status === 'NEW' || caseData.status === 'NEEDS_REVIEW'
   // determine if any lab/xray reviews are pending for this case
   const hasPendingReviews = React.useMemo(
@@ -268,6 +282,9 @@ export default function TriageTab({ caseData, onTriaged, routeContactMode }: Tri
             }}
             asideFooter={colleagueReviews(true)}
             handledBy={handledBy}
+            patientName={patient?.displayName}
+            patientPhone={patient?.phone}
+            priorCallAttempts={priorCallAttempts}
           />
         )}
       </Stack>

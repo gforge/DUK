@@ -967,6 +967,43 @@ export default interface Resources {
     },
     "triage": {
       "addToGoogle": "Lägg till i Google Kalender",
+      "aside": {
+        "action": "Åtgärd",
+        "actionValue": {
+          "DIGITAL": "Formulär i appen",
+          "PHONE": "Telefonsamtal",
+          "VISIT": "Besök på mottagning",
+          "reply": "Svar i appen"
+        },
+        "case": {
+          "closes": "Avslutas",
+          "followedUp": "Följs upp",
+          "stays": "Ligger kvar"
+        },
+        "caseLabel": "Ärendet",
+        "chip": {
+          "call": "Direktsamtal",
+          "close": "Stängs",
+          "notReached_one": "Ej nådd · försök {{count}}",
+          "notReached_other": "Ej nådd · försök {{count}}",
+          "planned": "Planerad",
+          "reply": "Direktsvar"
+        },
+        "nextStep": {
+          "ASK_PATIENT_TO_CALL": "Patienten ringer in",
+          "CALL_AGAIN": "Ring igen",
+          "HAND_OVER": "Lämnas över"
+        },
+        "nextStepLabel": "Nästa steg",
+        "outcome": "Utfall",
+        "performed": "Utförs",
+        "performedNow": "Nu, av dig",
+        "whenConfirm": "När du bekräftar",
+        "whenSend": "När du skickar"
+      },
+      "askToCallHint": "Skickas till patientens app. Ärendet ligger kvar hos dig tills patienten hört av sig.",
+      "askToCallTemplate": "Hej! Vi har försökt nå dig per telefon utan att lyckas. Ring gärna mottagningen på [TELEFONNUMMER] så att vi kan stämma av hur du mår.",
+      "askToCallTitle": "Meddelande till patienten",
       "assignRole": "Bokas till",
       "assignmentModeHelp": {
         "ANY": "Vem som helst med rätt kompetens",
@@ -990,6 +1027,20 @@ export default interface Resources {
       "bookingTypeXray": "Röntgen",
       "bookingUpdated": "Bokning uppdaterad",
       "bookings": "Bokningar",
+      "callNote": {
+        "hint": "Sparas i händelseloggen och föreslås som journaltext.",
+        "placeholder": "Vad patienten uppger, din bedömning och de råd du gav …",
+        "title": "Samtalsanteckning"
+      },
+      "callOutcome": {
+        "NOT_REACHED": "Nådde inte patienten",
+        "NOT_REACHED_short": "Nådde inte",
+        "REACHED": "Nådde patienten",
+        "title": "Samtalsutfall"
+      },
+      "callSummaryLabel": "Sammanfattning till patienten",
+      "callSummaryLink": "+ Skicka även en sammanfattning till patienten i appen",
+      "callSummaryPlaceholder": "Visas för patienten i appen",
       "careRole": "Kompetens",
       "careRoleOption": {
         "DOCTOR": "Läkare",
@@ -1032,9 +1083,9 @@ export default interface Resources {
       },
       "contactModeHelp": {
         "CLOSE": "Stäng ärendet direkt utan uppföljning",
-        "DIGITAL": "Patienten besvarar formulär i appen",
-        "PHONE": "Personal ringer upp patienten",
-        "VISIT": "Patienten kallas till besök"
+        "DIGITAL": "Via appen",
+        "PHONE": "Någon ringer patienten",
+        "VISIT": "Kallas till mottagningen"
       },
       "contactModeLabel": "Kontaktläge",
       "createsTask": "Skapar en uppgift på åtgärdslistan",
@@ -1052,21 +1103,45 @@ export default interface Resources {
       },
       "dueShort": "Förfaller",
       "editBooking": "Redigera bokning",
+      "effects": {
+        "askMessage": "Patienten får ett meddelande i appen",
+        "attemptLogged": "Försöket loggas i händelseloggen",
+        "awaitTask": "Uppgift till dig att följa upp om patienten inte hört av sig",
+        "callLogged": "Samtalet och anteckningen loggas",
+        "callTask": "Den ansvarige ringer patienten senast på förfallodagen",
+        "caseCloses": "Ärendet stängs och lämnar översikten",
+        "caseStays": "Ärendet ligger kvar tills patienten nåtts",
+        "formSentOnDue": "Formulär skickas till patienten på förfallodagen",
+        "handOverTask": "Uppgiften hamnar hos den du lämnar över till",
+        "noTask": "Ingen uppgift skapas på åtgärdslistan",
+        "replySent": "Svaret skickas till patientens app",
+        "retryTask": "Uppgiften ”Ring igen” hamnar på din åtgärdslista",
+        "summarySent": "Sammanfattningen skickas till patientens app",
+        "taskCreated": "Uppgift skapas på åtgärdslistan",
+        "visitTask": "Patienten kallas och besöket bokas via åtgärdslistan"
+      },
       "error": "Fel vid triage",
       "exportIcal": "Exportera till iCal",
       "followingUpInWorklist": "Uppföljning pågår — hanteras via uppgiftslistan.",
       "handledInWorklist": "Uppföljning sker via uppgiftslistan.",
-      "handledNow": "Jag ringer patienten nu",
-      "handledNowDecision": "Ringer nu",
-      "handledNowHint": "Samtalet loggas och ärendet avslutas direkt när du bekräftar. Ingen uppgift skapas på åtgärdslistan.",
-      "handledNowSubmit": "Bekräfta och avsluta",
       "hideAnswers": "Dölj svar",
       "internalNoteAdd": "Lägg till",
       "internalNoteNone": "Ingen intern anteckning",
       "internalNoteSame": "Intern anteckning: samma som ärendets notering",
+      "irrevocable": "Svaret kan inte dras tillbaka efter att det skickats.",
       "latestForm": "Senaste formulär",
-      "missingRequired_one": "{{count}} obligatoriskt val kvar",
-      "missingRequired_other": "{{count}} obligatoriska val kvar",
+      "missing": {
+        "assignee": "ansvarig",
+        "callNote": "samtalsanteckning",
+        "callOutcome": "samtalsutfall",
+        "careRole": "kompetens",
+        "contactMode": "kontaktläge",
+        "dueAt": "förfallodatum",
+        "notReachedPlan": "hur du går vidare",
+        "patientMessage": "meddelande till patienten",
+        "retryAt": "tid för nytt försök"
+      },
+      "missingList": "Kvar att välja: {{items}}",
       "moreFormsHint_one": "1 tidigare formulär finns under fliken Formulär.",
       "moreFormsHint_other": "{{count}} tidigare formulär finns under fliken Formulär.",
       "nextCase": {
@@ -1081,20 +1156,48 @@ export default interface Resources {
       },
       "noNamedUsers": "Inga användare tillgängliga för denna roll",
       "notChosen": "Ej valt",
+      "notReached": {
+        "ASK_PATIENT_TO_CALL": "Be patienten ringa in",
+        "ASK_PATIENT_TO_CALL_hint": "Meddelande i appen med mottagningens nummer",
+        "CALL_AGAIN": "Ring igen senare",
+        "CALL_AGAIN_hint": "Uppgift till dig på åtgärdslistan",
+        "HAND_OVER": "Lämna över",
+        "HAND_OVER_hint": "Till person eller grupp",
+        "banner": {
+          "body": "Försöket loggas. Välj hur ärendet går vidare.",
+          "title": "Ärendet kan inte avslutas – patienten har inte fått besked"
+        },
+        "title": "Hur går du vidare?"
+      },
       "note": "Intern anteckning",
       "optional": "(valfritt)",
       "palRequiresDoctor": "PAL kan bara väljas när kompetensen är Läkare",
       "patientMessage": "Meddelande till patient",
       "patientMessagePlaceholder": "Visas för patienten i appen tillsammans med formuläret",
       "pendingReviews": "Kan inte triagera innan laboratorie- eller röntgengranskningar är färdiga.",
+      "phone": {
+        "call": "Ring {{name}}",
+        "copied": "Kopierat",
+        "copy": "Kopiera telefonnummer",
+        "missing": "Telefonnummer saknas – se journalsystemet",
+        "started": "Samtal startat {{time}}"
+      },
       "pickPersonsHint": "Välj en eller flera personer",
       "previousFormLabel": "Föregående ({{date}})",
-      "replyNow": "Jag svarar patienten nu",
-      "replyNowDecision": "Svarar nu",
-      "replyNowHint": "Svaret skickas till patienten i appen och ärendet avslutas när du bekräftar. Ingen uppgift skapas på åtgärdslistan.",
-      "replyNowSubmit": "Skicka svar och avsluta",
+      "replyBanner": {
+        "body": "Svaret visas i patientens app · inget formulär skickas · ingen uppgift på åtgärdslistan",
+        "title": "Direktsvar – ärendet avslutas när du skickar"
+      },
+      "replyPlaceholder": "Skriv ditt svar till patienten …",
+      "replySigned": "Visas för patienten i appen, signerat {{name}}.",
+      "replyTitle": "Svar till patienten",
       "requiresClinician": "Triagering kräver åtkomst som klinisk personal.",
       "responsible": "Ansvarig",
+      "retry": {
+        "custom": "Välj tid",
+        "todayLate": "Idag 17:00",
+        "tomorrowMorning": "Imorgon 09:00"
+      },
       "scoreWithPrevious": "{{key}}: {{value}} (föreg. {{previous}})",
       "searchPerson": "Sök person",
       "showAnswers": "Visa svar",
@@ -1102,10 +1205,26 @@ export default interface Resources {
       "specificOption": "Person eller grupp",
       "specificPerson": "Person",
       "submit": "Bekräfta triage",
+      "submitLabel": {
+        "callNotReached": "Logga försök och skapa uppgift",
+        "callReached": "Logga samtal och avsluta",
+        "reply": "Skicka svar och avsluta"
+      },
       "submitting": "Skickar...",
       "success": "Triage sparad",
       "teamMembers_one": "{{count}} pers.",
       "teamMembers_other": "{{count}} pers.",
+      "timing": {
+        "callNow": "Jag ringer patienten nu",
+        "callNowHint": "Du ringer och loggar utfallet. Ärendet avslutas om du når patienten.",
+        "planCall": "Planera telefonsamtal",
+        "planCallHint": "Uppgift att ringa skapas på åtgärdslistan.",
+        "planDigital": "Planera digital uppföljning",
+        "planDigitalHint": "Formulär skickas senare. Uppgift skapas på åtgärdslistan.",
+        "replyNow": "Jag svarar patienten nu",
+        "replyNowHint": "Du skriver svaret här. Ärendet avslutas – ingen uppgift skapas.",
+        "title": "När och av vem?"
+      },
       "validation": {
         "dueAtInvalid": "Ogiltigt datumformat",
         "dueAtRequired": "Förfallodatum måste anges"

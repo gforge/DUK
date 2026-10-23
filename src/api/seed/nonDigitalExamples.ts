@@ -18,6 +18,7 @@ export const nonDigitalPatients: Patient[] = [
     displayName: 'Gunhild Lindgren',
     personalNumber: '193806124567',
     dateOfBirth: '1938-06-12',
+    phone: '070-211 49 31',
     palId: 'user-doc-1',
     noDigitalChannel: true,
     createdAt: iso(daysAgo(12)),
