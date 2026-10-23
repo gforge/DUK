@@ -160,7 +160,17 @@ function TriageDecisionSummary({ caseData, info }: { caseData: Case; info: strin
             ? [{ key: 'xray', label: t('triage.xrayBeforeVisit'), value: t('common.yes') }]
             : []),
           ...(td.handledNow
-            ? [{ key: 'now', label: t('triage.handledNowDecision'), value: t('common.yes') }]
+            ? [
+                {
+                  key: 'now',
+                  label: t(
+                    td.contactMode === 'DIGITAL'
+                      ? 'triage.replyNowDecision'
+                      : 'triage.handledNowDecision',
+                  ),
+                  value: t('common.yes'),
+                },
+              ]
             : []),
         ]}
       />

@@ -479,15 +479,16 @@ These stories map directly to the workflows and components described in the desi
 
 ---
 
-## US25 – "I am calling the patient now"
+## US25 – "I am calling / replying to the patient now"
 
-**As a** doctor or nurse **I want** to phone the patient myself during triage instead of creating a task for someone else.
+**As a** doctor or nurse **I want** to phone or answer the patient myself during triage instead of creating a task for someone else.
 
 **Acceptance criteria**
 
 1. With contact mode PHONE a checkbox "Jag ringer patienten nu" (`handledNow`) hides competence, assignee and due date; the decision panel shows "Telefonkontakt · Ringer nu" and the clinician as responsible.
-2. On confirm the service records the decision (NAMED, the clinician, due today), logs `CONTACTED` and closes the case; no worklist task is created.
-3. The patient message can still be sent in the same step.
+2. With contact mode DIGITAL the same checkbox reads "Jag svarar patienten nu": the message to the patient becomes the only required field and the submit button reads "Skicka svar och avsluta".
+3. On confirm the service records the decision (NAMED, the clinician, due today), stores the message, logs `CONTACTED` and closes the case; no worklist task is created.
+4. Closing a case ("Stäng ärendet") opens a dialog with an optional message to the patient, so the all-clear can be sent in the same step.
 
 > _Related code_: `src/components/case/triage/schema.ts`, `toSubmitData.ts`, `TriageForm.tsx`, `src/api/service/cases.ts` (`triageCase`).
 

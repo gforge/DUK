@@ -21,7 +21,10 @@ export const TriageFormSchema = z
     note: z.string().optional(),
     /** VISIT only: book a radiograph before the follow-up visit. */
     xrayBeforeVisit: z.boolean().optional(),
-    /** PHONE only: the clinician calls right away; competence, assignee and due date are implied. */
+    /**
+     * PHONE: the clinician calls right away. DIGITAL: the clinician replies in the app
+     * right away (message required). Competence, assignee and due date are implied.
+     */
     handledNow: z.boolean().optional(),
     patientMessage: z.string().max(PATIENT_MESSAGE_MAX).optional(),
   })
@@ -48,7 +51,17 @@ export const TriageFormSchema = z
     }
 
     if (value.contactMode === 'CLOSE') return
-    if (value.contactMode === 'PHONE' && value.handledNow) return
+    if (isReplyingNow(value)) {
+      if (!value.patientMessage?.trim()) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['patientMessage'],
+          message: 'patientMessage is required when replying now',
+        })
+      }
+      return
+    }
+    if (isHandledNow(value)) return
 
     if (!value.careRole) {
       ctx.addIssue({
@@ -101,6 +114,10 @@ export const TriageFormSchema = z
 
 export type TriageForm = z.infer<typeof TriageFormSchema>
 
-/** True when the clinician handles a phone contact immediately (no task, case closes). */
+/** True when the clinician handles the contact immediately by phone or in-app reply (no task, case closes). */
 export const isHandledNow = (v: Partial<TriageForm>): boolean =>
-  v.contactMode === 'PHONE' && v.handledNow === true
+  (v.contactMode === 'PHONE' || v.contactMode === 'DIGITAL') && v.handledNow === true
+
+/** True when the clinician answers the patient in the app right away. */
+export const isReplyingNow = (v: Partial<TriageForm>): boolean =>
+  v.contactMode === 'DIGITAL' && v.handledNow === true

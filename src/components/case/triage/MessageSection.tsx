@@ -15,10 +15,18 @@ interface Props {
   /** The case's current internal note; the triage note defaults to it. */
   readonly caseNote: string | undefined
   readonly number: number
+  /** The message is the whole reply ("Jag svarar patienten nu"): no longer optional. */
+  readonly required?: boolean
 }
 
 /** Step 5: optional message to the patient and the (collapsed) internal note. */
-export function MessageSection({ control, patientMessageLength, caseNote, number }: Props) {
+export function MessageSection({
+  control,
+  patientMessageLength,
+  caseNote,
+  number,
+  required = false,
+}: Props) {
   const { t } = useTranslation()
   const [editNote, setEditNote] = React.useState(false)
   const hasNote = Boolean(caseNote?.trim())
@@ -27,7 +35,7 @@ export function MessageSection({ control, patientMessageLength, caseNote, number
     <TriageSection
       number={number}
       title={t('triage.patientMessage')}
-      optional
+      optional={!required}
       id="triage-message"
       trailing={
         <Typography

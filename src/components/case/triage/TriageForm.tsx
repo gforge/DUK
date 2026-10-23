@@ -1,5 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutlined'
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
+import PhoneInTalkIcon from '@mui/icons-material/PhoneInTalk'
+import SendIcon from '@mui/icons-material/Send'
 import {
   Box,
   Button,
@@ -15,17 +18,22 @@ import { Controller, useForm, useWatch } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
 import type { AssignmentMode, CareRole, Case, ContactMode } from '@/api/schemas'
-import { ConfirmDialog } from '@/components/common'
 import { useAssigneeLabel, useCareRoleLabel, useContactModeLabel } from '@/hooks/labels'
 import { tokens } from '@/theme'
 
 import { AssigneeSection } from './AssigneeSection'
 import { CareRoleSection } from './CareRoleSection'
+import { CloseCaseDialog } from './CloseCaseDialog'
 import { ContactModeSection } from './ContactModeSection'
 import { DueAtField, type DueAtPreset } from './DueAtField'
 import { AsideTitle, type DecisionRow, DecisionRows, TriageLayout } from './layout'
 import { MessageSection } from './MessageSection'
-import { isHandledNow, type TriageForm as TriageFormValues, TriageFormSchema } from './schema'
+import {
+  isHandledNow,
+  isReplyingNow,
+  type TriageForm as TriageFormValues,
+  TriageFormSchema,
+} from './schema'
 import { cardSx } from './styles'
 import {
   countMissingRequired,
@@ -45,7 +53,7 @@ interface Props {
   readonly onContactModeRouteChange?: (mode: ContactMode | null) => void
   /** Extra aside content under the submit button (colleague review). */
   readonly asideFooter?: React.ReactNode
-  /** The clinician doing the triage; enables "I am calling the patient now" for phone contact. */
+  /** The clinician doing the triage; enables "calling now" / "replying now" for phone and digital contact. */
   readonly handledBy?: HandledBy
 }
 
@@ -96,7 +104,9 @@ export default function TriageForm({
   const isClose = contactMode === 'CLOSE'
   const isVisit = contactMode === 'VISIT'
   const isPhone = contactMode === 'PHONE'
+  const isDigital = contactMode === 'DIGITAL'
   const handledNow = isHandledNow(values)
+  const replyingNow = isReplyingNow(values)
   /** Hide competence/assignee/due date: the clinician is handling it right now. */
   const skipFollowUpFields = isClose || handledNow
 
@@ -116,7 +126,7 @@ export default function TriageForm({
 
   function selectMode(mode: ContactMode) {
     setValue('contactMode', mode, { shouldValidate: true })
-    if (mode !== 'PHONE') setValue('handledNow', false)
+    if (mode !== 'PHONE' && mode !== 'DIGITAL') setValue('handledNow', false)
     if (mode === 'CLOSE') clearFollowUpFields()
     onContactModeRouteChange?.(mode)
   }
@@ -152,7 +162,9 @@ export default function TriageForm({
           {
             key: 'mode',
             label: t('triage.contactModeLabel'),
-            value: `${getContactModeLabel('PHONE')} · ${t('triage.handledNowDecision')}`,
+            value: `${getContactModeLabel(replyingNow ? 'DIGITAL' : 'PHONE')} · ${t(
+              replyingNow ? 'triage.replyNowDecision' : 'triage.handledNowDecision',
+            )}`,
           },
           {
             key: 'who',
@@ -213,7 +225,7 @@ export default function TriageForm({
         />
       )}
 
-      {isPhone && handledBy && (
+      {(isPhone || isDigital) && handledBy && (
         <Controller
           name="handledNow"
           control={control}
@@ -229,11 +241,20 @@ export default function TriageForm({
                     }}
                   />
                 }
-                label={t('triage.handledNow')}
+                label={
+                  <Stack direction="row" sx={{ alignItems: 'center', gap: 1 }}>
+                    {isDigital ? (
+                      <SendIcon sx={{ fontSize: 18, color: 'primary.main' }} />
+                    ) : (
+                      <PhoneInTalkIcon sx={{ fontSize: 18, color: 'success.main' }} />
+                    )}
+                    <span>{t(isDigital ? 'triage.replyNow' : 'triage.handledNow')}</span>
+                  </Stack>
+                }
               />
               {field.value && (
                 <Typography sx={{ fontSize: 13, color: tokens.textSecondary, ml: 4 }}>
-                  {t('triage.handledNowHint')}
+                  {t(isDigital ? 'triage.replyNowHint' : 'triage.handledNowHint')}
                 </Typography>
               )}
             </Box>
@@ -295,6 +316,7 @@ export default function TriageForm({
         number={skipFollowUpFields ? 2 : 5}
         patientMessageLength={values.patientMessage?.length ?? 0}
         caseNote={caseData.internalNote}
+        required={replyingNow}
       />
     </Stack>
   )
@@ -312,34 +334,47 @@ export default function TriageForm({
           if (isClose) setConfirmClose(true)
           else void submit()
         }}
-        startIcon={isSubmitting ? <CircularProgress size={16} color="inherit" /> : undefined}
+        startIcon={
+          isSubmitting ? (
+            <CircularProgress size={16} color="inherit" />
+          ) : replyingNow ? (
+            <SendIcon />
+          ) : handledNow ? (
+            <PhoneInTalkIcon />
+          ) : isClose ? (
+            <CheckCircleOutlineIcon />
+          ) : undefined
+        }
         sx={{ py: 1.25, borderRadius: 2 }}
       >
         {isSubmitting
           ? t('triage.submitting')
-          : handledNow
-            ? t('triage.handledNowSubmit')
-            : t('triage.submit')}
+          : replyingNow
+            ? t('triage.replyNowSubmit')
+            : handledNow
+              ? t('triage.handledNowSubmit')
+              : t('triage.submit')}
       </Button>
       <Typography sx={{ fontSize: 12, color: tokens.textSecondary, textAlign: 'center' }}>
         {missing > 0
           ? t('triage.missingRequired', { count: missing })
           : isClose
             ? t('triage.closeNoWorklist')
-            : handledNow
-              ? t('triage.handledNowHint')
-              : t('triage.createsTask')}
+            : replyingNow
+              ? t('triage.replyNowHint')
+              : handledNow
+                ? t('triage.handledNowHint')
+                : t('triage.createsTask')}
       </Typography>
       {asideFooter}
-      <ConfirmDialog
+      <CloseCaseDialog
         open={confirmClose}
-        title={t('triage.closeConfirmTitle')}
-        message={t('triage.closeConfirmMessage')}
+        initialMessage={values.patientMessage ?? ''}
         confirmLabel={getContactModeLabel('CLOSE')}
-        confirmColor="primary"
         onCancel={() => setConfirmClose(false)}
-        onConfirm={() => {
+        onConfirm={(patientMessage) => {
           setConfirmClose(false)
+          setValue('patientMessage', patientMessage)
           void submit()
         }}
       />

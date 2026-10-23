@@ -140,9 +140,10 @@ export function triageCase(
     assignedRole: derivedAssignedRole,
   })
   setStore(state)
-  if (input.triageDecision.handledNow && input.triageDecision.contactMode === 'PHONE') {
-    // The clinician phones the patient right away: log the contact and close the case
-    // in the same step, so no worklist task is created.
+  const mode = input.triageDecision.contactMode
+  if (input.triageDecision.handledNow && (mode === 'PHONE' || mode === 'DIGITAL')) {
+    // The clinician phones the patient or replies in the app right away: log the contact
+    // and close the case in the same step, so no worklist task is created.
     state = addAuditEvent(getStore(), caseId, userId, userRole, 'CONTACTED')
     setStore(state)
     return completeWorklistCase(caseId, userId, userRole, {

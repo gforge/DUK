@@ -80,6 +80,82 @@ describe('"Jag ringer patienten nu" (handledNow)', () => {
   })
 })
 
+describe('"Jag svarar patienten nu" (replying in the app)', () => {
+  const replyingNowForm: TriageFormValues = {
+    ...callingNowForm,
+    contactMode: 'DIGITAL',
+    patientMessage: 'Allt ser bra ut, ingen mer uppföljning behövs.',
+  }
+
+  it('requires a message to the patient and nothing else', () => {
+    expect(countMissingRequired(replyingNowForm)).toBe(0)
+    expect(countMissingRequired({ ...replyingNowForm, patientMessage: '  ' })).toBe(1)
+    expect(countMissingRequired({ ...replyingNowForm, handledNow: false })).toBe(3)
+  })
+
+  it('maps to a digital decision owned by the triaging clinician, with the message', () => {
+    const data = toTriageSubmitData(replyingNowForm, { userId: 'user-pal-1', careRole: 'DOCTOR' })
+    expect(data.triageDecision).toMatchObject({
+      contactMode: 'DIGITAL',
+      careRole: 'DOCTOR',
+      assignmentMode: 'NAMED',
+      assignedUserId: 'user-pal-1',
+      handledNow: true,
+    })
+    expect(data.patientMessage).toBe(replyingNowForm.patientMessage)
+  })
+
+  it('stores the reply, logs the contact and closes the case', () => {
+    const c = reviewCase()
+    const result = service.triageCase(
+      c.id,
+      {
+        triageDecision: {
+          contactMode: 'DIGITAL',
+          careRole: 'DOCTOR',
+          assignmentMode: 'NAMED',
+          assignedUserId: 'user-pal-1',
+          assignedUserIds: ['user-pal-1'],
+          dueAt: new Date().toISOString(),
+          note: null,
+          handledNow: true,
+        },
+        patientMessage: 'Allt ser bra ut.',
+      },
+      'user-pal-1',
+      'DOCTOR',
+    )
+    expect(result.status).toBe('CLOSED')
+    expect(service.getCase(c.id)?.patientMessage).toBe('Allt ser bra ut.')
+    const actions = service.getAuditEvents(c.id).map((e) => e.action)
+    expect(actions).toContain('CONTACTED')
+  })
+})
+
+describe('closing a case keeps the message to the patient', () => {
+  it('stores the message written in the close dialog', () => {
+    const c = reviewCase()
+    const result = service.triageCase(
+      c.id,
+      {
+        triageDecision: {
+          contactMode: 'CLOSE',
+          careRole: null,
+          assignmentMode: null,
+          assignedUserId: null,
+          dueAt: null,
+          note: null,
+        },
+        patientMessage: 'Tack, allt ser bra ut. Hör av dig om något ändras.',
+      },
+      'user-pal-1',
+      'DOCTOR',
+    )
+    expect(result.status).toBe('CLOSED')
+    expect(result.patientMessage).toBe('Tack, allt ser bra ut. Hör av dig om något ändras.')
+  })
+})
+
 describe('getNextCaseToReview', () => {
   it('returns the next open case in queue order and the remaining count', () => {
     const queue = service.getReviewQueue()

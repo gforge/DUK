@@ -1,6 +1,6 @@
 import type { AssignmentMode, CareRole, ContactMode } from '@/api/schemas'
 
-import { isHandledNow, type TriageForm } from './schema'
+import { isHandledNow, isReplyingNow, type TriageForm } from './schema'
 import { computeDueAtFromInput } from './utils'
 
 export interface TriageSubmitData {
@@ -19,7 +19,7 @@ export interface TriageSubmitData {
   patientMessage?: string
 }
 
-/** Who performs a "calling now" phone contact: the triaging clinician. */
+/** Who performs a "calling now" / "replying now" contact: the triaging clinician. */
 export interface HandledBy {
   userId: string
   careRole: Exclude<CareRole, null>
@@ -35,10 +35,10 @@ export function toTriageSubmitData(data: TriageForm, handledBy?: HandledBy): Tri
   const contactMode = data.contactMode as ContactMode
 
   if (isHandledNow(data)) {
-    if (!handledBy) throw new Error('handledBy is required when the clinician calls now')
+    if (!handledBy) throw new Error('handledBy is required when the clinician handles it now')
     return {
       triageDecision: {
-        contactMode: 'PHONE',
+        contactMode,
         careRole: handledBy.careRole,
         assignmentMode: 'NAMED',
         assignedUserId: handledBy.userId,
@@ -87,6 +87,7 @@ export function toTriageSubmitData(data: TriageForm, handledBy?: HandledBy): Tri
 export function countMissingRequired(v: Partial<TriageForm>): number {
   if (!v.contactMode)
     return 4 - [v.careRole, hasAssignee(v), v.dueAtInput?.trim()].filter(Boolean).length
+  if (isReplyingNow(v)) return v.patientMessage?.trim() ? 0 : 1
   if (v.contactMode === 'CLOSE' || isHandledNow(v)) return 0
   return [v.careRole, hasAssignee(v), v.dueAtInput?.trim()].filter((x) => !x).length
 }
