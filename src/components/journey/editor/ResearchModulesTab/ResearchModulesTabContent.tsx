@@ -1,5 +1,5 @@
 import AddIcon from '@mui/icons-material/Add'
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlineOutlined'
 import EditIcon from '@mui/icons-material/Edit'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import ScienceIcon from '@mui/icons-material/Science'
@@ -26,19 +26,19 @@ import { useTranslation } from 'react-i18next'
 
 import type { QuestionnaireTemplate, ResearchModule } from '@/api/schemas'
 import ModuleEditorDialog from '@/components/journey/editor/ModuleEditorDialog'
-
 // dialog implementation moved to ModuleEditorDialog.tsx
-
 // ─── Main Tab ────────────────────────────────────────────────────────────────
-
 interface Props {
   researchModules: ResearchModule[] | null
   loading: boolean
   questionnaires: QuestionnaireTemplate[] | null
   onDelete: (id: string, name: string) => void
-  onSave: (m: Omit<ResearchModule, 'id' | 'createdAt'> & { id?: string }) => void
+  onSave: (
+    m: Omit<ResearchModule, 'id' | 'createdAt'> & {
+      id?: string
+    },
+  ) => void
 }
-
 export function ResearchModulesTab({
   researchModules,
   loading,
@@ -48,12 +48,10 @@ export function ResearchModulesTab({
 }: Props) {
   const { t } = useTranslation()
   const [editTarget, setEditTarget] = useState<ResearchModule | null | undefined>(null)
-
-  if (loading) return <Skeleton variant="rectangular" height={200} sx={{ borderRadius: 1 }} />
-
+  if (loading) return <Skeleton variant="rectangular" sx={{ borderRadius: 1, height: 200 }} />
   return (
     <>
-      <Stack direction="row" justifyContent="flex-end" sx={{ mb: 1.5 }}>
+      <Stack direction="row" sx={{ mb: 1.5, justifyContent: 'flex-end' }}>
         <Button
           size="small"
           variant="outlined"
@@ -67,14 +65,14 @@ export function ResearchModulesTab({
       {!researchModules?.length ? (
         <Typography color="text.secondary">{t('journey.editor.noModules')}</Typography>
       ) : (
-        <Stack gap={1.5}>
+        <Stack sx={{ gap: 1.5 }}>
           {researchModules.map((rm) => (
             <Accordion key={rm.id} variant="outlined" sx={{ borderRadius: '8px !important' }}>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Stack direction="row" alignItems="center" gap={1.5} sx={{ flex: 1, pr: 1 }}>
+                <Stack direction="row" sx={{ flex: 1, pr: 1, alignItems: 'center', gap: 1.5 }}>
                   <ScienceIcon color="secondary" fontSize="small" />
                   <Box sx={{ flex: 1 }}>
-                    <Typography variant="subtitle2" fontWeight={700}>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
                       {rm.name}
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
@@ -125,7 +123,7 @@ export function ResearchModulesTab({
                     {rm.entries.map((entry) => (
                       <TableRow key={entry.id} hover>
                         <TableCell>
-                          <Typography variant="body2" fontWeight={600}>
+                          <Typography variant="body2" sx={{ fontWeight: 600 }}>
                             {entry.label}
                           </Typography>
                         </TableCell>

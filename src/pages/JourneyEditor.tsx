@@ -1,15 +1,15 @@
+import ArticleIcon from '@mui/icons-material/Article'
 import AssignmentIcon from '@mui/icons-material/Assignment'
-import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined'
 import PeopleIcon from '@mui/icons-material/People'
 import RouteIcon from '@mui/icons-material/Route'
 import ScienceIcon from '@mui/icons-material/Science'
 import UndoIcon from '@mui/icons-material/Undo'
-import { Alert, Box, Button, Paper, Stack, Tab, Tabs, Tooltip, Typography } from '@mui/material'
+import { Box, Button, Stack, Tab, Tabs, Tooltip } from '@mui/material'
 import React, { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import * as client from '@/api/client'
-import { ConfirmDialog, TabPanel } from '@/components/common'
+import { ConfirmDialog, PageHeader } from '@/components/common'
 import {
   InstructionTemplatesTab,
   JourneyTemplatesTab,
@@ -20,6 +20,7 @@ import {
 import { useApi } from '@/hooks/useApi'
 import { useEditorUndo } from '@/hooks/useEditorUndo'
 import { useSnack } from '@/store/snackContext'
+import { tokens } from '@/theme'
 
 export default function JourneyEditor() {
   const { t } = useTranslation()
@@ -30,7 +31,6 @@ export default function JourneyEditor() {
     message: string
     onConfirm: () => void
   } | null>(null)
-
   const {
     data: journeyTemplates,
     loading: jLoading,
@@ -56,14 +56,12 @@ export default function JourneyEditor() {
     loading: qtLoading,
     refetch: refetchQT,
   } = useApi(() => client.getQuestionnaireTemplates(), [])
-
   const refetchAll = useCallback(() => {
     refetchJT()
     refetchRM()
     refetchIT()
     refetchQT()
   }, [refetchJT, refetchRM, refetchIT, refetchQT])
-
   const {
     canUndo,
     undoDescription,
@@ -73,9 +71,7 @@ export default function JourneyEditor() {
   } = useEditorUndo({
     onAfterUndo: refetchAll,
   })
-
   // ── Journey template handlers ──────────────────────────────────────────────
-
   const handleDeleteTemplate = async (templateId: string, name: string) => {
     setConfirmAction({
       title: t('common.delete'),
@@ -89,9 +85,7 @@ export default function JourneyEditor() {
       },
     })
   }
-
   // ── Research module handlers ───────────────────────────────────────────────
-
   const handleDeleteModule = async (moduleId: string, name: string) => {
     setConfirmAction({
       title: t('common.delete'),
@@ -105,16 +99,13 @@ export default function JourneyEditor() {
       },
     })
   }
-
   const handleSaveModule = async (module: Parameters<typeof client.saveResearchModule>[0]) => {
     pushUndo(t('journey.editor.undoSave', { name: module.name }))
     await client.saveResearchModule(module)
     showSnack(t('journey.research.moduleSaved'), 'success')
     refetchRM()
   }
-
   // ── Instruction template handlers ─────────────────────────────────────────
-
   const handleDeleteInstruction = async (id: string, name: string) => {
     setConfirmAction({
       title: t('common.delete'),
@@ -128,7 +119,6 @@ export default function JourneyEditor() {
       },
     })
   }
-
   const handleSaveInstruction = async (data: {
     id?: string
     name: string
@@ -140,9 +130,7 @@ export default function JourneyEditor() {
     showSnack(t('journey.editor.instructionSaved'), 'success')
     refetchIT()
   }
-
   // ── Questionnaire template handlers ──────────────────────────────────────
-
   const handleDeleteQuestionnaire = async (id: string, name: string) => {
     setConfirmAction({
       title: t('common.delete'),
@@ -156,7 +144,6 @@ export default function JourneyEditor() {
       },
     })
   }
-
   const handleSaveQuestionnaire = async (
     data: Parameters<typeof client.saveQuestionnaireTemplate>[0],
   ) => {
@@ -165,128 +152,161 @@ export default function JourneyEditor() {
     showSnack(t('journey.editor.instructionSaved'), 'success')
     refetchQT()
   }
-
   // ── Undo timestamp display ─────────────────────────────────────────────────
-
   const undoTime = undoTimestamp
     ? new Date(undoTimestamp).toLocaleTimeString('sv-SE', { hour: '2-digit', minute: '2-digit' })
     : null
-
+  const tabs = [
+    { icon: <RouteIcon />, label: t('journey.editor.tabTemplates') },
+    { icon: <ScienceIcon />, label: t('journey.editor.tabResearch') },
+    { icon: <PeopleIcon />, label: t('journey.editor.tabPatientJourneys') },
+    { icon: <ArticleIcon />, label: t('journey.editor.tabInstructions') },
+    { icon: <AssignmentIcon />, label: t('journey.editor.tabQuestionnaires') },
+  ]
+  const panel = (index: number, children: React.ReactNode, card = true) => (
+    <div
+      role="tabpanel"
+      hidden={tab !== index}
+      id={`journey-tabpanel-${index}`}
+      aria-labelledby={`journey-tab-${index}`}
+    >
+      {tab === index &&
+        (card ? (
+          <Box
+            sx={{
+              bgcolor: 'background.paper',
+              border: `1px solid ${tokens.border}`,
+              borderRadius: 3,
+              p: { xs: 2, sm: 2.5 },
+            }}
+          >
+            {children}
+          </Box>
+        ) : (
+          children
+        ))}
+    </div>
+  )
   return (
-    <Box>
-      <Stack direction="row" alignItems="center" gap={1.5} mb={2}>
-        <RouteIcon color="primary" />
-        <Typography variant="h5" fontWeight={700} sx={{ flex: 1 }}>
-          {t('journey.editor.title')}
-        </Typography>
-        <Tooltip
-          title={
-            canUndo
-              ? t('journey.editor.undoTooltip', { description: undoDescription, time: undoTime })
-              : t('journey.editor.nothingToUndo')
-          }
-        >
-          <span>
-            <Button
-              size="small"
-              variant="outlined"
-              startIcon={<UndoIcon />}
-              onClick={undo}
-              disabled={!canUndo}
-            >
-              {t('journey.editor.undo')}
-            </Button>
-          </span>
-        </Tooltip>
-      </Stack>
+    <Stack sx={{ gap: 2.5 }}>
+      <PageHeader
+        title={t('journey.editor.title')}
+        subtitle={t('journey.editor.subtitle')}
+        actions={
+          <Tooltip
+            title={
+              canUndo
+                ? t('journey.editor.undoTooltip', {
+                    description: undoDescription ?? '',
+                    time: undoTime ?? '',
+                  })
+                : t('journey.editor.nothingToUndo')
+            }
+          >
+            <span>
+              <Button
+                variant="outlined"
+                startIcon={<UndoIcon />}
+                onClick={undo}
+                disabled={!canUndo}
+                sx={{ borderRadius: 2, borderColor: tokens.inputBorder, color: tokens.text }}
+              >
+                {t('journey.editor.undo')}
+              </Button>
+            </span>
+          </Tooltip>
+        }
+      />
 
-      <Alert severity="info" sx={{ mb: 2 }}>
-        {t('journey.editor.description')}
-      </Alert>
+      <Tabs
+        value={tab}
+        onChange={(_, v: number) => setTab(v)}
+        aria-label={t('journey.editor.title')}
+        variant="scrollable"
+        scrollButtons={false}
+        sx={{
+          minHeight: 0,
+          borderBottom: `1px solid ${tokens.border}`,
+          '& .MuiTabs-flexContainer': { gap: 0.5 },
+          '& .MuiTabs-indicator': { height: 2 },
+          '& .MuiTab-root': {
+            minHeight: 0,
+            minWidth: 0,
+            px: 1.75,
+            py: 1.25,
+            gap: 0.75,
+            fontSize: 14,
+            fontWeight: 400,
+            textTransform: 'none',
+            color: tokens.textSecondary,
+            '& svg': { fontSize: 18 },
+          },
+          '& .MuiTab-root.Mui-selected': { color: tokens.primary, fontWeight: 600 },
+        }}
+      >
+        {tabs.map((tb, i) => (
+          <Tab
+            key={tb.label}
+            icon={tb.icon}
+            iconPosition="start"
+            label={tb.label}
+            id={`journey-tab-${i}`}
+            aria-controls={`journey-tabpanel-${i}`}
+          />
+        ))}
+      </Tabs>
 
-      <Paper variant="outlined" sx={{ borderRadius: 2 }}>
-        <Tabs
-          value={tab}
-          onChange={(_, v) => setTab(v)}
-          sx={{ borderBottom: 1, borderColor: 'divider' }}
-        >
-          <Tab
-            icon={<RouteIcon fontSize="small" />}
-            iconPosition="start"
-            label={t('journey.editor.tabTemplates')}
-            id="journey-tab-0"
-          />
-          <Tab
-            icon={<ScienceIcon fontSize="small" />}
-            iconPosition="start"
-            label={t('journey.editor.tabResearch')}
-            id="journey-tab-1"
-          />
-          <Tab
-            icon={<PeopleIcon fontSize="small" />}
-            iconPosition="start"
-            label={t('journey.editor.tabPatientJourneys')}
-            id="journey-tab-2"
-          />
-          <Tab
-            icon={<DescriptionOutlinedIcon fontSize="small" />}
-            iconPosition="start"
-            label={t('journey.editor.tabInstructions')}
-            id="journey-tab-3"
-          />
-          <Tab
-            icon={<AssignmentIcon fontSize="small" />}
-            iconPosition="start"
-            label={t('journey.editor.tabQuestionnaires')}
-            id="journey-tab-4"
-          />
-        </Tabs>
-
-        <Box sx={{ p: 2 }}>
-          <TabPanel value={tab} index={0}>
-            <JourneyTemplatesTab
-              journeyTemplates={journeyTemplates}
-              loading={jLoading}
-              onDelete={handleDeleteTemplate}
-              onRefresh={refetchJT}
-            />
-          </TabPanel>
-          <TabPanel value={tab} index={1}>
-            <ResearchModulesTab
-              researchModules={researchModules}
-              loading={rmLoading}
-              questionnaires={null}
-              onDelete={handleDeleteModule}
-              onSave={handleSaveModule}
-            />
-          </TabPanel>
-          <TabPanel value={tab} index={2}>
-            <PatientJourneysTable
-              patientJourneys={patientJourneys}
-              loading={pjLoading}
-              patients={patients}
-              journeyTemplates={journeyTemplates}
-              researchModules={researchModules}
-            />
-          </TabPanel>
-          <TabPanel value={tab} index={3}>
-            <InstructionTemplatesTab
-              instructionTemplates={instructionTemplates}
-              loading={itLoading}
-              onDelete={handleDeleteInstruction}
-              onSave={handleSaveInstruction}
-            />
-          </TabPanel>
-          <TabPanel value={tab} index={4}>
-            <QuestionnaireTemplatesTab
-              questionnaires={questionnaires}
-              loading={qtLoading}
-              onDelete={handleDeleteQuestionnaire}
-              onSave={handleSaveQuestionnaire}
-            />
-          </TabPanel>
-        </Box>
-      </Paper>
+      {panel(
+        0,
+        <JourneyTemplatesTab
+          journeyTemplates={journeyTemplates}
+          loading={jLoading}
+          onDelete={handleDeleteTemplate}
+          onRefresh={refetchJT}
+          patientJourneys={patientJourneys}
+          questionnaires={questionnaires}
+          instructionTemplates={instructionTemplates}
+        />,
+        false,
+      )}
+      {panel(
+        1,
+        <ResearchModulesTab
+          researchModules={researchModules}
+          loading={rmLoading}
+          questionnaires={null}
+          onDelete={handleDeleteModule}
+          onSave={handleSaveModule}
+        />,
+      )}
+      {panel(
+        2,
+        <PatientJourneysTable
+          patientJourneys={patientJourneys}
+          loading={pjLoading}
+          patients={patients}
+          journeyTemplates={journeyTemplates}
+          researchModules={researchModules}
+        />,
+      )}
+      {panel(
+        3,
+        <InstructionTemplatesTab
+          instructionTemplates={instructionTemplates}
+          loading={itLoading}
+          onDelete={handleDeleteInstruction}
+          onSave={handleSaveInstruction}
+        />,
+      )}
+      {panel(
+        4,
+        <QuestionnaireTemplatesTab
+          questionnaires={questionnaires}
+          loading={qtLoading}
+          onDelete={handleDeleteQuestionnaire}
+          onSave={handleSaveQuestionnaire}
+        />,
+      )}
 
       <ConfirmDialog
         open={!!confirmAction}
@@ -295,6 +315,6 @@ export default function JourneyEditor() {
         onConfirm={() => confirmAction?.onConfirm()}
         onCancel={() => setConfirmAction(null)}
       />
-    </Box>
+    </Stack>
   )
 }

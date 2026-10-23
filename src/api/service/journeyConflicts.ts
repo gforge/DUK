@@ -50,10 +50,7 @@ export function detectJourneyConflicts(
   const newSteps = getEffectiveStepsForTemplate(newTemplateId, newStartDate)
 
   // Build a lookup of existing steps keyed by templateId for O(n) matching.
-  const existingByTemplateId = new Map<
-    string,
-    { journeyId: string; step: EffectiveStep }[]
-  >()
+  const existingByTemplateId = new Map<string, { journeyId: string; step: EffectiveStep }[]>()
   for (const journey of existingJourneys) {
     for (const step of getEffectiveSteps(journey.id)) {
       if (!step.templateId) continue

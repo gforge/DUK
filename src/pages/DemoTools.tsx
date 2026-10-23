@@ -18,7 +18,6 @@ import * as client from '@/api/client'
 import type { ConfirmAction } from '@/components/demo'
 import { ExportPanel, ImportPanel, SeedPanel } from '@/components/demo'
 import { useSnack } from '@/store/snackContext'
-
 export default function DemoTools() {
   const { t } = useTranslation()
   const { showSnack } = useSnack()
@@ -27,7 +26,6 @@ export default function DemoTools() {
   const [importText, setImportText] = useState('')
   const [confirmAction, setConfirmAction] = useState<ConfirmAction>(null)
   const [parseError, setParseError] = useState('')
-
   async function handleExport() {
     setLoading(true)
     try {
@@ -40,13 +38,11 @@ export default function DemoTools() {
       setLoading(false)
     }
   }
-
   async function handleCopyExport() {
     if (!exported) return
     await navigator.clipboard.writeText(exported)
     showSnack(t('demoTools.copied'), 'success')
   }
-
   function handleDownload() {
     if (!exported) return
     const blob = new Blob([exported], { type: 'application/json' })
@@ -57,7 +53,6 @@ export default function DemoTools() {
     link.click()
     URL.revokeObjectURL(url)
   }
-
   function handleImportPrepare() {
     setParseError('')
     if (!importText.trim()) {
@@ -72,7 +67,6 @@ export default function DemoTools() {
     }
     setConfirmAction('import')
   }
-
   async function confirmAndExecute() {
     setLoading(true)
     const action = confirmAction
@@ -101,10 +95,9 @@ export default function DemoTools() {
       setLoading(false)
     }
   }
-
   return (
     <Box sx={{ p: 3, maxWidth: 800, mx: 'auto' }}>
-      <Typography variant="h5" fontWeight={700} gutterBottom>
+      <Typography sx={{ fontWeight: 700 }} variant="h5" gutterBottom>
         {t('demoTools.title')}
       </Typography>
       <Alert severity="warning" sx={{ mb: 3 }}>
@@ -135,8 +128,8 @@ export default function DemoTools() {
       <Dialog
         open={confirmAction !== null}
         onClose={() => setConfirmAction(null)}
-        maxWidth="xs"
         fullWidth
+        sx={{ maxWidth: 'xs' }}
       >
         <DialogTitle>
           {confirmAction === 'import'

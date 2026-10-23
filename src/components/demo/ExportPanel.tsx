@@ -18,7 +18,7 @@ export default function ExportPanel({ loading, exported, onExport, onCopy, onDow
 
   return (
     <Paper variant="outlined" sx={{ borderRadius: 2, p: 2.5, mb: 3 }}>
-      <Typography variant="subtitle1" fontWeight={600} gutterBottom>
+      <Typography sx={{ fontWeight: 600 }} variant="subtitle1" gutterBottom>
         {t('demoTools.exportTitle')}
       </Typography>
       <Typography variant="body2" color="text.secondary" gutterBottom>

@@ -70,6 +70,10 @@ export function buildRealisticSeed(): AppState {
 
       const startDate = isoDate(-cohort.startDaysAgo)
       const createdAt = isoTs(-cohort.startDaysAgo)
+      const queuedDaysAgo = Math.min(
+        cohort.startDaysAgo,
+        rng.bool(0.1) ? rng.int(8, 10) : rng.int(0, 7),
+      )
 
       // Generate reviews for this case
       const reviews = generateReviews(rng, caseId, createdAt, palId)
@@ -176,9 +180,11 @@ export function buildRealisticSeed(): AppState {
         policyWarnings: [],
         createdByUserId: palId,
         createdAt,
-        scheduledAt: createdAt,
-        lastActivityAt: isoTs(-rng.int(0, 3)),
+        // Queue entry (drives "Väntat"): a few days, occasionally just past the one-week target.
+        scheduledAt: isoTs(-queuedDaysAgo),
+        lastActivityAt: isoTs(-rng.int(0, Math.min(3, queuedDaysAgo))),
         reviews,
+        colleagueReviews: [],
         nextStep,
         triageDecision,
       })

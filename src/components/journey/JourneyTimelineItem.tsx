@@ -1,4 +1,4 @@
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutlineOutlined'
 import BiotechIcon from '@mui/icons-material/Biotech'
 import ImageIcon from '@mui/icons-material/Image'
 import RepeatIcon from '@mui/icons-material/Repeat'
@@ -13,14 +13,19 @@ import { type StepStatus, useStepStatusLabel } from '@/hooks/labels'
 import { JourneyIcon } from '@/utils'
 
 import { StatusIcon } from './JourneyTimeline/StatusIcon'
-import { ReviewTypeKey } from './JourneyTimeline/types'
-
+import type { ReviewTypeKey } from './JourneyTimeline/types'
 interface Props {
   step: EffectiveStep
   status: StepStatus
   isLast: boolean
   reviews: ClinicalReview[]
-  addedReviews: Map<string, { reviewId: string; description?: string }>
+  addedReviews: Map<
+    string,
+    {
+      reviewId: string
+      description?: string
+    }
+  >
   onAddReview?: (
     stepId: string,
     reviewType: string,
@@ -31,7 +36,6 @@ interface Props {
   setReviewDetails: (r: ClinicalReview | null) => void
   openDialog: (stepId: string, reviewType: ReviewTypeKey, stepLabel: string) => void
 }
-
 export default function JourneyTimelineItem({
   step,
   status,
@@ -46,15 +50,12 @@ export default function JourneyTimelineItem({
   const { t } = useTranslation()
   const getStepStatusLabel = useStepStatusLabel()
   const theme = useTheme()
-
   const statusColor: Record<StepStatus, string> = {
     SUBMITTED: theme.palette.success.main,
     UPCOMING: theme.palette.primary.main,
     OVERDUE: theme.palette.error.main,
   }
-
   const REVIEW_TYPES: ReviewTypeKey[] = ['LAB', 'XRAY']
-
   const reviewChip = (reviewType: ReviewTypeKey) => {
     const key = `${step.id}:${reviewType}`
     const addedEntry = addedReviews.get(key)
@@ -128,7 +129,6 @@ export default function JourneyTimelineItem({
       </Tooltip>
     )
   }
-
   return (
     <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5 }}>
       {/* left column */}
@@ -151,9 +151,9 @@ export default function JourneyTimelineItem({
 
       {/* right column */}
       <Box sx={{ pb: isLast ? 0 : 2, flex: 1 }}>
-        <Stack direction="row" alignItems="center" flexWrap="wrap" gap={0.5} mb={0.25}>
-          <JourneyIcon icon={step.icon} fontSize="small" color="action" sx={{ flexShrink: 0 }} />
-          <Typography variant="body2" fontWeight={600}>
+        <Stack direction="row" sx={{ alignItems: 'center', flexWrap: 'wrap', gap: 0.5, mb: 0.25 }}>
+          <JourneyIcon icon={step.icon} color="action" sx={{ flexShrink: 0, fontSize: 'small' }} />
+          <Typography variant="body2" sx={{ fontWeight: 600 }}>
             {step.label}
           </Typography>
 
@@ -218,7 +218,7 @@ export default function JourneyTimelineItem({
           REVIEW_TYPES.some((rt) =>
             reviews.some((r) => r.type === rt && r.journeyStepLabel === step.label),
           )) && (
-          <Stack direction="row" gap={0.5} sx={{ mt: 0.5 }} flexWrap="wrap">
+          <Stack direction="row" sx={{ mt: 0.5, gap: 0.5, flexWrap: 'wrap' }}>
             {REVIEW_TYPES.map(reviewChip)}
           </Stack>
         )}

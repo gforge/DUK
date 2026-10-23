@@ -2,51 +2,49 @@
 ' Purpose: Form submission pipeline to case/policy/audit updates
 ' Source of truth:
 '   src/api/service/forms.ts
-'   src/api/service/policy.ts
-'   src/api/service/cases.ts
+'   src/api/service/journeyResolver.ts
+'   src/api/service/utils.ts
 
 title Form Submission to Case Update - Sequence Diagram
 
-actor "Patient/Clinician" as User
-participant "UI\n(PatientQuestionnaireForm / Case forms)" as UI
+actor "Patient" as User
+participant "PatientQuestionnaireForm\n(UI)" as UI
 participant "client/forms" as Client
-participant "service/forms" as Forms
+participant "service/forms\n(submitFormResponse)" as Forms
 participant "service/journeyResolver" as Resolver
-participant "service/policy" as Policy
-participant "service/cases" as Cases
-participant "service/audit" as Audit
-participant "patchStore" as Store
+participant "service/utils" as Utils
+participant "store" as Store
 
-User -> UI : Submit questionnaire answers
+User -> UI : Submit questionnaire answers\n(for a MergedDueStep)
+UI -> UI : Build journeyContext from step\n(journeyIds[0], base entry id,\noccurrenceIndex)
 UI -> Client : submitFormResponse(patientId, caseId, templateId, answers, journeyContext?)
 Client -> Forms : submitFormResponse(...)
-Forms -> Forms : Validate template/questions
-Forms -> Forms : Compute scores from scoringRules
-Forms -> Store : Save FormResponse
-Store --> Forms : persisted FormResponse
+Forms -> Utils : computeScores(template, answers)
+Utils --> Forms : scores
 
-Forms -> Cases : touch case lastActivityAt
-Cases -> Store : patch case fields/triggers when needed
-Store --> Cases : updated case
+Forms -> Resolver : buildPolicyScopeWithAliases(caseResponses, patientId)
+Resolver --> Forms : numeric scope (incl. journey score aliases)
+Forms -> Forms : Add new answers + scores to scope
+Forms -> Utils : evaluatePolicyRules(policyRules, scope)
+Utils --> Forms : PolicyWarning[]
+Forms -> Forms : Derive triggers\n(HIGH_PAIN, INFECTION_SUSPECTED,\nLOW_FUNCTION, LOW_QOL)
 
-Forms -> Resolver : buildPolicyScopeWithAliases(caseId)
-Resolver --> Forms : numeric scope
-Forms -> Policy : evaluatePolicyRules(caseId, scope)
-Policy -> Store : update Case.policyWarnings
-Store --> Policy : updated case warnings
+Forms -> Forms : Build FormResponse (with journey links)
+Forms -> Forms : Update Case: triggers, policyWarnings,\nlastActivityAt, NEW → NEEDS_REVIEW
+opt journeyContext on a recurring step
+  Forms -> Forms : Append recurringCompletions\n(stepId, occurrenceIndex, completedAt)
+end
+Forms -> Utils : addAuditEvent(FORM_SUBMITTED)
+Forms -> Store : setStore (response, case,\njourneys, audit) in one write
 
-Forms -> Audit : addAuditEvent(FORM_SUBMITTED, context)
-Audit -> Store : append audit event
-Store --> Audit : persisted event
-
-Forms --> Client : FormResponse + updated case context
+Forms --> Client : FormResponse
 Client --> UI : success
-UI -> UI : Show success snack\nrefetch due steps / case view
+UI -> UI : Show success\nrefetch due steps
 
 note right of Forms
-  Journey context may include:
-  patientJourneyId, journeyTemplateEntryId,
-  occurrenceIndex
+  Journey context:
+  patientJourneyId, journeyTemplateEntryId
+  (base id, no __r<n>), occurrenceIndex
 end note
 
 @enduml

@@ -42,5 +42,15 @@ JourneyTemplateEntry "*" -- "0..1" QuestionnaireTemplate : templateId
 JourneyTemplateInstruction "*" -- "1" InstructionTemplate
 PolicyRule "*" -- "1" JourneyTemplate : journeyTemplateId
 ResearchModule "*" -- "*" QuestionnaireTemplate : entries[].templateId
+ResearchModule "*" -- "*" JourneyTemplateEntry : entries[].replaceStepId
+
+note right of JourneyTemplate
+  Optional group + phaseOrder:
+  templates in the same group with a
+  phaseOrder form a multi-phase care
+  pathway (e.g. referral → waiting list
+  → post-op). Derived templates inherit
+  the parent's group.
+end note
 
 @enduml

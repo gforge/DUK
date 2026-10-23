@@ -1,5 +1,5 @@
 import AddIcon from '@mui/icons-material/Add'
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlineOutlined'
 import {
   Button,
   Dialog,
@@ -25,14 +25,12 @@ import type {
   JourneyTemplateInstruction,
 } from '@/api/schemas'
 import { useSnack } from '@/store/snackContext'
-
 interface Props {
   template: JourneyTemplate
   instructionTemplates: InstructionTemplate[]
   onClose: () => void
   onSaved: () => void
 }
-
 export function TemplateInstructionsDialog({
   template,
   instructionTemplates,
@@ -48,12 +46,10 @@ export function TemplateInstructionsDialog({
       .sort((a, b) => a.order - b.order)
       .map((i) => ({ ...i })),
   )
-
   const templateOptions = useMemo(
     () => instructionTemplates.map((it) => ({ id: it.id, name: it.name })),
     [instructionTemplates],
   )
-
   const addRow = () => {
     setRows((prev) => [
       ...prev,
@@ -69,15 +65,12 @@ export function TemplateInstructionsDialog({
       },
     ])
   }
-
   const removeRow = (id: string) => {
     setRows((prev) => prev.filter((r) => r.id !== id).map((r, idx) => ({ ...r, order: idx })))
   }
-
   const patchRow = (id: string, patch: Partial<JourneyTemplateInstruction>) => {
     setRows((prev) => prev.map((r) => (r.id === id ? { ...r, ...patch } : r)))
   }
-
   const handleSave = async () => {
     setSaving(true)
     try {
@@ -95,12 +88,11 @@ export function TemplateInstructionsDialog({
       setSaving(false)
     }
   }
-
   return (
-    <Dialog open onClose={onClose} maxWidth="md" fullWidth>
+    <Dialog open onClose={onClose} fullWidth sx={{ maxWidth: 'md' }}>
       <DialogTitle>{t('journey.editor.tabInstructions')}</DialogTitle>
       <DialogContent>
-        <Stack gap={1.5} sx={{ mt: 1 }}>
+        <Stack sx={{ mt: 1, gap: 1.5 }}>
           {rows.length === 0 && (
             <Typography variant="body2" color="text.secondary">
               {t('journey.noInstructions')}
@@ -108,7 +100,7 @@ export function TemplateInstructionsDialog({
           )}
 
           {rows.map((row) => (
-            <Stack key={row.id} direction="row" gap={1} alignItems="center">
+            <Stack key={row.id} direction="row" sx={{ gap: 1, alignItems: 'center' }}>
               <FormControl size="small" sx={{ minWidth: 220 }}>
                 <InputLabel>{t('journey.entry.instructionFromTemplate')}</InputLabel>
                 <Select

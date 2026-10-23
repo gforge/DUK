@@ -1,6 +1,6 @@
 import type { AlertColor } from '@mui/material'
-import { Alert,Snackbar } from '@mui/material'
-import React, { createContext, useCallback,useContext, useState } from 'react'
+import { Alert, Snackbar } from '@mui/material'
+import React, { createContext, useCallback, useContext, useState } from 'react'
 
 interface SnackMessage {
   id: number

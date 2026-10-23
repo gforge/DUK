@@ -27,7 +27,7 @@ describe('journalRenderer translation helpers', () => {
     const tpl = '{{case.category}}|{{case.status}}|{{triage.nextStep}}'
     const out = renderTemplate(tpl, { ...BASE_CTX })
     expect(out).toContain('Akut')
-    expect(out).toContain('Ny kontrollpunkt')
+    expect(out).toContain('Väntar på patient')
     expect(out).toContain('Läkarbesök')
   })
 

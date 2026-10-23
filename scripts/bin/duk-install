@@ -1,0 +1,75 @@
+#!/bin/bash
+set -e
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/../utils/common.sh"
+
+BIN_DIR="$PROJECT_ROOT/scripts/bin"
+COMPLETION_FILE="$PROJECT_ROOT/scripts/utils/duk-completion.bash"
+BASHRC_FILE="$HOME/.bashrc"
+
+show_help() {
+  echo "Usage: duk-install [--clean] [--setup]"
+  echo "  (no args):  Install dependencies (npm install)"
+  echo "  --clean|-c: Remove node_modules and do a clean install from package-lock.json (npm ci)"
+  echo "  --setup|-s: Also add the duk-* commands and their tab completion to ~/.bashrc"
+  exit 1
+}
+
+# Idempotently add PATH and bash completion entries to ~/.bashrc
+setup_bashrc() {
+  print_banner "Adding duk-* commands and tab completion to $BASHRC_FILE"
+
+  touch "$BASHRC_FILE"
+
+  if grep -q "# DUK bin directory" "$BASHRC_FILE"; then
+    echo -e "${GREEN}✔${NC} PATH entry already present"
+  else
+    {
+      echo ""
+      echo "# DUK bin directory"
+      echo "export PATH=\"$BIN_DIR:\$PATH\""
+    } >> "$BASHRC_FILE"
+    echo -e "${GREEN}✔${NC} Added $BIN_DIR to PATH"
+  fi
+
+  if grep -q "# DUK bash completion" "$BASHRC_FILE"; then
+    echo -e "${GREEN}✔${NC} Bash completion already present"
+  else
+    {
+      echo "# DUK bash completion"
+      echo "[ -f \"$COMPLETION_FILE\" ] && source \"$COMPLETION_FILE\""
+    } >> "$BASHRC_FILE"
+    echo -e "${GREEN}✔${NC} Added bash completion"
+  fi
+
+  echo -e "${YELLOW}💡 Run 'source ~/.bashrc' or open a new terminal to activate${NC}"
+}
+
+CLEAN=false
+SETUP=false
+for arg in "$@"; do
+  case "$arg" in
+    --clean|-c) CLEAN=true ;;
+    --setup|-s) SETUP=true ;;
+    *) show_help ;;
+  esac
+done
+
+require_npm
+cd "$PROJECT_ROOT"
+
+if [ "$SETUP" = true ]; then
+  setup_bashrc
+fi
+
+if [ "$CLEAN" = true ]; then
+  print_banner "Clean install from package-lock.json"
+  rm -rf node_modules
+  npm ci
+else
+  print_banner "Installing dependencies"
+  npm install
+fi
+
+echo -e "\n${BOLD}${GREEN}✅ All dependencies installed.${NC}"

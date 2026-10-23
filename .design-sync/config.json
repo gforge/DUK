@@ -1,0 +1,77 @@
+{
+  "projectId": "6687edd2-3208-4f7c-8768-d62b2a16a906",
+  "shape": "package",
+  "pkg": "duk-clinical-triage-demo",
+  "globalName": "DUK",
+  "componentSrcMap": {
+    "DukProvider": ".design-sync/setup/DukProvider.tsx",
+    "AutoWarningsBadge": "src/components/common/AutoWarningsBadge.tsx",
+    "CareRoleIcon": "src/components/common/CareRoleIcon.tsx",
+    "ConfirmDialog": "src/components/common/ConfirmDialog.tsx",
+    "DeadlineLabel": "src/components/common/DeadlineLabel.tsx",
+    "LanguageSwitcher": "src/components/common/LanguageSwitcher.tsx",
+    "PersonalNumberCopy": "src/components/common/PersonalNumberCopy.tsx",
+    "RoleIcon": "src/components/common/RoleIcon.tsx",
+    "RoleSwitcher": "src/components/common/RoleSwitcher.tsx",
+    "StatusChip": "src/components/common/StatusChip.tsx",
+    "TabPanel": "src/components/common/TabPanel.tsx",
+    "TriggerChips": "src/components/common/TriggerChips.tsx",
+    "AppShell": "src/components/layout/AppShell.tsx",
+    "GlobalSearch": "src/components/layout/GlobalSearch.tsx",
+    "SideNav": "src/components/layout/SideNav.tsx",
+    "TopBar": "src/components/layout/TopBar.tsx"
+  },
+  "provider": {
+    "component": "DukProvider"
+  },
+  "dtsPropsFor": {
+    "DukProvider": "  children: React.ReactNode;\n  /** UI language (default 'sv'). */\n  lang?: 'sv' | 'en';\n  /** Demo user signed in: 'user-nurse-1' (nurse, default), 'user-pal-1' / 'user-doc-1' (doctor), 'user-sec-1' (secretary), 'user-patient-1' (patient). Drives role-gated UI. */\n  userId?: 'user-pal-1' | 'user-doc-1' | 'user-nurse-1' | 'user-sec-1' | 'user-patient-1';\n  /** Initial in-memory route, e.g. '/worklist' (default '/dashboard'). Ignored when DukProvider is rendered inside an existing router. */\n  initialPath?: string;",
+    "AutoWarningsBadge": "  /** Policy-rule warnings; renders nothing when empty. Chip colour follows the highest severity; click opens a details dialog. */\n  warnings: Array<{ ruleId: string; ruleName: string; severity: 'LOW' | 'MEDIUM' | 'HIGH'; triggeredValues: Record<string, number>; expression: string }>;\n  /** ISO datetime of the last policy calculation. */\n  lastActivityAt?: string;",
+    "CareRoleIcon": "  /** Care role; 'PAL' renders the doctor icon, null renders nothing. */\n  role: 'DOCTOR' | 'NURSE' | 'PHYSIO' | 'PAL' | null | undefined;\n  fontSize?: 'inherit' | 'small' | 'medium' | 'large';",
+    "ConfirmDialog": "  open: boolean;\n  title: string;\n  message: string;\n  /** Defaults to the translated 'Confirm'. */\n  confirmLabel?: string;\n  onConfirm: () => void;\n  onCancel: () => void;\n  /** Default 'error'. */\n  confirmColor?: 'error' | 'primary' | 'warning';",
+    "DeadlineLabel": "  /** ISO date of the deadline. */\n  deadline: string;\n  /** 'queue' = muted when far off, warning when <=3 days, bold red when overdue. Default 'default'. */\n  tone?: 'default' | 'queue';",
+    "LanguageSwitcher": "",
+    "PersonalNumberCopy": "  /** Swedish personnummer (YYYYMMDD-XXXX or 12 digits). */\n  personalNumber?: string | null;\n  /** 'long' prefixes the translated label, 'none' shows only the copy button. Default 'short'. */\n  labelFormat?: 'long' | 'short' | 'none';\n  showCopy?: boolean;\n  /** Copy digits only instead of YYYYMMDD-XXXX. */\n  copyAsRaw?: boolean;\n  /** MUI colour token, default 'text.secondary'. */\n  color?: string;\n  onCopy?: (copied: string) => void;\n  sx?: object;\n  'aria-label'?: string;",
+    "RoleIcon": "  role: 'PATIENT' | 'NURSE' | 'DOCTOR' | 'SECRETARY';\n  /** Default true - wraps the icon in a tooltip with the role label. */\n  showTooltip?: boolean;\n  sx?: object;",
+    "RoleSwitcher": "",
+    "StatusChip": "  status: 'NEW' | 'NEEDS_REVIEW' | 'TRIAGED' | 'FOLLOWING_UP' | 'CLOSED';\n  /** Default 'small'. */\n  size?: 'small' | 'medium';",
+    "TabPanel": "  children: React.ReactNode;\n  /** Currently selected tab index. */\n  value: number;\n  /** This panel's index; content renders only when value === index. */\n  index: number;",
+    "TriggerChips": "  triggers: Array<'NO_RESPONSE' | 'NOT_OPENED' | 'HIGH_PAIN' | 'INFECTION_SUSPECTED' | 'LOW_FUNCTION' | 'LOW_QOL' | 'SEEK_CONTACT' | 'ABNORMAL_ANSWER' | 'LAB_PENDING' | 'XRAY_PENDING'>;\n  /** Chips shown before collapsing the rest into '+N'. Default 3. */\n  maxVisible?: number;",
+    "AppShell": "  /** Page content, rendered in the main area beside the side nav and under the top bar. */\n  children: React.ReactNode;",
+    "GlobalSearch": "",
+    "SideNav": "  drawerWidth: number;\n  mobileOpen: boolean;\n  onClose: () => void;\n  /** true = temporary drawer, false = permanent drawer (md+). */\n  isMobile: boolean;",
+    "TopBar": "  /** Called by the hamburger button (visible below md). */\n  onMenuClick: () => void;"
+  },
+  "guidelinesGlob": [
+    "docs/user_stories.md"
+  ],
+  "overrides": {
+    "AppShell": {
+      "cardMode": "single",
+      "viewport": "1200x640"
+    },
+    "ConfirmDialog": {
+      "cardMode": "single",
+      "viewport": "720x360"
+    },
+    "TopBar": {
+      "cardMode": "single",
+      "primaryStory": "Default",
+      "viewport": "960x120"
+    },
+    "DukProvider": {
+      "cardMode": "single",
+      "primaryStory": "NurseSession",
+      "viewport": "960x420"
+    },
+    "SideNav": {
+      "cardMode": "single",
+      "viewport": "960x520"
+    },
+    "TabPanel": {
+      "cardMode": "column"
+    }
+  },
+  "readmeHeader": ".design-sync/conventions.md",
+  "buildCmd": "(none - bundled from source via --entry ./.design-sync/entry.tsx)"
+}

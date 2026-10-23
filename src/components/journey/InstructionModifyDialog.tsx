@@ -1,4 +1,4 @@
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutlineOutlined'
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined'
 import EventRepeatIcon from '@mui/icons-material/EventRepeat'
 import {
@@ -25,7 +25,6 @@ import * as client from '@/api/client'
 import type { InstructionTemplate } from '@/api/schemas'
 import type { ResolvedInstruction } from '@/api/service'
 import { useApi } from '@/hooks/useApi'
-
 interface Props {
   open: boolean
   onClose: () => void
@@ -36,7 +35,6 @@ interface Props {
   initialTab?: number
   onChanged: () => void
 }
-
 export function InstructionModifyDialog({
   open,
   onClose,
@@ -46,25 +44,20 @@ export function InstructionModifyDialog({
   onChanged,
 }: Props) {
   const { t } = useTranslation()
-
   // Tabs: 0 = reschedule, 1 = cancel, 2 = add (when instruction is null, start at 2)
   const [tab, setTab] = useState<number>(instruction === null ? 2 : (initialTab ?? 0))
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
-
   // Reschedule fields (prefill from existing instruction)
   const [rescheduleStart, setRescheduleStart] = useState(String(instruction?.startDayOffset ?? 0))
   const [rescheduleEnd, setRescheduleEnd] = useState(
     instruction?.endDayOffset !== undefined ? String(instruction.endDayOffset) : '',
   )
-
   // Add fields
   const [addTemplateId, setAddTemplateId] = useState('')
   const [addStart, setAddStart] = useState('0')
   const [addEnd, setAddEnd] = useState('')
-
   const { data: instructionTemplates } = useApi(() => client.getInstructionTemplates(), [])
-
   const reset = () => {
     setTab(instruction === null ? 2 : (initialTab ?? 0))
     setError(null)
@@ -77,12 +70,10 @@ export function InstructionModifyDialog({
     setAddStart('0')
     setAddEnd('')
   }
-
   const handleClose = () => {
     reset()
     onClose()
   }
-
   const handleReschedule = async () => {
     if (!instruction) return
     const startDayOffset = parseInt(rescheduleStart, 10)
@@ -105,7 +96,6 @@ export function InstructionModifyDialog({
       setSaving(false)
     }
   }
-
   const handleCancel = async () => {
     if (!instruction) return
     setSaving(true)
@@ -118,7 +108,6 @@ export function InstructionModifyDialog({
       setSaving(false)
     }
   }
-
   const handleAdd = async () => {
     if (!addTemplateId) {
       setError(t('journey.instructionModify.templateRequired'))
@@ -148,16 +137,14 @@ export function InstructionModifyDialog({
       setSaving(false)
     }
   }
-
   const isAddMode = instruction === null
-
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
+    <Dialog open={open} onClose={handleClose} fullWidth sx={{ maxWidth: 'sm' }}>
       <DialogTitle>
         {isAddMode
           ? t('journey.instructionModify.addTitle')
           : t('journey.instructionModify.modifyTitle', {
-              name: instruction.label || instruction.templateName,
+              name: instruction.label || instruction.templateName || '',
             })}
       </DialogTitle>
 
@@ -201,7 +188,7 @@ export function InstructionModifyDialog({
 
         {/* Reschedule tab */}
         {tab === 0 && !isAddMode && (
-          <Stack gap={2}>
+          <Stack sx={{ gap: 2 }}>
             <Typography variant="body2" color="text.secondary">
               {t('journey.instructionModify.rescheduleHint')}
             </Typography>
@@ -228,10 +215,10 @@ export function InstructionModifyDialog({
 
         {/* Cancel tab */}
         {tab === 1 && !isAddMode && (
-          <Stack gap={2}>
+          <Stack sx={{ gap: 2 }}>
             <Alert severity="warning">
               {t('journey.instructionModify.cancelWarning', {
-                name: instruction?.label || instruction?.templateName,
+                name: instruction?.label || instruction?.templateName || '',
               })}
             </Alert>
           </Stack>
@@ -239,7 +226,7 @@ export function InstructionModifyDialog({
 
         {/* Add tab */}
         {tab === 2 && (
-          <Stack gap={2}>
+          <Stack sx={{ gap: 2 }}>
             <FormControl size="small" fullWidth required>
               <InputLabel>{t('journey.instructionModify.templateLabel')}</InputLabel>
               <Select

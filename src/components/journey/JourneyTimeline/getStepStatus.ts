@@ -1,7 +1,7 @@
-import { FormResponse } from '@/api/schemas'
-import { EffectiveStep } from '@/api/service'
+import type { FormResponse } from '@/api/schemas'
+import type { EffectiveStep } from '@/api/service'
 
-import { StepStatus } from './types'
+import type { StepStatus } from './types'
 
 export function getStepStatus(step: EffectiveStep, responses: FormResponse[]): StepStatus {
   const submitted = responses.some((r) => r.templateId === step.templateId)

@@ -166,3 +166,74 @@ describe('seekContact', () => {
     expect(result.triggers).toContain('SEEK_CONTACT')
   })
 })
+
+describe('triageCase assignment to several people or teams', () => {
+  const pick = () => {
+    const c = SEED_STATE.cases.find((x) => x.status === 'NEEDS_REVIEW' && x.reviews.length === 0)
+    if (!c) throw new Error('No NEEDS_REVIEW case without reviews in seed data')
+    return c
+  }
+
+  it('stores several named people without a single owner', () => {
+    const c = pick()
+    const result = service.triageCase(
+      c.id,
+      {
+        triageDecision: {
+          contactMode: 'PHONE',
+          careRole: 'DOCTOR',
+          assignmentMode: 'NAMED',
+          assignedUserId: null,
+          assignedUserIds: ['user-pal-1', 'user-doc-1'],
+        },
+      },
+      'user-doc-1',
+      'DOCTOR',
+    )
+    expect(result.triageDecision?.assignedUserIds).toEqual(['user-pal-1', 'user-doc-1'])
+    expect(result.assignedUserId).toBeUndefined()
+    expect(service.isCaseAssignedToUser(result, 'user-pal-1', [])).toBe(true)
+  })
+
+  it('makes a single named person the owner', () => {
+    const c = pick()
+    const result = service.triageCase(
+      c.id,
+      {
+        triageDecision: {
+          contactMode: 'PHONE',
+          careRole: 'NURSE',
+          assignmentMode: 'NAMED',
+          assignedUserId: 'user-nurse-1',
+          assignedUserIds: ['user-nurse-1'],
+        },
+      },
+      'user-doc-1',
+      'DOCTOR',
+    )
+    expect(result.assignedUserId).toBe('user-nurse-1')
+  })
+
+  it('routes a TEAM decision to the team members', () => {
+    const c = pick()
+    const result = service.triageCase(
+      c.id,
+      {
+        triageDecision: {
+          contactMode: 'VISIT',
+          careRole: 'NURSE',
+          assignmentMode: 'TEAM',
+          assignedUserId: null,
+          assignedTeamIds: ['team-hip'],
+        },
+      },
+      'user-doc-1',
+      'DOCTOR',
+    )
+    expect(result.assignedUserId).toBeUndefined()
+    expect(result.triageDecision?.assignedTeamIds).toEqual(['team-hip'])
+    const teams = service.getCareTeams()
+    expect(service.isCaseAssignedToUser(result, 'user-nurse-1', teams)).toBe(true)
+    expect(service.isCaseAssignedToUser(result, 'user-nurse-2', teams)).toBe(false)
+  })
+})

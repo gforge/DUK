@@ -1,5 +1,5 @@
 import AddIcon from '@mui/icons-material/Add'
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlineOutlined'
 import {
   Box,
   Button,
@@ -16,8 +16,7 @@ import {
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { ScoringRowDraft } from './questionnaireUtils'
-
+import type { ScoringRowDraft } from './questionnaireUtils'
 interface Props {
   scoringRows: ScoringRowDraft[]
   questionKeys: string[]
@@ -29,7 +28,6 @@ interface Props {
   ) => void
   deleteScoringRow: (id: string) => void
 }
-
 export default function QuestionnaireEditorScoringTab({
   scoringRows,
   questionKeys,
@@ -38,10 +36,9 @@ export default function QuestionnaireEditorScoringTab({
   deleteScoringRow,
 }: Props) {
   const { t } = useTranslation()
-
   return (
     <Box>
-      <Stack direction="row" justifyContent="space-between" alignItems="center" mb={1}>
+      <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
         <Typography variant="caption" color="text.secondary">
           {t('journey.qTemplate.scoringHint', { keys: questionKeys.join(', ') || '—' })}
         </Typography>

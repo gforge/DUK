@@ -1,15 +1,11 @@
 import AddIcon from '@mui/icons-material/Add'
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline'
-import RouteIcon from '@mui/icons-material/Route'
+import HelpOutlineIcon from '@mui/icons-material/HelpOutlineOutlined'
 import {
   Alert,
-  Box,
   Button,
   CircularProgress,
   IconButton,
-  MenuItem,
   Stack,
-  TextField,
   Tooltip,
   Typography,
 } from '@mui/material'
@@ -18,32 +14,28 @@ import { useTranslation } from 'react-i18next'
 
 import * as client from '@/api/client'
 import type { PolicyRule } from '@/api/schemas'
+import { PageHeader } from '@/components/common'
 import type { RuleForm } from '@/components/policy'
 import {
   PolicyHelpDialog,
   PolicyRuleDialog,
   PolicyRulesTable,
-  ruleSchema,
-  SEVERITIES,
+  PolicyTemplatePicker,
 } from '@/components/policy'
 import { useApi } from '@/hooks/useApi'
 import { useSnack } from '@/store/snackContext'
+import { tokens } from '@/theme'
 
 const EMPTY_FORM: RuleForm = { severity: 'MEDIUM', name: '', expression: '', description: '' }
-
-// suppress unused imports
-void ruleSchema
-void SEVERITIES
 
 export function PolicyEditor() {
   const { t } = useTranslation()
   const { showSnack } = useSnack()
-
   const { data: templates } = useApi(() => client.getJourneyTemplates(), [])
   const { data: allVariables } = useApi(() => client.getAvailablePolicyVariables(), [])
-
-  const [selectedTemplateId, setSelectedTemplateId] = useState<string>('')
-
+  const [pickedTemplateId, setPickedTemplateId] = useState<string>('')
+  // Default to the first template so the page opens with rules visible
+  const selectedTemplateId = pickedTemplateId || templates?.[0]?.id || ''
   // Reload rules whenever the selected template changes
   const {
     data: rules,
@@ -54,25 +46,21 @@ export function PolicyEditor() {
     () => (selectedTemplateId ? client.getPolicyRules(selectedTemplateId) : Promise.resolve(null)),
     [selectedTemplateId],
   )
-
   const [open, setOpen] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [formValues, setFormValues] = useState<RuleForm>(EMPTY_FORM)
   const [deleting, setDeleting] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
   const [helpOpen, setHelpOpen] = useState(false)
-
   // Variables scoped to the currently selected template
   const selectedTemplate = templates?.find((t) => t.id === selectedTemplateId)
   const templateVariables =
     allVariables?.filter((v) => v.templateName === selectedTemplate?.name) ?? []
-
   function openCreate() {
     setEditingId(null)
     setFormValues(EMPTY_FORM)
     setOpen(true)
   }
-
   function openEdit(rule: PolicyRule) {
     setEditingId(rule.id)
     setFormValues({
@@ -83,7 +71,6 @@ export function PolicyEditor() {
     })
     setOpen(true)
   }
-
   async function onSubmit(data: RuleForm) {
     if (!selectedTemplateId) return
     setSaving(true)
@@ -104,7 +91,6 @@ export function PolicyEditor() {
       setSaving(false)
     }
   }
-
   async function handleToggle(rule: PolicyRule) {
     try {
       await client.savePolicyRule({ ...rule, enabled: !rule.enabled })
@@ -113,7 +99,6 @@ export function PolicyEditor() {
       showSnack(t('common.error'), 'error')
     }
   }
-
   async function handleDelete(id: string) {
     setDeleting(id)
     try {
@@ -126,44 +111,57 @@ export function PolicyEditor() {
       setDeleting(null)
     }
   }
+  const activeCount = rules?.filter((r) => r.enabled).length ?? 0
 
   return (
-    <Box sx={{ p: 3 }}>
-      <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 3 }}>
-        <Typography variant="h5" fontWeight={700} flex={1}>
-          {t('policy.title')}
-        </Typography>
-        <Tooltip title={t('policy.help')}>
-          <IconButton size="small" onClick={() => setHelpOpen(true)} aria-label={t('policy.help')}>
-            <HelpOutlineIcon />
-          </IconButton>
-        </Tooltip>
-      </Stack>
+    <Stack sx={{ gap: 2.5 }}>
+      <PageHeader
+        title={
+          <>
+            {t('policy.title')}
+            <Tooltip title={t('policy.help')}>
+              <IconButton
+                size="small"
+                onClick={() => setHelpOpen(true)}
+                aria-label={t('policy.help')}
+                sx={{ color: tokens.textMuted, p: 0.5 }}
+              >
+                <HelpOutlineIcon sx={{ fontSize: 18 }} />
+              </IconButton>
+            </Tooltip>
+          </>
+        }
+        subtitle={t('policy.subtitle')}
+        actions={
+          selectedTemplateId ? (
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={openCreate}
+              disableElevation
+              sx={{ fontWeight: 600, borderRadius: 2, px: 1.75, py: 1 }}
+            >
+              {t('policy.addRule')}
+            </Button>
+          ) : undefined
+        }
+      />
 
-      {/* Template selector */}
-      <Stack direction="row" alignItems="center" gap={2} sx={{ mb: 3 }}>
-        <RouteIcon color="primary" />
-        <TextField
-          select
-          label={t('policy.selectTemplate')}
+      {/* Template selector + summary */}
+      <Stack direction="row" sx={{ alignItems: 'center', gap: 1.5, flexWrap: 'wrap' }}>
+        <PolicyTemplatePicker
+          templates={templates ?? []}
           value={selectedTemplateId}
-          onChange={(e) => {
-            setSelectedTemplateId(e.target.value)
+          onChange={(id) => {
+            setPickedTemplateId(id)
             setOpen(false)
           }}
-          size="small"
-          sx={{ minWidth: 280 }}
-        >
-          {(templates ?? []).map((jt) => (
-            <MenuItem key={jt.id} value={jt.id}>
-              {jt.name}
-            </MenuItem>
-          ))}
-        </TextField>
-        {selectedTemplateId && (
-          <Button variant="contained" startIcon={<AddIcon />} onClick={openCreate} disableElevation>
-            {t('policy.addRule')}
-          </Button>
+        />
+        {selectedTemplateId && rules && (
+          <Typography sx={{ color: tokens.textSecondary }}>
+            {t('policy.ruleCount', { count: rules.length })} ·{' '}
+            {t('policy.activeCount', { count: activeCount })}
+          </Typography>
         )}
       </Stack>
 
@@ -175,10 +173,6 @@ export function PolicyEditor() {
         <CircularProgress />
       ) : error ? (
         <Alert severity="error">{error}</Alert>
-      ) : rules && rules.length === 0 ? (
-        <Typography color="text.secondary" variant="body2">
-          {t('policy.noRules')}
-        </Typography>
       ) : (
         <PolicyRulesTable
           rules={rules ?? []}
@@ -200,6 +194,6 @@ export function PolicyEditor() {
       />
 
       <PolicyHelpDialog open={helpOpen} onClose={() => setHelpOpen(false)} />
-    </Box>
+    </Stack>
   )
 }

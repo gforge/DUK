@@ -53,3 +53,25 @@ describe('runMigrations', () => {
     }
   })
 })
+
+describe('migration 17 → 18 (journey template grouping)', () => {
+  it('fills group and phaseOrder on bundled templates and keeps custom values', () => {
+    const seeded = SEED_STATE.journeyTemplates.find((t) => t.phaseOrder !== undefined)!
+    const custom = { ...SEED_STATE.journeyTemplates[0], id: 'jt-custom', name: 'Egen mall' }
+    const raw = structuredClone({
+      ...SEED_STATE,
+      schemaVersion: 17,
+      journeyTemplates: [
+        { ...seeded, group: undefined, phaseOrder: undefined },
+        { ...custom, group: undefined, phaseOrder: undefined },
+      ],
+    })
+    const result = runMigrations(raw)
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    const [migrated, untouched] = result.state.journeyTemplates
+    expect(migrated.group).toBe(seeded.group)
+    expect(migrated.phaseOrder).toBe(seeded.phaseOrder)
+    expect(untouched.group).toBeUndefined()
+  })
+})

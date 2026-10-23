@@ -9,7 +9,7 @@ import { ReviewDetailsDialog } from '@/components/journey/ConsentDialog/ReviewDe
 import JourneyTimelineItem from '@/components/journey/JourneyTimelineItem'
 
 import { getStepStatus } from './getStepStatus'
-import { ReviewTypeKey, StepStatus } from './types'
+import type { ReviewTypeKey, StepStatus } from './types'
 
 interface JourneyTimelineProps {
   readonly steps: EffectiveStep[]

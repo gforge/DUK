@@ -1,4 +1,4 @@
-import type { ClinicalReview, ReviewOutcome,ReviewType, Role } from '../schemas'
+import type { ClinicalReview, ReviewOutcome, ReviewType, Role } from '../schemas'
 import * as service from '../service/reviews'
 import { withDelay } from './delay'
 

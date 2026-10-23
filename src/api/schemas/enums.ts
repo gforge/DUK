@@ -9,7 +9,7 @@ export type ContactMode = z.infer<typeof ContactModeSchema>
 export const CareRoleSchema = z.enum(['DOCTOR', 'NURSE', 'PHYSIO']).nullable()
 export type CareRole = z.infer<typeof CareRoleSchema>
 
-export const AssignmentModeSchema = z.enum(['ANY', 'PAL', 'NAMED']).nullable()
+export const AssignmentModeSchema = z.enum(['ANY', 'PAL', 'NAMED', 'TEAM']).nullable()
 export type AssignmentMode = z.infer<typeof AssignmentModeSchema>
 
 /**

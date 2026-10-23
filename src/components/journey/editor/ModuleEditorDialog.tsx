@@ -1,5 +1,5 @@
 import AddIcon from '@mui/icons-material/Add'
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlineOutlined'
 import {
   Autocomplete,
   Button,
@@ -22,12 +22,9 @@ import {
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import type { QuestionnaireTemplate,ResearchModule, ResearchModuleEntry } from '@/api/schemas'
-
+import type { QuestionnaireTemplate, ResearchModule, ResearchModuleEntry } from '@/api/schemas'
 const mkId = () => Date.now().toString(36) + '-' + Math.random().toString(36).slice(2)
-
 type EntryMode = 'REPLACE' | 'ADDITIVE'
-
 export interface EntryDraft {
   _id: string
   label: string
@@ -36,7 +33,6 @@ export interface EntryDraft {
   replaceStepId: string
   offsetDays: number | ''
 }
-
 function moduleToEntryDrafts(module: ResearchModule): EntryDraft[] {
   return module.entries.map((e) => ({
     _id: e.id,
@@ -47,14 +43,16 @@ function moduleToEntryDrafts(module: ResearchModule): EntryDraft[] {
     offsetDays: e.offsetDays ?? '',
   }))
 }
-
 interface ModuleEditorDialogProps {
   module?: ResearchModule
   questionnaires: QuestionnaireTemplate[]
-  onSave: (m: Omit<ResearchModule, 'id' | 'createdAt'> & { id?: string }) => void
+  onSave: (
+    m: Omit<ResearchModule, 'id' | 'createdAt'> & {
+      id?: string
+    },
+  ) => void
   onClose: () => void
 }
-
 export default function ModuleEditorDialog({
   module,
   questionnaires,
@@ -63,16 +61,13 @@ export default function ModuleEditorDialog({
 }: ModuleEditorDialogProps) {
   const { t } = useTranslation()
   const isCreate = !module
-
   const [name, setName] = useState(module?.name ?? '')
   const [studyName, setStudyName] = useState(module?.studyName ?? '')
   const [studyInfoMarkdown, setStudyInfoMarkdown] = useState(module?.studyInfoMarkdown ?? '')
   const [entryDrafts, setEntryDrafts] = useState<EntryDraft[]>(
     module ? moduleToEntryDrafts(module) : [],
   )
-
   const qtOptions = questionnaires.map((q) => ({ id: q.id, name: q.name }))
-
   const addEntry = () => {
     setEntryDrafts((prev) => [
       ...prev,
@@ -86,17 +81,13 @@ export default function ModuleEditorDialog({
       },
     ])
   }
-
   const updateEntry = <K extends keyof EntryDraft>(id: string, field: K, value: EntryDraft[K]) => {
     setEntryDrafts((prev) => prev.map((e) => (e._id === id ? { ...e, [field]: value } : e)))
   }
-
   const deleteEntry = (id: string) => {
     setEntryDrafts((prev) => prev.filter((e) => e._id !== id))
   }
-
   const isValid = name.trim() !== '' && studyName.trim() !== ''
-
   const handleSave = () => {
     if (!isValid) return
     const entries: ResearchModuleEntry[] = entryDrafts
@@ -116,15 +107,14 @@ export default function ModuleEditorDialog({
       entries,
     })
   }
-
   return (
-    <Dialog open onClose={onClose} maxWidth="md" fullWidth>
+    <Dialog open onClose={onClose} fullWidth sx={{ maxWidth: 'md' }}>
       <DialogTitle>
         {isCreate ? t('journey.research.createModule') : t('journey.research.editModule')}
       </DialogTitle>
       <DialogContent>
-        <Stack gap={2} sx={{ mt: 0.5 }}>
-          <Stack direction="row" gap={2}>
+        <Stack sx={{ mt: 0.5, gap: 2 }}>
+          <Stack direction="row" sx={{ gap: 2 }}>
             <TextField
               label={t('journey.template.name')}
               value={name}
@@ -155,7 +145,7 @@ export default function ModuleEditorDialog({
             helperText={t('journey.research.studyInfoHint')}
           />
 
-          <Stack direction="row" alignItems="center" justifyContent="space-between">
+          <Stack direction="row" sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
             <Typography variant="overline" color="text.secondary">
               {t('journey.research.entries')}
             </Typography>

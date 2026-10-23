@@ -28,31 +28,32 @@ interface CompletionDialogProps {
   personalNumber?: string | null
   followUpDate: Date | null
   completionComment: string
+  isCompleting: boolean
+  requireFollowUpDate?: boolean
   /** Case needs a radiograph booked before the follow-up visit. */
   needsXray?: boolean
   xrayDate?: Date | null
   xrayLocation?: string
   onXrayDateChange?: (value: Date | null) => void
   onXrayLocationChange?: (value: string) => void
-  isCompleting: boolean
   onClose: () => void
   onFollowUpDateChange: (value: Date | null) => void
   onCompletionCommentChange: (value: string) => void
   onConfirm: () => void
 }
-
 export default function CompletionDialog({
   open,
   patientLabel,
   personalNumber,
   followUpDate,
   completionComment,
+  isCompleting,
+  requireFollowUpDate,
   needsXray = false,
   xrayDate = null,
   xrayLocation = DEFAULT_XRAY_LOCATION,
   onXrayDateChange,
   onXrayLocationChange,
-  isCompleting,
   onClose,
   onFollowUpDateChange,
   onCompletionCommentChange,
@@ -68,10 +69,10 @@ export default function CompletionDialog({
     needsXray && xrayDate && followUpDate && xrayDate.getTime() >= followUpDate.getTime()
   const missingXray = needsXray && !xrayDate
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
+    <Dialog open={open} onClose={onClose} fullWidth sx={{ maxWidth: 'xs' }}>
       <DialogTitle>{t('worklist.completeDialogTitle', { name: patientLabel })}</DialogTitle>
       <DialogContent>
-        <Stack gap={2} sx={{ pt: 1 }}>
+        <Stack sx={{ pt: 1, gap: 2 }}>
           <PersonalNumberCopy
             personalNumber={personalNumber ?? undefined}
             labelFormat="long"
@@ -107,11 +108,23 @@ export default function CompletionDialog({
               </>
             )}
             <DateTimePicker
-              label={needsXray ? t('worklist.visitDate') : t('worklist.nextContactDate')}
+              label={
+                needsXray
+                  ? t('worklist.visitDate')
+                  : requireFollowUpDate
+                    ? t('worklist.nextContactDateRequired')
+                    : t('worklist.nextContactDate')
+              }
               value={followUpDate}
               onChange={(value) => onFollowUpDateChange(value)}
               slotProps={{
-                textField: { size: 'small', helperText: t('worklist.nextContactDateHint') },
+                textField: {
+                  size: 'small',
+                  helperText: requireFollowUpDate
+                    ? t('worklist.nextContactDateRequiredHint')
+                    : t('worklist.nextContactDateHint'),
+                  required: requireFollowUpDate,
+                },
               }}
               minTime={minTime}
               maxTime={maxTime}
@@ -138,7 +151,7 @@ export default function CompletionDialog({
           variant="contained"
           color="success"
           onClick={onConfirm}
-          disabled={isCompleting || missingXray}
+          disabled={isCompleting || missingXray || (requireFollowUpDate && !followUpDate)}
         >
           {t('worklist.confirmDone')}
         </Button>

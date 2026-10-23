@@ -11,30 +11,37 @@ state ACTIVE
 state SUSPENDED
 state COMPLETED
 
-[*] --> ACTIVE : assignPatientJourney\n(pausedAt=null, totalPausedDays=0)
+[*] --> ACTIVE : assignPatientJourney / startNextPhase\n(pausedAt=null, totalPausedDays=0)
 
 ACTIVE --> SUSPENDED : pauseJourney\n(records pausedAt=now())
 SUSPENDED --> ACTIVE : resumeJourney\n(totalPausedDays += elapsedDays,\npausedAt=null)
-ACTIVE --> COMPLETED : complete
-SUSPENDED --> COMPLETED : complete
+ACTIVE --> COMPLETED : startNextPhase (previous phase)\n/ cancelJourney (has data)
+SUSPENDED --> COMPLETED : cancelJourney (has data,\npausedAt=null)
+ACTIVE --> [*] : cancelJourney (no data)\njourney deleted
+SUSPENDED --> [*] : cancelJourney (no data)\njourney deleted
 
 note right of SUSPENDED
   Step dates shift dynamically by
   totalPausedDays + currentPauseDays
-  (calculated in getEffectiveSteps;
-  no store write until resumeJourney)
+  (computeTotalPauseShift; no store
+  write until resumeJourney, which also
+  re-dates the journey's Instructions)
 end note
 
 note right of ACTIVE
-  pauseJourney / resumeJourney in
-  src/api/service/patientJourneys.ts
+  Late enrolment (joinedAt > startDate):
+  closed-window steps get system
+  REMOVE_STEP modifications and past
+  instructions are created CANCELLED
+  (cancelReason = LATE_JOIN).
 end note
 
 note bottom of ACTIVE
   Phase progression is handled by
   startNextPhase(...): previous journey
-  becomes COMPLETED and a new
-  journey is created in the same episode.
+  becomes COMPLETED and a new journey is
+  created in the same episode with phaseType
+  and transition (fromJourneyId, trigger).
 end note
 
 @enduml

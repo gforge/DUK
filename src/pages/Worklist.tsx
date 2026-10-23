@@ -1,48 +1,40 @@
-import { Alert, Box, Skeleton, Stack } from '@mui/material'
+import { Alert, Skeleton, Stack } from '@mui/material'
 import React, { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import * as client from '@/api/client'
-import type { CareRole, WorkCategory } from '@/api/schemas'
-import {
-  CompletedSection,
-  GroupSection,
-  WorklistFilters,
-  WorklistHeader,
-} from '@/components/worklist'
+import type { WorklistTab } from '@/components/worklist'
+import { GroupSection, WorklistFilters, WorklistHeader } from '@/components/worklist'
 import { useApi } from '@/hooks/useApi'
+import { useCollapsedSections } from '@/hooks/useCollapsedSections'
+import type { CareRoleFilter, CategoryFilter, RecipientFilter } from '@/hooks/useWorklistQueue'
 import { useWorklistQueue, WORKLIST_CATEGORY_ORDER } from '@/hooks/useWorklistQueue'
 import { useRole } from '@/store/roleContext'
 import { useSnack } from '@/store/snackContext'
-
-type CategoryFilter = 'ALL' | WorkCategory
-type CareRoleFilter = 'ALL' | Exclude<CareRole, null>
 
 export function Worklist() {
   const { t } = useTranslation()
   const { currentUser } = useRole()
   const { showSnack } = useSnack()
-
+  const [tab, setTab] = useState<WorklistTab>('active')
+  const groupsState = useCollapsedSections<string>('worklist.collapsedGroups')
   const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>('ALL')
   const [careRoleFilter, setCareRoleFilter] = useState<CareRoleFilter>('ALL')
-  const [palOnly, setPalOnly] = useState(false)
-  const [xrayOnly, setXrayOnly] = useState(false)
-  const [claimedByMe, setClaimedByMe] = useState(false)
+  const [recipientFilter, setRecipientFilter] = useState<RecipientFilter>('ALL')
+  const [assignedToMe, setAssignedToMe] = useState(false)
   const [myPatientsOnly, setMyPatientsOnly] = useState(false)
-  const [completedExpanded, setCompletedExpanded] = useState(false)
-
+  const [xrayOnly, setXrayOnly] = useState(false)
   const {
     data: cases,
     loading: casesLoading,
     error: casesError,
     refetch: refetchCases,
   } = useApi(() => client.getCases(), [])
-
   const { data: patients, loading: patientsLoading } = useApi(() => client.getPatients(), [])
   const { data: users, loading: usersLoading } = useApi(() => client.getUsers(), [])
-
+  const { data: teams } = useApi(() => client.getCareTeams(), [])
   const userMap = React.useMemo(() => new Map((users ?? []).map((u) => [u.id, u.name])), [users])
-
+  const teamMap = React.useMemo(() => new Map((teams ?? []).map((tm) => [tm.id, tm])), [teams])
   const {
     patientMap,
     activeGroupedCases,
@@ -57,20 +49,19 @@ export function Worklist() {
   } = useWorklistQueue({
     cases: cases ?? [],
     patients: patients ?? [],
+    teams: teams ?? undefined,
     currentUserId: currentUser.id,
     filters: {
       categoryFilter,
       careRoleFilter,
-      palOnly,
-      xrayOnly,
-      claimedByMe,
+      recipientFilter,
+      assignedToMe,
       myPatientsOnly,
+      xrayOnly,
     },
   })
-
   const loading = casesLoading || patientsLoading || usersLoading
   const isInitialLoading = loading && (!cases || !patients || !users)
-
   const handleClaim = useCallback(
     async (caseId: string) => {
       try {
@@ -83,7 +74,6 @@ export function Worklist() {
     },
     [currentUser, refetchCases, showSnack, t],
   )
-
   const handleMarkDone = useCallback(
     async (
       caseId: string,
@@ -97,11 +87,9 @@ export function Worklist() {
       try {
         const worklistCase = cases?.find((c) => c.id === caseId)
         if (!worklistCase) throw new Error(`Case ${caseId} not found`)
-
         if (worklistCase.status === 'TRIAGED') {
           await client.advanceCaseStatus(caseId, 'FOLLOWING_UP', currentUser.id, currentUser.role)
         }
-
         await client.completeWorklistCase(caseId, currentUser.id, currentUser.role, options)
         showSnack(t('worklist.doneSuccess'), 'success')
         refetchCases()
@@ -112,9 +100,24 @@ export function Worklist() {
     [cases, currentUser, refetchCases, showSnack, t],
   )
 
+  const groups =
+    tab === 'active'
+      ? activeGroupedCases
+      : tab === 'monitoring'
+        ? monitoringGroupedCases
+        : completedGroupedCases
+  const emptyText =
+    tab === 'active'
+      ? t('worklist.empty')
+      : tab === 'monitoring'
+        ? t('worklist.emptyMonitoring')
+        : t('worklist.emptyCompleted')
+
   return (
-    <Box sx={{ bgcolor: 'background.default' }}>
+    <Stack sx={{ gap: 2.5 }}>
       <WorklistHeader
+        tab={tab}
+        onTabChange={setTab}
         activeCount={activeCount}
         monitoringCount={monitoringCount}
         completedCount={completedCount}
@@ -126,99 +129,54 @@ export function Worklist() {
         categoryOrder={WORKLIST_CATEGORY_ORDER}
         categoryFilter={categoryFilter}
         careRoleFilter={careRoleFilter}
-        palOnly={palOnly}
-        xrayOnly={xrayOnly}
-        claimedByMe={claimedByMe}
+        recipientFilter={recipientFilter}
+        assignedToMe={assignedToMe}
         myPatientsOnly={myPatientsOnly}
+        xrayOnly={xrayOnly}
         onCategoryFilterChange={setCategoryFilter}
         onCareRoleFilterChange={setCareRoleFilter}
-        onPalOnlyToggle={() => setPalOnly((v) => !v)}
-        onXrayOnlyToggle={() => setXrayOnly((v) => !v)}
-        onClaimedByMeToggle={() => setClaimedByMe((v) => !v)}
+        onRecipientFilterChange={setRecipientFilter}
+        onAssignedToMeToggle={() => setAssignedToMe((v) => !v)}
         onMyPatientsOnlyToggle={() => setMyPatientsOnly((v) => !v)}
+        onXrayOnlyToggle={() => setXrayOnly((v) => !v)}
       />
 
       {isInitialLoading && (
-        <Stack gap={2}>
+        <Stack sx={{ gap: 2 }}>
           {[1, 2, 3].map((i) => (
-            <Skeleton key={i} variant="rectangular" height={80} sx={{ borderRadius: 2 }} />
+            <Skeleton key={i} variant="rectangular" sx={{ borderRadius: 3, height: 80 }} />
           ))}
         </Stack>
       )}
 
-      {casesError && (
-        <Alert severity="error" sx={{ mb: 2 }}>
-          {casesError}
-        </Alert>
-      )}
+      {casesError && <Alert severity="error">{casesError}</Alert>}
 
-      {!isInitialLoading && !casesError && activeGroupedCases.length === 0 && (
-        <Alert severity="info">{t('worklist.empty')}</Alert>
-      )}
-
-      {!isInitialLoading &&
-        !casesError &&
-        activeGroupedCases.map((g) => (
-          <GroupSection
-            key={g.workCategory}
-            workCategory={g.workCategory}
-            cases={g.cases}
-            patientMap={patientMap}
-            userMap={userMap}
-            highlightedCaseIds={highlightedCaseIds}
-            defaultExpanded={g.cases.length <= 6}
-            onClaim={handleClaim}
-            onMarkDone={handleMarkDone}
-          />
-        ))}
-
-      {!isInitialLoading && !casesError && monitoringCount > 0 && (
-        <Box sx={{ mt: 2.5 }}>
-          <Stack direction="row" alignItems="center" gap={1} mb={0.5}>
-            <Alert severity="warning" icon={false} sx={{ py: 0, px: 1 }}>
-              {t('worklist.monitoringSectionTitle')} ({monitoringCount})
-            </Alert>
-          </Stack>
-          <Alert severity="info" sx={{ mb: 1.5 }}>
-            {t('worklist.monitoringSectionHint')}
-          </Alert>
-          {monitoringGroupedCases.map((g) => (
-            <GroupSection
-              key={`monitoring-${g.workCategory}`}
-              workCategory={g.workCategory}
-              cases={g.cases}
-              patientMap={patientMap}
-              userMap={userMap}
-              highlightedCaseIds={highlightedCaseIds}
-              defaultExpanded={false}
-              onClaim={handleClaim}
-              onMarkDone={handleMarkDone}
-            />
-          ))}
-        </Box>
-      )}
-
-      {!isInitialLoading && !casesError && completedCount > 0 && (
-        <CompletedSection
-          expanded={completedExpanded}
-          onToggle={setCompletedExpanded}
-          count={completedCount}
+      {!isInitialLoading && !casesError && (
+        <Stack
+          id="worklist-tabpanel"
+          role="tabpanel"
+          aria-labelledby={`worklist-tab-${tab}`}
+          sx={{ gap: 2.5 }}
         >
-          {completedGroupedCases.map((g) => (
+          {groups.length === 0 && <Alert severity="info">{emptyText}</Alert>}
+          {groups.map((g) => (
             <GroupSection
-              key={`completed-${g.workCategory}`}
+              key={`${tab}-${g.workCategory}`}
               workCategory={g.workCategory}
               cases={g.cases}
+              mode={tab}
               patientMap={patientMap}
               userMap={userMap}
+              teamMap={teamMap}
               highlightedCaseIds={highlightedCaseIds}
-              defaultExpanded={false}
+              open={groupsState.isOpen(g.workCategory)}
+              onToggleOpen={() => groupsState.toggle(g.workCategory)}
               onClaim={handleClaim}
               onMarkDone={handleMarkDone}
             />
           ))}
-        </CompletedSection>
+        </Stack>
       )}
-    </Box>
+    </Stack>
   )
 }

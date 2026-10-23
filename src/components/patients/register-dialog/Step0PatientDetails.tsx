@@ -1,4 +1,4 @@
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutlineOutlined'
 import { Alert, Box, Button, CircularProgress, TextField } from '@mui/material'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
@@ -122,7 +122,7 @@ export function Step0PatientDetails({
           type="date"
           fullWidth
           required
-          InputLabelProps={{ shrink: true }}
+          slotProps={{ inputLabel: { shrink: true } }}
           sx={{ mt: 1 }}
         />
       )}

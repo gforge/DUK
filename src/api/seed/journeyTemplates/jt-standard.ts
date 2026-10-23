@@ -126,4 +126,6 @@ export const jtStandard: JourneyTemplate = {
   ],
   createdAt: iso(daysAgo(100)),
   referenceDateLabel: 'Operationsdatum',
+  anchorEventType: 'SURGERY_COMPLETED',
+  group: 'Frakturer',
 }

@@ -39,6 +39,22 @@ export const instructionTemplates: InstructionTemplate[] = [
     updatedAt: iso(daysAgo(90)),
   },
   {
+    id: 'it-cast-care',
+    name: 'Gipsvård — Distal radiusfraktur',
+    tags: ['cast', 'wrist', 'fracture'],
+    content: `## Gipsvård — Distal radiusfraktur
+
+**Första dygnen:** Håll handen i högläge (över hjärthöjd) så ofta som möjligt för att minska svullnad. Rör aktivt på fingrarna, tummen, armbågen och axeln flera gånger per timme.
+
+**Under gipsperioden:** Håll gipset torrt. Stoppa inte in föremål under gipset vid klåda. Belasta inte handen.
+
+**Röntgenkontroll dag 7–10:** Frakturens läge kontrolleras med röntgen. Om läget försämrats kan operation bli aktuell — du får då ett nytt uppföljningsprogram.
+
+> **Kontakta mottagningen omgående** vid tilltagande smärta trots högläge och smärtlindring, domningar eller stickningar i fingrarna, bleka/blå eller kalla fingrar, eller om gipset känns för trångt eller skaver.`,
+    createdAt: iso(daysAgo(60)),
+    updatedAt: iso(daysAgo(60)),
+  },
+  {
     id: 'it-wound-care',
     name: 'Wound Care Instructions',
     tags: ['wound', 'post-op', 'infection'],
@@ -106,6 +122,28 @@ export const instructionTemplates: InstructionTemplate[] = [
       'Halvårsuppföljning. Besvara frågorna om smärta, funktion och livskvalitet. Nästa uppföljning schemaläggs automatiskt 6 månader efter att du svarat.',
     createdAt: iso(daysAgo(30)),
     updatedAt: iso(daysAgo(30)),
+  },
+  // ── Generic referral phase ────────────────────────────────────────────────
+  {
+    id: 'it-pre-visit',
+    name: 'Förberedelse inför ortopedbesök',
+    tags: ['pre-visit', 'referral', 'patient-info'],
+    content: `## Förberedelse inför ditt ortopedbesök
+
+Din remiss har kommit till Ortopedkliniken. Innan besöket ber vi dig fylla i formulären i appen. Då kan vi använda besöket till att prata om det viktigaste: dina besvär och vilken behandling som passar dig.
+
+**Ta med till besöket:**
+- Lista med aktuella läkemedel och doser
+- Antecknade frågor till läkaren
+
+**Tänk igenom inför besöket:**
+- Hur länge har du haft besvären?
+- Vilka aktiviteter begränsas av besvären?
+- Vad har du provat hittills (t.ex. fysioterapi, smärtlindring)?
+
+> **Akuta besvär:** Kontakta 1177 eller vid livshotande tillstånd 112. Formulären i appen läses inte dygnet runt.`,
+    createdAt: iso(daysAgo(60)),
+    updatedAt: iso(daysAgo(60)),
   },
   // ── Knee OA templates ─────────────────────────────────────────────────────
   {

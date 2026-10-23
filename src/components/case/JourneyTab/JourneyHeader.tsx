@@ -22,14 +22,12 @@ import React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import type { JourneyTemplate, PatientJourney } from '@/api/schemas'
-import { useJourneyStatusLabel } from '@/hooks/labels'
-
+import { useJourneyStatusLabel, useTransitionTriggerLabel } from '@/hooks/labels'
 function journeyStatusColor(status: string): 'primary' | 'warning' | 'default' {
   if (status === 'ACTIVE') return 'primary'
   if (status === 'SUSPENDED') return 'warning'
   return 'default'
 }
-
 interface JourneyHeaderProps {
   readonly journey: PatientJourney
   readonly template: JourneyTemplate | undefined
@@ -41,7 +39,6 @@ interface JourneyHeaderProps {
   readonly onCancelClick: () => void
   readonly onStartNextPhase?: () => void
 }
-
 export default function JourneyHeader({
   journey,
   template,
@@ -55,38 +52,36 @@ export default function JourneyHeader({
 }: JourneyHeaderProps) {
   const { t } = useTranslation()
   const getJourneyStatusLabel = useJourneyStatusLabel()
+  const getTriggerLabel = useTransitionTriggerLabel()
   const [menuAnchorEl, setMenuAnchorEl] = React.useState<null | HTMLElement>(null)
-
   const isActive = journey.status === 'ACTIVE'
   const isSuspended = journey.status === 'SUSPENDED'
   const hasOverflowActions = isActive || isSuspended
   const canStartNextPhase = isActive && !!onStartNextPhase
   const showModify = isActive || isSuspended
-
   const closeMenu = () => setMenuAnchorEl(null)
-
   const handlePauseClick = () => {
     onPauseClick()
     closeMenu()
   }
-
   const handleCancelClick = () => {
     onCancelClick()
     closeMenu()
   }
-
   return (
     <Stack
       direction={{ xs: 'column', sm: 'row' }}
-      alignItems={{ xs: 'stretch', sm: 'flex-start' }}
-      justifyContent="space-between"
-      gap={1}
-      mb={1.5}
+      sx={{
+        alignItems: { xs: 'stretch', sm: 'flex-start' },
+        justifyContent: 'space-between',
+        gap: 1,
+        mb: 1.5,
+      }}
     >
-      <Stack gap={0.5} sx={{ minWidth: 0 }}>
-        <Stack direction="row" alignItems="center" gap={1}>
+      <Stack sx={{ minWidth: 0, gap: 0.5 }}>
+        <Stack direction="row" sx={{ alignItems: 'center', gap: 1 }}>
           <RouteIcon color="primary" fontSize="small" />
-          <Typography variant="subtitle1" fontWeight={700}>
+          <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
             {template?.name ?? journey.journeyTemplateId}
           </Typography>
           {showStatusChip && (
@@ -99,7 +94,9 @@ export default function JourneyHeader({
           )}
         </Stack>
         <Typography variant="caption" color="text.secondary">
-          {t('journey.startDate')}: {journey.startDate}
+          {template?.referenceDateLabel ?? t('journey.startDate')}: {journey.startDate}
+          {journey.transition &&
+            ` · ${t('journey.triggeredBy')}: ${getTriggerLabel(journey.transition.type)}`}
           {journey.totalPausedDays > 0 &&
             ` · ${t('journey.pausedDaysShort', { days: journey.totalPausedDays })}`}
         </Typography>
@@ -107,10 +104,12 @@ export default function JourneyHeader({
 
       <Stack
         direction="row"
-        alignItems="center"
-        justifyContent={{ xs: 'flex-start', sm: 'flex-end' }}
-        gap={1}
-        sx={{ flexWrap: 'wrap' }}
+        sx={{
+          flexWrap: 'wrap',
+          alignItems: 'center',
+          justifyContent: { xs: 'flex-start', sm: 'flex-end' },
+          gap: 1,
+        }}
       >
         {canStartNextPhase && (
           <Button

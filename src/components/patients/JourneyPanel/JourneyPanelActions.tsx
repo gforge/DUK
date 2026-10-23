@@ -8,7 +8,6 @@ import { useTranslation } from 'react-i18next'
 
 import type { PatientJourney } from '@/api/schemas'
 import { useRole } from '@/store/roleContext'
-
 interface Props {
   readonly journey: PatientJourney
   readonly pauseLoading: boolean
@@ -17,7 +16,6 @@ interface Props {
   readonly onModifyClick: () => void
   readonly onCancelClick: () => void
 }
-
 export function JourneyPanelActions({
   journey,
   pauseLoading,
@@ -28,12 +26,10 @@ export function JourneyPanelActions({
 }: Props) {
   const { t } = useTranslation()
   const { currentUser } = useRole()
-
   const canEdit = currentUser.role === 'DOCTOR' || currentUser.role === 'NURSE'
   if (!canEdit) return null
-
   return (
-    <Stack direction="row" gap={1} flexWrap="wrap">
+    <Stack direction="row" sx={{ gap: 1, flexWrap: 'wrap' }}>
       {journey.status === 'ACTIVE' && (
         <>
           <Tooltip title={t('journey.pause')}>

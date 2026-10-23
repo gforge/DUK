@@ -1,5 +1,5 @@
 import type { QuestionnaireTemplate } from '../../schemas'
-import { daysAgo,iso } from '../shared'
+import { daysAgo, iso } from '../shared'
 
 const CREATED_AT = iso(daysAgo(100))
 
@@ -41,6 +41,62 @@ export const qtNumbnessInfection: QuestionnaireTemplate = {
       key: 'PNRS_1',
       type: 'SCALE',
       label: { sv: 'Smärta just nu (0–10)' },
+      required: true,
+      min: 0,
+      max: 10,
+    },
+  ],
+  scoringRules: [],
+  createdAt: CREATED_AT,
+}
+
+/** Day 7–10 in cast (conservative fracture treatment): cast fit, circulation and pain. */
+export const qtCastCheck: QuestionnaireTemplate = {
+  id: 'qt-cast-check',
+  name: 'Day 7-10: Cast Check & Pain',
+  questions: [
+    {
+      id: 'q-cast-1',
+      key: 'CAST_TIGHT',
+      type: 'BOOLEAN',
+      label: { sv: 'Känns gipset för trångt eller skaver det?' },
+      required: true,
+    },
+    {
+      id: 'q-cast-2',
+      key: 'CAST_NUMB',
+      type: 'BOOLEAN',
+      label: { sv: 'Domningar eller stickningar i fingrarna?' },
+      required: true,
+    },
+    {
+      id: 'q-cast-3',
+      key: 'CAST_COLOR',
+      type: 'BOOLEAN',
+      label: { sv: 'Är fingrarna bleka, blåaktiga eller kalla?' },
+      required: true,
+    },
+    {
+      id: 'q-cast-4',
+      key: 'CAST_SWELLING',
+      type: 'BOOLEAN',
+      label: { sv: 'Har svullnaden i fingrarna ökat?' },
+      required: false,
+    },
+    {
+      id: 'q-cast-pain',
+      key: 'PNRS_2',
+      type: 'SCALE',
+      label: { sv: 'Smärta just nu (0–10)' },
+      required: true,
+      min: 0,
+      max: 10,
+    },
+    {
+      id: 'q-cast-pain-night',
+      key: 'PNRS_NIGHT',
+      type: 'SCALE',
+      label: { sv: 'Värsta smärtan natten (0–10)' },
       required: true,
       min: 0,
       max: 10,

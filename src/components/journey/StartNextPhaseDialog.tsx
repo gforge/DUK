@@ -18,16 +18,12 @@ import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import * as client from '@/api/client'
-import type {
-  JourneyTemplate,
-  PatientJourney,
-  PhaseType,
-  TransitionTriggerType,
-} from '@/api/schemas'
+import type { JourneyTemplate, PatientJourney, PhaseType } from '@/api/schemas'
+import { type TransitionTriggerType, TransitionTriggerTypeSchema } from '@/api/schemas'
+import { phaseTypeForTrigger } from '@/api/service'
 import { usePhaseTypeLabel, useTransitionTriggerLabel } from '@/hooks/labels'
 import { useRole } from '@/store/roleContext'
 import { useSnack } from '@/store/snackContext'
-
 const PHASE_TYPES: PhaseType[] = [
   'REFERRAL',
   'INTAKE',
@@ -37,18 +33,7 @@ const PHASE_TYPES: PhaseType[] = [
   'MONITORING',
   'DISCHARGE',
 ]
-
-const TRIGGER_TYPES: TransitionTriggerType[] = [
-  'REFERRAL_RECEIVED',
-  'TRIAGE_DECISION',
-  'VISIT_DECISION',
-  'SURGERY_SCHEDULED',
-  'SURGERY_COMPLETED',
-  'PHYSIO_COMPLETED',
-  'MILESTONE',
-  'MANUAL',
-]
-
+const TRIGGER_TYPES: TransitionTriggerType[] = TransitionTriggerTypeSchema.options
 interface Props {
   readonly open: boolean
   readonly onClose: () => void
@@ -56,7 +41,6 @@ interface Props {
   readonly journeyTemplates: JourneyTemplate[]
   readonly onCompleted: () => void
 }
-
 export default function StartNextPhaseDialog({
   open,
   onClose,
@@ -69,14 +53,21 @@ export default function StartNextPhaseDialog({
   const { currentUser } = useRole()
   const phaseTypeLabel = usePhaseTypeLabel()
   const transitionTriggerLabel = useTransitionTriggerLabel()
-
   const [templateId, setTemplateId] = useState(journey.journeyTemplateId)
   const [phaseType, setPhaseType] = useState<PhaseType>('FOLLOWUP')
   const [startDate, setStartDate] = useState<Date | null>(new Date())
   const [triggerType, setTriggerType] = useState<TransitionTriggerType>('MANUAL')
   const [note, setNote] = useState('')
   const [loading, setLoading] = useState(false)
-
+  /** Choosing a template pre-selects the event its reference date refers to and the phase it implies. */
+  const handleTemplateChange = (id: string) => {
+    setTemplateId(id)
+    const anchor = journeyTemplates.find((jt) => jt.id === id)?.anchorEventType
+    if (anchor) {
+      setTriggerType(anchor)
+      setPhaseType(phaseTypeForTrigger(anchor))
+    }
+  }
   const handleConfirm = async () => {
     if (!startDate) return
     setLoading(true)
@@ -100,18 +91,17 @@ export default function StartNextPhaseDialog({
       setLoading(false)
     }
   }
-
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog open={open} onClose={onClose} fullWidth sx={{ maxWidth: 'sm' }}>
       <DialogTitle>{t('journey.nextPhase.title')}</DialogTitle>
       <DialogContent>
-        <Stack gap={2.5} mt={1}>
+        <Stack sx={{ gap: 2.5, mt: 1 }}>
           <FormControl fullWidth size="small">
             <InputLabel>{t('journey.nextPhase.template')}</InputLabel>
             <Select
               label={t('journey.nextPhase.template')}
               value={templateId}
-              onChange={(e) => setTemplateId(e.target.value)}
+              onChange={(e) => handleTemplateChange(e.target.value)}
             >
               {journeyTemplates.map((jt) => (
                 <MenuItem key={jt.id} value={jt.id}>

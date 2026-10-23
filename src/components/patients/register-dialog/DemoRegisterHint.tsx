@@ -15,13 +15,11 @@ import {
 } from '@mui/material'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-
 interface Hint {
   pnr: string
   displayName: string
   pnr12: string
 }
-
 interface Props {
   hintOpen: boolean
   setHintOpen: (v: boolean) => void
@@ -29,7 +27,6 @@ interface Props {
   registeredPnrs: Set<string>
   onSelectPnr: (pnr: string) => void
 }
-
 export function DemoRegisterHint({
   hintOpen,
   setHintOpen,
@@ -38,7 +35,6 @@ export function DemoRegisterHint({
   onSelectPnr,
 }: Props) {
   const { t } = useTranslation()
-
   return (
     <Box
       sx={{
@@ -71,7 +67,7 @@ export function DemoRegisterHint({
 
       <Collapse in={hintOpen}>
         <Box sx={{ px: 1.5, pb: 1 }}>
-          <Typography variant="caption" color="text.secondary" display="block" mb={1}>
+          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
             {t('patients.register.demoHintDescription')}
           </Typography>
           <Table size="small">

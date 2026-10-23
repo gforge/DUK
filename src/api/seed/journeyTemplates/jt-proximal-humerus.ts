@@ -134,4 +134,6 @@ export const jtProximalHumerus: JourneyTemplate = {
   ],
   createdAt: iso(daysAgo(60)),
   referenceDateLabel: 'Operationsdatum',
+  anchorEventType: 'SURGERY_COMPLETED',
+  group: 'Frakturer',
 }

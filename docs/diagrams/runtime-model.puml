@@ -17,6 +17,7 @@ hide stereotypes
 
 package "Runtime Core" #E8F5E9 {
   class EpisodeOfCare
+  class Referral <<embedded>>
   class PatientJourney
   class Instruction
   class FormResponse
@@ -28,9 +29,20 @@ package "Research Runtime" #F3E5F5 {
 }
 
 EpisodeOfCare "1" -- "*" PatientJourney
+EpisodeOfCare "1" *-- "0..1" Referral : referral
 PatientJourney "1" -- "*" Instruction
 PatientJourney "1" -- "*" Consent
 PatientJourney "0..1" -- "*" FormResponse
+
+note right of PatientJourney
+  Embedded: modifications[], recurringCompletions[],
+  transition (phase progression), pause fields.
+end note
+
+note right of Referral
+  receivedAt, referrer, reason, diagnoses[]
+  (diagnosisSource UTHOPP | MANUAL)
+end note
 
 note right of JournalDraft
   JournalDraft links to Case via caseId.

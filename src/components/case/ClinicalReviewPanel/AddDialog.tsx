@@ -1,3 +1,5 @@
+import BiotechOutlinedIcon from '@mui/icons-material/BiotechOutlined'
+import ImageOutlinedIcon from '@mui/icons-material/ImageOutlined'
 import {
   Button,
   CircularProgress,
@@ -5,10 +7,9 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
+  ToggleButton,
+  ToggleButtonGroup,
+  Typography,
 } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 
@@ -34,25 +35,37 @@ export function AddReviewDialog({
   const { t } = useTranslation()
 
   return (
-    <Dialog open={open} onClose={onClose}>
-      <DialogTitle>{t('review.addReview')}</DialogTitle>
-      <DialogContent sx={{ minWidth: 400, pt: 2 }}>
-        <FormControl fullWidth>
-          <InputLabel>{t('review.type')}</InputLabel>
-          <Select
-            value={reviewType}
-            label={t('review.type')}
-            onChange={(e) => setReviewType(e.target.value as ReviewType)}
-          >
-            <MenuItem value="LAB">{t('reviewType.LAB')}</MenuItem>
-            <MenuItem value="XRAY">{t('reviewType.XRAY')}</MenuItem>
-          </Select>
-        </FormControl>
+    <Dialog open={open} onClose={onClose} aria-labelledby="add-review-title">
+      <DialogTitle id="add-review-title">{t('review.awaitResultTitle')}</DialogTitle>
+      <DialogContent sx={{ minWidth: 400 }}>
+        <Typography id="add-review-type" sx={{ fontSize: 14, color: 'text.secondary', mb: 1 }}>
+          {t('review.awaitResultLabel')}
+        </Typography>
+        <ToggleButtonGroup
+          value={reviewType}
+          exclusive
+          fullWidth
+          aria-labelledby="add-review-type"
+          onChange={(_, val: ReviewType | null) => val && setReviewType(val)}
+          sx={{ '& .MuiToggleButton-root': { textTransform: 'none', gap: 1, py: 1.25 } }}
+        >
+          <ToggleButton value="LAB" color="primary">
+            <BiotechOutlinedIcon fontSize="small" />
+            {t('reviewType.LAB')}
+          </ToggleButton>
+          <ToggleButton value="XRAY" color="primary">
+            <ImageOutlinedIcon fontSize="small" />
+            {t('reviewType.XRAY')}
+          </ToggleButton>
+        </ToggleButtonGroup>
+        <Typography sx={{ fontSize: 13, color: 'text.secondary', mt: 1.5 }}>
+          {t('review.awaitResultHelp')}
+        </Typography>
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>{t('common.cancel')}</Button>
         <Button onClick={onConfirm} variant="contained" disabled={loading}>
-          {loading ? <CircularProgress size={24} /> : t('common.confirm')}
+          {loading ? <CircularProgress size={24} /> : t('review.awaitResultConfirm')}
         </Button>
       </DialogActions>
     </Dialog>

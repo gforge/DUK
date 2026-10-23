@@ -6,48 +6,60 @@
 
 title Policy Expression Language - Grammar Diagram
 
-class "Expression" as Expression
-class "LogicalOr" as LogicalOr
-class "LogicalAnd" as LogicalAnd
-class "Comparison" as Comparison
-class "Arithmetic" as Arithmetic
-class "Term" as Term
-class "Factor" as Factor
-class "Primary" as Primary
+class "Expression (parseExpr)" as Expression
+class "LogicalAnd (parseAnd)" as LogicalAnd
+class "Comparison (parseComparison)" as Comparison
+class "Term (parseTerm)" as Term
+class "Factor (parseFactor)" as Factor
+class "Unary (parseUnary)" as Unary
+class "Primary (parsePrimary)" as Primary
 
-Expression --> LogicalOr
-LogicalOr --> LogicalAnd
+Expression --> LogicalAnd
 LogicalAnd --> Comparison
-Comparison --> Arithmetic
-Arithmetic --> Term
+Comparison --> Term
 Term --> Factor
-Factor --> Primary
+Factor --> Unary
+Unary --> Primary
+Primary ..> Term : "( term )"
 
-note right of LogicalOr
-  Logical operators (lowest precedence):
-  ||, &&
+note right of Expression
+  Logical OR (lowest precedence):
+  ||
+end note
+
+note right of LogicalAnd
+  Logical AND:
+  &&
 end note
 
 note right of Comparison
-  Comparison operators:
+  Comparison operators (single, not chained):
   == != < <= > >=
+  Operands must be numbers.
 end note
 
-note right of Arithmetic
+note right of Term
   Additive:
   + -
 end note
 
-note right of Term
-  Multiplicative (highest among operators):
-  * /
+note right of Factor
+  Multiplicative:
+  * /   (division by zero -> error)
+end note
+
+note right of Unary
+  Unary minus:
+  -x
 end note
 
 note bottom of Primary
   Primary tokens:
   - Number literals
-  - Identifiers (e.g. score.PNRS, OSS.total)
-  - Parenthesized expressions
+  - Identifiers (e.g. PNRS_2, OSS.total, OSS_week4)
+    unknown identifier -> error (rule does not fire)
+  - Parenthesized arithmetic only (parseTerm);
+    comparisons/logic inside ( ) are rejected
 
   Implemented in:
   src/api/policyParser/tokens.ts

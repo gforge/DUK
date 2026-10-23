@@ -5,35 +5,31 @@ import { useTranslation } from 'react-i18next'
 import * as client from '@/api/client'
 import type { JourneyTemplate } from '@/api/schemas'
 import { useSnack } from '@/store/snackContext'
-
 interface Props {
   parentTemplate: JourneyTemplate
   onClose: () => void
-  onDerived: () => void
+  onDerived: (derived: JourneyTemplate) => void
 }
-
 export default function DeriveDialog({ parentTemplate, onClose, onDerived }: Props) {
   const { t } = useTranslation()
   const { showSnack } = useSnack()
   const [name, setName] = useState(`${parentTemplate.name} ${t('journey.deriveCopy')}`)
   const [saving, setSaving] = useState(false)
-
   const handleSubmit = async () => {
     if (!name.trim()) return
     setSaving(true)
     try {
-      await client.deriveJourneyTemplate(parentTemplate.id, name.trim())
+      const derived = await client.deriveJourneyTemplate(parentTemplate.id, name.trim())
       showSnack(t('journey.editor.templateSaved'), 'success')
-      onDerived()
+      onDerived(derived)
     } catch {
       showSnack(t('common.error'), 'error')
     } finally {
       setSaving(false)
     }
   }
-
   return (
-    <Dialog open onClose={onClose} maxWidth="xs" fullWidth>
+    <Dialog open onClose={onClose} fullWidth sx={{ maxWidth: 'xs' }}>
       <DialogTitle>
         {t('journey.editor.deriveDialogTitle', { name: parentTemplate.name })}
       </DialogTitle>

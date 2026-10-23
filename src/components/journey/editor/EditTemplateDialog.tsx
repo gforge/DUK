@@ -11,15 +11,15 @@ import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import * as client from '@/api/client'
-import type { JourneyTemplate } from '@/api/schemas'
+import type { JourneyTemplate, TransitionTriggerType } from '@/api/schemas'
 import { useSnack } from '@/store/snackContext'
 
+import TriggerEventSelect from '../TriggerEventSelect'
 interface Props {
   template?: JourneyTemplate
   onClose: () => void
-  onSaved: () => void
+  onSaved: (saved: JourneyTemplate) => void
 }
-
 export default function EditTemplateDialog({ template, onClose, onSaved }: Props) {
   const { t } = useTranslation()
   const { showSnack } = useSnack()
@@ -28,43 +28,53 @@ export default function EditTemplateDialog({ template, onClose, onSaved }: Props
   const [referenceDateLabel, setReferenceDateLabel] = useState(
     template?.referenceDateLabel ?? t('journey.referenceDateDefault'),
   )
+  const [anchorEventType, setAnchorEventType] = useState<TransitionTriggerType | ''>(
+    template?.anchorEventType ?? '',
+  )
+  const [group, setGroup] = useState(template?.group ?? '')
+  const [phaseOrder, setPhaseOrder] = useState<number | ''>(template?.phaseOrder ?? '')
   const [saving, setSaving] = useState(false)
-
   const handleSave = async () => {
     if (!name.trim()) return
     setSaving(true)
     try {
-      await client.saveJourneyTemplate(
+      const grouping = {
+        anchorEventType: anchorEventType || undefined,
+        group: group.trim() || undefined,
+        phaseOrder: phaseOrder === '' || phaseOrder < 1 ? undefined : Math.round(phaseOrder),
+      }
+      const saved = await client.saveJourneyTemplate(
         template
           ? {
               ...template,
               name: name.trim(),
               description: description.trim() || undefined,
               referenceDateLabel: referenceDateLabel.trim() || t('journey.referenceDateDefault'),
+              ...grouping,
             }
           : {
               name: name.trim(),
               description: description.trim() || undefined,
               referenceDateLabel: referenceDateLabel.trim() || t('journey.referenceDateDefault'),
               entries: [],
+              ...grouping,
             },
       )
       showSnack(t('journey.editor.templateSaved'), 'success')
-      onSaved()
+      onSaved(saved)
     } catch {
       showSnack(t('common.error'), 'error')
     } finally {
       setSaving(false)
     }
   }
-
   return (
-    <Dialog open onClose={onClose} maxWidth="xs" fullWidth>
+    <Dialog open onClose={onClose} fullWidth sx={{ maxWidth: 'xs' }}>
       <DialogTitle>
         {template ? t('journey.editor.editTemplate') : t('journey.editor.createTemplate')}
       </DialogTitle>
       <DialogContent>
-        <Stack gap={2} sx={{ mt: 1 }}>
+        <Stack sx={{ mt: 1, gap: 2 }}>
           <TextField
             label={t('journey.template.name')}
             value={name}
@@ -91,6 +101,31 @@ export default function EditTemplateDialog({ template, onClose, onSaved }: Props
             fullWidth
             required
             helperText={t('journey.template.referenceDateLabelHint')}
+          />
+          <TriggerEventSelect
+            label={t('journey.template.anchorEventType')}
+            helperText={t('journey.template.anchorEventTypeHint')}
+            value={anchorEventType}
+            onChange={setAnchorEventType}
+            allowEmpty
+          />
+          <TextField
+            label={t('journey.template.group')}
+            value={group}
+            onChange={(e) => setGroup(e.target.value)}
+            size="small"
+            fullWidth
+            helperText={t('journey.template.groupHint')}
+          />
+          <TextField
+            label={t('journey.template.phaseOrder')}
+            type="number"
+            value={phaseOrder}
+            onChange={(e) => setPhaseOrder(e.target.value === '' ? '' : Number(e.target.value))}
+            size="small"
+            fullWidth
+            slotProps={{ htmlInput: { min: 1 } }}
+            helperText={t('journey.template.phaseOrderHint')}
           />
         </Stack>
       </DialogContent>

@@ -3,48 +3,64 @@
 ' Source of truth:
 '   src/api/service/patientJourneys.ts
 '   src/api/service/journeyResolver.ts
+'   src/components/journey/ModifyJourneyDialog.tsx
+'   src/components/case/JourneyTab/useJourneyActions.ts
+'   src/components/case/JourneyTab/CancelJourneyDialog.tsx
 
 title Journey Modifications - Sequence Diagram
 
 actor Clinician
-participant "ModifyJourneyDialog\n(UI)" as UI
+participant "ModifyJourneyDialog /\nCancelJourneyDialog\n(UI)" as UI
+participant "useJourneyActions" as Hook
 participant "client/patientJourneys" as Client
 participant "service/patientJourneys" as Service
-participant "patchStore" as Store
-
-Clinician -> UI : Open modification dialog
+participant "store" as Store
 
 alt ADD_STEP
-  Clinician -> UI : Submit ADD_STEP(reason, entry)
-  UI -> Client : modifyPatientJourney(journeyId, ADD_STEP, payload)
+  Clinician -> UI : "Modify" → Add step tab\n(label, offset, window, questionnaire, reason)
+  UI -> Hook : handleModify(ADD_STEP, payload)
+  Hook -> Client : modifyPatientJourney(journeyId,\n{type: ADD_STEP, entry, reason, addedByUserId})
   Client -> Service : modifyPatientJourney(...)
-  Service -> Store : Append JourneyModification(type=ADD_STEP)\nand add entry to journey modifications/effective plan
-  Store --> Service : updated journey
+  Service -> Store : Append JourneyModification(type=ADD_STEP, entry)
+  Store --> Service : ok
   Service --> Client : updated journey
-  Client --> UI : success
+  Client --> Hook : updated journey
+  Hook -> Hook : snack, refetch journeys + steps
 else REMOVE_STEP
-  Clinician -> UI : Submit REMOVE_STEP(reason, stepId)
-  UI -> Client : modifyPatientJourney(journeyId, REMOVE_STEP, payload)
+  Clinician -> UI : "Modify" → Remove step tab\n(step, reason)
+  UI -> Hook : handleModify(REMOVE_STEP, payload)
+  Hook -> Client : modifyPatientJourney(journeyId,\n{type: REMOVE_STEP, stepId, reason, addedByUserId})
   Client -> Service : modifyPatientJourney(...)
   Service -> Store : Append JourneyModification(type=REMOVE_STEP)
-  Store --> Service : updated journey
+  Store --> Service : ok
   Service --> Client : updated journey
-  Client --> UI : success
+  Client --> Hook : updated journey
+  Hook -> Hook : snack, refetch journeys + steps
 else CANCEL
-  Clinician -> UI : Submit CANCEL(reason)
-  UI -> Client : cancelJourney(journeyId, reason, userId)
+  Clinician -> UI : Actions menu → Cancel journey\n(reason, min 5 chars)
+  UI -> Hook : handleCancel(reason)
+  Hook -> Client : cancelJourney(journeyId, reason, userId)
   Client -> Service : cancelJourney(...)
-  Service -> Store : If data exists: append JourneyModification(type=CANCEL)\nset status COMPLETED; else delete journey
-  Store --> Service : cancel result
-  Service --> Client : cancel result
-  Client --> UI : success
+  alt journey has form responses or recurring completions
+    Service -> Store : Append JourneyModification(type=CANCEL)\nstatus = COMPLETED, pausedAt = null
+    Service --> Client : { deleted: false, journey }
+  else no data
+    Service -> Store : Delete journey
+    Service --> Client : { deleted: true }
+  end
+  Client --> Hook : cancel result
+  Hook -> Hook : snack (archived / deleted),\nrefetch journeys + steps
 end
 
 note right of Service
-  All modification types require
-  a clinician reason and are kept
-  as audit-friendly history in
-  PatientJourney.modifications[].
+  Clinician modifications require a
+  reason and are kept as audit-friendly
+  history in PatientJourney.modifications[]
+  (shown in JourneyModHistory).
+  System REMOVE_STEP entries
+  (addedByUserId = "system") are added at
+  assignment for merged steps
+  (mergedFromJourneyId) and late enrolment.
 end note
 
 @enduml

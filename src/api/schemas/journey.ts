@@ -26,6 +26,8 @@ export type PhaseType = z.infer<typeof PhaseTypeSchema>
  * Why a new phase was started — the clinical event that triggered the transition.
  */
 export const TransitionTriggerTypeSchema = z.enum([
+  /** Injury/fracture — the anchor event for conservatively treated fractures. */
+  'INJURY',
   'REFERRAL_RECEIVED',
   'TRIAGE_DECISION',
   'VISIT_DECISION',
@@ -59,6 +61,25 @@ export type JourneyPhaseTransition = z.infer<typeof JourneyPhaseTransitionSchema
 export const EpisodeOfCareStatusSchema = z.enum(['OPEN', 'COMPLETED', 'DISCHARGED'])
 export type EpisodeOfCareStatus = z.infer<typeof EpisodeOfCareStatusSchema>
 
+/**
+ * Diagnoses are not entered in this app: they are set in the journal system
+ * and passed in when the clinician opens the patient via an "uthopp"
+ * (context launch) from TakeCare.
+ */
+export const DiagnosisSourceSchema = z.enum(['UTHOPP', 'MANUAL'])
+export type DiagnosisSource = z.infer<typeof DiagnosisSourceSchema>
+
+export const ReferralSchema = z.object({
+  receivedAt: z.string().datetime(),
+  /** Referring unit, e.g. "Vårdcentral Täby". */
+  referrer: z.string(),
+  /** Free-text reason for referral as written by the referrer. */
+  reason: z.string(),
+  diagnoses: z.array(z.object({ code: z.string(), text: z.string() })).default([]),
+  diagnosisSource: DiagnosisSourceSchema.optional(),
+})
+export type Referral = z.infer<typeof ReferralSchema>
+
 export const EpisodeOfCareSchema = z.object({
   id: z.string(),
   patientId: z.string(),
@@ -73,6 +94,8 @@ export const EpisodeOfCareSchema = z.object({
   responsibleUserId: z.string().optional(),
   /** The primary triage Case linked to this episode. */
   primaryCaseId: z.string().optional(),
+  /** Incoming referral that opened this episode, if any. */
+  referral: ReferralSchema.optional(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
 })
@@ -199,6 +222,20 @@ export const JourneyTemplateSchema = z.object({
    * Examples: "Operationsdatum", "Skadedatum", "Uppföljningsstart".
    */
   referenceDateLabel: z.string().default('Startdatum'),
+  /**
+   * The clinical event that `referenceDateLabel` refers to, e.g. SURGERY_COMPLETED for
+   * "Operationsdatum" or INJURY for "Skadedatum". Pre-selects the triggering event when
+   * the template is assigned and is recorded as the journey's `transition`.
+   */
+  anchorEventType: TransitionTriggerTypeSchema.optional(),
+  /**
+   * Optional grouping shown in the journey editor, e.g. "Frakturer" or
+   * "Knäartros". Templates in the same group with a phaseOrder form a
+   * multi-phase care pathway (vårdförlopp).
+   */
+  group: z.string().optional(),
+  /** 1-based position of this template within its group's care pathway. */
+  phaseOrder: z.number().int().positive().optional(),
 })
 export type JourneyTemplate = z.infer<typeof JourneyTemplateSchema>
 

@@ -64,6 +64,7 @@ export function deriveJourneyTemplate(parentId: string, newName: string): Journe
     parentTemplateId: parentId,
     derivedAt: now(),
     referenceDateLabel: parent.referenceDateLabel,
+    group: parent.group,
   }
   setStore({ ...state, journeyTemplates: [...state.journeyTemplates, child] })
   return child

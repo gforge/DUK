@@ -42,6 +42,7 @@ Primary journey diagrams:
 5. `docs/diagrams/pause-resume-sequence.svg`
 6. `docs/diagrams/journey-modifications-sequence.svg`
 7. `docs/diagrams/form-submission-flow.svg`
+8. `docs/diagrams/parallel-journey-rendering-sequence.svg`
 
 ### Policy Domain
 
@@ -74,6 +75,12 @@ Reference diagrams:
 3. `docs/diagrams/template-model.svg`
 4. `docs/diagrams/runtime-template-bindings-flow.svg`
 
+### Case Lifecycle Reference
+
+Case status transitions and the service functions that drive them.
+
+1. `docs/diagrams/case-lifecycle.svg`
+
 ### Consent Reference
 
 Consent behavior is modeled separately from overview diagrams.
@@ -99,16 +106,26 @@ Core source-of-truth files:
 - `src/api/schemas/case.ts`
 - `src/api/schemas/journey.ts`
 - `src/api/schemas/forms.ts`
+- `src/api/schemas/team.ts`
+- `src/api/service/cases.ts`
+- `src/api/service/teams.ts`
+- `src/api/service/colleagueReviews.ts`
+- `src/api/service/episodes.ts`
 - `src/api/service/patientJourneys.ts`
 - `src/api/service/journeyResolver.ts`
 - `src/api/service/policy.ts`
 - `src/api/service/researchConsents.ts`
 - `src/api/journalRenderer.ts`
 - `src/api/policyParser/parser.ts`
+- `src/api/storage.ts`, `src/api/bootstrap.ts`, `src/api/migrations.ts`, `src/api/schemaVersion.ts`
+- `src/auth/` (replaceable auth adapter; `fakeAuthProvider` in the demo)
 
 ## Glossary
 
 - `PAL`: responsible physician ownership assignment, not a standalone role enum.
+- `Assignment mode`: who gets a triaged task — `ANY` (role pool), `PAL`, `NAMED` (one or more people) or `TEAM` (a `CareTeam`'s shared queue).
+- `Colleague review`: advisory second opinion on a case from a named colleague; never blocks triage.
+- `Uthopp`: context launch from the journal system (TakeCare) that supplies referral diagnoses; simulated in the demo.
 - `EpisodeOfCare`: container for journey phases for one clinical problem.
 - `PatientJourney`: one phase/program within an episode.
 - `Effective step`: computed follow-up step output from resolver logic.

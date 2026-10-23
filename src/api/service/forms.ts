@@ -41,6 +41,10 @@ export function submitFormResponse(
   if (answers['INF_WOUND'] === true || answers['INF_FEVER'] === true)
     triggers.push('INFECTION_SUSPECTED')
   if (scores['OSS.total'] && scores['OSS.total'] < 30) triggers.push('LOW_FUNCTION')
+  if (scores['OKS.total'] && scores['OKS.total'] < 28) triggers.push('LOW_FUNCTION')
+  if (scores['OHS.total'] && scores['OHS.total'] < 28) triggers.push('LOW_FUNCTION')
+  if (scores['PRWE.total'] && scores['PRWE.total'] > 55) triggers.push('LOW_FUNCTION')
+  if (scores['MOXFQ.total'] && scores['MOXFQ.total'] > 55) triggers.push('LOW_FUNCTION')
   if (scores['EQ5D.index'] && scores['EQ5D.index'] < 0.5) triggers.push('LOW_QOL')
 
   const response: FormResponse = {
@@ -65,6 +69,8 @@ export function submitFormResponse(
     policyWarnings: warnings,
     lastActivityAt: now(),
     status: existingCase.status === 'NEW' ? 'NEEDS_REVIEW' : existingCase.status,
+    // First patient signal puts the case in the review queue: "Väntat" counts from here.
+    scheduledAt: existingCase.status === 'NEW' ? now() : existingCase.scheduledAt,
   }
 
   // If linked to a recurring step, record the completion so the next occurrence
@@ -124,6 +130,7 @@ export function seekContact(patientId: string, caseId: string): Case {
     triggers: [...new Set([...existing.triggers, 'SEEK_CONTACT' as TriggerType])],
     lastActivityAt: now(),
     status: existing.status === 'NEW' ? 'NEEDS_REVIEW' : existing.status,
+    scheduledAt: existing.status === 'NEW' ? now() : existing.scheduledAt,
   }
   state = { ...state, cases: state.cases.map((c) => (c.id === caseId ? updated : c)) }
   state = addAuditEvent(state, caseId, patientId, 'PATIENT', 'SEEK_CONTACT', {})

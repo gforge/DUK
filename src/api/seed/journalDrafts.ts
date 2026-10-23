@@ -25,7 +25,7 @@ Förnyad sårinspektion rekommenderas. Ytlig sårinfektion kan ej uteslutas. Öv
     createdAt: iso(daysAgo(1)),
     updatedAt: iso(daysAgo(1)),
   },
-  // Bert Borg — case-14 — distal radius, OSS deterioration V4→V8
+  // Bert Borg — case-14 — distal radius, PRWE-short deterioration V4→V8
   {
     id: 'jd-2',
     caseId: 'case-14',
@@ -39,9 +39,9 @@ Förnyad sårinspektion rekommenderas. Ytlig sårinfektion kan ej uteslutas. Öv
 - Smärta (NRS, vila): 6/10
 - Smärta (NRS, natt): –
 
-### OSS-utveckling
-- Vecka 4: 36/48
-- Vecka 8: 20/48
+### PRWE-short-utveckling
+- Vecka 4: 40/100
+- Vecka 8: 70/100
 - Trend: försämras
 
 ### Klinisk bedömning

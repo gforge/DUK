@@ -140,3 +140,13 @@ vite.config.ts.timestamp-*
 
 # I18next old
 src/i18n/locales/*_old.json
+
+# design-sync
+.ds-sync/
+ds-bundle/
+.design-sync/.cache/
+.design-sync/learnings/
+.design-sync/node_modules
+
+other/
+other/**/*

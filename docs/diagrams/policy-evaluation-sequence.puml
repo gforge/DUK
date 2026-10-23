@@ -1,29 +1,45 @@
 @startuml
 ' Purpose: Case triage policy evaluation sequence
 ' Source of truth:
+'   src/api/service/forms.ts
 '   src/api/service/policy.ts
 '   src/api/service/journeyResolver.ts
+'   src/api/service/utils.ts
 '   src/api/policyParser/parser.ts
 
 title Case Triage - Policy Evaluation Sequence Diagram
 
-actor Clinician
-participant "UI" as UI
+actor Patient
+participant "UI\n(PatientQuestionnaireForm)" as UI
 participant "Client" as Client
-participant "Service" as Service
+participant "Service\n(forms.ts)" as Service
 participant "JourneyResolver" as JR
+participant "evaluatePolicyRules\n(utils.ts)" as Eval
 participant "PolicyParser" as PP
 
-Clinician -> UI : submit triage form
-UI -> Client : triageCase(request)
-Client -> Service : triageCase
-Service -> Service : gather latest FormResponses
-Service -> JR : buildPolicyScopeWithAliases(responses)
-JR -> PP : evaluateExpression(rule, scope)
-PP --> JR : evaluation result
-JR --> Service : PolicyWarning[]
-Service -> Client : updated Case with policyWarnings
-Service -> Service : addAuditEvent
+Patient -> UI : submit questionnaire
+UI -> Client : submitFormResponse(...)
+Client -> Service : submitFormResponse
+Service -> Service : computeScores(template, answers)
+Service -> JR : buildPolicyScopeWithAliases(earlier responses, patientId)
+JR --> Service : scope (raw keys + aliases)
+Service -> Service : overlay submitted answers + scores
+Service -> Eval : evaluatePolicyRules(rules, scope)
+loop each enabled PolicyRule
+  Eval -> PP : evaluateExpression(rule.expression, scope)
+  PP --> Eval : { ok, result, resolvedVars } | { ok: false }
+end
+Eval --> Service : PolicyWarning[] (result === true only)
+Service -> Service : save FormResponse,\nreplace Case.policyWarnings,\nadd triggers, NEW -> NEEDS_REVIEW
+Service --> Client : FormResponse
+
+note right of Eval
+  submitFormResponse evaluates enabled rules
+  from all journey templates.
+  reEvaluatePolicyForCase(caseId) instead filters
+  to the active journey's journeyTemplateId
+  (client API only, not called from UI).
+end note
 
 note right of PP: src/api/policyParser/*
 

@@ -3,7 +3,11 @@ import { describe, expect, it } from 'vitest'
 
 import type { Case } from '@/api/schemas'
 import { SEED_STATE } from '@/api/seed'
-import { resolveCaseCareRole, useWorklistQueue } from '@/hooks/useWorklistQueue'
+import {
+  COMPLETED_WINDOW_DAYS,
+  resolveCaseCareRole,
+  useWorklistQueue,
+} from '@/hooks/useWorklistQueue'
 
 describe('worklist queue role filtering', () => {
   it('resolves care role from nextStep when triage decision is missing', () => {
@@ -52,8 +56,8 @@ describe('worklist queue role filtering', () => {
         filters: {
           categoryFilter: 'ALL',
           careRoleFilter: 'NURSE',
-          palOnly: false,
-          claimedByMe: false,
+          recipientFilter: 'ALL',
+          assignedToMe: false,
           myPatientsOnly: false,
         },
       }),
@@ -121,8 +125,8 @@ describe('worklist queue role filtering', () => {
         filters: {
           categoryFilter: 'ALL',
           careRoleFilter: 'ALL',
-          palOnly: false,
-          claimedByMe: false,
+          recipientFilter: 'ALL',
+          assignedToMe: false,
           myPatientsOnly: false,
         },
       }),
@@ -139,5 +143,101 @@ describe('worklist queue role filtering', () => {
     expect(
       result.current.monitoringGroupedCases.some((g) => g.cases.some((c) => c.id === others.id)),
     ).toBe(true)
+  })
+
+  it('treats team and multi-person assignments naming me as mine', () => {
+    const base = SEED_STATE.cases[0]
+    const make = (
+      id: string,
+      triageDecision: Partial<NonNullable<Case['triageDecision']>>,
+    ): Case => ({
+      ...base,
+      id,
+      status: 'TRIAGED',
+      nextStep: 'NURSE_VISIT',
+      assignedUserId: undefined,
+      triageDecision: {
+        contactMode: 'VISIT',
+        careRole: 'NURSE',
+        assignmentMode: 'NAMED',
+        assignedUserId: null,
+        dueAt: null,
+        note: null,
+        ...triageDecision,
+      },
+    })
+    const myTeam = make('team-mine', { assignmentMode: 'TEAM', assignedTeamIds: ['team-a'] })
+    const otherTeam = make('team-other', { assignmentMode: 'TEAM', assignedTeamIds: ['team-b'] })
+    const namedWithMe = make('named-with-me', { assignedUserIds: ['user-nurse-1', 'user-nurse-2'] })
+    const namedWithoutMe = make('named-without-me', {
+      assignedUserIds: ['user-nurse-2', 'user-doc-1'],
+    })
+    const teams = [
+      { id: 'team-a', name: 'Höft', memberUserIds: ['user-nurse-1'] },
+      { id: 'team-b', name: 'Trauma', memberUserIds: ['user-nurse-2'] },
+    ]
+    const baseFilters = {
+      categoryFilter: 'ALL',
+      careRoleFilter: 'ALL',
+      recipientFilter: 'ALL',
+      assignedToMe: false,
+      myPatientsOnly: false,
+    } as const
+
+    const { result } = renderHook(() =>
+      useWorklistQueue({
+        cases: [myTeam, otherTeam, namedWithMe, namedWithoutMe],
+        patients: SEED_STATE.patients,
+        teams,
+        currentUserId: 'user-nurse-1',
+        filters: baseFilters,
+      }),
+    )
+    const ids = (groups: typeof result.current.activeGroupedCases) =>
+      groups.flatMap((g) => g.cases.map((c) => c.id)).sort()
+    expect(ids(result.current.activeGroupedCases)).toEqual(['named-with-me', 'team-mine'])
+    expect(ids(result.current.monitoringGroupedCases)).toEqual(['named-without-me', 'team-other'])
+
+    const { result: mineOnly } = renderHook(() =>
+      useWorklistQueue({
+        cases: [myTeam, otherTeam, namedWithMe, namedWithoutMe],
+        patients: SEED_STATE.patients,
+        teams,
+        currentUserId: 'user-nurse-1',
+        filters: { ...baseFilters, assignedToMe: true },
+      }),
+    )
+    expect(mineOnly.current.activeCount).toBe(2)
+    expect(mineOnly.current.monitoringCount).toBe(0)
+  })
+
+  it('only lists cases completed within the completed window', () => {
+    const base = SEED_STATE.cases[0]
+    const daysAgo = (n: number) => new Date(Date.now() - n * 86_400_000).toISOString()
+    const closed = (id: string, closedAt: string): Case => ({
+      ...base,
+      id,
+      status: 'CLOSED',
+      nextStep: 'PHONE_CALL',
+      triageDecision: undefined,
+      closedAt,
+      lastActivityAt: closedAt,
+    })
+    const { result } = renderHook(() =>
+      useWorklistQueue({
+        cases: [closed('recent', daysAgo(3)), closed('old', daysAgo(COMPLETED_WINDOW_DAYS + 5))],
+        patients: SEED_STATE.patients,
+        currentUserId: 'user-nurse-1',
+        filters: {
+          categoryFilter: 'ALL',
+          careRoleFilter: 'ALL',
+          recipientFilter: 'ALL',
+          assignedToMe: false,
+          myPatientsOnly: false,
+        },
+      }),
+    )
+    expect(result.current.completedCount).toBe(1)
+    expect(result.current.completedGroupedCases[0].cases[0].id).toBe('recent')
   })
 })

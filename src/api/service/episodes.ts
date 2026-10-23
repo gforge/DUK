@@ -1,6 +1,6 @@
-import type { EpisodeOfCare } from '../schemas'
+import type { DiagnosisSource, EpisodeOfCare, Referral, Role } from '../schemas'
 import { getStore, patchStore } from '../storage'
-import { now, uuid } from './utils'
+import { addAuditEvent, now, uuid } from './utils'
 
 export function getEpisodesOfCare(patientId?: string): EpisodeOfCare[] {
   const episodes = getStore().episodesOfCare ?? []
@@ -85,6 +85,43 @@ export function updateEpisodeResponsibleUser(
     ...s,
     episodesOfCare: (s.episodesOfCare ?? []).map((e) => (e.id === episodeId ? updated : e)),
   }))
+
+  return updated
+}
+
+/**
+ * Sets the referral diagnoses on an episode. In production these arrive via an
+ * "uthopp" (context launch) from TakeCare; the demo simulates that launch.
+ */
+export function setReferralDiagnoses(
+  episodeId: string,
+  diagnoses: Referral['diagnoses'],
+  source: DiagnosisSource,
+  userId: string,
+  userRole: Role,
+): EpisodeOfCare {
+  const state = getStore()
+  const episode = state.episodesOfCare?.find((e) => e.id === episodeId)
+  if (!episode) throw new Error(`Episode ${episodeId} not found`)
+  if (!episode.referral) throw new Error(`Episode ${episodeId} has no referral`)
+
+  const updated: EpisodeOfCare = {
+    ...episode,
+    referral: { ...episode.referral, diagnoses, diagnosisSource: source },
+    updatedAt: now(),
+  }
+
+  patchStore((s) => {
+    const next = {
+      ...s,
+      episodesOfCare: (s.episodesOfCare ?? []).map((e) => (e.id === episodeId ? updated : e)),
+    }
+    if (!episode.primaryCaseId) return next
+    return addAuditEvent(next, episode.primaryCaseId, userId, userRole, 'REFERRAL_DIAGNOSES_SET', {
+      codes: diagnoses.map((d) => d.code),
+      source,
+    })
+  })
 
   return updated
 }

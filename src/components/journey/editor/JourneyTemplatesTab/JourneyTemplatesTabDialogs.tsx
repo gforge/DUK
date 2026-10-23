@@ -13,6 +13,7 @@ export function JourneyTemplatesTabDialogs({
   setSyncTarget,
   setEditTarget,
   onRefresh,
+  onCreated,
 }: {
   deriveTarget: JourneyTemplate | null
   syncTarget: JourneyTemplate | null
@@ -21,6 +22,8 @@ export function JourneyTemplatesTabDialogs({
   setSyncTarget: React.Dispatch<React.SetStateAction<JourneyTemplate | null>>
   setEditTarget: React.Dispatch<React.SetStateAction<JourneyTemplate | null | undefined>>
   onRefresh?: () => void
+  /** Called with a newly created or derived template so it can be selected. */
+  onCreated?: (template: JourneyTemplate) => void
 }) {
   return (
     <>
@@ -28,9 +31,10 @@ export function JourneyTemplatesTabDialogs({
         <DeriveDialog
           parentTemplate={deriveTarget}
           onClose={() => setDeriveTarget(null)}
-          onDerived={() => {
+          onDerived={(derived) => {
             setDeriveTarget(null)
             onRefresh?.()
+            onCreated?.(derived)
           }}
         />
       )}
@@ -48,9 +52,11 @@ export function JourneyTemplatesTabDialogs({
         <EditTemplateDialog
           template={editTarget ?? undefined}
           onClose={() => setEditTarget(null)}
-          onSaved={() => {
+          onSaved={(saved) => {
+            const isNew = editTarget === undefined
             setEditTarget(null)
             onRefresh?.()
+            if (isNew) onCreated?.(saved)
           }}
         />
       )}

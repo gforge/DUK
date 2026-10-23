@@ -1,17 +1,11 @@
 import AddIcon from '@mui/icons-material/Add'
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlineOutlined'
+import MergeTypeIcon from '@mui/icons-material/MergeType'
 import {
-  Alert,
   Autocomplete,
   Box,
-  Chip,
+  ButtonBase,
   IconButton,
-  Stack,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
   TextField,
   Tooltip,
   Typography,
@@ -20,6 +14,7 @@ import React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import type { QuestionnaireTemplate } from '@/api/schemas'
+import { tokens } from '@/theme'
 
 export interface AliasRow {
   _id: string
@@ -36,114 +31,133 @@ interface Props {
   onDelete: (id: string) => void
 }
 
+const MONO = 'ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace'
+const GRID = { display: 'grid', gridTemplateColumns: '1fr 1fr 1.3fr 32px', gap: 1 } as const
+const chipSx = {
+  font: 'inherit',
+  fontSize: 12,
+  fontFamily: MONO,
+  px: 1,
+  py: '3px',
+  borderRadius: '12px',
+  border: `1px dashed ${tokens.textMuted}`,
+  bgcolor: 'background.paper',
+  color: tokens.text2,
+  '&:hover': { borderColor: tokens.primary, color: tokens.primary },
+  '&:focus-visible': { outline: `2px solid ${tokens.primary}`, outlineOffset: 1 },
+} as const
+
+/** Score alias table for a journey step: metric → alias (+ display name). */
 export function ScoreAliasEditor({ selectedQT, aliasRows, onAdd, onUpdate, onDelete }: Props) {
   const { t } = useTranslation()
+  const metrics = selectedQT?.scoringRules.map((r) => r.outputKey) ?? []
+  const suggestions = metrics.filter((m) => !aliasRows.some((row) => row.raw === m))
 
   return (
-    <Box>
-      <Stack direction="row" alignItems="center" justifyContent="space-between" mb={0.5}>
-        <Typography variant="overline" color="text.secondary">
-          {t('journey.scoreAliases')}
-        </Typography>
-        <Tooltip title={t('journey.entry.addAlias')}>
-          <IconButton size="small" onClick={() => onAdd()}>
-            <AddIcon fontSize="small" />
-          </IconButton>
-        </Tooltip>
-      </Stack>
-      <Alert severity="info" sx={{ mb: 1.5, py: 0.5 }}>
-        <Typography variant="caption">{t('journey.entry.aliasHelp')}</Typography>
-      </Alert>
-      {aliasRows.length === 0 ? (
-        <Typography variant="caption" color="text.secondary">
-          {t('journey.entry.noAliases')}
-        </Typography>
-      ) : (
-        <Table size="small">
-          <TableHead>
-            <TableRow>
-              <TableCell>{t('journey.entry.scoreAliasRaw')}</TableCell>
-              <TableCell>{t('journey.entry.scoreAliasAlias')}</TableCell>
-              <TableCell>{t('journey.entry.scoreAliasLabel')}</TableCell>
-              <TableCell sx={{ width: 40 }} />
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {aliasRows.map((row) => (
-              <TableRow key={row._id}>
-                <TableCell>
-                  <Autocomplete
-                    freeSolo
-                    options={
-                      selectedQT?.scoringRules.map((r: { outputKey: string }) => r.outputKey) ?? []
-                    }
-                    value={row.raw}
-                    onInputChange={(_, v) => onUpdate(row._id, 'raw', v)}
-                    size="small"
-                    renderOption={(props, option) => (
-                      <li {...props}>
-                        <Chip label={option} size="small" />
-                      </li>
-                    )}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        size="small"
-                        variant="standard"
-                        sx={{ minWidth: 120 }}
-                      />
-                    )}
-                  />
-                </TableCell>
-                <TableCell>
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.25 }}>
+      <Typography
+        component="h3"
+        sx={{
+          m: 0,
+          fontSize: 14,
+          fontWeight: 700,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 0.75,
+        }}
+      >
+        <MergeTypeIcon sx={{ fontSize: 18, color: tokens.textSecondary }} />
+        {t('journey.editor.stepDrawer.scoreAliases')}
+      </Typography>
+      <Typography sx={{ m: 0, fontSize: 13, color: tokens.textSecondary, lineHeight: 1.5 }}>
+        {t('journey.editor.stepDrawer.aliasHelp')}
+      </Typography>
+
+      {aliasRows.length > 0 && (
+        <>
+          <Box sx={{ ...GRID, fontSize: 12, fontWeight: 600, color: tokens.textSecondary }}>
+            <span>{t('journey.editor.stepDrawer.aliasMetric')}</span>
+            <span>{t('journey.editor.stepDrawer.aliasName')}</span>
+            <span>{t('journey.editor.stepDrawer.aliasLabel')}</span>
+            <span />
+          </Box>
+          {aliasRows.map((row) => (
+            <Box key={row._id} sx={{ ...GRID, alignItems: 'center' }}>
+              <Autocomplete
+                freeSolo
+                disableClearable
+                options={metrics}
+                value={row.raw}
+                onInputChange={(_, v) => onUpdate(row._id, 'raw', v)}
+                size="small"
+                renderInput={(params) => (
                   <TextField
-                    value={row.alias}
-                    onChange={(e) => onUpdate(row._id, 'alias', e.target.value)}
+                    {...params}
                     size="small"
+                    slotProps={{
+                      ...params.slotProps,
+                      htmlInput: {
+                        ...params.slotProps.htmlInput,
+                        'aria-label': t('journey.editor.stepDrawer.aliasMetric'),
+                      },
+                    }}
+                    sx={{
+                      '& .MuiOutlinedInput-root': { bgcolor: tokens.greyFill },
+                      '& input': { fontFamily: MONO, fontSize: 12 },
+                    }}
                   />
-                </TableCell>
-                <TableCell>
-                  <TextField
-                    value={row.label}
-                    onChange={(e) => onUpdate(row._id, 'label', e.target.value)}
-                    size="small"
-                  />
-                </TableCell>
-                <TableCell>
-                  <IconButton size="small" onClick={() => onDelete(row._id)}>
-                    <DeleteOutlineIcon fontSize="small" />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      )}
-      {selectedQT && selectedQT.scoringRules.length > 0 && (
-        <Box sx={{ mt: 1 }}>
-          <Typography variant="caption" color="text.secondary" sx={{ mb: 0.5, display: 'block' }}>
-            {t('journey.entry.tapRuleToAdd' as any)}
-          </Typography>
-          <Stack direction="row" gap={0.5} flexWrap="wrap">
-            {selectedQT.scoringRules.map((r: { outputKey: string }) => (
-              <Tooltip key={r.outputKey} title={r.outputKey}>
-                <Chip
-                  label={r.outputKey}
+                )}
+              />
+              <TextField
+                value={row.alias}
+                onChange={(e) => onUpdate(row._id, 'alias', e.target.value)}
+                size="small"
+                slotProps={{
+                  htmlInput: { 'aria-label': t('journey.editor.stepDrawer.aliasName') },
+                }}
+                sx={{ '& input': { fontFamily: MONO, fontSize: 12 } }}
+              />
+              <TextField
+                value={row.label}
+                onChange={(e) => onUpdate(row._id, 'label', e.target.value)}
+                size="small"
+                slotProps={{
+                  htmlInput: { 'aria-label': t('journey.editor.stepDrawer.aliasLabel') },
+                }}
+                sx={{ '& input': { fontSize: 13 } }}
+              />
+              <Tooltip title={t('journey.editor.stepDrawer.removeAlias')}>
+                <IconButton
                   size="small"
-                  color="primary"
-                  variant="outlined"
-                  clickable
-                  onClick={() => {
-                    const alreadyExists = aliasRows.some((row) => row.raw === r.outputKey)
-                    if (!alreadyExists) onAdd(r.outputKey)
-                  }}
-                  sx={{ fontSize: 10, height: 20 }}
-                />
+                  onClick={() => onDelete(row._id)}
+                  aria-label={t('journey.editor.stepDrawer.removeAlias')}
+                  sx={{ color: tokens.textSecondary, borderRadius: 1.5 }}
+                >
+                  <DeleteOutlineIcon sx={{ fontSize: 18 }} />
+                </IconButton>
               </Tooltip>
-            ))}
-          </Stack>
-        </Box>
+            </Box>
+          ))}
+        </>
       )}
+
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap', fontSize: 13 }}>
+        <Box component="span" sx={{ color: tokens.textSecondary }}>
+          {t('journey.editor.stepDrawer.addLabel')}
+        </Box>
+        {suggestions.map((m) => (
+          <ButtonBase key={m} onClick={() => onAdd(m)} sx={chipSx}>
+            + {m}
+          </ButtonBase>
+        ))}
+        {/* Without unused metrics, add a blank row for a free-text metric */}
+        {suggestions.length === 0 && (
+          <ButtonBase onClick={() => onAdd()} sx={{ ...chipSx, fontFamily: 'inherit', gap: 0.25 }}>
+            <AddIcon sx={{ fontSize: 14 }} />
+            {t('journey.editor.stepDrawer.addAlias')}
+          </ButtonBase>
+        )}
+      </Box>
     </Box>
   )
 }

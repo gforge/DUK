@@ -30,23 +30,35 @@ export function getCase(id: string): Case | undefined {
 
 export function getCasesForDashboard(): CaseWithActiveCategory[] {
   const state = getStore()
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
-  const todayMs = today.getTime()
+  // Journey startDate is a YYYY-MM-DD (UTC midnight), so compare against today's
+  // calendar date at UTC midnight — not local midnight — to keep whole-day arithmetic exact.
+  const now = new Date()
+  const todayMs = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate())
   const priority: Record<CaseCategory, number> = { ACUTE: 0, SUBACUTE: 1, CONTROL: 2 }
+  const byNewest = (a: { createdAt: string }, b: { createdAt: string }) =>
+    new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
 
   return state.cases.map((c) => {
-    const journey = state.patientJourneys
-      .filter((j) => j.patientId === c.patientId && j.status === 'ACTIVE')
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0]
+    // Prefer the active journey of the case's own episode (a patient may have several
+    // concurrent episodes, e.g. a 1-year control and a new fracture); fall back to the
+    // patient's newest active journey for legacy cases without an episode.
+    const active = state.patientJourneys.filter(
+      (j) => j.patientId === c.patientId && j.status === 'ACTIVE',
+    )
+    const journey =
+      (c.episodeId
+        ? active.filter((j) => j.episodeId === c.episodeId).sort(byNewest)[0]
+        : undefined) ?? active.sort(byNewest)[0]
 
     if (!journey) return { ...c, activeCategory: c.category }
 
-    const startMs = new Date(journey.startDate).getTime()
     let best: CaseCategory | null = null
     for (const step of getEffectiveSteps(journey.id)) {
-      const windowStart = startMs + (step.offsetDays - step.windowDays) * 86_400_000
-      const windowEnd = startMs + (step.offsetDays + step.windowDays) * 86_400_000
+      // scheduledDate already includes pause shifts and, for recurring steps,
+      // the occurrence's own date (offsetDays is the base entry's offset).
+      const stepMs = new Date(step.scheduledDate).getTime()
+      const windowStart = stepMs - step.windowDays * 86_400_000
+      const windowEnd = stepMs + step.windowDays * 86_400_000
       if (todayMs >= windowStart && todayMs <= windowEnd) {
         const cat = step.dashboardCategory ?? c.category
         if (best === null || priority[cat] < priority[best]) best = cat
@@ -90,7 +102,14 @@ export function triageCase(
   const dueAt = normalizeIsoDateTime(rawDueAt) ?? null
 
   const deadline: string | undefined = dueAt ?? undefined
-  const assignedUserId = input.triageDecision.assignedUserId ?? input.assignedUserId
+  // A single named person owns the task directly; several people or a team leave it claimable.
+  const namedIds = input.triageDecision.assignedUserIds ?? []
+  const assignedUserId =
+    input.triageDecision.assignedUserId ??
+    input.assignedUserId ??
+    (input.triageDecision.assignmentMode === 'NAMED' && namedIds.length === 1
+      ? namedIds[0]
+      : undefined)
 
   const updated: Case = {
     ...existing,
@@ -113,6 +132,8 @@ export function triageCase(
     contactMode: input.triageDecision.contactMode,
     careRole: input.triageDecision.careRole,
     assignmentMode: input.triageDecision.assignmentMode,
+    assignedUserIds: input.triageDecision.assignedUserIds,
+    assignedTeamIds: input.triageDecision.assignedTeamIds,
     nextStep: derivedNextStep,
     deadline,
     internalNote: note,

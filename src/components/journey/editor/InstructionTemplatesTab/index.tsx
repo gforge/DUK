@@ -1,5 +1,5 @@
 import AddIcon from '@mui/icons-material/Add'
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlineOutlined'
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined'
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
@@ -26,14 +26,12 @@ import { useTranslation } from 'react-i18next'
 import ReactMarkdown from 'react-markdown'
 
 import type { InstructionTemplate } from '@/api/schemas'
-
 interface Props {
   instructionTemplates: InstructionTemplate[] | null
   loading: boolean
   onDelete: (id: string, name: string) => void
   onSave: (data: { id?: string; name: string; content: string; tags: string[] }) => void
 }
-
 function EditInstructionDialog({
   open,
   onClose,
@@ -50,7 +48,6 @@ function EditInstructionDialog({
   const [content, setContent] = useState(initial?.content ?? '')
   const [tagsStr, setTagsStr] = useState(initial?.tags?.join(', ') ?? '')
   const [error, setError] = useState<string | null>(null)
-
   const handleSubmit = () => {
     if (!name.trim() || !content.trim()) {
       setError(t('journey.modify.requiredFields'))
@@ -63,9 +60,8 @@ function EditInstructionDialog({
     onSave({ id: initial?.id, name: name.trim(), content: content.trim(), tags })
     onClose()
   }
-
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog open={open} onClose={onClose} fullWidth sx={{ maxWidth: 'sm' }}>
       <DialogTitle>{initial ? t('common.edit') : t('journey.editor.tabInstructions')}</DialogTitle>
       <DialogContent>
         {error && (
@@ -73,7 +69,7 @@ function EditInstructionDialog({
             {error}
           </Typography>
         )}
-        <Stack gap={2} sx={{ mt: 1 }}>
+        <Stack sx={{ mt: 1, gap: 2 }}>
           <TextField
             label={t('policy.name')}
             value={name}
@@ -113,7 +109,6 @@ function EditInstructionDialog({
     </Dialog>
   )
 }
-
 export function InstructionTemplatesTab({
   instructionTemplates,
   loading,
@@ -123,22 +118,18 @@ export function InstructionTemplatesTab({
   const { t } = useTranslation()
   const [editDialogOpen, setEditDialogOpen] = useState(false)
   const [editTarget, setEditTarget] = useState<InstructionTemplate | undefined>(undefined)
-
-  if (loading) return <Skeleton variant="rectangular" height={200} sx={{ borderRadius: 1 }} />
-
+  if (loading) return <Skeleton variant="rectangular" sx={{ borderRadius: 1, height: 200 }} />
   const handleEdit = (it: InstructionTemplate) => {
     setEditTarget(it)
     setEditDialogOpen(true)
   }
-
   const handleCreate = () => {
     setEditTarget(undefined)
     setEditDialogOpen(true)
   }
-
   return (
     <Box>
-      <Stack direction="row" justifyContent="flex-end" sx={{ mb: 1.5 }}>
+      <Stack direction="row" sx={{ mb: 1.5, justifyContent: 'flex-end' }}>
         <Button size="small" variant="outlined" startIcon={<AddIcon />} onClick={handleCreate}>
           {t('journey.editor.addInstruction')}
         </Button>
@@ -147,18 +138,18 @@ export function InstructionTemplatesTab({
       {!instructionTemplates?.length ? (
         <Typography color="text.secondary">{t('journey.editor.noInstructions')}</Typography>
       ) : (
-        <Stack gap={1.5}>
+        <Stack sx={{ gap: 1.5 }}>
           {instructionTemplates.map((it) => (
             <Accordion key={it.id} variant="outlined" sx={{ borderRadius: '8px !important' }}>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Stack direction="row" alignItems="center" gap={1.5} sx={{ flex: 1, pr: 1 }}>
+                <Stack direction="row" sx={{ flex: 1, pr: 1, alignItems: 'center', gap: 1.5 }}>
                   <DescriptionOutlinedIcon color="primary" fontSize="small" />
                   <Box sx={{ flex: 1 }}>
-                    <Typography variant="subtitle2" fontWeight={700}>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
                       {it.name}
                     </Typography>
                     {it.tags.length > 0 && (
-                      <Stack direction="row" gap={0.5} mt={0.25}>
+                      <Stack direction="row" sx={{ gap: 0.5, mt: 0.25 }}>
                         {it.tags.map((tag) => (
                           <Chip
                             key={tag}

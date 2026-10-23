@@ -2,28 +2,50 @@
 ' Purpose: Parallel journey due-step deduplication
 ' Source of truth:
 '   src/api/service/journeyResolver.ts
+'   src/api/service/journeyConflicts.ts
+'   src/api/service/patientJourneys.ts
 
 title Parallel Journeys - Due-Step Deduplication Activity Diagram
 
 start
-:Load ACTIVE/SUSPENDED journeys for patient;
-:For each journey -> getEffectiveSteps(journeyId);
-:Filter steps due for selected date;
-:Collect all due steps across journeys;
+partition "At assignment (AssignJourneyDialog)" {
+  :detectJourneyConflicts(patientId, templateId, startDate);
+  :Resolve new template steps
+  (getEffectiveStepsForTemplate);
+  :Match against steps of existing
+  ACTIVE/SUSPENDED journeys
+  (same templateId, overlapping windows);
+  if (clinician merges conflicting steps?) then (yes)
+    :assignPatientJourney(..., mergedStepIds);
+    :Store REMOVE_STEP modifications
+    with mergedFromJourneyId;
+  else (no)
+    :assignPatientJourney without merges;
+  endif
+}
 
-if (same templateId appears more than once?) then (yes)
-  :Keep first occurrence;
-  :Drop duplicate occurrences;
-else (no)
-  :Keep all due steps;
-endif
-
-:Return MergedDueStep[];
-:Render questionnaire list once per templateId;
+partition "At runtime (PatientDueForms)" {
+  :Load ACTIVE/SUSPENDED journeys for patient;
+  :For each journey -> getEffectiveSteps(journeyId);
+  :Keep steps with templateId whose window
+  (scheduledDate ± windowDays) contains date;
+  :Skip steps already submitted
+  (patientJourneyId + base entry id
+  + occurrenceIndex);
+  if (templateId already collected?) then (yes)
+    :Keep first step;
+    :Append journey id to journeyIds;
+  else (no)
+    :Add step with journeyIds = [journeyId];
+  endif
+  :Return MergedDueStep[]
+  sorted by scheduledDate, order;
+  :Render questionnaire list once per templateId;
+}
 stop
 
 note right
-  Implemented by:
+  Runtime merge implemented by:
   getMergedDueStepsForPatient(patientId, date)
   in src/api/service/journeyResolver.ts
 end note

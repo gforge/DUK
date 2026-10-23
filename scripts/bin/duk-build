@@ -1,0 +1,48 @@
+#!/bin/bash
+set -e
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Kept for backward compatibility: publishing lives in duk-publish
+if [ "${1:-}" = "deploy" ]; then
+  shift
+  exec "$SCRIPT_DIR/duk-publish" "$@"
+fi
+
+source "$SCRIPT_DIR/../utils/common.sh"
+
+show_help() {
+  echo "Usage: duk-build [check]"
+  echo "  (no args): Type-check and build into dist/"
+  echo "  check:     Run typecheck, lint and tests, then build"
+  echo "  (to publish to GitHub Pages, use duk-publish)"
+  exit 1
+}
+
+require_npm
+cd "$PROJECT_ROOT"
+
+case "${1:-}" in
+  ""|check) ensure_dependencies ;;
+esac
+
+case "${1:-}" in
+  "")
+    print_banner "Building DUK"
+    npm run build
+    ;;
+  check)
+    print_banner "Checking DUK (typecheck + lint)"
+    npm run check
+    print_banner "Running tests"
+    npm test
+    print_banner "Building DUK"
+    npm run build
+    ;;
+  -h|--help|*)
+    show_help
+    ;;
+esac
+
+echo -e "\n${BOLD}${GREEN}✅ Build written to dist/${NC}"
+echo "Preview it with: duk-run preview"

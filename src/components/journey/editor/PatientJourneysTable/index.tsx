@@ -1,5 +1,5 @@
 import AddIcon from '@mui/icons-material/Add'
-import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline'
+import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutlineOutlined'
 import ScienceIcon from '@mui/icons-material/Science'
 import {
   Chip,
@@ -24,12 +24,10 @@ import type {
   ResearchModule,
 } from '@/api/schemas'
 import { useJourneyStatusLabel } from '@/hooks/labels'
-
 const MOD_ICON: Record<string, React.ReactNode> = {
   ADD_STEP: <AddIcon fontSize="inherit" />,
   REMOVE_STEP: <RemoveCircleOutlineIcon fontSize="inherit" />,
 }
-
 interface Props {
   patientJourneys: PatientJourney[] | null
   loading: boolean
@@ -37,13 +35,11 @@ interface Props {
   journeyTemplates: JourneyTemplate[] | null
   researchModules: ResearchModule[] | null
 }
-
 function modSummary(mod: JourneyModification, _templateName: (id: string) => string) {
   if (mod.type === 'ADD_STEP') return `+${mod.entry?.label ?? ''}`
   if (mod.type === 'REMOVE_STEP') return `-${mod.stepId ?? ''}`
   return mod.type
 }
-
 export function PatientJourneysTable({
   patientJourneys,
   loading,
@@ -53,14 +49,11 @@ export function PatientJourneysTable({
 }: Props) {
   const { t } = useTranslation()
   const getJourneyStatusLabel = useJourneyStatusLabel()
-
   const patientName = (id: string) => patients?.find((p) => p.id === id)?.displayName ?? id
   const templateName = (id: string) => journeyTemplates?.find((jt) => jt.id === id)?.name ?? id
-
-  if (loading) return <Skeleton variant="rectangular" height={200} sx={{ borderRadius: 1 }} />
+  if (loading) return <Skeleton variant="rectangular" sx={{ borderRadius: 1, height: 200 }} />
   if (!patientJourneys?.length)
     return <Typography color="text.secondary">{t('journey.editor.noPatientJourneys')}</Typography>
-
   return (
     <Table size="small">
       <TableHead>
@@ -77,7 +70,7 @@ export function PatientJourneysTable({
         {patientJourneys.map((pj) => (
           <TableRow key={pj.id} hover>
             <TableCell>
-              <Typography variant="body2" fontWeight={600}>
+              <Typography variant="body2" sx={{ fontWeight: 600 }}>
                 {patientName(pj.patientId)}
               </Typography>
             </TableCell>
@@ -104,7 +97,7 @@ export function PatientJourneysTable({
             </TableCell>
             <TableCell>
               {pj.researchModuleIds.length > 0 ? (
-                <Stack direction="row" gap={0.5} flexWrap="wrap">
+                <Stack direction="row" sx={{ gap: 0.5, flexWrap: 'wrap' }}>
                   {pj.researchModuleIds.map((rmId) => (
                     <Chip
                       key={rmId}
@@ -125,9 +118,9 @@ export function PatientJourneysTable({
             </TableCell>
             <TableCell>
               {pj.modifications.length > 0 ? (
-                <Stack gap={0.25}>
+                <Stack sx={{ gap: 0.25 }}>
                   {pj.modifications.map((mod) => (
-                    <Stack key={mod.id} direction="row" alignItems="center" gap={0.5}>
+                    <Stack key={mod.id} direction="row" sx={{ alignItems: 'center', gap: 0.5 }}>
                       {MOD_ICON[mod.type]}
                       <Typography variant="caption">{modSummary(mod, templateName)}</Typography>
                       <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />

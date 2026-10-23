@@ -1,0 +1,44 @@
+#!/bin/bash
+set -e
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/../utils/common.sh"
+
+show_help() {
+  echo "Usage: duk-run [dev|preview|test] [extra args...]"
+  echo "  dev (default): Start the Vite dev server with hot reload"
+  echo "  preview:       Serve the production build in dist/ (builds first if missing)"
+  echo "  test:          Run vitest in watch mode"
+  echo "  Extra args are passed through, e.g. 'duk-run dev --host --port 5174'"
+  exit 1
+}
+
+require_npm
+cd "$PROJECT_ROOT"
+
+MODE="${1:-dev}"
+[ $# -gt 0 ] && shift
+
+case "$MODE" in
+  dev|development)
+    ensure_dependencies
+    print_banner "Starting DUK dev server"
+    exec npm run dev -- "$@"
+    ;;
+  preview)
+    ensure_dependencies
+    if [ ! -f dist/index.html ]; then
+      echo -e "${YELLOW}No build found in dist/ — running duk-build first...${NC}"
+      "$SCRIPT_DIR/duk-build"
+    fi
+    print_banner "Serving production build"
+    exec npm run preview -- "$@"
+    ;;
+  test)
+    ensure_dependencies
+    exec npm run test:watch -- "$@"
+    ;;
+  -h|--help|*)
+    show_help
+    ;;
+esac

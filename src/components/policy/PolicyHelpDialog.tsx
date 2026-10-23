@@ -11,16 +11,14 @@ import {
 } from '@mui/material'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-
 interface Props {
   open: boolean
   onClose: () => void
 }
-
 export default function PolicyHelpDialog({ open, onClose }: Props) {
   const { t } = useTranslation()
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog open={open} onClose={onClose} fullWidth sx={{ maxWidth: 'sm' }}>
       <DialogTitle>{t('policy.syntaxTitle')}</DialogTitle>
       <DialogContent>
         <Typography variant="body2" color="text.secondary" gutterBottom>
@@ -29,17 +27,21 @@ export default function PolicyHelpDialog({ open, onClose }: Props) {
 
         <Divider sx={{ my: 2 }} />
 
-        <Stack gap={2}>
+        <Stack sx={{ gap: 2 }}>
           <Box>
             <Typography variant="subtitle2" gutterBottom>
               {t('policy.syntaxExamplesTitle')}
             </Typography>
-            <Stack gap={0.75}>
+            <Stack sx={{ gap: 0.75 }}>
               {(['syntaxExample1', 'syntaxExample2', 'syntaxExample3'] as const).map((key) => {
                 const full = t(`policy.${key}`)
                 const [code, ...rest] = full.split('—')
                 return (
-                  <Stack key={key} direction="row" gap={1} alignItems="baseline" flexWrap="wrap">
+                  <Stack
+                    sx={{ gap: 1, alignItems: 'baseline', flexWrap: 'wrap' }}
+                    key={key}
+                    direction="row"
+                  >
                     <Box
                       component="code"
                       sx={{

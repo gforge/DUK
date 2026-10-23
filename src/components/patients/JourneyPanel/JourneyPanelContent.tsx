@@ -13,14 +13,12 @@ import { InstructionModifyDialog } from '@/components/journey/InstructionModifyD
 import { useApi } from '@/hooks/useApi'
 
 import { JourneyPanelActions } from './JourneyPanelActions'
-
 interface Props {
   readonly journey: PatientJourney
   readonly journeyTemplates: JourneyTemplate[]
   readonly questionnaireTemplates: QuestionnaireTemplate[]
   readonly onJourneyChanged: () => void
 }
-
 export function JourneyPanelContent({
   journey,
   journeyTemplates,
@@ -28,29 +26,23 @@ export function JourneyPanelContent({
   onJourneyChanged,
 }: Props) {
   const { t } = useTranslation()
-
   const [modifyOpen, setModifyOpen] = useState(false)
   const [instrTarget, setInstrTarget] = useState<ResolvedInstruction | null>(null)
   const [instrDialogOpen, setInstrDialogOpen] = useState(false)
   const [instrInitialTab, setInstrInitialTab] = useState(0)
-
   const [mountedAt] = useState(Date.now)
-
   const { data: effectiveSteps, refetch: refetchSteps } = useApi(
     () => client.getEffectiveSteps(journey.id),
     [journey.id],
   )
-
   const { data: formResponses } = useApi(
     () => client.getFormResponsesByJourney(journey.id),
     [journey.id],
   )
-
   const { data: resolvedInstructions, refetch: refetchInstructions } = useApi(
     () => client.getResolvedInstructionsForJourney(journey.id),
     [journey.id],
   )
-
   // useJourneyActions works with a single-journey context; provide empty refetchSteps wrapper
   const {
     pauseLoading,
@@ -70,18 +62,15 @@ export function JourneyPanelContent({
     refetchJourneys: onJourneyChanged,
     refetchSteps,
   })
-
   const currentTemplate = useMemo(
     () => journeyTemplates.find((jt) => jt.id === journey.journeyTemplateId),
     [journeyTemplates, journey.journeyTemplateId],
   )
-
   const pausedDays = journey.pausedAt
-    ? Math.max(0, Math.floor((mountedAt - new Date(journey.pausedAt).getTime()) / 86_400_000))
+    ? Math.max(0, Math.floor((mountedAt - new Date(journey.pausedAt).getTime()) / 86400000))
     : 0
-
   return (
-    <Stack gap={2}>
+    <Stack sx={{ gap: 2 }}>
       <JourneyPanelActions
         journey={journey}
         pauseLoading={pauseLoading}

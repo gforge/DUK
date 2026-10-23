@@ -12,7 +12,6 @@ import {
 } from '@mui/material'
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-
 interface CancelJourneyDialogProps {
   readonly open: boolean
   readonly loading: boolean
@@ -20,7 +19,6 @@ interface CancelJourneyDialogProps {
   readonly onClose: () => void
   readonly onConfirm: (reason: string) => void
 }
-
 export default function CancelJourneyDialog({
   open,
   loading,
@@ -30,20 +28,17 @@ export default function CancelJourneyDialog({
 }: CancelJourneyDialogProps) {
   const { t } = useTranslation()
   const [reason, setReason] = useState('')
-
   const handleClose = () => {
     setReason('')
     onClose()
   }
-
   const handleConfirm = () => {
     if (reason.trim().length < 5) return
     onConfirm(reason.trim())
     setReason('')
   }
-
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="xs" fullWidth>
+    <Dialog open={open} onClose={handleClose} fullWidth sx={{ maxWidth: 'xs' }}>
       <DialogTitle>{t('journey.cancelConfirmTitle')}</DialogTitle>
       <DialogContent>
         <Alert severity={hasData ? 'warning' : 'error'} sx={{ mb: 2 }}>

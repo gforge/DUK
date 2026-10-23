@@ -2,35 +2,40 @@ import { Box, Stack, Typography } from '@mui/material'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 
-import type { JourneyTemplate } from '@/api/schemas'
-
+import type { JourneyTemplate, TransitionTriggerType } from '@/api/schemas'
+import { useTransitionTriggerLabel } from '@/hooks/labels'
 interface Props {
   effectiveName: string
   personalNumber: string
   dateOfBirth: string
   selectedTemplate: JourneyTemplate | undefined | null
+  eventType: TransitionTriggerType | ''
   startDate: string
   selectedModuleIds: string[]
-  researchModules: Array<{ id: string; studyName: string }> | null
+  researchModules: Array<{
+    id: string
+    studyName: string
+  }> | null
 }
-
 export function Step3Review({
   effectiveName,
   personalNumber,
   dateOfBirth,
   selectedTemplate,
+  eventType,
   startDate,
   selectedModuleIds,
   researchModules,
 }: Props) {
   const { t } = useTranslation()
+  const triggerLabel = useTransitionTriggerLabel()
   return (
-    <Stack gap={1.5}>
-      <Typography variant="subtitle2" fontWeight={600}>
+    <Stack sx={{ gap: 1.5 }}>
+      <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
         {t('patients.register.reviewTitle')}
       </Typography>
       <Box sx={{ border: 1, borderColor: 'divider', borderRadius: 1, p: 1.5 }}>
-        <Stack gap={0.5}>
+        <Stack sx={{ gap: 0.5 }}>
           <Typography variant="body2">
             <strong>{t('patients.displayName')}:</strong> {effectiveName}
           </Typography>
@@ -43,10 +48,15 @@ export function Step3Review({
         </Stack>
       </Box>
       <Box sx={{ border: 1, borderColor: 'divider', borderRadius: 1, p: 1.5 }}>
-        <Stack gap={0.5}>
+        <Stack sx={{ gap: 0.5 }}>
           <Typography variant="body2">
             <strong>{t('nav.journeys')}:</strong> {selectedTemplate?.name}
           </Typography>
+          {eventType && (
+            <Typography variant="body2">
+              <strong>{t('patients.register.eventType')}:</strong> {triggerLabel(eventType)}
+            </Typography>
+          )}
           <Typography variant="body2">
             <strong>{selectedTemplate?.referenceDateLabel ?? t('journey.startDate')}:</strong>{' '}
             {startDate}
@@ -54,7 +64,7 @@ export function Step3Review({
         </Stack>
       </Box>
       <Box sx={{ border: 1, borderColor: 'divider', borderRadius: 1, p: 1.5 }}>
-        <Stack gap={0.5}>
+        <Stack sx={{ gap: 0.5 }}>
           <Typography variant="body2">
             <strong>{t('patients.register.reviewStudies')}</strong>{' '}
             {selectedModuleIds.length === 0

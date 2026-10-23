@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 
-import type { AssignmentMode, CareRole, ContactMode } from '@/api/schemas'
+import type { AssignmentMode, CareRole, CareTeam, ContactMode, User } from '@/api/schemas'
 
 import { assertNever } from './never'
 
@@ -72,6 +72,8 @@ export function useAssignmentModeLabel() {
         return t('triage.assignmentModeOption.PAL')
       case 'NAMED':
         return t('triage.assignmentModeOption.NAMED')
+      case 'TEAM':
+        return t('triage.assignmentModeOption.TEAM')
       default:
         return assertNever(mode)
     }
@@ -89,6 +91,8 @@ export function useAssignmentModeHelpLabel() {
         return t('triage.assignmentModeHelp.PAL')
       case 'NAMED':
         return t('triage.assignmentModeHelp.NAMED')
+      case 'TEAM':
+        return t('triage.assignmentModeHelp.TEAM')
       default:
         return assertNever(mode)
     }
@@ -96,24 +100,62 @@ export function useAssignmentModeHelpLabel() {
 }
 
 /**
- * Returns the title text for step 2 of the triage form depending on the contact
- * mode.  We keep a hook so that each literal key is visible to the i18n extractor
- * (vs. building the key dynamically from a map object).
+ * Returns the heading for the "who" step of the triage form. Without a chosen
+ * contact mode the generic (digital) wording is used.
  */
-export function useStep2TitleLabel() {
+export function useWhoLabel() {
   const { t } = useTranslation()
-  return (mode: ContactMode): string => {
+  return (mode: ContactMode | null): string => {
     switch (mode) {
-      case 'DIGITAL':
-        return t('triage.step2TitleByMode.DIGITAL')
       case 'PHONE':
-        return t('triage.step2TitleByMode.PHONE')
+        return t('triage.whoLabel.PHONE')
       case 'VISIT':
-        return t('triage.step2TitleByMode.VISIT')
+        return t('triage.whoLabel.VISIT')
+      case 'DIGITAL':
       case 'CLOSE':
-        return t('triage.step2TitleByMode.CLOSE')
+      case null:
+        return t('triage.whoLabel.DIGITAL')
       default:
         return assertNever(mode)
     }
+  }
+}
+
+interface AssigneeSource {
+  readonly assignmentMode: AssignmentMode
+  readonly careRole?: CareRole
+  readonly assignedUserId?: string | null
+  readonly assignedUserIds?: string[]
+  readonly assignedTeamIds?: string[]
+}
+
+/**
+ * Returns a formatter for who a triage decision is directed at: "VSH", "PAL",
+ * the chosen people or the chosen teams. Returns null when nothing is chosen.
+ */
+export function useAssigneeLabel() {
+  const getModeLabel = useAssignmentModeLabel()
+  return (
+    source: AssigneeSource,
+    users: readonly User[] | null | undefined,
+    teams: readonly CareTeam[] | null | undefined,
+  ): string | null => {
+    const mode = source.assignmentMode
+    if (!mode) return null
+    if (mode === 'NAMED') {
+      const ids = source.assignedUserIds?.length
+        ? source.assignedUserIds
+        : source.assignedUserId
+          ? [source.assignedUserId]
+          : []
+      if (ids.length === 0) return null
+      return ids.map((id) => users?.find((u) => u.id === id)?.name ?? id).join(', ')
+    }
+    if (mode === 'TEAM') {
+      const ids = source.assignedTeamIds ?? []
+      if (ids.length === 0) return null
+      return ids.map((id) => teams?.find((tm) => tm.id === id)?.name ?? id).join(', ')
+    }
+    return getModeLabel(mode)
   }
 }

@@ -1,4 +1,4 @@
-import { differenceInDays, format,parseISO, startOfDay } from 'date-fns'
+import { differenceInDays, format, parseISO, startOfDay } from 'date-fns'
 
 export interface DeadlineInfo {
   /** Formatted date string, e.g. "14 mar 2026" */

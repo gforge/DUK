@@ -13,6 +13,9 @@ export const jtHindfootReferral: JourneyTemplate = {
   description:
     'Basal kartläggning vid inkommen remiss. Patienten besvarar en kortfattad hälso- och livssituationsenkät innan ortopedbesök bokas.',
   referenceDateLabel: 'Remissdatum',
+  anchorEventType: 'REFERRAL_RECEIVED',
+  group: 'Hindfoot',
+  phaseOrder: 1,
   entries: [
     {
       id: 'jte-hf-ref-1',
@@ -21,7 +24,7 @@ export const jtHindfootReferral: JourneyTemplate = {
       windowDays: 7,
       order: 1,
       templateId: 'qt-preop-intake',
-      dashboardCategory: 'ACUTE',
+      dashboardCategory: 'CONTROL',
       scoreAliases: { PNRS_1: 'PNRS_referral' },
       scoreAliasLabels: { PNRS_referral: 'Smärta vid remiss' },
     },

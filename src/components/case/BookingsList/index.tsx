@@ -30,12 +30,10 @@ import { useNextStepLabel } from '@/hooks/labels'
 import { useApi } from '@/hooks/useApi'
 import { useRole } from '@/store/roleContext'
 import { useSnack } from '@/store/snackContext'
-
 interface Props {
   caseData: Case
   onChange?: () => void
 }
-
 export default function BookingsList({ caseData, onChange }: Props) {
   const { t } = useTranslation()
   const { currentUser } = useRole()
@@ -51,7 +49,6 @@ export default function BookingsList({ caseData, onChange }: Props) {
     if (role === 'PAL') return t('triage.assignmentModeOption.PAL')
     return t('common.notSet')
   }
-
   const [editing, setEditing] = useState<null | {
     id: string
     scheduledAt: string
@@ -64,7 +61,6 @@ export default function BookingsList({ caseData, onChange }: Props) {
     [caseData.id],
   )
   const isPalBookingAvailable = Boolean(responsiblePhysicianUserId)
-
   async function handleCancel(bookingId: string) {
     setCancelTarget(null)
     try {
@@ -75,7 +71,6 @@ export default function BookingsList({ caseData, onChange }: Props) {
       showSnack(String(err), 'error')
     }
   }
-
   function toGoogleCalendarLink(b: { scheduledAt: string; type: string; note?: string }) {
     const start = new Date(b.scheduledAt)
     const end = new Date(start.getTime() + 30 * 60 * 1000)
@@ -85,7 +80,6 @@ export default function BookingsList({ caseData, onChange }: Props) {
     const details = encodeURIComponent(b.note ?? '')
     return `https://www.google.com/calendar/render?action=TEMPLATE&text=${text}&dates=${dates}&details=${details}`
   }
-
   function downloadICal(b: { id: string; scheduledAt: string; type: string; note?: string }) {
     const start = new Date(b.scheduledAt)
     const end = new Date(start.getTime() + 30 * 60 * 1000)
@@ -107,7 +101,6 @@ export default function BookingsList({ caseData, onChange }: Props) {
       'END:VEVENT',
       'END:VCALENDAR',
     ].join('\r\n')
-
     const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
@@ -118,7 +111,6 @@ export default function BookingsList({ caseData, onChange }: Props) {
     a.remove()
     URL.revokeObjectURL(url)
   }
-
   async function handleSave() {
     if (!editing) return
     if (editing.role === 'PAL' && !isPalBookingAvailable) {
@@ -140,13 +132,12 @@ export default function BookingsList({ caseData, onChange }: Props) {
       showSnack(String(err), 'error')
     }
   }
-
   return (
     <Box>
       <Typography variant="subtitle2" gutterBottom>
         {t('triage.bookings')}
       </Typography>
-      <Stack gap={1}>
+      <Stack sx={{ gap: 1 }}>
         {(caseData.bookings ?? []).map((b) => (
           <Paper key={b.id} variant="outlined" sx={{ p: 1, display: 'flex', alignItems: 'center' }}>
             <Box sx={{ flex: 1 }}>
@@ -156,7 +147,7 @@ export default function BookingsList({ caseData, onChange }: Props) {
                 {b.location ?? getBookingRoleLabel(b.role)}
               </Typography>
               {b.note && (
-                <Typography variant="caption" display="block">
+                <Typography sx={{ display: 'block' }} variant="caption">
                   {b.note}
                 </Typography>
               )}
@@ -201,13 +192,13 @@ export default function BookingsList({ caseData, onChange }: Props) {
       <Dialog open={!!editing} onClose={() => setEditing(null)}>
         <DialogTitle>{t('triage.editBooking')}</DialogTitle>
         <DialogContent>
-          <Stack gap={2} sx={{ mt: 1 }}>
+          <Stack sx={{ gap: 2, mt: 1 }}>
             <TextField
               label={t('triage.bookingTime')}
               type="datetime-local"
               value={editing?.scheduledAt ?? ''}
               onChange={(e) => setEditing((s) => (s ? { ...s, scheduledAt: e.target.value } : s))}
-              InputLabelProps={{ shrink: true }}
+              slotProps={{ inputLabel: { shrink: true } }}
               size="small"
             />
             <FormControl size="small">

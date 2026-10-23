@@ -1,5 +1,6 @@
-export { default as CompletedSection } from './CompletedSection'
+export { default as CompletionDialog } from './CompletionDialog'
 export { default as GroupSection } from './GroupSection'
 export { default as WorklistFilters } from './WorklistFilters'
+export type { WorklistTab } from './WorklistHeader'
 export { default as WorklistHeader } from './WorklistHeader'
 export { default as WorklistRow } from './WorklistRow'

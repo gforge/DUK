@@ -1,5 +1,5 @@
 import AddIcon from '@mui/icons-material/Add'
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlineOutlined'
 import {
   Box,
   Button,
@@ -24,14 +24,12 @@ import { useTranslation } from 'react-i18next'
 
 import type { Question } from '@/api/schemas'
 import { useQuestionTypeLabel } from '@/hooks/labels'
-
 interface Props {
   questions: Question[]
   addQuestion: () => void
   updateQuestion: <K extends keyof Question>(id: string, field: K, value: Question[K]) => void
   deleteQuestion: (id: string) => void
 }
-
 export default function QuestionnaireEditorQuestionsTab({
   questions,
   addQuestion,
@@ -40,10 +38,9 @@ export default function QuestionnaireEditorQuestionsTab({
 }: Props) {
   const { t } = useTranslation()
   const getQuestionTypeLabel = useQuestionTypeLabel()
-
   return (
     <Box>
-      <Stack direction="row" justifyContent="flex-end" mb={1}>
+      <Stack direction="row" sx={{ justifyContent: 'flex-end', mb: 1 }}>
         <Button size="small" startIcon={<AddIcon />} onClick={addQuestion} variant="outlined">
           {t('journey.qTemplate.addQuestion')}
         </Button>
@@ -94,10 +91,10 @@ export default function QuestionnaireEditorQuestionsTab({
                   </FormControl>
                 </TableCell>
                 <TableCell>
-                  <Stack gap={0.5}>
+                  <Stack sx={{ gap: 0.5 }}>
                     {Object.entries(q.label.sv != null ? q.label : { sv: '' }).map(
                       ([lang, text]) => (
-                        <Stack key={lang} direction="row" alignItems="center" gap={0.5}>
+                        <Stack key={lang} direction="row" sx={{ alignItems: 'center', gap: 0.5 }}>
                           <Chip
                             label={lang.toUpperCase()}
                             size="small"
@@ -173,7 +170,7 @@ export default function QuestionnaireEditorQuestionsTab({
                 </TableCell>
                 <TableCell>
                   {(q.type === 'SCALE' || q.type === 'NUMBER') && (
-                    <Stack direction="row" gap={0.5}>
+                    <Stack direction="row" sx={{ gap: 0.5 }}>
                       <TextField
                         value={q.min ?? ''}
                         onChange={(e) =>

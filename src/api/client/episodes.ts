@@ -1,4 +1,4 @@
-import type { EpisodeOfCare } from '../schemas'
+import type { DiagnosisSource, EpisodeOfCare, Referral, Role } from '../schemas'
 import * as service from '../service'
 import { withDelay } from './delay'
 
@@ -24,3 +24,12 @@ export const updateEpisodeResponsibleUser = (
   responsibleUserId?: string,
 ): Promise<EpisodeOfCare> =>
   withDelay(() => service.updateEpisodeResponsibleUser(episodeId, responsibleUserId))
+
+export const setReferralDiagnoses = (
+  episodeId: string,
+  diagnoses: Referral['diagnoses'],
+  source: DiagnosisSource,
+  userId: string,
+  userRole: Role,
+): Promise<EpisodeOfCare> =>
+  withDelay(() => service.setReferralDiagnoses(episodeId, diagnoses, source, userId, userRole))

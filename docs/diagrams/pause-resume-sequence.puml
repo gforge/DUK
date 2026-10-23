@@ -4,38 +4,40 @@
 '   src/api/service/patientJourneys.ts
 '   src/api/service/journeyDates.ts
 '   src/api/service/journeyResolver.ts
+'   src/components/case/JourneyTab/useJourneyActions.ts
 
 title Journey Pause and Resume - Sequence
 
 actor Clinician
-participant "JourneyTab\n(UI)" as UI
+participant "JourneyTab\n(JourneyHeader /\nPauseConfirmDialog)" as UI
 participant "client/\npatientJourneys" as Client
 participant "service/\npatientJourneys" as Service
 participant "journeyResolver\n(getEffectiveSteps)" as Resolver
-participant "patchStore" as Store
+participant "store" as Store
 
 == Pause Journey ==
 
-Clinician -> UI : Click "Pause journey"
-UI -> UI : Show confirmation dialog
+Clinician -> UI : Actions menu → "Pause journey"
+UI -> UI : Show PauseConfirmDialog
 Clinician -> UI : Confirm pause
 UI -> Client : pauseJourney(journeyId)
 Client -> Service : pauseJourney(journeyId)
 Service -> Service : Guard: status must be ACTIVE
 alt status is ACTIVE
-  Service -> Store : patchStore:\n  status = SUSPENDED\n  pausedAt = now()
-  Store --> Service : updated PatientJourney
+  Service -> Store : setStore:\n  status = SUSPENDED\n  pausedAt = now()
+  Store --> Service : ok
   Service --> Client : PatientJourney
   Client --> UI : PatientJourney
+  UI -> UI : success snack, refetch\njourneys + steps
 else status is not ACTIVE
-  Service --> Client : Error("Journey must be ACTIVE to pause")
-  Client --> UI : show error snackbar
+  Service --> Client : Error("Journey … is not active")
+  Client --> UI : show error snack
 end
 UI -> UI : Show paused-days banner\n+ Resume button
-UI -> Resolver : getEffectiveSteps(journeyId)
-Resolver -> Resolver : currentPauseDays = floor(\n  (Date.now() - pausedAt) / 86400000\n)
-Resolver -> Resolver : totalPauseShift =\n  totalPausedDays + currentPauseDays
-Resolver --> UI : EffectiveStep[] with dates\nshifted by totalPauseShift
+UI -> Client : getEffectiveSteps(journeyId)
+Client -> Resolver : getEffectiveSteps(journeyId)
+Resolver -> Resolver : computeTotalPauseShift:\n  totalPausedDays +\n  floor((now - pausedAt) / 1 day)
+Resolver --> UI : EffectiveStep[] with dates\nshifted by pause shift
 
 note right of Resolver
   No store write — shift is
@@ -46,20 +48,21 @@ end note
 
 == Resume Journey ==
 
-Clinician -> UI : Click "Resume journey"
+Clinician -> UI : Click "Resume"
 UI -> Client : resumeJourney(journeyId)
 Client -> Service : resumeJourney(journeyId)
 Service -> Service : Guard: status must be SUSPENDED
 alt status is SUSPENDED
-  Service -> Service : elapsedDays = floor(\n  (Date.now() - pausedAt) / 86400000\n)
-  Service -> Store : patchStore:\n  totalPausedDays += elapsedDays\n  pausedAt = null\n  status = ACTIVE
-  Store --> Service : updated PatientJourney
+  Service -> Service : elapsedDays = floor(\n  (now - pausedAt) / 1 day\n)
+  Service -> Service : Re-date journey Instructions\n(startAt / endAt with new shift)
+  Service -> Store : setStore:\n  totalPausedDays += elapsedDays\n  pausedAt = null\n  status = ACTIVE\n  instructions updated
+  Store --> Service : ok
   Service --> Client : PatientJourney
   Client --> UI : PatientJourney
 else status is not SUSPENDED
-  Service --> Client : Error("Journey must be SUSPENDED to resume")
-  Client --> UI : show error snackbar
+  Service --> Client : Error("Journey … is not suspended")
+  Client --> UI : show error snack
 end
-UI -> UI : Hide banner, show\nnormal timeline
+UI -> UI : Refetch; hide banner,\nshow normal timeline
 
 @enduml

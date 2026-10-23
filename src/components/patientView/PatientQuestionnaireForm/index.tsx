@@ -108,7 +108,7 @@ export default function PatientQuestionnaireForm({
 
   return (
     <Paper variant="outlined" sx={{ p: 3, borderRadius: 2 }}>
-      <Stack direction="row" alignItems="center" gap={1} mb={0.5}>
+      <Stack sx={{ alignItems: 'center', gap: 1, mb: 0.5 }} direction="row">
         <Button
           size="small"
           startIcon={<ArrowBackIcon />}
@@ -119,17 +119,17 @@ export default function PatientQuestionnaireForm({
         </Button>
       </Stack>
 
-      <Typography variant="h6" fontWeight={700} mb={0.5}>
+      <Typography sx={{ fontWeight: 700, mb: 0.5 }} variant="h6">
         {template.name}
       </Typography>
 
       {step.label && (
-        <Typography variant="body2" color="text.secondary" mb={2}>
+        <Typography sx={{ mb: 2 }} variant="body2" color="text.secondary">
           {step.label} — {t('journey.scheduledDate')}: {step.scheduledDate}
         </Typography>
       )}
 
-      <Stack spacing={3} mt={2}>
+      <Stack sx={{ mt: 2 }} spacing={3}>
         {template.questions.map((q) => (
           <QuestionField
             key={q.id}
@@ -143,7 +143,7 @@ export default function PatientQuestionnaireForm({
         ))}
       </Stack>
 
-      <Stack direction="row" justifyContent="flex-end" mt={4}>
+      <Stack sx={{ justifyContent: 'flex-end', mt: 4 }} direction="row">
         <Button
           variant="contained"
           size="large"
@@ -272,9 +272,11 @@ function QuestionField({
           error={error}
           helperText={error ? t('patient.form.required') : undefined}
           required={question.required}
-          inputProps={{
-            min: question.min,
-            max: question.max,
+          slotProps={{
+            htmlInput: {
+              min: question.min,
+              max: question.max,
+            },
           }}
         />
       )
