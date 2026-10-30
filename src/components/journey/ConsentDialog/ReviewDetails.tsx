@@ -19,7 +19,7 @@ export interface ReviewDetailsDialogProps {
   onClose: () => void
 }
 export function ReviewDetailsDialog({ reviewDetails, onClose }: ReviewDetailsDialogProps) {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   return (
     <Dialog open={!!reviewDetails} onClose={onClose} fullWidth sx={{ maxWidth: 'xs' }}>
       <DialogTitle>
@@ -36,7 +36,7 @@ export function ReviewDetailsDialog({ reviewDetails, onClose }: ReviewDetailsDia
             <Typography variant="caption" color="text.secondary">
               {reviewDetails.reviewedAt
                 ? t('review.reviewedAt', {
-                    date: new Date(reviewDetails.reviewedAt).toLocaleDateString(),
+                    date: new Date(reviewDetails.reviewedAt).toLocaleDateString(i18n.language),
                   })
                 : t('review.pending')}
             </Typography>

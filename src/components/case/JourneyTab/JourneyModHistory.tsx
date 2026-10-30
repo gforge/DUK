@@ -16,7 +16,7 @@ interface Props {
     readonly modifications: JourneyModification[];
 }
 export default function JourneyModHistory({ modifications }: Props) {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const getModificationTypeLabel = useJourneyModificationTypeLabel();
     if (modifications.length === 0)
         return null;
@@ -32,7 +32,7 @@ export default function JourneyModHistory({ modifications }: Props) {
                 {getModificationTypeLabel(mod.type)}
               </Typography>
               <Typography variant="caption" color="text.secondary" sx={{ ml: 'auto' }}>
-                {new Date(mod.addedAt).toLocaleDateString()}
+                {new Date(mod.addedAt).toLocaleDateString(i18n.language)}
               </Typography>
             </Stack>
             <Divider sx={{ my: 0.5 }}/>
@@ -40,7 +40,7 @@ export default function JourneyModHistory({ modifications }: Props) {
               {mod.reason}
             </Typography>
             {mod.entry && (<Typography variant="caption" sx={{ display: 'block' }}>
-                {t('journey.step')}: {mod.entry.label} (Day {mod.entry.offsetDays})
+                {t('journey.step')}: {mod.entry.label} {t('journey.modDay', { day: mod.entry.offsetDays })}
               </Typography>)}
           </Paper>))}
       </Stack>

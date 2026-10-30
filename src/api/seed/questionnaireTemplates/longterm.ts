@@ -12,7 +12,7 @@ const EQ5D_OPTIONS = [
 /** 6-month / 1-year: EQ-5D quality-of-life + Oxford Shoulder Score PROMs. */
 export const qtEq5dOss: QuestionnaireTemplate = {
   id: 'qt-eq5d-oss',
-  name: '6-month / 1-year: EQ-5D & OSS (PROMs)',
+  name: '6 månader / 1 år: EQ-5D och OSS (PROM)',
   questions: [
     {
       id: 'q-eq-mob',
@@ -202,7 +202,7 @@ const FREE_TEXT = {
 
 export const qtEq5dPrweShort: QuestionnaireTemplate = {
   id: 'qt-eq5d-prwe-short',
-  name: '6-month / 1-year: EQ-5D & PRWE-short',
+  name: '6 månader / 1 år: EQ-5D och PRWE-kort',
   questions: [
     ...EQ5D_QUESTIONS,
     {
@@ -248,7 +248,7 @@ export const qtEq5dPrweShort: QuestionnaireTemplate = {
 
 export const qtEq5dOksShort: QuestionnaireTemplate = {
   id: 'qt-eq5d-oks-short',
-  name: '6-month / 1-year: EQ-5D & OKS-short',
+  name: '6 månader / 1 år: EQ-5D och OKS-kort',
   questions: [
     ...EQ5D_QUESTIONS,
     {
@@ -303,7 +303,7 @@ export const qtEq5dOksShort: QuestionnaireTemplate = {
 
 export const qtEq5dMoxfqShort: QuestionnaireTemplate = {
   id: 'qt-eq5d-moxfq-short',
-  name: '6-month / 1-year: EQ-5D & MOXFQ-short',
+  name: '6 månader / 1 år: EQ-5D och MOXFQ-kort',
   questions: [
     ...EQ5D_QUESTIONS,
     {

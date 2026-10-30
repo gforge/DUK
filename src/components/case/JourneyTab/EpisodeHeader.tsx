@@ -1,9 +1,11 @@
 import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import { Chip, Skeleton, Stack, Typography } from '@mui/material';
+import { format, parseISO } from 'date-fns';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { EpisodeOfCare, EpisodeOfCareStatus } from '@/api/schemas';
+import { useDateLocale } from '@/components/case/triage/useTriageDirectory';
 import { useEpisodeStatusLabel } from '@/hooks/labels';
 function episodeStatusColor(status: EpisodeOfCareStatus): 'success' | 'default' | 'secondary' {
     if (status === 'OPEN')
@@ -19,6 +21,7 @@ interface Props {
 export default function EpisodeHeader({ episode, loading }: Props) {
     const { t } = useTranslation();
     const episodeStatusLabel = useEpisodeStatusLabel();
+    const locale = useDateLocale();
     if (loading) {
         return (<Stack direction="row" sx={{ alignItems: 'center', gap: 1, mb: 1 }}>
         <Skeleton variant="circular" sx={{ width: 18, height: 18 }}/>
@@ -37,7 +40,7 @@ export default function EpisodeHeader({ episode, loading }: Props) {
         </Typography>)}
       <Chip label={episodeStatusLabel(episode.status)} size="small" color={episodeStatusColor(episode.status)} variant="outlined"/>
       <Typography variant="caption" color="text.secondary">
-        {t('episode.openedAt')}: {episode.openedAt}
+        {t('episode.openedAt')}: {format(parseISO(episode.openedAt), 'd MMM yyyy', { locale })}
       </Typography>
     </Stack>);
 }

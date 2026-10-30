@@ -13,6 +13,7 @@ import { format } from 'date-fns'
 import { useTranslation } from 'react-i18next'
 
 import * as client from '@/api/client'
+import { useDateLocale } from '@/components/case/triage/useTriageDirectory'
 import { useApi } from '@/hooks/useApi'
 
 import FormAnswersTable from './FormAnswersTable'
@@ -23,6 +24,7 @@ interface FormResponsesTabProps {
 
 export default function FormResponsesTab({ caseId }: FormResponsesTabProps) {
   const { t } = useTranslation()
+  const locale = useDateLocale()
   const {
     data: responses,
     loading,
@@ -69,7 +71,7 @@ export default function FormResponsesTab({ caseId }: FormResponsesTabProps) {
                   {template?.name ?? resp.templateId}
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
-                  {t('case.submittedAt')}: {format(new Date(resp.submittedAt), 'dd MMM yyyy HH:mm')}
+                  {t('case.submittedAt')}: {format(new Date(resp.submittedAt), 'd MMM yyyy HH:mm', { locale })}
                 </Typography>
                 {/* Scores */}
                 {Object.entries(resp.scores).map(([key, val]) => (

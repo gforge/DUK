@@ -28,6 +28,7 @@ export default defineConfig({
       'eq.*', // EQ-5D scoring dimension keys
       'policy.syntaxExample*', // number-indexed examples: syntaxExample1/2/3
       'policy.var*', // general variable label keys in policy editor
+      'app.login.userDescription.*', // keyed by demo user id
     ],
   },
 })

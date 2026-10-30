@@ -6,7 +6,7 @@ const CREATED_AT = iso(daysAgo(100))
 /** Day 1–2 post-op: numbness and infection screening. */
 export const qtNumbnessInfection: QuestionnaireTemplate = {
   id: 'qt-numbness-infection',
-  name: 'Day 1-2: Numbness & Infection',
+  name: 'Dag 1–2: Domningar och infektion',
   questions: [
     {
       id: 'q-numb-1',
@@ -53,7 +53,7 @@ export const qtNumbnessInfection: QuestionnaireTemplate = {
 /** Day 7–10 in cast (conservative fracture treatment): cast fit, circulation and pain. */
 export const qtCastCheck: QuestionnaireTemplate = {
   id: 'qt-cast-check',
-  name: 'Day 7-10: Cast Check & Pain',
+  name: 'Dag 7–10: Gipskontroll och smärta',
   questions: [
     {
       id: 'q-cast-1',
@@ -109,7 +109,7 @@ export const qtCastCheck: QuestionnaireTemplate = {
 /** Day 10–14 post-op: wound healing and pain assessment. */
 export const qtWoundPain: QuestionnaireTemplate = {
   id: 'qt-wound-pain',
-  name: 'Day 10-14: Wound Status & Pain',
+  name: 'Dag 10–14: Sårstatus och smärta',
   questions: [
     {
       id: 'q-wound-1',

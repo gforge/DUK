@@ -13,7 +13,7 @@ interface Props {
     onConsentsChanged: () => void;
 }
 export function ResearchStudiesSection({ patientId, enrolledModules, consentsList, currentUserRole, onConsentsChanged, }: Props) {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const [manualConsentTarget, setManualConsentTarget] = useState<{
         module: ResearchModule;
         journeyId: string;
@@ -67,7 +67,7 @@ export function ResearchStudiesSection({ patientId, enrolledModules, consentsLis
                   {rm.studyName}
                 </Typography>
                 {activeConsent ? (<Chip label={t('patient.consentGranted', {
-                        date: new Date(activeConsent.grantedAt).toLocaleDateString(),
+                        date: new Date(activeConsent.grantedAt).toLocaleDateString(i18n.language),
                     })} size="small" color="success" variant="outlined" sx={{ mt: 0.5, alignSelf: 'flex-start', height: 20, fontSize: 11 }}/>) : (<Chip label={t('patient.consentPending')} size="small" color="warning" variant="outlined" sx={{ mt: 0.5, alignSelf: 'flex-start', height: 20, fontSize: 11 }}/>)}
               </Stack>
               {activeConsent ? (<Button size="small" color="error" variant="outlined" onClick={() => currentUserRole === 'PATIENT'

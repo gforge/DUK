@@ -61,7 +61,7 @@ export default function RoleSwitcher() {
         </Typography>
         <Divider />
         <Typography variant="caption" sx={{ px: 2, py: 0.5, display: 'block', opacity: 0.65 }}>
-          Session expires {new Date(session.expiresAt).toLocaleTimeString()}
+          {t('common.sessionExpires', { time: new Date(session.expiresAt).toLocaleTimeString(i18n.language) })}
         </Typography>
         <Divider />
         <ListSubheader sx={{ lineHeight: '32px', display: 'flex', alignItems: 'center', gap: 1 }}>

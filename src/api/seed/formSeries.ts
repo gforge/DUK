@@ -4,7 +4,7 @@ import { daysAgo, iso } from './shared'
 export const formSeries: FormSeries[] = [
   {
     id: 'fs-1',
-    name: 'Acute follow-up series (0-2 weeks)',
+    name: 'Akut uppföljningsserie (0–2 veckor)',
     entries: [
       { templateId: 'qt-numbness-infection', offsetDays: 1, order: 1 },
       { templateId: 'qt-wound-pain', offsetDays: 10, order: 2 },
@@ -13,7 +13,7 @@ export const formSeries: FormSeries[] = [
   },
   {
     id: 'fs-2',
-    name: 'Subacute follow-up series (3-8 weeks)',
+    name: 'Subakut uppföljningsserie (3–8 veckor)',
     entries: [
       { templateId: 'qt-wound-pain', offsetDays: 10, order: 1 },
       { templateId: 'qt-function-oss', offsetDays: 28, order: 2 },
@@ -23,7 +23,7 @@ export const formSeries: FormSeries[] = [
   },
   {
     id: 'fs-3',
-    name: 'Long-term PROMs series (6m / 1yr)',
+    name: 'Långtids-PROM-serie (6 mån / 1 år)',
     entries: [
       { templateId: 'qt-function-oss', offsetDays: 42, order: 1 },
       { templateId: 'qt-eq5d-oss', offsetDays: 180, order: 2 },

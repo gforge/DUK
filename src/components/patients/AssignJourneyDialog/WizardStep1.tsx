@@ -29,7 +29,7 @@ export default function WizardStep1({
   mergedStepIds,
   onToggleMerge,
 }: Props) {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   if (loadingConflicts) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', py: 3 }}>
@@ -82,9 +82,9 @@ export default function WizardStep1({
                   </Typography>
                   <Typography variant="caption" color="text.secondary">
                     {t('patients.conflicts.scheduledOn')}{' '}
-                    {new Date(c.newStep.scheduledDate).toLocaleDateString()} —{' '}
+                    {new Date(c.newStep.scheduledDate).toLocaleDateString(i18n.language)} —{' '}
                     {t('patients.conflicts.existingOn')}{' '}
-                    {new Date(c.existingStep.scheduledDate).toLocaleDateString()} (
+                    {new Date(c.existingStep.scheduledDate).toLocaleDateString(i18n.language)} (
                     {t('patients.conflicts.overlapDays', { count: c.overlapDays })})
                   </Typography>
                 </Stack>

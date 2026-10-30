@@ -5,7 +5,7 @@ export const episodesOfCare: EpisodeOfCare[] = [
   {
     id: 'ep-1',
     patientId: 'p-1',
-    label: 'Standard fracture follow-up',
+    label: 'Standardfraktur, uppföljning',
     clinicalArea: 'Ortopedi',
     status: 'OPEN',
     openedAt: iso(daysAgo(14)),
@@ -18,7 +18,7 @@ export const episodesOfCare: EpisodeOfCare[] = [
   {
     id: 'ep-2',
     patientId: 'p-2',
-    label: 'Standard fracture follow-up',
+    label: 'Standardfraktur, uppföljning',
     clinicalArea: 'Ortopedi',
     status: 'OPEN',
     openedAt: iso(daysAgo(10)),
@@ -31,7 +31,7 @@ export const episodesOfCare: EpisodeOfCare[] = [
   {
     id: 'ep-3',
     patientId: 'p-3',
-    label: 'Standard fracture follow-up',
+    label: 'Standardfraktur, uppföljning',
     clinicalArea: 'Ortopedi',
     status: 'OPEN',
     openedAt: iso(daysAgo(29)),
@@ -44,7 +44,7 @@ export const episodesOfCare: EpisodeOfCare[] = [
   {
     id: 'ep-4',
     patientId: 'p-4',
-    label: 'Standard fracture follow-up',
+    label: 'Standardfraktur, uppföljning',
     clinicalArea: 'Ortopedi',
     status: 'OPEN',
     openedAt: iso(daysAgo(25)),
@@ -57,7 +57,7 @@ export const episodesOfCare: EpisodeOfCare[] = [
   {
     id: 'ep-5',
     patientId: 'p-5',
-    label: 'Standard fracture follow-up',
+    label: 'Standardfraktur, uppföljning',
     clinicalArea: 'Ortopedi',
     status: 'OPEN',
     openedAt: iso(daysAgo(183)),
@@ -70,7 +70,7 @@ export const episodesOfCare: EpisodeOfCare[] = [
   {
     id: 'ep-6',
     patientId: 'p-6',
-    label: 'Standard fracture follow-up',
+    label: 'Standardfraktur, uppföljning',
     clinicalArea: 'Ortopedi',
     status: 'COMPLETED',
     openedAt: iso(daysAgo(190)),
@@ -83,7 +83,7 @@ export const episodesOfCare: EpisodeOfCare[] = [
   {
     id: 'ep-7',
     patientId: 'p-7',
-    label: 'Complex fracture follow-up',
+    label: 'Komplex fraktur, uppföljning',
     clinicalArea: 'Ortopedi',
     status: 'OPEN',
     openedAt: iso(daysAgo(1)),
@@ -96,7 +96,7 @@ export const episodesOfCare: EpisodeOfCare[] = [
   {
     id: 'ep-8',
     patientId: 'p-8',
-    label: 'Complex fracture follow-up',
+    label: 'Komplex fraktur, uppföljning',
     clinicalArea: 'Ortopedi',
     status: 'OPEN',
     openedAt: iso(daysAgo(30)),
@@ -109,7 +109,7 @@ export const episodesOfCare: EpisodeOfCare[] = [
   {
     id: 'ep-9',
     patientId: 'p-9',
-    label: 'Standard fracture follow-up',
+    label: 'Standardfraktur, uppföljning',
     clinicalArea: 'Ortopedi',
     status: 'OPEN',
     openedAt: iso(daysAgo(192)),
@@ -122,7 +122,7 @@ export const episodesOfCare: EpisodeOfCare[] = [
   {
     id: 'ep-10',
     patientId: 'p-10',
-    label: 'Standard fracture follow-up — MOVE 2026',
+    label: 'Standardfraktur, uppföljning — MOVE 2026',
     clinicalArea: 'Ortopedi',
     status: 'OPEN',
     openedAt: iso(daysAgo(182)),
@@ -135,7 +135,7 @@ export const episodesOfCare: EpisodeOfCare[] = [
   {
     id: 'ep-11',
     patientId: 'p-11',
-    label: 'Proximal humerus fracture follow-up',
+    label: 'Proximal humerusfraktur, uppföljning',
     clinicalArea: 'Schulter',
     status: 'OPEN',
     openedAt: iso(daysAgo(2)),
@@ -148,7 +148,7 @@ export const episodesOfCare: EpisodeOfCare[] = [
   {
     id: 'ep-12',
     patientId: 'p-12',
-    label: 'Proximal humerus fracture follow-up',
+    label: 'Proximal humerusfraktur, uppföljning',
     clinicalArea: 'Schulter',
     status: 'OPEN',
     openedAt: iso(daysAgo(30)),
@@ -161,7 +161,7 @@ export const episodesOfCare: EpisodeOfCare[] = [
   {
     id: 'ep-13',
     patientId: 'p-13',
-    label: 'Distal radius fracture follow-up',
+    label: 'Distal radiusfraktur, uppföljning',
     clinicalArea: 'Hand',
     status: 'OPEN',
     openedAt: iso(daysAgo(14)),
@@ -174,7 +174,7 @@ export const episodesOfCare: EpisodeOfCare[] = [
   {
     id: 'ep-14',
     patientId: 'p-14',
-    label: 'Distal radius fracture follow-up',
+    label: 'Distal radiusfraktur, uppföljning',
     clinicalArea: 'Hand',
     status: 'OPEN',
     openedAt: iso(daysAgo(52)),

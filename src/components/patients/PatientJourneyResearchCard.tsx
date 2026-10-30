@@ -16,7 +16,7 @@ interface Props {
     readonly onChanged: () => void;
 }
 export default function PatientJourneyResearchCard({ journey, patientId, allModules, consents, onChanged, }: Props) {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const { showSnack } = useSnack();
     const [enrolling, setEnrolling] = useState(false);
     const [selectedNewModuleId, setSelectedNewModuleId] = useState('');
@@ -70,7 +70,7 @@ export default function PatientJourneyResearchCard({ journey, patientId, allModu
                     </Typography>
                   </Stack>
                   {consent ? (<Chip label={t('patient.consentGranted', {
-                            date: new Date(consent.grantedAt).toLocaleDateString(),
+                            date: new Date(consent.grantedAt).toLocaleDateString(i18n.language),
                         })} size="small" color="success" variant="outlined" sx={{ alignSelf: 'flex-start', height: 20, fontSize: 11 }}/>) : (<Chip label={t('patient.consentPending')} size="small" color="warning" variant="outlined" sx={{ alignSelf: 'flex-start', height: 20, fontSize: 11 }}/>)}
                 </Stack>
                 {consent ? (<Button size="small" color="error" variant="outlined" onClick={() => setRevokeTarget(consent)}>

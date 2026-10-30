@@ -2,7 +2,19 @@
 export default interface Resources {
   "translation": {
     "app": {
-      "disclaimer": "DEMO – All data är fiktiv. Ingen riktig patientdata."
+      "disclaimer": "DEMO – All data är fiktiv. Ingen riktig patientdata.",
+      "login": {
+        "logIn": "Logga in",
+        "providerNote": "Den här lokala inloggningen går att byta ut. I produktion kopplas GrandID, SITHS, OIDC eller SAML in bakom samma sessionskontrakt.",
+        "subtitle": "Testinloggning som efterliknar ett riktigt inloggningsflöde.",
+        "userDescription": {
+          "user-doc-1": "Läkare för triage och klinisk granskning.",
+          "user-nurse-1": "Sjuksköterska för triage, uppföljning och kontakter.",
+          "user-pal-1": "PAL/läkare med behörighet att godkänna journalanteckningar.",
+          "user-patient-1": "Patientkonto kopplat till en demopatient.",
+          "user-sec-1": "Sekreterare som samordnar åtgärdslistan."
+        }
+      }
     },
     "audit": {
       "action": "Händelse",
@@ -44,6 +56,7 @@ export default interface Resources {
       "autoWarningsValues": "Utlösta värden",
       "autoWarnings_one": "1 automatisk varning",
       "autoWarnings_other": "{{count}} automatiska varningar",
+      "breadcrumb": "Brödsmulor",
       "category": "Kategori",
       "headerLastOpened": "Senast öppnad {{date}}",
       "internalNote": "Intern notering",
@@ -59,6 +72,7 @@ export default interface Resources {
       "tab_journal": "Journaltext",
       "tab_journey": "Patientresa",
       "tab_triage": "Triagera",
+      "tabsLabel": "Ärendeflikar",
       "title": "Ärendedetalj",
       "waited": "Väntat",
       "waitedDays_one": "{{count}} dag",
@@ -97,6 +111,7 @@ export default interface Resources {
       "search": "Sök",
       "searchNoResults": "Inga träffar",
       "searchPatients": "Sök patient eller personnummer",
+      "sessionExpires": "Sessionen går ut {{time}}",
       "yes": "Ja"
     },
     "contactActions": {
@@ -306,19 +321,19 @@ export default interface Resources {
           "stepDay": "{{when}} (dag {{day}})",
           "stepsHeading": "Steg",
           "templateGroups": "Resmallar",
-          "tickMonths_one": "__NOT_TRANSLATED__",
-          "tickMonths_other": "__NOT_TRANSLATED__",
+          "tickMonths_one": "{{count}} mån",
+          "tickMonths_other": "{{count}} mån",
           "tickStart": "Start",
-          "tickWeeks_one": "__NOT_TRANSLATED__",
-          "tickWeeks_other": "__NOT_TRANSLATED__",
-          "tickYears_one": "__NOT_TRANSLATED__",
-          "tickYears_other": "__NOT_TRANSLATED__",
+          "tickWeeks_one": "{{count}} v",
+          "tickWeeks_other": "{{count}} v",
+          "tickYears_one": "{{count}} år",
+          "tickYears_other": "{{count}} år",
           "timeline": "Tidslinje",
           "ungrouped": "Övriga",
           "usedByPatients_one": "Används av {{count}} patient",
           "usedByPatients_other": "Används av {{count}} patienter",
-          "windowDays_one": "__NOT_TRANSLATED__",
-          "windowDays_other": "__NOT_TRANSLATED__"
+          "windowDays_one": "±{{count}} dag",
+          "windowDays_other": "±{{count}} dagar"
         },
         "confirmDeleteInstruction": "Ta bort instruktionsmall \"{{name}}\"?",
         "confirmDeleteModule": "Ta bort forskningsmodul \"{{name}}\"?",
@@ -335,8 +350,11 @@ export default interface Resources {
         "editTemplate": "Redigera mall",
         "entryDeleted": "Steg borttaget",
         "entrySaved": "Steg sparat",
+        "instructionContent": "Innehåll",
         "instructionDeleted": "Instruktionsmall borttagen",
         "instructionSaved": "Instruktionsmall sparad",
+        "instructionTags": "Taggar",
+        "instructionTagsHelper": "Kommaseparerade taggar",
         "moduleDeleted": "Forskningsmodul borttagen",
         "newQuestionnaire": "Nytt formulär",
         "newTemplate": "Ny mall",
@@ -437,6 +455,7 @@ export default interface Resources {
         "SUSPENDED": "Pausad",
         "label": "Status"
       },
+      "modDay": "(dag {{day}})",
       "modType": {
         "ADD_STEP": "Lägg till steg",
         "CANCEL": "Avbruten",

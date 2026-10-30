@@ -11,6 +11,7 @@ import {
   Typography,
 } from '@mui/material'
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 import { useLocation, useNavigate } from 'react-router-dom'
 
 import { getAuthProvider } from '@/auth'
@@ -18,6 +19,7 @@ import { useRoleLabel } from '@/hooks/labels'
 import { useLogin } from '@/store/roleContext'
 const authProvider = getAuthProvider()
 export default function Login() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const location = useLocation()
   const login = useLogin()
@@ -41,14 +43,11 @@ export default function Login() {
               DUK
             </Typography>
             <Typography color="text.secondary">
-              Fake login for production-style authentication flow.
+              {t('app.login.subtitle')}
             </Typography>
           </Box>
 
-          <Alert severity="info">
-            This local provider is intentionally replaceable. A production deployment should plug in
-            GrandID, SITHS, OIDC or SAML behind the same session contract.
-          </Alert>
+          <Alert severity="info">{t('app.login.providerNote')}</Alert>
 
           <Stack spacing={2}>
             {authProvider.getLoginOptions().map(({ user, description }) => (
@@ -77,7 +76,7 @@ export default function Login() {
                         />
                       </Stack>
                       <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-                        {description}
+                        {t(`app.login.userDescription.${user.id}`, { defaultValue: description })}
                       </Typography>
                       {user.careUnitName ? (
                         <Typography variant="caption" color="text.secondary">
@@ -91,7 +90,7 @@ export default function Login() {
                       startIcon={<LoginIcon />}
                       onClick={() => void handleLogin(user.id)}
                     >
-                      Log in
+                      {t('app.login.logIn')}
                     </Button>
                   </Stack>
                 </CardContent>

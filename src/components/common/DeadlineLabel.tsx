@@ -2,6 +2,7 @@ import { Typography } from '@mui/material'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 
+import { useDateLocale } from '@/components/case/triage/useTriageDirectory'
 import { getDeadlineInfo } from '@/utils'
 
 interface Props {
@@ -14,7 +15,8 @@ interface Props {
  */
 export default function DeadlineLabel({ deadline, tone = 'default' }: Props) {
   const { t } = useTranslation()
-  const { dateLabel, days, isOverdue } = getDeadlineInfo(deadline)
+  const locale = useDateLocale()
+  const { dateLabel, days, isOverdue } = getDeadlineInfo(deadline, locale)
 
   let relativeLabel: string
   if (isOverdue) {

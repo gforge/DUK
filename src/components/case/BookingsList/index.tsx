@@ -35,7 +35,7 @@ interface Props {
   onChange?: () => void
 }
 export default function BookingsList({ caseData, onChange }: Props) {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const { currentUser } = useRole()
   const { showSnack } = useSnack()
   const getNextStepLabel = useNextStepLabel()
@@ -143,7 +143,7 @@ export default function BookingsList({ caseData, onChange }: Props) {
             <Box sx={{ flex: 1 }}>
               <Typography variant="body2">{getBookingTypeLabel(b.type)}</Typography>
               <Typography variant="caption" color="text.secondary">
-                {new Date(b.scheduledAt).toLocaleString()} —{' '}
+                {new Date(b.scheduledAt).toLocaleString(i18n.language)} —{' '}
                 {b.location ?? getBookingRoleLabel(b.role)}
               </Typography>
               {b.note && (

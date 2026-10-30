@@ -1,6 +1,18 @@
 {
   "app": {
-    "disclaimer": "DEMO – All data is fictional. No real patient data."
+    "disclaimer": "DEMO – All data is fictional. No real patient data.",
+    "login": {
+      "logIn": "Log in",
+      "providerNote": "This local provider is intentionally replaceable. A production deployment should plug in GrandID, SITHS, OIDC or SAML behind the same session contract.",
+      "subtitle": "Fake login for a production-style authentication flow.",
+      "userDescription": {
+        "user-doc-1": "Doctor account for triage and clinical review.",
+        "user-nurse-1": "Nurse account for triage, follow-up and contact actions.",
+        "user-pal-1": "PAL/doctor account with journal approval permissions.",
+        "user-patient-1": "Patient portal account bound to one demo patient.",
+        "user-sec-1": "Secretary account for operational worklist coordination."
+      }
+    }
   },
   "audit": {
     "action": "Event",
@@ -42,6 +54,7 @@
     "autoWarningsExpression": "Expression",
     "autoWarningsLastCalc": "Last recalculated: {{date}}",
     "autoWarningsValues": "Triggered values",
+    "breadcrumb": "Breadcrumb",
     "category": "Category",
     "headerLastOpened": "Last opened {{date}}",
     "internalNote": "Internal Note",
@@ -57,6 +70,7 @@
     "tab_journal": "Journal",
     "tab_journey": "Journey",
     "tab_triage": "Triage",
+    "tabsLabel": "Case tabs",
     "title": "Case Detail",
     "waited": "Waited",
     "waitedDays_one": "{{count}} day",
@@ -95,6 +109,7 @@
     "search": "Search",
     "searchNoResults": "No patients found",
     "searchPatients": "Search patient or personal number",
+    "sessionExpires": "Session expires {{time}}",
     "yes": "Yes"
   },
   "contactActions": {
@@ -304,19 +319,19 @@
         "stepDay": "{{when}} (day {{day}})",
         "stepsHeading": "Steps",
         "templateGroups": "Journey templates",
-        "tickMonths_one": "__NOT_TRANSLATED__",
-        "tickMonths_other": "__NOT_TRANSLATED__",
+        "tickMonths_one": "{{count}} mo",
+        "tickMonths_other": "{{count}} mo",
         "tickStart": "Start",
-        "tickWeeks_one": "__NOT_TRANSLATED__",
-        "tickWeeks_other": "__NOT_TRANSLATED__",
-        "tickYears_one": "__NOT_TRANSLATED__",
-        "tickYears_other": "__NOT_TRANSLATED__",
+        "tickWeeks_one": "{{count}} wk",
+        "tickWeeks_other": "{{count}} wks",
+        "tickYears_one": "{{count}} yr",
+        "tickYears_other": "{{count}} yrs",
         "timeline": "Timeline",
         "ungrouped": "Other",
         "usedByPatients_one": "Used by {{count}} patient",
         "usedByPatients_other": "Used by {{count}} patients",
-        "windowDays_one": "__NOT_TRANSLATED__",
-        "windowDays_other": "__NOT_TRANSLATED__"
+        "windowDays_one": "±{{count}} day",
+        "windowDays_other": "±{{count}} days"
       },
       "confirmDeleteInstruction": "Delete instruction template \"{{name}}\"?",
       "confirmDeleteModule": "Delete research module \"{{name}}\"?",
@@ -333,8 +348,11 @@
       "editTemplate": "Edit template",
       "entryDeleted": "Step deleted",
       "entrySaved": "Step saved",
+      "instructionContent": "Content",
       "instructionDeleted": "Instruction template deleted",
       "instructionSaved": "Instruction template saved",
+      "instructionTags": "Tags",
+      "instructionTagsHelper": "Comma-separated tags",
       "moduleDeleted": "Research module deleted",
       "newQuestionnaire": "New form",
       "newTemplate": "New template",
@@ -435,6 +453,7 @@
       "label": "Status",
       "SUSPENDED": "Paused"
     },
+    "modDay": "(day {{day}})",
     "modificationHistory": "Modification History",
     "modifications": "Modifications",
     "modify": {

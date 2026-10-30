@@ -4,7 +4,7 @@ import { daysAgo, iso } from './shared'
 export const instructionTemplates: InstructionTemplate[] = [
   {
     id: 'it-proximal-humerus',
-    name: 'Proximal Humerus — Physio Protocol',
+    name: 'Proximal humerus — fysioterapiprotokoll',
     tags: ['shoulder', 'physio', 'fracture'],
     content: `## Rörelseträning — Proximal humerusfraktur
 
@@ -22,7 +22,7 @@ export const instructionTemplates: InstructionTemplate[] = [
   },
   {
     id: 'it-distal-radius',
-    name: 'Distal Radius — Physio Protocol',
+    name: 'Distal radius — fysioterapiprotokoll',
     tags: ['wrist', 'physio', 'fracture'],
     content: `## Rörelseträning — Distal radiusfraktur
 
@@ -56,7 +56,7 @@ export const instructionTemplates: InstructionTemplate[] = [
   },
   {
     id: 'it-wound-care',
-    name: 'Wound Care Instructions',
+    name: 'Sårvårdsinstruktioner',
     tags: ['wound', 'post-op', 'infection'],
     content: `## Sårvård efter operation
 
@@ -78,7 +78,7 @@ export const instructionTemplates: InstructionTemplate[] = [
   },
   {
     id: 'it-post-op-general',
-    name: 'Post-Op General Information',
+    name: 'Allmän information efter operation',
     tags: ['post-op', 'general', 'patient-info'],
     content: `## Allmän information efter operation
 

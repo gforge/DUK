@@ -29,7 +29,7 @@ export const nonDigitalEpisodes: EpisodeOfCare[] = [
   {
     id: 'ep-42',
     patientId: 'p-42',
-    label: 'Standard fracture follow-up',
+    label: 'Standardfraktur, uppföljning',
     clinicalArea: 'Ortopedi',
     status: 'OPEN',
     openedAt: iso(daysAgo(12)),

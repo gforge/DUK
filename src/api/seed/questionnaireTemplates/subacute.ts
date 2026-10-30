@@ -6,7 +6,7 @@ const CREATED_AT = iso(daysAgo(100))
 /** Week 4–8: Oxford Shoulder Score + pain (subacute phase). */
 export const qtFunctionOss: QuestionnaireTemplate = {
   id: 'qt-function-oss',
-  name: 'Function & Pain (OSS)',
+  name: 'Funktion och smärta (OSS)',
   questions: [
     {
       id: 'q-oss-1',
@@ -77,7 +77,7 @@ export const qtFunctionOss: QuestionnaireTemplate = {
 /** Wrist follow-up: short PRWE-style pain/function screen + pain NRS. */
 export const qtFunctionPrweShort: QuestionnaireTemplate = {
   id: 'qt-function-prwe-short',
-  name: 'Wrist Function & Pain (PRWE-short)',
+  name: 'Handledsfunktion och smärta (PRWE-kort)',
   questions: [
     {
       id: 'q-prwe-pain',
@@ -130,7 +130,7 @@ export const qtFunctionPrweShort: QuestionnaireTemplate = {
 /** Knee follow-up: short OKS-style function screen + pain NRS. */
 export const qtFunctionOksShort: QuestionnaireTemplate = {
   id: 'qt-function-oks-short',
-  name: 'Knee Function & Pain (OKS-short)',
+  name: 'Knäfunktion och smärta (OKS-kort)',
   questions: [
     {
       id: 'q-oks-pain',
@@ -192,7 +192,7 @@ export const qtFunctionOksShort: QuestionnaireTemplate = {
 /** Hip OA referral / follow-up: short OHS-style function screen + pain NRS. */
 export const qtFunctionOhsShort: QuestionnaireTemplate = {
   id: 'qt-function-ohs-short',
-  name: 'Hip Function & Pain (OHS-short)',
+  name: 'Höftfunktion och smärta (OHS-kort)',
   questions: [
     {
       id: 'q-ohs-pain',
@@ -254,7 +254,7 @@ export const qtFunctionOhsShort: QuestionnaireTemplate = {
 /** Foot/ankle follow-up: compact MOXFQ-style walking/pain/social screen + pain NRS. */
 export const qtFunctionMoxfqShort: QuestionnaireTemplate = {
   id: 'qt-function-moxfq-short',
-  name: 'Foot/Ankle Function & Pain (MOXFQ-short)',
+  name: 'Fot-/fotledsfunktion och smärta (MOXFQ-kort)',
   questions: [
     {
       id: 'q-moxfq-walk',

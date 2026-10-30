@@ -47,7 +47,7 @@ export default function JourneyTimelineItem({
   setReviewDetails,
   openDialog,
 }: Props) {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const getStepStatusLabel = useStepStatusLabel()
   const theme = useTheme()
   const statusColor: Record<StepStatus, string> = {
@@ -78,7 +78,7 @@ export default function JourneyTimelineItem({
       tooltipTitle =
         existingReview.reviewedAt !== null
           ? t('review.reviewedAt', {
-              date: new Date(existingReview.reviewedAt).toLocaleDateString(),
+              date: new Date(existingReview.reviewedAt).toLocaleDateString(i18n.language),
             })
           : t('review.pending')
     } else if (isAdded) {

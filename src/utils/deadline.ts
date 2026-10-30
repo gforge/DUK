@@ -1,4 +1,4 @@
-import { differenceInDays, format, parseISO, startOfDay } from 'date-fns'
+import { differenceInDays, format, type Locale, parseISO, startOfDay } from 'date-fns'
 
 export interface DeadlineInfo {
   /** Formatted date string, e.g. "14 mar 2026" */
@@ -12,12 +12,12 @@ export interface DeadlineInfo {
 }
 
 /** Returns structured deadline info for rendering relative labels. */
-export function getDeadlineInfo(deadline: string): DeadlineInfo {
+export function getDeadlineInfo(deadline: string, locale?: Locale): DeadlineInfo {
   const date = parseISO(deadline)
   const today = startOfDay(new Date())
   const days = differenceInDays(startOfDay(date), today)
 
-  const dateLabel = format(date, 'dd MMM yyyy')
+  const dateLabel = format(date, 'dd MMM yyyy', { locale })
 
   return { dateLabel, days, isOverdue: days < 0 }
 }

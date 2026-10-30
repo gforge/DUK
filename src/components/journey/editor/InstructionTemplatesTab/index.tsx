@@ -80,7 +80,7 @@ function EditInstructionDialog({
             autoFocus
           />
           <TextField
-            label="Content"
+            label={t('journey.editor.instructionContent')}
             value={content}
             onChange={(e) => setContent(e.target.value)}
             size="small"
@@ -91,12 +91,12 @@ function EditInstructionDialog({
             maxRows={12}
           />
           <TextField
-            label="Tags"
+            label={t('journey.editor.instructionTags')}
             value={tagsStr}
             onChange={(e) => setTagsStr(e.target.value)}
             size="small"
             fullWidth
-            helperText="Comma-separated tags"
+            helperText={t('journey.editor.instructionTagsHelper')}
           />
         </Stack>
       </DialogContent>

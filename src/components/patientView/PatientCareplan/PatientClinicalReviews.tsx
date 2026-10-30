@@ -11,7 +11,7 @@ interface Props {
     patientId: string;
 }
 export function PatientClinicalReviews({ patientId }: Readonly<Props>) {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const getReviewTypeLabel = useReviewTypeLabel();
     const [openDetails, setOpenDetails] = useState(false);
     // Fetch all cases to find reviews
@@ -85,7 +85,7 @@ export function PatientClinicalReviews({ patientId }: Readonly<Props>) {
                     </Stack>
                     <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
                       {t('review.createdAt', {
-                    date: new Date(review.createdAt).toLocaleDateString(),
+                    date: new Date(review.createdAt).toLocaleDateString(i18n.language),
                 })}
                     </Typography>
                     {review.journeyStepLabel && (<Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
@@ -119,7 +119,7 @@ export function PatientClinicalReviews({ patientId }: Readonly<Props>) {
                     </Stack>
                     <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
                       {t('review.reviewedAt', {
-                    date: new Date(review.reviewedAt!).toLocaleDateString(),
+                    date: new Date(review.reviewedAt!).toLocaleDateString(i18n.language),
                 })}
                     </Typography>
                     {review.journeyStepLabel && (<Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>

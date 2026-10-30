@@ -105,7 +105,7 @@ export default function CaseDetail() {
   return (
     <Stack sx={{ gap: 2.5 }}>
       <Breadcrumbs
-        aria-label="breadcrumb"
+        aria-label={t('case.breadcrumb')}
         sx={{
           fontSize: 13,
           color: tokens.textSecondary,
@@ -140,7 +140,7 @@ export default function CaseDetail() {
               navigate(`/cases/${id}`, { replace: true })
             }
           }}
-          aria-label="case detail tabs"
+          aria-label={t('case.tabsLabel')}
           variant="scrollable"
           scrollButtons="auto"
           sx={{
